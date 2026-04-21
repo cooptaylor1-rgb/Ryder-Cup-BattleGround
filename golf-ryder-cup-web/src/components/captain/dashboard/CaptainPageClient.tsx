@@ -151,6 +151,26 @@ export default function CaptainPageClient() {
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
   const [captainPin, setCaptainPin] = useState('');
 
+  // Matches with no course assigned are a silent blocker for
+  // handicap scoring. We count them here so the dashboard can
+  // surface a nudge banner. Hoisted above the early returns below
+  // so React's hook count stays constant regardless of trip /
+  // captain-mode state — the previous placement fired this hook
+  // ONLY after both gates passed, which meant toggling captain
+  // mode on increased the hook count mid-lifetime and tripped
+  // "rendered more hooks than during the previous render" the
+  // moment the captain authenticated.
+  const sessionIds = sessions.map((s) => s.id);
+  const tripMatches = useLiveQuery(
+    async () => {
+      if (sessionIds.length === 0) return [];
+      return db.matches.where('sessionId').anyOf(sessionIds).toArray();
+    },
+    [sessionIds.join(',')],
+    []
+  );
+  const matchesMissingCourse = (tripMatches ?? []).filter((m) => !m.courseId).length;
+
   const handleEnableCaptain = async () => {
     try {
       await enableCaptainMode(captainPin);
@@ -270,23 +290,6 @@ export default function CaptainPageClient() {
   const unassignedPlayers = players.filter(
     (player) => !teamMembers.some((membership) => membership.playerId === player.id)
   );
-
-  // Matches with no course assigned are a silent blocker: players can
-  // still score, but handicap strokes never apply. Surfacing the count
-  // on the captain dashboard is the single-biggest fix for "where do
-  // I set the course?" — the existing path (/captain/manage → expand
-  // session → match → Set course & tee) is 3 taps but only if you
-  // already know it exists.
-  const sessionIds = sessions.map((s) => s.id);
-  const tripMatches = useLiveQuery(
-    async () => {
-      if (sessionIds.length === 0) return [];
-      return db.matches.where('sessionId').anyOf(sessionIds).toArray();
-    },
-    [sessionIds.join(',')],
-    []
-  );
-  const matchesMissingCourse = (tripMatches ?? []).filter((m) => !m.courseId).length;
 
   const activeSessions = sessions.filter((session) => session.status === 'inProgress');
   const upcomingSessions = sessions.filter((session) => session.status === 'scheduled');
