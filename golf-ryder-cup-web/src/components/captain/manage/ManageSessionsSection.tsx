@@ -675,7 +675,7 @@ function SessionSettingsEditor({
                 </option>
                 {availableTees.map((tee) => (
                   <option key={tee.id} value={tee.id}>
-                    {tee.name}
+                    {formatTeeOptionLabel(tee)}
                   </option>
                 ))}
               </select>
@@ -990,7 +990,7 @@ function MatchManagementCard({
                 <option value="">{courseId ? 'Select tee set' : 'Choose course first'}</option>
                 {availableTeeSets.map((teeSet) => (
                   <option key={teeSet.id} value={teeSet.id}>
-                    {teeSet.name}
+                    {formatTeeOptionLabel(teeSet)}
                   </option>
                 ))}
               </select>
@@ -1185,5 +1185,23 @@ function formatSessionType(type: RyderCupSession['sessionType']) {
     default:
       return type;
   }
+}
+
+/**
+ * Tee option label with rating + slope. Captains picking a tee need
+ * the course numbers visible at the point of decision — not buried
+ * under another tap — because the handicap answer they're actually
+ * trying to compute ("which tees should my group play?") depends on
+ * both. Degree signs + slash match the scorecard convention (72.1 /
+ * 131). Falls back to just the name when either field is missing so
+ * a half-configured tee doesn't render "— NaN/NaN".
+ */
+function formatTeeOptionLabel(tee: TeeSet): string {
+  const rating = Number.isFinite(tee.rating) ? tee.rating.toFixed(1) : null;
+  const slope = Number.isFinite(tee.slope) ? String(Math.round(tee.slope)) : null;
+  if (rating && slope) {
+    return `${tee.name} — ${rating} / ${slope}`;
+  }
+  return tee.name;
 }
 
