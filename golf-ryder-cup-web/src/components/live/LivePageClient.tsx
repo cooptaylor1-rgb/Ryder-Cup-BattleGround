@@ -104,6 +104,21 @@ export default function LivePageClient() {
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
     }, [activeSession, loadSessionMatches]);
 
+    // Refetch when the network comes back. Realtime can miss updates that
+    // happened while offline (clubhouse wifi dropouts between holes), so we
+    // pull fresh session state on reconnect rather than trusting stale Dexie.
+    useEffect(() => {
+        const handleOnline = () => {
+            if (activeSession) {
+                loadSessionMatches(activeSession.id);
+                setLastUpdate(new Date());
+            }
+        };
+
+        window.addEventListener('online', handleOnline);
+        return () => window.removeEventListener('online', handleOnline);
+    }, [activeSession, loadSessionMatches]);
+
     useEffect(() => {
         return () => {
             if (flashTimeoutRef.current) {

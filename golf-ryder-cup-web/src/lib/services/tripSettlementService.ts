@@ -7,6 +7,7 @@ import type {
   VegasGame,
   WolfGame,
 } from '@/lib/types/sideGames';
+import { normalizeSkinsResults } from '@/lib/utils/sideBetLedger';
 
 type SkinsSettlementResult = {
   playerId: Player['id'];
@@ -39,14 +40,38 @@ export function buildSkinsSettlementResults(sideBets: SideBet[]): SkinsSettlemen
       (bet) =>
         bet.type === 'skins' &&
         bet.status === 'completed' &&
-        Boolean(bet.winnerId) &&
         bet.participantIds.length > 0 &&
-        (bet.pot || 0) > 0
+        (bet.pot || 0) > 0 &&
+        (Boolean(bet.winnerId) || (bet.results ?? []).some((r) => r.winnerId))
     )
     .flatMap((bet) => {
       const pot = bet.pot || 0;
       const share = pot / bet.participantIds.length;
+      const perHoleResults = (bet.results ?? []).filter((r) => r.winnerId);
 
+      // Preferred: distribute by the per-hole ledger so multi-winner skins
+      // and unresolved carryover at trip end both settle correctly. Any
+      // unwon carryover is effectively refunded because `actualShare` is
+      // only the portion of the pot that was actually paid out.
+      if (perHoleResults.length > 0) {
+        const perHole = bet.perHole || Math.round(pot / 18);
+        const normalized = normalizeSkinsResults(bet.results ?? [], perHole);
+        const winnings = new Map<string, number>();
+        for (const id of bet.participantIds) winnings.set(id, 0);
+        for (const entry of normalized) {
+          if (!entry.winnerId) continue;
+          winnings.set(entry.winnerId, (winnings.get(entry.winnerId) ?? 0) + entry.amount);
+        }
+        const totalDistributed = Array.from(winnings.values()).reduce((sum, v) => sum + v, 0);
+        const actualShare = totalDistributed / bet.participantIds.length;
+        return bet.participantIds.map((playerId) => ({
+          playerId,
+          amount: (winnings.get(playerId) ?? 0) - actualShare,
+        }));
+      }
+
+      // Fallback: captain picked an overall winner without recording per-hole
+      // ledger entries. Winner takes the pot, everyone else loses their share.
       return bet.participantIds.map((playerId) => ({
         playerId,
         amount: playerId === bet.winnerId ? pot - share : -share,
@@ -70,9 +95,9 @@ export function getSettlementActivitySummary({
     (bet) =>
       bet.type === 'skins' &&
       bet.status === 'completed' &&
-      Boolean(bet.winnerId) &&
       bet.participantIds.length > 0 &&
-      (bet.pot || 0) > 0
+      (bet.pot || 0) > 0 &&
+      (Boolean(bet.winnerId) || (bet.results ?? []).some((r) => r.winnerId))
   ).length;
 
   return {

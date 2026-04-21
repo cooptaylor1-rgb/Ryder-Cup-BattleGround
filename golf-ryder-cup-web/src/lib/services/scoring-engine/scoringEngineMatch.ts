@@ -17,6 +17,33 @@ async function resolveTripIdForSession(sessionId: string): Promise<string | null
   return session?.tripId ?? null;
 }
 
+/**
+ * Keep a session's status in sync with its matches so the Live page's
+ * getActiveSession selector can move on to the next round automatically:
+ *   - all matches completed → session 'completed'
+ *   - any match back to inProgress/scheduled → session back to 'inProgress'
+ * Paused sessions are left alone so a captain override survives.
+ */
+async function maybeAdvanceSessionStatus(sessionId: string): Promise<void> {
+  const session = await db.sessions.get(sessionId);
+  if (!session) return;
+  if (session.status === 'paused') return;
+
+  const sessionMatches = await db.matches.where('sessionId').equals(sessionId).toArray();
+  if (sessionMatches.length === 0) return;
+
+  const allComplete = sessionMatches.every((m) => m.status === 'completed');
+  const nextStatus = allComplete ? 'completed' : 'inProgress';
+  if (session.status === nextStatus) return;
+
+  const updates = {
+    status: nextStatus as 'inProgress' | 'completed',
+    updatedAt: new Date().toISOString(),
+  };
+  await db.sessions.update(sessionId, updates);
+  queueSyncOperation('session', sessionId, 'update', session.tripId, { ...session, ...updates });
+}
+
 export async function createMatch(
   sessionId: string,
   matchNumber: number,
@@ -101,6 +128,7 @@ export async function finalizeMatch(matchId: string): Promise<void> {
     if (tripId) {
       queueSyncOperation('match', matchId, 'update', tripId, { ...match, ...updates });
     }
+    await maybeAdvanceSessionStatus(match.sessionId);
   }
 }
 
@@ -130,4 +158,5 @@ export async function reopenMatch(matchId: string): Promise<void> {
   if (tripId) {
     queueSyncOperation('match', matchId, 'update', tripId, { ...match, ...updates });
   }
+  await maybeAdvanceSessionStatus(match.sessionId);
 }
