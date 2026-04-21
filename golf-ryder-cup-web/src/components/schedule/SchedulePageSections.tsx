@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import Link from 'next/link';
-import { cn, getCountdown, getCountdownColor, isToday } from '@/lib/utils';
+import { cn, getCountdown, getCountdownColor, isToday, parseDateInLocalZone } from '@/lib/utils';
 import type { DaySchedule, ScheduleEntry } from '@/components/schedule/scheduleData';
 import {
   Calendar,
@@ -80,7 +80,13 @@ export const ScheduleDaySection = React.memo(function ScheduleDaySection({
         <div>
           <p className="font-semibold">{day.dayName}</p>
           <p className="type-caption">
-            {new Date(day.date).toLocaleDateString('en-US', {
+            {/* day.date is a local date-only string (yyyy-mm-dd). new Date()
+                on a date-only ISO parses as UTC midnight and can shift back
+                a day in any negative-UTC-offset timezone ("Thursday Apr 30"
+                → "Apr 29" on US Eastern). Anchor to local midnight via
+                parseDateInLocalZone so the rendered day always matches the
+                day name above. */}
+            {parseDateInLocalZone(day.date).toLocaleDateString('en-US', {
               month: 'long',
               day: 'numeric',
             })}
