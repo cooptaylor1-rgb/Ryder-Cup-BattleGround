@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { LinkButton } from '@/components/ui/LinkButton';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '@/lib/db';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
 import { CaptainToggle } from '@/components/ui/CaptainToggle';
@@ -268,6 +270,24 @@ export default function CaptainPageClient() {
   const unassignedPlayers = players.filter(
     (player) => !teamMembers.some((membership) => membership.playerId === player.id)
   );
+
+  // Matches with no course assigned are a silent blocker: players can
+  // still score, but handicap strokes never apply. Surfacing the count
+  // on the captain dashboard is the single-biggest fix for "where do
+  // I set the course?" — the existing path (/captain/manage → expand
+  // session → match → Set course & tee) is 3 taps but only if you
+  // already know it exists.
+  const sessionIds = sessions.map((s) => s.id);
+  const tripMatches = useLiveQuery(
+    async () => {
+      if (sessionIds.length === 0) return [];
+      return db.matches.where('sessionId').anyOf(sessionIds).toArray();
+    },
+    [sessionIds.join(',')],
+    []
+  );
+  const matchesMissingCourse = (tripMatches ?? []).filter((m) => !m.courseId).length;
+
   const activeSessions = sessions.filter((session) => session.status === 'inProgress');
   const upcomingSessions = sessions.filter((session) => session.status === 'scheduled');
   const completedSessions = sessions.filter((session) => session.status === 'completed');
@@ -296,6 +316,11 @@ export default function CaptainPageClient() {
       label: 'Assignments Clean',
       done: unassignedPlayers.length === 0,
       count: unassignedPlayers.length,
+    },
+    {
+      label: 'Courses Assigned',
+      done: (tripMatches?.length ?? 0) > 0 && matchesMissingCourse === 0,
+      count: matchesMissingCourse,
     },
   ];
   const readinessPercent = Math.round(
@@ -361,6 +386,38 @@ export default function CaptainPageClient() {
             </div>
           </section>
         ) : null}
+
+        {/* Course-assignment nudge. Handicap scoring depends on the
+            course + tee being set on each match; without this the
+            scoring page fires a warning banner the captain might not
+            see until they're already on the course. Surfacing it on
+            the dashboard gets it fixed during setup, not the morning
+            of. */}
+        {matchesMissingCourse > 0 && (
+          <section className="mb-[var(--space-6)] rounded-[1.2rem] border border-[color:var(--warning)]/30 bg-[color:var(--warning)]/10 px-[var(--space-5)] py-[var(--space-4)]">
+            <div className="flex flex-col gap-[var(--space-3)] sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <AlertTriangle size={20} className="mt-0.5 shrink-0 text-[var(--warning)]" />
+                <div>
+                  <p className="font-semibold text-[var(--ink-primary)]">
+                    {matchesMissingCourse} {matchesMissingCourse === 1 ? 'match needs' : 'matches need'} a course &amp; tee
+                  </p>
+                  <p className="mt-1 text-sm text-[var(--ink-secondary)]">
+                    Assign the course each match is being played on so handicap strokes
+                    apply. Scores still record without it, but handicaps won&apos;t adjust.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/captain/manage"
+                className="inline-flex items-center justify-center rounded-lg border border-[var(--warning)] bg-[var(--warning)] px-4 py-2 text-sm font-semibold text-[var(--ink)] transition-transform hover:scale-[1.02]"
+              >
+                Assign courses
+              </Link>
+            </div>
+          </section>
+        )}
+
 
         <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(247,240,241,0.97))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
           <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">

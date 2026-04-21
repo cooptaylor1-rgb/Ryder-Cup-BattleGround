@@ -188,6 +188,60 @@ export async function signInWithEmailPassword(email: string, password: string): 
   }
 }
 
+/**
+ * Email a password-reset link. Supabase sends a one-time recovery link
+ * that redirects back to /auth/callback?next=/auth/reset-password; the
+ * callback establishes a short-lived recovery session and hands off to
+ * the set-new-password screen. Used by the Forgot Password link on
+ * /login for players who signed up during onboarding and can't
+ * remember the password they picked.
+ */
+export async function sendPasswordResetEmail(email: string): Promise<void> {
+  if (!supabase) {
+    throw new Error('Password reset is unavailable on this device right now.');
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  if (!normalizedEmail) throw new Error('Enter the email on your account first.');
+
+  const origin =
+    typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+  const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent('/auth/reset-password')}`;
+
+  const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+    redirectTo,
+  });
+  if (error) {
+    authLogger.warn('Supabase password reset request failed:', error);
+    const detail = error.message?.trim();
+    throw new Error(
+      detail ? `Couldn't send reset email: ${detail}` : 'Couldn\'t send reset email. Try again.'
+    );
+  }
+}
+
+/**
+ * Set a new password on the currently authenticated session. The
+ * recovery-link redirect gives us a session that's only valid for
+ * updateUser operations; this is the one the reset page calls after
+ * the user picks a new password.
+ */
+export async function setNewPassword(password: string): Promise<void> {
+  if (!supabase) {
+    throw new Error('Cloud auth is unavailable on this device right now.');
+  }
+  if (!password || password.length < 6) {
+    throw new Error('Pick a password that\'s at least 6 characters.');
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) {
+    authLogger.warn('Supabase password update failed:', error);
+    const detail = error.message?.trim();
+    throw new Error(detail ? `Couldn't update password: ${detail}` : 'Couldn\'t update password.');
+  }
+}
+
 export async function completeSupabaseAuthFromUrl(
   rawUrl: string | URL
 ): Promise<SupabaseAuthCompletionResult> {

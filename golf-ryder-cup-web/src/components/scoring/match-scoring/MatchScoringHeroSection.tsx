@@ -30,6 +30,7 @@ interface MatchScoringHeroSectionProps {
   scoringModeMeta: ScoringModeMeta;
   savingIndicator: string | null;
   undoCount: number;
+  isCaptain: boolean;
   onBack: () => void;
   onOpenVoiceScoring: () => void;
   onUndo: () => void;
@@ -55,6 +56,7 @@ export function MatchScoringHeroSection({
   currentPar,
   scoringModeMeta,
   savingIndicator,
+  isCaptain,
   undoCount,
   onBack,
   onOpenVoiceScoring,
@@ -154,7 +156,9 @@ export function MatchScoringHeroSection({
               </div>
               {(!currentCourseName || !currentTeeSetName) && (
                 <p className="mt-2 text-xs text-[var(--warning)]">
-                  Captain: open Manage Trip, expand the session, then use Set course & tee on this match before handicap-based scoring starts.
+                  {isCaptain
+                    ? 'Assign a course and tee set in Manage Trip → session to turn on handicap-adjusted scoring. You can still score gross without it.'
+                    : 'Scores will still count, but handicap strokes won’t apply until the captain sets a course and tee.'}
                 </p>
               )}
             </div>

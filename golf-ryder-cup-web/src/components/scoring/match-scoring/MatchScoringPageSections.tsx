@@ -260,6 +260,7 @@ export function MatchScoringPageSections({
         scoringModeMeta={model.scoringModeMeta}
         savingIndicator={ui.savingIndicator}
         undoCount={undoCount}
+        isCaptain={isCaptainMode}
         onBack={onBackToScore}
         onOpenVoiceScoring={onOpenVoiceModal}
         onUndo={actions.handleUndo}

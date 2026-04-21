@@ -2,11 +2,35 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { MapPin, Calendar, Crown, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores';
-import { PageLoadingSkeleton } from '@/components/ui';
+import { PageLoadingSkeleton, Button, EmptyStatePremium } from '@/components/ui';
+import { supabase } from '@/lib/supabase/client';
+
+interface TripPreview {
+  id: string;
+  name: string;
+  start_date: string | null;
+  end_date: string | null;
+  location: string | null;
+  captain_name: string | null;
+}
 
 function buildJoinPath(code: string | null): string {
   return code ? `/join?code=${encodeURIComponent(code)}` : '/join';
+}
+
+function formatDateRange(start: string | null, end: string | null): string | null {
+  if (!start) return null;
+  const startDate = new Date(start);
+  const opts: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+  if (!end || end === start) return startDate.toLocaleDateString(undefined, opts);
+  const endDate = new Date(end);
+  return `${startDate.toLocaleDateString(undefined, opts)} – ${endDate.toLocaleDateString(
+    undefined,
+    opts
+  )}`;
 }
 
 function JoinPageInner() {
@@ -16,6 +40,10 @@ function JoinPageInner() {
 
   const { isAuthenticated, currentUser, hasResolvedSupabaseSession } = useAuthStore();
   const [isHydrated, setIsHydrated] = useState(useAuthStore.persist.hasHydrated());
+  const [trip, setTrip] = useState<TripPreview | null>(null);
+  const [lookupState, setLookupState] = useState<'idle' | 'loading' | 'found' | 'missing' | 'error'>(
+    'idle'
+  );
 
   useEffect(() => {
     const finishHydration = () => setIsHydrated(true);
@@ -33,46 +61,183 @@ function JoinPageInner() {
     };
   }, []);
 
+  // Look up the trip by share code *before* we redirect. This turns the
+  // invite landing from an unexplained loading screen into a proper
+  // confirmation page: invitees see the trip name, dates, and captain
+  // before they commit to signing up. A bad code or deleted trip now
+  // surfaces a clear empty state instead of quietly dropping them on
+  // the login screen with no context.
   useEffect(() => {
-    // Wait for auth state to settle before deciding where to send the
-    // invitee. Previously we unconditionally stashed the share code in
-    // sessionStorage and redirected home, which meant a first-time
-    // invitee with no profile could be rostered onto a trip before
-    // they had a name, email, or handicap on file — the captain would
-    // then see a blank player card and have to chase them to fill it in.
+    if (!code || !supabase) {
+      setLookupState(code ? 'error' : 'idle');
+      return;
+    }
+    let cancelled = false;
+    setLookupState('loading');
+    void supabase
+      .from('trips')
+      .select('id, name, start_date, end_date, location, captain_name')
+      .eq('share_code', code.toUpperCase())
+      .maybeSingle()
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) {
+          setLookupState('error');
+          return;
+        }
+        if (!data) {
+          setLookupState('missing');
+          return;
+        }
+        setTrip(data as TripPreview);
+        setLookupState('found');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [code]);
+
+  // Once the user is signed in and onboarded, hand the code off to the
+  // JoinTripModal on home. Unauthenticated users wait on the preview
+  // screen — we deliberately *don't* auto-redirect so they have a
+  // chance to read what they're about to join.
+  useEffect(() => {
     if (!isHydrated || !hasResolvedSupabaseSession) return;
-
-    const joinPath = buildJoinPath(code);
-
-    // Not signed in yet: send them through login (which falls through to
-    // /profile/create for brand-new users). The next= param preserves
-    // the invite code so they land back on /join after finishing.
-    if (!isAuthenticated || !currentUser) {
-      router.replace(`/login?next=${encodeURIComponent(joinPath)}`);
-      return;
-    }
-
-    // Signed in but onboarding not complete (name/handicap/etc. empty):
-    // force them through profile completion before we wire them into the
-    // trip. Same next= trip-back trick.
+    if (lookupState === 'loading') return;
+    if (!isAuthenticated || !currentUser) return;
     if (!currentUser.hasCompletedOnboarding) {
-      router.replace(`/profile/complete?next=${encodeURIComponent(joinPath)}`);
+      router.replace(`/profile/complete?next=${encodeURIComponent(buildJoinPath(code))}`);
       return;
     }
-
-    // Fully ready: hand the code to the JoinTripModal on home.
     if (code) {
       sessionStorage.setItem('pendingJoinCode', code);
     }
     router.replace('/');
-  }, [code, currentUser, hasResolvedSupabaseSession, isAuthenticated, isHydrated, router]);
+  }, [
+    code,
+    currentUser,
+    hasResolvedSupabaseSession,
+    isAuthenticated,
+    isHydrated,
+    lookupState,
+    router,
+  ]);
 
-  return <PageLoadingSkeleton title="Joining trip…" showBackButton={false} variant="default" />;
+  // No code at all — send them home so they can enter one manually.
+  if (!code) {
+    router.replace('/');
+    return <PageLoadingSkeleton title="Loading…" showBackButton={false} variant="default" />;
+  }
+
+  if (lookupState === 'loading' || lookupState === 'idle') {
+    return <PageLoadingSkeleton title="Looking up your trip…" showBackButton={false} variant="default" />;
+  }
+
+  if (lookupState === 'missing') {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--canvas)]">
+        <EmptyStatePremium
+          illustration="trophy"
+          title="That invite code didn't match a trip"
+          description={`We couldn't find a trip with code "${code.toUpperCase()}". Double-check the code with whoever invited you — codes are case-insensitive but the letters matter.`}
+          action={{
+            label: 'Back to home',
+            onClick: () => router.push('/'),
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (lookupState === 'error' || !trip) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--canvas)]">
+        <EmptyStatePremium
+          illustration="trophy"
+          title="Couldn't reach the server"
+          description="We can't verify the invite code right now. Check your connection and try again."
+          action={{
+            label: 'Try again',
+            onClick: () => window.location.reload(),
+          }}
+        />
+      </div>
+    );
+  }
+
+  const dateRange = formatDateRange(trip.start_date, trip.end_date);
+  const authed = isAuthenticated && currentUser && currentUser.hasCompletedOnboarding;
+  const joinPath = buildJoinPath(code);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--canvas)]">
+      <div className="w-full max-w-md rounded-2xl border border-[var(--rule)] bg-[var(--surface)] p-6 shadow-lg">
+        <p className="type-micro text-[var(--ink-tertiary)] uppercase tracking-wider">
+          You&apos;re invited to
+        </p>
+        <h1 className="type-display mt-1 text-[var(--ink-primary)]">{trip.name}</h1>
+        <div className="mt-4 space-y-2 text-sm text-[var(--ink-secondary)]">
+          {dateRange && (
+            <div className="flex items-center gap-2">
+              <Calendar size={16} className="text-[var(--ink-tertiary)]" />
+              <span>{dateRange}</span>
+            </div>
+          )}
+          {trip.location && (
+            <div className="flex items-center gap-2">
+              <MapPin size={16} className="text-[var(--ink-tertiary)]" />
+              <span>{trip.location}</span>
+            </div>
+          )}
+          {trip.captain_name && (
+            <div className="flex items-center gap-2">
+              <Crown size={16} className="text-[var(--ink-tertiary)]" />
+              <span>Hosted by {trip.captain_name}</span>
+            </div>
+          )}
+        </div>
+        <div className="mt-6">
+          {authed ? (
+            <Button
+              variant="primary"
+              className="w-full"
+              onClick={() => {
+                sessionStorage.setItem('pendingJoinCode', code);
+                router.replace('/');
+              }}
+              rightIcon={<ChevronRight size={16} />}
+            >
+              Join this trip
+            </Button>
+          ) : (
+            <>
+              <Link href={`/login?next=${encodeURIComponent(joinPath)}`}>
+                <Button variant="primary" className="w-full" rightIcon={<ChevronRight size={16} />}>
+                  Sign in to join
+                </Button>
+              </Link>
+              <p className="mt-3 text-center type-micro text-[var(--ink-tertiary)]">
+                New here? You&apos;ll make a quick account on the next screen.
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function JoinPage() {
   return (
-    <Suspense fallback={<PageLoadingSkeleton title="Joining trip…" showBackButton={false} variant="default" />}>
+    <Suspense
+      fallback={
+        <PageLoadingSkeleton
+          title="Looking up your trip…"
+          showBackButton={false}
+          variant="default"
+        />
+      }
+    >
       <JoinPageInner />
     </Suspense>
   );

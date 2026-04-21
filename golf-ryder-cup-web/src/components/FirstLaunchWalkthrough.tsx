@@ -3,13 +3,21 @@
 /**
  * First-Launch Walkthrough
  *
- * A 4-step coach-mark overlay shown exactly once on first app open.
- * Explains the core flow: Create → Add Players → Sessions → Score.
- * Dismisses permanently after completion or skip.
+ * A 4-step coach-mark overlay that explains the captain workflow:
+ * create trip → add players → set up sessions → score.
+ *
+ * Only fires for users who land on home with no trip and no pending
+ * invite code — i.e. the captain who opened the app cold. Invitees
+ * arriving via /join?code=… have a different mental model (they're
+ * joining someone else's trip, not creating one); the captain-flow
+ * steps confuse them, so we skip the walkthrough entirely for them
+ * and let the invite landing do the explaining.
  */
 
 import { useState, useEffect } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { Plus, Users, Calendar, Target, ChevronRight, X } from 'lucide-react';
+import { db } from '@/lib/db';
 import { zIndex } from '@/lib/constants/zIndex';
 
 const STORAGE_KEY = 'walkthrough-completed';
@@ -51,18 +59,34 @@ export function FirstLaunchWalkthrough() {
   const [visible, setVisible] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
 
+  // Count local trips (captain-authored) so we can suppress the
+  // captain walkthrough for anyone who already has a trip or is
+  // arriving via an invite code.
+  const tripCount = useLiveQuery(async () => db.trips.count(), [], 0);
+
   useEffect(() => {
-    // Only show once, ever
     try {
-      if (!localStorage.getItem(STORAGE_KEY)) {
-        // Give the primary home-page CTA time to be used before instructional UI takes over.
-        const timer = setTimeout(() => setVisible(true), 2500);
-        return () => clearTimeout(timer);
+      if (localStorage.getItem(STORAGE_KEY)) return;
+      // Pending invite means they came in via /join?code=… — the
+      // invite landing already oriented them; don't stack a captain
+      // tutorial on top.
+      if (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('pendingJoinCode')) {
+        return;
       }
+      // Already have a trip → they've been onboarded by doing, not
+      // by a tour. Mark done so the tour never fires retroactively.
+      if (tripCount > 0) {
+        localStorage.setItem(STORAGE_KEY, 'true');
+        return;
+      }
+      // Cold-open captain: give the home CTA a moment to be used
+      // before instructional UI takes over.
+      const timer = setTimeout(() => setVisible(true), 2500);
+      return () => clearTimeout(timer);
     } catch {
-      // localStorage unavailable
+      // localStorage/sessionStorage unavailable
     }
-  }, []);
+  }, [tripCount]);
 
   const dismiss = () => {
     setVisible(false);

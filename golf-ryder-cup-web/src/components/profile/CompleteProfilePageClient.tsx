@@ -209,14 +209,14 @@ export default function CompleteProfilePageClient() {
         <div className="container-editorial">
           <div className="text-center pt-[var(--space-10)] pb-[var(--space-8)]">
             <p className="type-overline text-ink-tertiary tracking-[0.15em] mb-[var(--space-3)]">
-              Complete Your Profile
+              One Last Step
             </p>
             <h2 className="font-serif italic text-[length:clamp(2rem,5vw,2.75rem)] font-normal text-ink leading-[1.1] m-0">
-              Almost There
+              Finish your profile
             </h2>
             <p className="font-sans text-[length:var(--text-base)] text-ink-secondary mt-[var(--space-3)] leading-normal">
-              Welcome, {currentUser.firstName}. A few more details help with trip planning,
-              pairings, and contact info.
+              Welcome, {currentUser.firstName}. Your captain needs your handicap to set fair
+              pairings and your name so it shows up on the leaderboard. Takes under a minute.
             </p>
           </div>
 

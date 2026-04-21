@@ -16,7 +16,7 @@ import {
   Shield,
   Tv,
 } from 'lucide-react';
-import { formatDate } from '@/lib/utils';
+import { formatDate, parseDateInLocalZone } from '@/lib/utils';
 import { shareTrip } from '@/lib/utils/share';
 import { Button } from '@/components/ui/Button';
 import { useState, useCallback, useEffect, useMemo } from 'react';
@@ -150,8 +150,13 @@ export default function HomePage() {
     if (!activeTrip) return null;
 
     const now = homeClock;
-    const start = new Date(activeTrip.startDate).getTime();
-    const end = new Date(activeTrip.endDate).getTime();
+    // Trip start/end are stored as local date-only strings. new Date() on
+    // those parses as UTC midnight, which in any negative-UTC zone shifts
+    // the comparison back a day — a trip starting "tomorrow" could already
+    // read as Upcoming→Live on the wrong calendar day. parseDateInLocalZone
+    // anchors to local midnight to match the captain's intent.
+    const start = parseDateInLocalZone(activeTrip.startDate).getTime();
+    const end = parseDateInLocalZone(activeTrip.endDate).getTime();
 
     if (now < start) return 'Upcoming';
     if (now > end) return 'Completed';
