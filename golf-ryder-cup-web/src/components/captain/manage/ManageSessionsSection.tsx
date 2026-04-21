@@ -22,8 +22,7 @@ import { Button } from '@/components/ui/Button';
 import { cn, parseDateInLocalZone } from '@/lib/utils';
 import { db } from '@/lib/db';
 import { buildCanonicalCourseKey } from '@/lib/utils/courseImport';
-import { createCourseFromProfile } from '@/lib/services/courseLibraryService';
-import { queueSyncOperation } from '@/lib/services/tripSyncService';
+import { importLibraryCourseIntoTrip } from '@/lib/services/tripCourseImportService';
 import { useToastStore, useTripStore } from '@/lib/stores';
 import { pauseSession, resumeSession } from '@/lib/services/sessionPauseService';
 import { useShallow } from 'zustand/shallow';
@@ -479,34 +478,16 @@ function SessionSettingsEditor({
       const profileId = nextValue.slice('profile:'.length);
       setIsImportingProfile(true);
       try {
-        const { course, teeSets: importedTees } = await createCourseFromProfile(profileId);
-        // createCourseFromProfile writes to Dexie but doesn't touch
-        // the Zustand store or the trip-sync queue. Without these two
-        // pushes: (a) `courses` / `teeSets` props stay stale so the
-        // dropdown falls back to "Select course…" on the next render,
-        // and the course+tee look like they didn't save; (b) the
-        // import never reaches Supabase, so a session.defaultCourseId
-        // that sync'd first would point to a course that doesn't
-        // exist on another device.
         const tripId = useTripStore.getState().currentTrip?.id;
-        useTripStore.setState((state) => ({
-          courses: state.courses.some((c) => c.id === course.id)
-            ? state.courses
-            : [...state.courses, course],
-          teeSets: [
-            ...state.teeSets,
-            ...importedTees.filter((t) => !state.teeSets.some((e) => e.id === t.id)),
-          ],
-        }));
-        if (tripId) {
-          queueSyncOperation('course', course.id, 'create', tripId, course);
-          for (const tee of importedTees) {
-            queueSyncOperation('teeSet', tee.id, 'create', tripId, tee);
-          }
-        }
+        const { course, teeSets: importedTees } = await importLibraryCourseIntoTrip(profileId, {
+          tripId,
+        });
         // Stash the just-imported rows so the dropdowns have options to
-        // match defaultCourseId / defaultTeeSetId until useLiveQuery
-        // in the parent refreshes `courses` and `teeSets`.
+        // match defaultCourseId / defaultTeeSetId until the store's
+        // next load-trip cycle. The service already pushed them into
+        // the Zustand store, but the locally-scoped pendingImport
+        // bridges the single frame before React re-renders with the
+        // updated props.
         setPendingImport({ course, teeSets: importedTees });
         setDefaultCourseId(course.id);
         setDefaultTeeSetId(importedTees[0]?.id ?? '');
@@ -868,27 +849,10 @@ function MatchManagementCard({
       const profileId = nextValue.slice('profile:'.length);
       setIsImportingProfile(true);
       try {
-        const { course, teeSets: importedTees } = await createCourseFromProfile(profileId);
-        // Same fix as SessionSettingsEditor: push the newly-imported
-        // rows into the Zustand store and queue the trip-sync writes
-        // so the match card persists the pick and the cloud gets the
-        // course.
         const tripId = useTripStore.getState().currentTrip?.id;
-        useTripStore.setState((state) => ({
-          courses: state.courses.some((c) => c.id === course.id)
-            ? state.courses
-            : [...state.courses, course],
-          teeSets: [
-            ...state.teeSets,
-            ...importedTees.filter((t) => !state.teeSets.some((e) => e.id === t.id)),
-          ],
-        }));
-        if (tripId) {
-          queueSyncOperation('course', course.id, 'create', tripId, course);
-          for (const tee of importedTees) {
-            queueSyncOperation('teeSet', tee.id, 'create', tripId, tee);
-          }
-        }
+        const { course, teeSets: importedTees } = await importLibraryCourseIntoTrip(profileId, {
+          tripId,
+        });
         setCourseId(course.id);
         setTeeSetId(importedTees[0]?.id ?? '');
         showToast('success', `Imported ${course.name} from library`);
