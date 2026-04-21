@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { zIndex } from '@/lib/constants/zIndex';
 import type { SideBetDefinition } from '@/lib/constants/sideBets';
 import type { Match, NassauResults, Player, SideBet } from '@/lib/types/models';
-import type { NassauSummary, SkinsStanding } from '@/lib/utils/sideBetLedger';
+import { formatNassauAmount, type NassauSummary, type SkinsStanding } from '@/lib/utils/sideBetLedger';
 import { cn } from '@/lib/utils';
 import {
   AlertCircle,
@@ -376,7 +376,10 @@ export function NassauBoard({
   summary: NassauSummary | null;
   onSetWinner: (segment: NassauSegment, value: NassauWinner) => Promise<void>;
 }) {
-  const segmentValue = Math.round((bet.pot || 20) / 3);
+  // Exact segment value, sourced from the shared ledger so copy, summary
+  // tiles, and settlement all agree on what a "segment" is worth.
+  const segmentValue = summary?.segmentValue ?? (bet.pot ?? 60) / 3;
+  const segmentLabel = formatNassauAmount(segmentValue);
   const segmentRows: Array<{ key: NassauSegment; label: string }> = [
     { key: 'front9Winner', label: 'Front Nine' },
     { key: 'back9Winner', label: 'Back Nine' },
@@ -387,7 +390,7 @@ export function NassauBoard({
     <SectionCard
       overline="Nassau"
       title="Score the three segments cleanly."
-      subtitle={`Each segment is worth $${segmentValue}. The bet closes itself when front, back, and overall are all logged.`}
+      subtitle={`Each segment is worth ${segmentLabel}. The bet closes itself when front, back, and overall are all logged.`}
     >
       <div className="grid gap-[var(--space-3)] sm:grid-cols-[1fr_auto_1fr]">
         <TeamPanel label="Team A" tone="usa" players={teamAPlayers} />
@@ -409,7 +412,7 @@ export function NassauBoard({
               <div className="flex items-center justify-between gap-[var(--space-3)]">
                 <div>
                   <p className="text-sm font-semibold text-[var(--ink)]">{segment.label}</p>
-                  <p className="text-sm text-[var(--ink-secondary)]">${segmentValue} segment</p>
+                  <p className="text-sm text-[var(--ink-secondary)]">{segmentLabel} segment</p>
                 </div>
                 {result ? (
                   <span
@@ -472,14 +475,14 @@ export function NassauBoard({
           <SummaryTile
             label="Team A"
             value={`${summary.teamAWins} win${summary.teamAWins === 1 ? '' : 's'}`}
-            detail={`$${summary.teamAWins * summary.segmentValue}`}
+            detail={formatNassauAmount(summary.teamAWins * summary.segmentValue)}
             tone="usa"
           />
           <SummaryTile label="Pushes" value={summary.pushes} detail="Halved segments" />
           <SummaryTile
             label="Team B"
             value={`${summary.teamBWins} win${summary.teamBWins === 1 ? '' : 's'}`}
-            detail={`$${summary.teamBWins * summary.segmentValue}`}
+            detail={formatNassauAmount(summary.teamBWins * summary.segmentValue)}
             tone="europe"
           />
         </div>

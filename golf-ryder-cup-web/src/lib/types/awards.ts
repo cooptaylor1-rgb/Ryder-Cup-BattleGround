@@ -12,7 +12,6 @@ export type AwardType =
     | 'most-halves'
     | 'biggest-win'
     | 'iron-man'
-    | 'clutch-performer'
     | 'streak-master';
 
 export interface PlayerStats {
@@ -103,11 +102,6 @@ export const AWARD_DEFINITIONS: Record<AwardType, { title: string; description: 
         title: 'Iron Man',
         description: 'Most matches played',
         icon: '🦾',
-    },
-    'clutch-performer': {
-        title: 'Clutch Performer',
-        description: 'Won the most holes while down in match',
-        icon: '🎯',
     },
     'streak-master': {
         title: 'Streak Master',

@@ -5,6 +5,7 @@ import { getSideBetDefinition, SIDE_BET_DEFINITIONS } from '@/lib/constants';
 import { zIndex } from '@/lib/constants/zIndex';
 import type { Match, Player, SideBet, SideBetType } from '@/lib/types/models';
 import { cn } from '@/lib/utils';
+import { getNassauSummary } from '@/lib/utils/sideBetLedger';
 import {
   Check,
   ChevronRight,
@@ -670,20 +671,3 @@ function getBetSummary(
   };
 }
 
-function getNassauSummary(bet: SideBet) {
-  const results = bet.nassauResults || {};
-  let teamAWins = 0;
-  let teamBWins = 0;
-
-  if (results.front9Winner === 'teamA') teamAWins += 1;
-  if (results.front9Winner === 'teamB') teamBWins += 1;
-  if (results.back9Winner === 'teamA') teamAWins += 1;
-  if (results.back9Winner === 'teamB') teamBWins += 1;
-  if (results.overallWinner === 'teamA') teamAWins += 1;
-  if (results.overallWinner === 'teamB') teamBWins += 1;
-
-  const completed = [results.front9Winner, results.back9Winner, results.overallWinner].filter(
-    Boolean
-  ).length;
-  return { teamAWins, teamBWins, completed };
-}
