@@ -84,8 +84,27 @@ export function buildScheduleByDay({
     return [];
   }
 
-  const startDate = tripDayToLocalDate(currentTrip.startDate) ?? new Date(currentTrip.startDate);
-  const endDate = tripDayToLocalDate(currentTrip.endDate) ?? new Date(currentTrip.endDate);
+  // Trip dates are the captain's declared bounds, but sessions often
+  // get scheduled beyond them (e.g. a one-day trip with practice and
+  // Day 2-4 sessions). Union the trip range with the actual session
+  // dates so the full schedule renders every day that has play on
+  // it, not just the span the trip was created with.
+  const tripStart = tripDayToLocalDate(currentTrip.startDate) ?? new Date(currentTrip.startDate);
+  const tripEnd = tripDayToLocalDate(currentTrip.endDate) ?? new Date(currentTrip.endDate);
+  const sessionDates = sessions
+    .map((session) =>
+      session.scheduledDate ? tripDayToLocalDate(session.scheduledDate.slice(0, 10)) : null,
+    )
+    .filter((date): date is Date => date !== null);
+  const startDate = sessionDates.reduce(
+    (min, current) => (current < min ? current : min),
+    tripStart,
+  );
+  const endDate = sessionDates.reduce(
+    (max, current) => (current > max ? current : max),
+    tripEnd,
+  );
+
   const playerNameById = new Map(
     players.map((player) => [
       player.id,
@@ -129,12 +148,29 @@ export function buildScheduleByDay({
     for (const session of daySessions) {
       const sessionMatches = matches.filter((match) => match.sessionId === session.id);
 
+      // Prefer the real first-tee time when the lineup builder has
+      // stamped one on Match 1 — captains set actual clock times
+      // during lineup publish and the UI should show those, not a
+      // hard-coded 8:00 / 1:00 pair. Fall back to the AM/PM
+      // convention only when no match has a start_time yet.
+      const firstMatch = sessionMatches
+        .slice()
+        .sort((a, b) => a.matchOrder - b.matchOrder)[0];
+      const firstMatchTime = firstMatch?.startTime
+        ? new Date(firstMatch.startTime).toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit',
+          })
+        : null;
+      const sessionTime =
+        firstMatchTime ?? (session.timeSlot === 'AM' ? '8:00 AM' : '1:00 PM');
+
       entries.push({
         id: session.id,
         type: 'session',
         title: session.name,
         subtitle: `${SessionTypeDisplay[session.sessionType as keyof typeof SessionTypeDisplay] ?? session.sessionType} • ${sessionMatches.length} matches`,
-        time: session.timeSlot === 'AM' ? '8:00 AM' : '1:00 PM',
+        time: sessionTime,
         date: dateStr,
         sessionType: session.sessionType,
         status:

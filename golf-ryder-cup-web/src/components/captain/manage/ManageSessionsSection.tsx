@@ -286,7 +286,7 @@ export function SessionManagementCard({
           )}
           <div className="grid gap-[var(--space-4)] lg:grid-cols-[0.92fr_1.08fr]">
             <SessionSettingsEditor
-              key={`${session.id}:${session.status}:${session.pointsPerMatch ?? ''}:${session.defaultCourseId ?? ''}:${session.defaultTeeSetId ?? ''}`}
+              key={`${session.id}:${session.status}:${session.pointsPerMatch ?? ''}:${session.defaultCourseId ?? ''}:${session.defaultTeeSetId ?? ''}:${session.scheduledDate ?? ''}:${session.timeSlot ?? ''}`}
               session={session}
               courses={courses}
               teeSets={teeSets}
@@ -383,6 +383,13 @@ function SessionSettingsEditor({
   );
   const [sessionNumber, setSessionNumber] = useState(String(session.sessionNumber));
   const [isPracticeSession, setIsPracticeSession] = useState(Boolean(session.isPracticeSession));
+  // scheduledDate is stored as either a date-only "YYYY-MM-DD" string
+  // or an ISO-with-time — slice the first 10 chars so the native
+  // date input accepts it. Empty string renders an un-set date picker.
+  const [scheduledDate, setScheduledDate] = useState(
+    session.scheduledDate ? session.scheduledDate.slice(0, 10) : '',
+  );
+  const [timeSlot, setTimeSlot] = useState<'' | 'AM' | 'PM'>(session.timeSlot ?? '');
   const [defaultCourseId, setDefaultCourseId] = useState(session.defaultCourseId ?? '');
   const [defaultTeeSetId, setDefaultTeeSetId] = useState(session.defaultTeeSetId ?? '');
   // useLiveQuery in the parent store refreshes `courses`/`teeSets` on
@@ -429,6 +436,8 @@ function SessionSettingsEditor({
     isPracticeSession !== Boolean(session.isPracticeSession) ||
     defaultCourseId !== (session.defaultCourseId ?? '') ||
     defaultTeeSetId !== (session.defaultTeeSetId ?? '') ||
+    scheduledDate !== (session.scheduledDate ? session.scheduledDate.slice(0, 10) : '') ||
+    timeSlot !== (session.timeSlot ?? '') ||
     pointsPerMatch !==
       (session.pointsPerMatch !== undefined ? String(session.pointsPerMatch) : '');
 
@@ -562,6 +571,36 @@ function SessionSettingsEditor({
               className="input"
               title="Session order in the schedule"
             />
+          </label>
+        </div>
+
+        {/* Schedule + slot — captains could see these read-only on
+            the session header but had no way to correct them from the
+            settings editor. Wrong slot stamps "1:00 PM" on every
+            morning session; wrong date hides the session from the
+            schedule day it should actually live on. */}
+        <div className="grid grid-cols-2 gap-[var(--space-3)]">
+          <label className="space-y-[var(--space-2)]">
+            <span className="type-meta font-semibold text-[var(--ink)]">Date</span>
+            <input
+              type="date"
+              value={scheduledDate}
+              onChange={(event) => setScheduledDate(event.target.value)}
+              className="input"
+            />
+          </label>
+
+          <label className="space-y-[var(--space-2)]">
+            <span className="type-meta font-semibold text-[var(--ink)]">Slot</span>
+            <select
+              value={timeSlot}
+              onChange={(event) => setTimeSlot(event.target.value as '' | 'AM' | 'PM')}
+              className="input"
+            >
+              <option value="">Not set</option>
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
           </label>
         </div>
 
@@ -713,6 +752,8 @@ function SessionSettingsEditor({
               status,
               pointsPerMatch: pointsPerMatch.trim() ? Number(pointsPerMatch) : undefined,
               isPracticeSession,
+              scheduledDate: scheduledDate || undefined,
+              timeSlot: timeSlot || undefined,
               defaultCourseId: defaultCourseId || undefined,
               defaultTeeSetId: defaultTeeSetId || undefined,
             });
