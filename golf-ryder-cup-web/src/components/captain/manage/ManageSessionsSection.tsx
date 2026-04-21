@@ -312,25 +312,48 @@ export function SessionManagementCard({
                   <p className="mt-[var(--space-2)] type-caption">
                     Build pairings first, then come back here to fine-tune them.
                   </p>
+                  <Link
+                    href="/lineup/new"
+                    className="mt-[var(--space-3)] inline-flex items-center justify-center rounded-lg border border-[var(--masters)] bg-[var(--masters)] px-[var(--space-4)] py-[var(--space-2)] text-sm font-semibold text-[var(--canvas)] transition-transform hover:scale-[1.02]"
+                  >
+                    Build pairings
+                  </Link>
                 </div>
               ) : (
-                session.matches.map((match) => (
-                  <MatchManagementCard
-                    key={`${match.id}:${match.status}:${match.teamAHandicapAllowance}:${match.teamBHandicapAllowance}:${match.courseId ?? ''}:${match.teeSetId ?? ''}:${editingMatchId === match.id ? 'edit' : 'view'}`}
-                    match={match}
+                <>
+                  <SessionCourseCascade
+                    session={session}
                     courses={courses}
                     teeSets={teeSets}
-                    teamAName={teamAName}
-                    teamBName={teamBName}
-                    getPlayerNames={getPlayerNames}
-                    isEditing={editingMatchId === match.id}
-                    onEdit={() => onEditMatch(match.id)}
-                    onCancel={() => onEditMatch(null)}
-                    onSave={(updates) => onSaveMatch(match.id, updates)}
-                    onDelete={() => onDeleteMatch(match.id)}
+                    onCascade={async (updates) => {
+                      // Per-match save is the only atomic handle we have
+                      // from this surface; loop the session's matches
+                      // sequentially so the first failure aborts the rest
+                      // instead of leaving a half-assigned session.
+                      for (const match of session.matches) {
+                        await onSaveMatch(match.id, updates);
+                      }
+                    }}
                     isSubmitting={isSubmitting}
                   />
-                ))
+                  {session.matches.map((match) => (
+                    <MatchManagementCard
+                      key={`${match.id}:${match.status}:${match.teamAHandicapAllowance}:${match.teamBHandicapAllowance}:${match.courseId ?? ''}:${match.teeSetId ?? ''}:${editingMatchId === match.id ? 'edit' : 'view'}`}
+                      match={match}
+                      courses={courses}
+                      teeSets={teeSets}
+                      teamAName={teamAName}
+                      teamBName={teamBName}
+                      getPlayerNames={getPlayerNames}
+                      isEditing={editingMatchId === match.id}
+                      onEdit={() => onEditMatch(match.id)}
+                      onCancel={() => onEditMatch(null)}
+                      onSave={(updates) => onSaveMatch(match.id, updates)}
+                      onDelete={() => onDeleteMatch(match.id)}
+                      isSubmitting={isSubmitting}
+                    />
+                  ))}
+                </>
               )}
             </div>
           </div>
@@ -358,12 +381,14 @@ function SessionSettingsEditor({
     session.pointsPerMatch !== undefined ? String(session.pointsPerMatch) : ''
   );
   const [sessionNumber, setSessionNumber] = useState(String(session.sessionNumber));
+  const [isPracticeSession, setIsPracticeSession] = useState(Boolean(session.isPracticeSession));
 
   const hasChanges =
     name !== session.name ||
     sessionType !== session.sessionType ||
     status !== session.status ||
     sessionNumber !== String(session.sessionNumber) ||
+    isPracticeSession !== Boolean(session.isPracticeSession) ||
     pointsPerMatch !==
       (session.pointsPerMatch !== undefined ? String(session.pointsPerMatch) : '');
 
@@ -455,6 +480,28 @@ function SessionSettingsEditor({
             />
           </label>
         </div>
+
+        {/* Practice toggle. Practice sessions still run end-to-end
+            (scoring, live board) but are excluded from the cup standings
+            and point totals. Without a toggle in settings the "Practice"
+            chip on the header was read-only — the captain had no way to
+            undo a misclick from trip setup. */}
+        <label className="flex items-start gap-[var(--space-3)] rounded-[var(--radius-md)] border border-[var(--rule)] bg-[rgba(255,255,255,0.6)] px-[var(--space-3)] py-[var(--space-3)]">
+          <input
+            type="checkbox"
+            checked={isPracticeSession}
+            onChange={(event) => setIsPracticeSession(event.target.checked)}
+            className="mt-1 h-4 w-4 accent-[var(--masters)]"
+          />
+          <span className="flex-1">
+            <span className="block type-meta font-semibold text-[var(--ink)]">
+              Practice session
+            </span>
+            <span className="mt-1 block type-caption text-[var(--ink-secondary)]">
+              Score it, chart it, and share it — but keep it out of the cup standings.
+            </span>
+          </span>
+        </label>
       </div>
 
       <div className="mt-[var(--space-5)] flex flex-col gap-[var(--space-3)] sm:flex-row">
@@ -467,6 +514,7 @@ function SessionSettingsEditor({
               sessionNumber: sessionNumber.trim() ? Number(sessionNumber) : session.sessionNumber,
               status,
               pointsPerMatch: pointsPerMatch.trim() ? Number(pointsPerMatch) : undefined,
+              isPracticeSession,
             })
           }
           disabled={isSubmitting || !hasChanges}
@@ -933,4 +981,169 @@ function formatSessionType(type: RyderCupSession['sessionType']) {
     default:
       return type;
   }
+}
+
+/**
+ * Session Course & Tee cascade.
+ *
+ * Pick a course + tee once and apply to every match in the session.
+ * Before this, the per-match editor was the only surface — so a
+ * session with 12 singles matches meant 12 trips through the same
+ * dialog, and captains hit an apparent dead-end on zero-match
+ * sessions with no visible control at all. This control also doubles
+ * as a readout: when every match already shares a course, it
+ * reflects the current value; when matches disagree it labels the
+ * mix so the captain can see it at a glance and re-set intentionally.
+ */
+function SessionCourseCascade({
+  session,
+  courses,
+  teeSets,
+  onCascade,
+  isSubmitting,
+}: {
+  session: SessionWithMatches;
+  courses: Course[];
+  teeSets: TeeSet[];
+  onCascade: (updates: Partial<Match>) => Promise<void>;
+  isSubmitting: boolean;
+}) {
+  // Detect the shared-vs-mixed state before rendering so the picker
+  // can pre-fill with the current value instead of forcing a re-pick.
+  const distinctCourseIds = Array.from(
+    new Set(session.matches.map((match) => match.courseId ?? ''))
+  );
+  const distinctTeeIds = Array.from(
+    new Set(session.matches.map((match) => match.teeSetId ?? ''))
+  );
+  const sharedCourseId =
+    distinctCourseIds.length === 1 && distinctCourseIds[0] ? distinctCourseIds[0] : '';
+  const sharedTeeId =
+    distinctTeeIds.length === 1 && distinctTeeIds[0] ? distinctTeeIds[0] : '';
+  const courseIsMixed = distinctCourseIds.length > 1;
+  const teeIsMixed = distinctTeeIds.length > 1;
+
+  const [courseId, setCourseId] = useState(sharedCourseId);
+  const [teeSetId, setTeeSetId] = useState(sharedTeeId);
+  const [isBusy, setIsBusy] = useState(false);
+  const { showToast } = useToastStore(useShallow((s) => ({ showToast: s.showToast })));
+
+  const availableTees = courseId
+    ? teeSets.filter((tee) => tee.courseId === courseId)
+    : [];
+
+  const selectedCourse = courses.find((course) => course.id === courseId);
+
+  const hasChange =
+    (courseId !== sharedCourseId || teeSetId !== sharedTeeId) && Boolean(courseId);
+
+  const handleApply = async () => {
+    if (!courseId) {
+      showToast('error', 'Pick a course first.');
+      return;
+    }
+    setIsBusy(true);
+    try {
+      await onCascade({ courseId, teeSetId: teeSetId || null });
+      showToast(
+        'success',
+        `Course ${selectedCourse?.name ?? ''} applied to ${session.matches.length} ${
+          session.matches.length === 1 ? 'match' : 'matches'
+        }.`
+      );
+    } catch (error) {
+      showToast(
+        'error',
+        error instanceof Error ? error.message : 'Couldn\'t apply course to every match.'
+      );
+    } finally {
+      setIsBusy(false);
+    }
+  };
+
+  return (
+    <div className="rounded-[1.35rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-4)] py-[var(--space-4)]">
+      <div className="flex items-start justify-between gap-[var(--space-3)]">
+        <div>
+          <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
+            Course &amp; Tee
+          </p>
+          <h5 className="mt-[var(--space-1)] type-title-sm text-[var(--ink)]">
+            Applies to all {session.matches.length}{' '}
+            {session.matches.length === 1 ? 'match' : 'matches'}
+          </h5>
+          <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
+            Pick once — we&apos;ll set the course and tee on every match in this session.
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-[var(--space-3)] grid grid-cols-1 gap-[var(--space-3)] md:grid-cols-2">
+        <label className="space-y-[var(--space-2)]">
+          <span className="type-meta font-semibold text-[var(--ink)]">
+            Course
+            {courseIsMixed ? (
+              <span className="ml-2 rounded-full bg-[color:var(--warning)]/15 px-2 py-0.5 text-[10px] font-medium text-[var(--warning)]">
+                Mixed
+              </span>
+            ) : null}
+          </span>
+          <select
+            value={courseId}
+            onChange={(event) => {
+              setCourseId(event.target.value);
+              setTeeSetId('');
+            }}
+            className="input"
+            disabled={isBusy || isSubmitting}
+          >
+            <option value="">Select course…</option>
+            {courses.map((course) => (
+              <option key={course.id} value={course.id}>
+                {course.name}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="space-y-[var(--space-2)]">
+          <span className="type-meta font-semibold text-[var(--ink)]">
+            Tee set
+            {teeIsMixed ? (
+              <span className="ml-2 rounded-full bg-[color:var(--warning)]/15 px-2 py-0.5 text-[10px] font-medium text-[var(--warning)]">
+                Mixed
+              </span>
+            ) : null}
+          </span>
+          <select
+            value={teeSetId}
+            onChange={(event) => setTeeSetId(event.target.value)}
+            className="input"
+            disabled={!courseId || isBusy || isSubmitting}
+          >
+            <option value="">
+              {courseId ? 'Select tee set…' : 'Choose course first'}
+            </option>
+            {availableTees.map((tee) => (
+              <option key={tee.id} value={tee.id}>
+                {tee.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      <div className="mt-[var(--space-3)] flex justify-end">
+        <Button
+          variant="secondary"
+          onClick={handleApply}
+          disabled={!hasChange || isBusy || isSubmitting}
+          isLoading={isBusy}
+        >
+          Apply to {session.matches.length}{' '}
+          {session.matches.length === 1 ? 'match' : 'matches'}
+        </Button>
+      </div>
+    </div>
+  );
 }
