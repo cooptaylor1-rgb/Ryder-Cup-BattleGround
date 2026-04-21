@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   CheckCircle2,
@@ -385,11 +385,40 @@ function SessionSettingsEditor({
   const [isPracticeSession, setIsPracticeSession] = useState(Boolean(session.isPracticeSession));
   const [defaultCourseId, setDefaultCourseId] = useState(session.defaultCourseId ?? '');
   const [defaultTeeSetId, setDefaultTeeSetId] = useState(session.defaultTeeSetId ?? '');
+  // useLiveQuery in the parent store refreshes `courses`/`teeSets` on
+  // the NEXT tick after Dexie writes, so without a local bridge the
+  // dropdowns render for one frame with the new defaultCourseId
+  // pointing at nothing — select collapses to "Select course…" and
+  // the tee dropdown goes empty. Hold the just-imported rows
+  // locally until the prop catches up, then clear.
+  const [pendingImport, setPendingImport] = useState<
+    { course: Course; teeSets: TeeSet[] } | null
+  >(null);
+
+  useEffect(() => {
+    if (!pendingImport) return;
+    if (courses.some((course) => course.id === pendingImport.course.id)) {
+      setPendingImport(null);
+    }
+  }, [courses, pendingImport]);
+
+  const mergedCourses = pendingImport
+    ? courses.some((c) => c.id === pendingImport.course.id)
+      ? courses
+      : [...courses, pendingImport.course]
+    : courses;
+
+  const mergedTeeSets = pendingImport
+    ? [
+        ...teeSets,
+        ...pendingImport.teeSets.filter((t) => !teeSets.some((existing) => existing.id === t.id)),
+      ]
+    : teeSets;
 
   // Tee sets are scoped per-course; only show tees that belong to the
   // picked course, and clear the tee if the captain switches courses.
   const availableTees = defaultCourseId
-    ? teeSets.filter((tee) => tee.courseId === defaultCourseId)
+    ? mergedTeeSets.filter((tee) => tee.courseId === defaultCourseId)
     : [];
 
   const hasChanges =
@@ -450,6 +479,10 @@ function SessionSettingsEditor({
       setIsImportingProfile(true);
       try {
         const { course, teeSets: importedTees } = await createCourseFromProfile(profileId);
+        // Stash the just-imported rows so the dropdowns have options to
+        // match defaultCourseId / defaultTeeSetId until useLiveQuery
+        // in the parent refreshes `courses` and `teeSets`.
+        setPendingImport({ course, teeSets: importedTees });
         setDefaultCourseId(course.id);
         setDefaultTeeSetId(importedTees[0]?.id ?? '');
         showToast('success', `Imported ${course.name} from library`);
@@ -608,9 +641,9 @@ function SessionSettingsEditor({
                 disabled={isSubmitting || isImportingProfile}
               >
                 <option value="">Select course…</option>
-                {courses.length > 0 && (
+                {mergedCourses.length > 0 && (
                   <optgroup label="In this trip">
-                    {courses.map((course) => (
+                    {mergedCourses.map((course) => (
                       <option key={course.id} value={course.id}>
                         {course.name}
                       </option>
