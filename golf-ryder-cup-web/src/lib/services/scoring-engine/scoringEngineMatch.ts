@@ -2,8 +2,20 @@ import { db } from '@/lib/db';
 import type { Match, Player } from '@/lib/types/models';
 
 import { buildMatchHandicapContext } from '../matchHandicapService';
+import { queueSyncOperation } from '../tripSyncService';
 import { calculateMatchState } from './scoringEngineAggregation';
 import { calculateStoredMatchResult } from './scoringEngineResults';
+
+/**
+ * Resolve the tripId for a session so every Dexie write in this
+ * module can hand the trip-sync queue a correctly-scoped operation.
+ * Returns null if the session is already gone — callers should
+ * skip queueing in that case rather than fabricate an empty id.
+ */
+async function resolveTripIdForSession(sessionId: string): Promise<string | null> {
+  const session = await db.sessions.get(sessionId);
+  return session?.tripId ?? null;
+}
 
 export async function createMatch(
   sessionId: string,
@@ -56,6 +68,15 @@ export async function createMatch(
   };
 
   await db.matches.add(match);
+  // Every scoring-engine Dexie write pushes a trip-sync create/update so
+  // the cloud eventually has the row. Without this the match lived
+  // only on the captain's device — standings, live view, and other
+  // devices stayed blind until someone touched the match through a
+  // different code path that happened to queue sync.
+  const tripId = session?.tripId ?? (await resolveTripIdForSession(sessionId));
+  if (tripId) {
+    queueSyncOperation('match', match.id, 'create', tripId, match);
+  }
   return match;
 }
 
@@ -67,14 +88,19 @@ export async function finalizeMatch(matchId: string): Promise<void> {
   const matchState = calculateMatchState(match, holeResults);
 
   if (matchState.isClosedOut || matchState.holesRemaining === 0) {
-    await db.matches.update(matchId, {
-      status: 'completed',
+    const updates = {
+      status: 'completed' as const,
       result: calculateStoredMatchResult(matchState),
       margin: Math.abs(matchState.currentScore),
       holesRemaining: matchState.holesRemaining,
       version: (match.version ?? 0) + 1,
       updatedAt: new Date().toISOString(),
-    });
+    };
+    await db.matches.update(matchId, updates);
+    const tripId = await resolveTripIdForSession(match.sessionId);
+    if (tripId) {
+      queueSyncOperation('match', matchId, 'update', tripId, { ...match, ...updates });
+    }
   }
 }
 
@@ -91,12 +117,17 @@ export async function reopenMatch(matchId: string): Promise<void> {
   const holeResults = await db.holeResults.where('matchId').equals(matchId).toArray();
   const matchState = calculateMatchState(match, holeResults);
 
-  await db.matches.update(matchId, {
-    status: 'inProgress',
-    result: 'notFinished',
+  const updates = {
+    status: 'inProgress' as const,
+    result: 'notFinished' as const,
     margin: Math.abs(matchState.currentScore),
     holesRemaining: matchState.holesRemaining,
     version: (match.version ?? 0) + 1,
     updatedAt: new Date().toISOString(),
-  });
+  };
+  await db.matches.update(matchId, updates);
+  const tripId = await resolveTripIdForSession(match.sessionId);
+  if (tripId) {
+    queueSyncOperation('match', matchId, 'update', tripId, { ...match, ...updates });
+  }
 }

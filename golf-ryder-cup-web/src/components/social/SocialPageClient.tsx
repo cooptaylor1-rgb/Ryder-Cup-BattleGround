@@ -122,25 +122,32 @@ export default function SocialPageClient() {
       }
 
       try {
-        const post = await db.banterPosts.get(postId);
-        if (!post) {
-          return;
-        }
+        // Wrap the read-modify-write in a Dexie transaction so two
+        // reactions landing in the same frame can't clobber each
+        // other. Previously a naive `get → mutate → update` lost
+        // whichever write finished second — User A's 🔥 reaction
+        // overwrote User B's 🔥 reaction (or vice versa) and one
+        // thumbs-up silently vanished. Transaction serializes the
+        // pair so both reactors end up in the array.
+        await db.transaction('rw', db.banterPosts, async () => {
+          const post = await db.banterPosts.get(postId);
+          if (!post) return;
 
-        const reactions = { ...(post.reactions || {}) };
-        const currentReactors = reactions[emoji] ? [...reactions[emoji]] : [];
-        const alreadyReacted = currentReactors.includes(currentUserId);
+          const reactions = { ...(post.reactions || {}) };
+          const currentReactors = reactions[emoji] ? [...reactions[emoji]] : [];
+          const alreadyReacted = currentReactors.includes(currentUserId);
 
-        if (alreadyReacted) {
-          reactions[emoji] = currentReactors.filter((id) => id !== currentUserId);
-          if (reactions[emoji].length === 0) {
-            delete reactions[emoji];
+          if (alreadyReacted) {
+            reactions[emoji] = currentReactors.filter((id) => id !== currentUserId);
+            if (reactions[emoji].length === 0) {
+              delete reactions[emoji];
+            }
+          } else {
+            reactions[emoji] = [...currentReactors, currentUserId];
           }
-        } else {
-          reactions[emoji] = [...currentReactors, currentUserId];
-        }
 
-        await db.banterPosts.update(postId, { reactions });
+          await db.banterPosts.update(postId, { reactions });
+        });
       } catch (error) {
         uiLogger.error('Failed to toggle reaction:', error);
       }

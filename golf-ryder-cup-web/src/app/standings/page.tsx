@@ -80,6 +80,38 @@ export default function StandingsPage() {
     []
   );
 
+  // Live invalidation signature so the aggregate calculations below
+  // (team standings, leaderboard, awards, player stats) actually
+  // re-run when matches finish or hole results land during live
+  // scoring. Before this, the effect fired once on mount and never
+  // again — standings silently stayed frozen mid-trip and the only
+  // way to see fresh numbers was to manually refresh the page.
+  //
+  // The signature is deliberately coarse — a composite of counts +
+  // the most recent updatedAt — so it bumps on anything that would
+  // change the aggregates without forcing a rerun on every render.
+  const tripId = currentTrip?.id;
+  const aggregateSignature = useLiveQuery(
+    async () => {
+      if (!tripId) return '';
+      const sessions = await db.sessions.where('tripId').equals(tripId).toArray();
+      const sessionIds = sessions.map((s) => s.id);
+      if (sessionIds.length === 0) return `0|0|0|`;
+      const matches = await db.matches.where('sessionId').anyOf(sessionIds).toArray();
+      const matchIds = matches.map((m) => m.id);
+      const holeResults = matchIds.length
+        ? await db.holeResults.where('matchId').anyOf(matchIds).toArray()
+        : [];
+      const completed = matches.filter((m) => m.status === 'completed').length;
+      const latestUpdate = [...matches, ...holeResults]
+        .map((row) => row.updatedAt ?? '')
+        .reduce((max, current) => (current > max ? current : max), '');
+      return `${matches.length}|${completed}|${holeResults.length}|${latestUpdate}`;
+    },
+    [tripId],
+    '',
+  );
+
   // If there is no active trip selected, we show a premium empty state instead of redirecting.
 
   // Scope the load effect to currentTrip.id, not the whole currentTrip
@@ -88,7 +120,6 @@ export default function StandingsPage() {
   // session locked, etc.), so keying the effect on it re-ran four
   // expensive aggregations on every tick. Pull the toast setter out of
   // the dep array via a ref so showToast's identity can't retrigger.
-  const tripId = currentTrip?.id;
   const showToastRef = useRef(showToast);
   useEffect(() => {
     showToastRef.current = showToast;
@@ -124,7 +155,7 @@ export default function StandingsPage() {
     return () => {
       cancelled = true;
     };
-  }, [tripId]);
+  }, [tripId, aggregateSignature]);
 
   useEffect(() => {
     if (!tripId || isLoading) return;

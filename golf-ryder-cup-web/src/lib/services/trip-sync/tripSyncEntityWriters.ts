@@ -7,6 +7,7 @@ import type {
   Match,
   Player,
   RyderCupSession,
+  SideBet,
   Team,
   TeamMember,
   TeeSet,
@@ -73,6 +74,9 @@ export async function syncEntityToCloud(item: SyncQueueItem): Promise<void> {
       break;
     case 'teeSet':
       await syncTeeSetToCloud(entityId, operation, data as TeeSet);
+      break;
+    case 'sideBet':
+      await syncSideBetToCloud(entityId, operation, data as SideBet);
       break;
   }
 }
@@ -426,5 +430,67 @@ export async function syncTeeSetToCloud(
   };
 
   const { error } = await getTable('tee_sets').upsert(cloudData, { onConflict: 'id' });
+  if (error) throw new Error(error.message);
+}
+
+/**
+ * Push a side bet row to Supabase. Before this writer existed the bets
+ * surface was Dexie-only — captains created skins/nassau/KP bets, the
+ * rows persisted locally, and the cloud never got them. A second
+ * device opening the trip saw no bets at all, and the settlement
+ * flow had nothing to settle.
+ *
+ * Column names match the public.side_bets schema: the `name` / `amount`
+ * / `winner_player_id` / `hole_number` / `notes` columns in Supabase
+ * don't perfectly mirror the local SideBet model, so the payload
+ * flattens the model's pot + perHole + hole + winnerId into those
+ * existing columns. The richer fields (description, participantIds,
+ * results, nassau team arrays) are stored as JSON in `notes` until the
+ * schema grows real columns for them.
+ */
+export async function syncSideBetToCloud(
+  sideBetId: string,
+  operation: SyncOperation,
+  data?: SideBet
+): Promise<void> {
+  if (operation === 'delete') {
+    const { error } = await getTable('side_bets').delete().eq('id', sideBetId);
+    if (error) throw new Error(error.message);
+    return;
+  }
+
+  const bet = data || (await db.sideBets.get(sideBetId));
+  if (!bet) throw new Error('SideBet not found locally');
+
+  const cloudData = {
+    id: bet.id,
+    trip_id: bet.tripId,
+    match_id: bet.matchId ?? null,
+    bet_type: bet.type,
+    name: bet.name,
+    // The schema has a single `amount` column; prefer pot, fall back to
+    // perHole for skins-style bets where the pot is per-hole rather
+    // than total.
+    amount: bet.pot ?? bet.perHole ?? null,
+    winner_player_id: bet.winnerId ?? null,
+    hole_number: bet.hole ?? null,
+    // Fold the app-specific richer shape into notes as JSON so we
+    // don't lose it on the round trip.
+    notes: JSON.stringify({
+      description: bet.description,
+      perHole: bet.perHole,
+      status: bet.status,
+      participantIds: bet.participantIds,
+      sessionId: bet.sessionId,
+      results: bet.results,
+      nassauTeamA: bet.nassauTeamA,
+      nassauTeamB: bet.nassauTeamB,
+      nassauResults: bet.nassauResults,
+      completedAt: bet.completedAt,
+    }),
+    updated_at: new Date().toISOString(),
+  };
+
+  const { error } = await getTable('side_bets').upsert(cloudData, { onConflict: 'id' });
   if (error) throw new Error(error.message);
 }

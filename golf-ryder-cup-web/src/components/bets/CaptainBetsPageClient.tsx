@@ -19,6 +19,7 @@ import {
 } from '@/components/bets/CaptainBetsPageSections';
 import { getSideBetDefinition, SIDE_BET_DEFINITIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
+import { queueSyncOperation } from '@/lib/services/tripSyncService';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { SideBet, SideBetType } from '@/lib/types/models';
@@ -117,6 +118,7 @@ export default function CaptainBetsPageClient() {
       setIsSubmitting(true);
       try {
         await db.sideBets.delete(betId);
+        queueSyncOperation('sideBet', betId, 'delete', currentTrip.id);
         showToast('success', 'Bet deleted');
       } catch (error) {
         betsLogger.error('Failed to delete bet:', error);
@@ -156,6 +158,15 @@ export default function CaptainBetsPageClient() {
 
     setIsSubmitting(true);
     try {
+      // Persist perHole for skins bets so carryover math has the real
+      // per-hole value instead of falling back to 5 in the skins
+      // calculator. Keeps pot populated too for the settlement path.
+      const defaultDefn = getSideBetDefinition(newBetType);
+      const perHole =
+        newBetType === 'skins'
+          ? defaultDefn.defaultPerHole ?? Math.max(1, Math.round(newBetPot / 18))
+          : undefined;
+
       const newBet: SideBet = {
         id: crypto.randomUUID(),
         tripId: currentTrip.id,
@@ -164,12 +175,17 @@ export default function CaptainBetsPageClient() {
         description: newBetDescription,
         status: 'active',
         pot: newBetPot,
+        perHole,
         participantIds: selectedParticipants,
         hole: newBetHole,
         createdAt: new Date().toISOString(),
       };
 
       await db.sideBets.add(newBet);
+      // Push to the trip-sync queue so the bet actually reaches
+      // Supabase and mirrors on other devices. Before this, every
+      // bet captains created stayed local and vanished on mirror.
+      queueSyncOperation('sideBet', newBet.id, 'create', currentTrip.id, newBet);
       showToast('success', `${newBetName} created!`);
       closeComposer();
     } catch (error) {
@@ -200,6 +216,10 @@ export default function CaptainBetsPageClient() {
       setIsSubmitting(true);
       try {
         await db.sideBets.update(betId, updates);
+        const fresh = await db.sideBets.get(betId);
+        if (fresh && currentTrip) {
+          queueSyncOperation('sideBet', betId, 'update', currentTrip.id, fresh);
+        }
         showToast('success', 'Bet updated');
         closeComposer();
       } catch (error) {
@@ -209,7 +229,7 @@ export default function CaptainBetsPageClient() {
         setIsSubmitting(false);
       }
     },
-    [closeComposer, isSubmitting, showToast]
+    [closeComposer, currentTrip, isSubmitting, showToast]
   );
 
   const handleCompleteBet = useCallback(
@@ -224,6 +244,10 @@ export default function CaptainBetsPageClient() {
           status: 'completed',
           winnerId,
         });
+        const fresh = await db.sideBets.get(betId);
+        if (fresh && currentTrip) {
+          queueSyncOperation('sideBet', betId, 'update', currentTrip.id, fresh);
+        }
         showToast('success', 'Bet completed!');
       } catch (error) {
         betsLogger.error('Failed to complete bet:', error);
@@ -232,7 +256,7 @@ export default function CaptainBetsPageClient() {
         setIsSubmitting(false);
       }
     },
-    [isSubmitting, showToast]
+    [currentTrip, isSubmitting, showToast]
   );
 
   if (!currentTrip) {

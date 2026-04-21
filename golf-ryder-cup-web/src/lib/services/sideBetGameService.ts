@@ -147,7 +147,12 @@ export function calculateSkins(
         const scores = holeScores.get(hole);
         if (!scores || scores.teamA === undefined || scores.teamB === undefined) continue;
 
-        const currentValue = skinValue + (config.doublesAfterCarry && carryover > 0 ? carryover : carryover);
+        // `doublesAfterCarry` was a no-op: the ternary returned `carryover`
+        // on both branches, so enabling the "double on carry" rule did
+        // nothing. When the flag is on and the previous hole pushed,
+        // the carry rides in at 2x its accumulated value.
+        const currentValue =
+          skinValue + (config.doublesAfterCarry && carryover > 0 ? carryover * 2 : carryover);
 
         if (scores.teamA < scores.teamB) {
             // Team A wins skin

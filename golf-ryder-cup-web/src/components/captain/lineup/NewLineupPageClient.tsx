@@ -338,7 +338,17 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
 
       setIsCreating(true);
       try {
-        const [hours] = firstTeeTime.split(':').map(Number);
+        // firstTeeTime is a "HH:MM" string from a native <input type="time">,
+        // but defensive parsing costs nothing: a malformed value would
+        // silently give NaN for hours, and `NaN < 12` is false, so every
+        // session would derive timeSlot=PM — a morning session stamped
+        // PM cascaded to wrong tee-time math in the lineup and 1:00 PM
+        // labels on the schedule. Fall back to AM when we can't read
+        // a valid hour, and cap at [0,23].
+        const [rawHours] = firstTeeTime.split(':').map(Number);
+        const hours = Number.isFinite(rawHours)
+          ? Math.max(0, Math.min(23, rawHours))
+          : 8;
         const derivedTimeSlot: 'AM' | 'PM' = hours < 12 ? 'AM' : 'PM';
 
         const session = await addSession({
