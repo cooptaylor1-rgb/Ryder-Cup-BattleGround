@@ -197,58 +197,120 @@ export function GolfersIllustration({ className, size = 'md', animated = true }:
     return (
         <svg
             viewBox="0 0 100 100"
-            className={cn(sizeClasses[size], className)}
+            className={cn(sizeClasses[size], animated && 'illo-entrance', className)}
             aria-hidden="true"
         >
-            {/* USA Player (left) */}
-            <g className={cn(animated && 'animate-golfer-left')}>
-                {/* Body */}
-                <ellipse cx="32" cy="62" rx="11" ry="16" fill="var(--usa-primary, #1E3A5F)" />
-                {/* Head */}
-                <circle cx="32" cy="40" r="9" fill="var(--cream, #FFFEF0)" />
-                {/* Cap */}
-                <path d="M23 38 Q32 33 41 38 L39 41 L25 41 Z" fill="var(--usa-primary, #1E3A5F)" />
-                {/* Visor */}
-                <rect x="22" y="38" width="20" height="2.5" rx="1" fill="var(--usa-dark, #0F1F33)" />
-                {/* Club */}
-                <path
-                    d="M42 48 L54 26"
-                    stroke="var(--surface-400, #A3A3A3)"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                />
-                <ellipse cx="55" cy="24" rx="3.5" ry="2.5" fill="var(--surface-500, #737373)" />
-            </g>
+            {/* A match is two sides facing off. Previously drew tiny
+                "golfers" that became unreadable blobs at 64px; two
+                pennants on opposing flagsticks read as competition
+                instantly at any size and match the Ryder Cup visual
+                vocabulary. Flags wave in opposite phases so the eye
+                catches movement between them without syncing into one
+                big thing. */}
 
-            {/* Europe Player (right) */}
-            <g className={cn(animated && 'animate-golfer-right')}>
-                {/* Body */}
-                <ellipse cx="68" cy="62" rx="11" ry="16" fill="var(--europe-primary, #1D4E89)" />
-                {/* Head */}
-                <circle cx="68" cy="40" r="9" fill="var(--cream, #FFFEF0)" />
-                {/* Cap */}
-                <path d="M59 38 Q68 33 77 38 L75 41 L61 41 Z" fill="var(--europe-primary, #1D4E89)" />
-                {/* Visor */}
-                <rect x="58" y="38" width="20" height="2.5" rx="1" fill="var(--europe-dark, #0F2847)" />
-            </g>
-
-            {/* VS badge in center */}
-            <g className={cn(animated && 'animate-pulse-gentle')}>
-                <circle cx="50" cy="52" r="9" fill="var(--canvas-raised, #FFFFFF)" stroke="var(--surface-border, #E5E5E5)" strokeWidth="1" />
-                <text x="50" y="55.5" textAnchor="middle" fontSize="9" fontWeight="bold" fill="var(--ink, #1C1917)">
-                    VS
-                </text>
-            </g>
-
-            {/* Grass */}
+            {/* Soft green arc behind — grounds the composition */}
+            <ellipse cx="50" cy="92" rx="40" ry="3" fill="var(--masters, #006644)" opacity="0.08" />
             <path
-                d="M10 82 Q25 78 40 82 Q55 78 70 82 Q85 78 95 82"
+                d="M6 84 Q28 80 50 84 Q72 80 94 84"
                 stroke="var(--masters, #006644)"
-                strokeWidth="2"
+                strokeWidth="1.5"
                 strokeLinecap="round"
                 fill="none"
-                opacity="0.4"
+                opacity="0.35"
             />
+
+            {/* Left flagstick (USA) */}
+            <g>
+                <line
+                    x1="24"
+                    y1="24"
+                    x2="24"
+                    y2="84"
+                    stroke="var(--ink, #1C1917)"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                    opacity="0.7"
+                />
+                <circle cx="24" cy="24" r="2" fill="var(--ink, #1C1917)" opacity="0.7" />
+                {/* Pennant swings from the pole; transform origin set at
+                    the pole so the shape rocks from its attach point. */}
+                <g
+                    className={cn(animated && 'illo-pennant-left')}
+                    style={{ transformOrigin: '24px 28px' }}
+                >
+                    <path
+                        d="M24 26 L50 30 L24 38 Z"
+                        fill="var(--usa-primary, #1E3A5F)"
+                    />
+                    <path
+                        d="M24 26 L50 30 L24 38 Z"
+                        fill="var(--canvas-raised, #FFFFFF)"
+                        opacity="0.12"
+                    />
+                </g>
+            </g>
+
+            {/* Right flagstick (Europe) */}
+            <g>
+                <line
+                    x1="76"
+                    y1="24"
+                    x2="76"
+                    y2="84"
+                    stroke="var(--ink, #1C1917)"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                    opacity="0.7"
+                />
+                <circle cx="76" cy="24" r="2" fill="var(--ink, #1C1917)" opacity="0.7" />
+                <g
+                    className={cn(animated && 'illo-pennant-right')}
+                    style={{ transformOrigin: '76px 28px' }}
+                >
+                    <path
+                        d="M76 26 L50 30 L76 38 Z"
+                        fill="var(--europe-primary, #1D4E89)"
+                    />
+                    <path
+                        d="M76 26 L50 30 L76 38 Z"
+                        fill="var(--canvas-raised, #FFFFFF)"
+                        opacity="0.12"
+                    />
+                </g>
+            </g>
+
+            {/* "vs" medallion — italic serif matches the wordmark voice.
+                A thin gold ring gives it the trophy-hardware feel rather
+                than the generic grey stroke it had before. */}
+            <g className={cn(animated && 'illo-vs-pulse')}>
+                <circle
+                    cx="50"
+                    cy="60"
+                    r="11"
+                    fill="var(--canvas-raised, #FFFFFF)"
+                />
+                <circle
+                    cx="50"
+                    cy="60"
+                    r="11"
+                    fill="none"
+                    stroke="var(--gold, #C7A03A)"
+                    strokeWidth="1.25"
+                    opacity="0.85"
+                />
+                <text
+                    x="50"
+                    y="64"
+                    textAnchor="middle"
+                    fontSize="11"
+                    fontStyle="italic"
+                    fontFamily="'Instrument Serif', 'Times New Roman', serif"
+                    fontWeight="400"
+                    fill="var(--ink, #1C1917)"
+                >
+                    vs
+                </text>
+            </g>
         </svg>
     );
 }
@@ -395,54 +457,117 @@ export function CalendarIllustration({ className, size = 'md', animated = true }
     return (
         <svg
             viewBox="0 0 100 100"
-            className={cn(sizeClasses[size], className)}
+            className={cn(sizeClasses[size], animated && 'illo-entrance', className)}
             aria-hidden="true"
         >
-            {/* Calendar body */}
+            {/* Rebuilt for 64px: the old version drew a full month
+                with 3×3 tiny dots that blurred together. Here the
+                calendar is a single day page — big number, tiny
+                weekday, a single green "tee time" pill — so the
+                metaphor lands at a glance. Soft drop-shadow sells
+                the "page" depth without a heavy stroke. */}
+
+            {/* Soft ground shadow */}
+            <ellipse cx="50" cy="90" rx="30" ry="2.5" fill="var(--ink, #1C1917)" opacity="0.06" />
+
+            {/* Two binder rings peek above the card */}
             <rect
-                x="18"
-                y="22"
-                width="64"
-                height="58"
-                rx="6"
-                fill="white"
-                stroke="var(--surface-200, #E5E5E5)"
-                strokeWidth="1.5"
+                x="30"
+                y="12"
+                width="3.5"
+                height="11"
+                rx="1.5"
+                fill="var(--surface-400, #A3A3A3)"
+            />
+            <rect
+                x="66.5"
+                y="12"
+                width="3.5"
+                height="11"
+                rx="1.5"
+                fill="var(--surface-400, #A3A3A3)"
             />
 
-            {/* Header */}
-            <rect x="18" y="22" width="64" height="15" rx="6" fill="var(--masters, #006644)" />
-            <rect x="18" y="32" width="64" height="5" fill="var(--masters, #006644)" />
+            {/* Page card */}
+            <rect
+                x="18"
+                y="20"
+                width="64"
+                height="64"
+                rx="7"
+                fill="var(--canvas-raised, #FFFFFF)"
+                stroke="var(--surface-200, #E5E5E5)"
+                strokeWidth="1.25"
+            />
 
-            {/* Ring holes */}
-            <circle cx="32" cy="22" r="3" fill="var(--surface-100, #F5F5F5)" stroke="var(--surface-300, #D4D4D4)" strokeWidth="0.75" />
-            <circle cx="50" cy="22" r="3" fill="var(--surface-100, #F5F5F5)" stroke="var(--surface-300, #D4D4D4)" strokeWidth="0.75" />
-            <circle cx="68" cy="22" r="3" fill="var(--surface-100, #F5F5F5)" stroke="var(--surface-300, #D4D4D4)" strokeWidth="0.75" />
+            {/* Masters-green header stripe */}
+            <path
+                d="M25 20 H75 A7 7 0 0 1 82 27 V34 H18 V27 A7 7 0 0 1 25 20 Z"
+                fill="var(--masters, #006644)"
+            />
 
-            {/* Rings */}
-            <rect x="30" y="14" width="4" height="12" rx="2" fill="var(--surface-400, #A3A3A3)" />
-            <rect x="48" y="14" width="4" height="12" rx="2" fill="var(--surface-400, #A3A3A3)" />
-            <rect x="66" y="14" width="4" height="12" rx="2" fill="var(--surface-400, #A3A3A3)" />
+            {/* Binder hole punches */}
+            <circle
+                cx="32"
+                cy="23"
+                r="2.25"
+                fill="var(--canvas, #FAF8F1)"
+                stroke="var(--surface-300, #D4D4D4)"
+                strokeWidth="0.6"
+            />
+            <circle
+                cx="68"
+                cy="23"
+                r="2.25"
+                fill="var(--canvas, #FAF8F1)"
+                stroke="var(--surface-300, #D4D4D4)"
+                strokeWidth="0.6"
+            />
 
-            {/* Day labels */}
-            <g fill="var(--ink-tertiary, #A3A3A3)" fontSize="7" fontWeight="500">
-                <text x="29" y="49">M</text>
-                <text x="43" y="49">T</text>
-                <text x="56" y="49">W</text>
-                <text x="70" y="49">T</text>
-            </g>
+            {/* Weekday label — small caps-ish via upper serif */}
+            <text
+                x="50"
+                y="46"
+                textAnchor="middle"
+                fontSize="6.5"
+                letterSpacing="0.5"
+                fontWeight="600"
+                fill="var(--ink-tertiary, #8A8A8A)"
+                fontFamily="'Plus Jakarta Sans', system-ui, sans-serif"
+            >
+                FRI
+            </text>
 
-            {/* Golf day markers */}
-            <g className={cn(animated && 'animate-stagger-fade')}>
-                <circle cx="31" cy="61" r="5" fill="var(--usa-primary, #1E3A5F)" opacity="0.15" stroke="var(--usa-primary, #1E3A5F)" strokeWidth="1" />
-                <circle cx="45" cy="61" r="5" fill="var(--europe-primary, #1D4E89)" opacity="0.15" stroke="var(--europe-primary, #1D4E89)" strokeWidth="1" />
-                <circle cx="59" cy="61" r="5" fill="var(--gold, #FFD700)" opacity="0.15" stroke="var(--gold, #FFD700)" strokeWidth="1" />
-            </g>
+            {/* Big date — italic serif to match the wordmark */}
+            <text
+                x="50"
+                y="66"
+                textAnchor="middle"
+                fontSize="22"
+                fontStyle="italic"
+                fontFamily="'Instrument Serif', 'Times New Roman', serif"
+                fontWeight="400"
+                fill="var(--ink, #1C1917)"
+                className={cn(animated && 'illo-date-settle')}
+            >
+                18
+            </text>
 
-            {/* Today marker */}
-            <g className={cn(animated && 'animate-pulse-gentle')}>
-                <circle cx="73" cy="61" r="5" fill="var(--masters, #006644)" />
-                <circle cx="73" cy="61" r="2.5" fill="white" />
+            {/* Single "tee time" pill — replaces the old three tiny
+                dot markers. Reads as "there's a tee time on this
+                day" rather than an ambiguous cluster. */}
+            <g className={cn(animated && 'illo-pill-pulse')} style={{ transformOrigin: '50px 76px' }}>
+                <rect
+                    x="34"
+                    y="72"
+                    width="32"
+                    height="7"
+                    rx="3.5"
+                    fill="var(--masters, #006644)"
+                    opacity="0.14"
+                />
+                <circle cx="40" cy="75.5" r="1.8" fill="var(--masters, #006644)" />
+                <rect x="44" y="74" width="18" height="3" rx="1" fill="var(--masters, #006644)" opacity="0.55" />
             </g>
         </svg>
     );

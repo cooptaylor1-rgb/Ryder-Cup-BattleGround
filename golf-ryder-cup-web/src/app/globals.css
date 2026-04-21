@@ -3688,6 +3688,114 @@ html.dark body {
   animation: pulse-gentle 2.5s var(--ease-smooth) infinite;
 }
 
+/* ─── Illustration refresh (2026-04-21) ──────────────────────────
+   Replaces animate-golfer-* and the generic pulse for the new
+   pennant-based GolfersIllustration and the simplified
+   CalendarIllustration. Each illo wrapper also gets an entrance
+   (fade + scale-in) so empty states read as composed arrivals
+   rather than instant pop-ins. Every animation sits at or below
+   3s so they never demand attention after the first glance.
+   */
+
+@keyframes illo-entrance {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.illo-entrance {
+  animation: illo-entrance 480ms var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) both;
+}
+
+/* Pennants wave in opposite phases so the eye never catches them
+   in sync. Skew + rotate gives the flag a "wind" feel without
+   physics. */
+@keyframes illo-pennant-left {
+  0%,
+  100% {
+    transform: rotate(-1deg) skewY(-1deg);
+  }
+  50% {
+    transform: rotate(1.5deg) skewY(1deg);
+  }
+}
+
+@keyframes illo-pennant-right {
+  0%,
+  100% {
+    transform: rotate(1deg) skewY(1deg);
+  }
+  50% {
+    transform: rotate(-1.5deg) skewY(-1deg);
+  }
+}
+
+.illo-pennant-left {
+  animation: illo-pennant-left 3.2s var(--ease-smooth, ease-in-out) 600ms infinite;
+}
+
+.illo-pennant-right {
+  animation: illo-pennant-right 3.2s var(--ease-smooth, ease-in-out) 900ms infinite;
+}
+
+/* VS medallion — a very small breath so the centerpoint feels
+   alive without drawing attention away from whatever CTA the
+   empty state is offering. */
+@keyframes illo-vs-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+.illo-vs-pulse {
+  transform-origin: 50px 60px;
+  animation: illo-vs-pulse 2.4s var(--ease-smooth, ease-in-out) infinite;
+}
+
+/* Calendar date "settles" after the entrance — a subtle sub-pixel
+   nudge that reads as the number landing on the page. */
+@keyframes illo-date-settle {
+  0% {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.illo-date-settle {
+  animation: illo-date-settle 540ms var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1)) 220ms both;
+}
+
+/* Tee-time pill gets a gentle breath to reinforce "an event lives
+   here" without being clicky. */
+@keyframes illo-pill-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 0.92;
+  }
+}
+
+.illo-pill-pulse {
+  animation: illo-pill-pulse 2.8s var(--ease-smooth, ease-in-out) 420ms infinite;
+}
+
 /* Scores filling in */
 @keyframes scores-fill {
   from {
@@ -5079,6 +5187,12 @@ html.dark body {
   .animate-golfer-left,
   .animate-golfer-right,
   .animate-pulse-gentle,
+  .illo-entrance,
+  .illo-pennant-left,
+  .illo-pennant-right,
+  .illo-vs-pulse,
+  .illo-date-settle,
+  .illo-pill-pulse,
   .animate-pencil-write,
   .animate-flag-wave,
   .animate-ball-roll,
