@@ -149,14 +149,32 @@ function LoginPageContent() {
       // the redirect to /profile/create or the original next= path.
     } catch (requestError) {
       const raw = requestError instanceof Error ? requestError.message : 'Sign-in failed';
-      // Supabase returns "User already registered" when a signup email
-      // collides with an existing row. Rewrite the message with an
-      // action the user can take — the raw error sounds like a bug.
-      const friendly = /already registered/i.test(raw)
-        ? 'That email already has an account. Switch to Sign in and use your existing password (or reset it if you\'ve forgotten).'
-        : /invalid login credentials/i.test(raw)
-          ? 'Email or password didn\'t match. Double-check both, or switch to Sign up if you\'re new here.'
-          : raw;
+      // Map the common Supabase error families onto copy the user
+      // can act on. Anything unmapped falls through to the raw
+      // message so we never hide a real failure, but covers the
+      // cases that show up in Sentry 95% of the time:
+      //   - duplicate email on sign-up
+      //   - wrong password on sign-in
+      //   - weak password ("Password should be at least N characters")
+      //   - malformed email
+      //   - network drops / Supabase 500s
+      //   - rate limit
+      const friendly =
+        /already registered/i.test(raw)
+          ? "That email already has an account. Switch to Sign in and use your existing password (or reset it if you've forgotten)."
+          : /invalid login credentials/i.test(raw)
+            ? "Email or password didn't match. Double-check both, or switch to Sign up if you're new here."
+            : /password.*(at least|length|too (short|weak)|characters)/i.test(raw)
+              ? 'Pick a longer password — at least 6 characters.'
+              : /invalid.*email|unable to validate email/i.test(raw)
+                ? "That email doesn't look right. Check for typos and try again."
+                : /rate limit|too many requests/i.test(raw)
+                  ? 'Too many attempts in a short window. Wait a minute and try again.'
+                  : /network|fetch|failed to fetch/i.test(raw)
+                    ? "Couldn't reach the server. Check your connection and try again — your local work is safe."
+                    : /user not found/i.test(raw)
+                      ? "No account on that email yet. Switch to Sign up to create one."
+                      : raw;
       useAuthStore.setState({ error: friendly });
     } finally {
       setIsCloudAuthInFlight(false);
