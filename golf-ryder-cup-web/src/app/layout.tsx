@@ -8,6 +8,7 @@ import { PWAUpdateToast } from '@/components/PWAUpdateToast';
 import { IOSInstallBanner } from '@/components/IOSInstallBanner';
 import { IOSInstallPrompt } from '@/components/IOSInstallPrompt';
 import { InstallBanner } from '@/components/InstallPrompt';
+import { PWAPromptGate } from '@/components/PWAPromptGate';
 import { ToastContainer } from '@/components/ui/Toast';
 import { KeyboardShortcutsProvider } from '@/components/ui/KeyboardShortcutsProvider';
 import { AppOnboardingProvider } from '@/components/AppOnboardingProvider';
@@ -230,14 +231,21 @@ export default function RootLayout({
               <CourseSyncInitializer />
               <TripSyncInitializer />
               <ToastContainer />
-              {/* Persistent-but-dismissible strip for iOS Safari users
-                  who haven't installed the PWA. Complements the modal
-                  IOSInstallPrompt, which only appears once per week. */}
-              <IOSInstallBanner />
-              <PWABanners />
+              {/* Install-the-app prompts are gated behind PWAPromptGate:
+                  they render only after the user is signed in, has a
+                  trip, and is off the auth/onboarding paths. The web
+                  experience is the product; the install is a nice
+                  extra for offline scoring, not the default pitch.
+                  PWAUpdateToast lives outside the gate because a
+                  stale service worker is a correctness issue, not a
+                  marketing nudge. */}
               <PWAUpdateToast />
-              <InstallBanner position="bottom" />
-              <IOSInstallPrompt delay={45000} dismissDays={14} />
+              <PWAPromptGate>
+                <IOSInstallBanner />
+                <PWABanners />
+                <InstallBanner position="bottom" />
+                <IOSInstallPrompt delay={45000} dismissDays={14} />
+              </PWAPromptGate>
               <KeyboardShortcutsProvider />
             </ThemeProvider>
           </CapacitorProvider>

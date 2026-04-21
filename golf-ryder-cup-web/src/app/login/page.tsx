@@ -14,7 +14,11 @@ import {
 } from 'lucide-react';
 import { PageLoadingSkeleton } from '@/components/ui';
 import { cn } from '@/lib/utils';
-import { signInWithEmailPassword, signUpWithEmailPassword } from '@/lib/supabase/auth';
+import {
+  sendPasswordResetEmail,
+  signInWithEmailPassword,
+  signUpWithEmailPassword,
+} from '@/lib/supabase/auth';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 
 /**
@@ -51,6 +55,8 @@ function LoginPageContent() {
   const [isCloudAuthInFlight, setIsCloudAuthInFlight] = useState(false);
   const [showOfflinePinForm, setShowOfflinePinForm] = useState(!isSupabaseConfigured);
   const [isOffline, setIsOffline] = useState(false);
+  const [isResetInFlight, setIsResetInFlight] = useState(false);
+  const [resetSentTo, setResetSentTo] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated && currentUser) {
@@ -105,6 +111,10 @@ function LoginPageContent() {
     if (error) {
       clearError();
     }
+    // If the user starts editing the email after asking for a reset,
+    // the "sent to X" confirmation is stale — clear it so they don't
+    // think the new email is what was sent.
+    setResetSentTo((current) => (current && current !== email.trim().toLowerCase() ? null : current));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, password, pin]);
 
@@ -155,6 +165,29 @@ function LoginPageContent() {
 
   const handleCreateAccount = () => {
     router.push(`/profile/create${nextParam}`);
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email || !isSupabaseConfigured) {
+      useAuthStore.setState({
+        error: 'Enter the email on your account first so we know where to send the reset link.',
+      });
+      return;
+    }
+    setIsResetInFlight(true);
+    clearError();
+    try {
+      await sendPasswordResetEmail(email);
+      setResetSentTo(email.trim().toLowerCase());
+    } catch (requestError) {
+      const message =
+        requestError instanceof Error
+          ? requestError.message
+          : 'Couldn\'t send the reset email. Try again.';
+      useAuthStore.setState({ error: message });
+    } finally {
+      setIsResetInFlight(false);
+    }
   };
 
   const canSubmit = Boolean(
@@ -248,6 +281,26 @@ function LoginPageContent() {
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
+                {/* Sign-in users get a forgot-password escape hatch;
+                    sign-up users don't need one (no password yet). */}
+                {authMode === 'sign-in' && (
+                  <div className="mt-[var(--space-2)] flex justify-end">
+                    {resetSentTo ? (
+                      <span className="text-xs text-[var(--masters)]">
+                        Reset email sent to {resetSentTo}. Check your inbox.
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleForgotPassword}
+                        disabled={isResetInFlight || !email || !isSupabaseConfigured}
+                        className="text-xs text-[var(--ink-secondary)] underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isResetInFlight ? 'Sending reset link…' : 'Forgot password?'}
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
 
               <button
