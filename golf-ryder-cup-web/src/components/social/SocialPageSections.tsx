@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useMemo, useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
+import { zIndex } from '@/lib/constants/zIndex';
 import { stripHtml } from '@/lib/utils/sanitize';
 import type { BanterPost, Player } from '@/lib/types/models';
 import { Camera, Image as ImageIcon, MessageCircle, Send, Share2, Smile, Trash2 } from 'lucide-react';
@@ -306,8 +307,17 @@ export function SocialComposerDock({
   onChangeMessage: (value: string) => void;
   onSubmit: () => void;
 }) {
+  // Composer sits above the BottomNav (72px tall with safe-area padding)
+  // on mobile and at bottom-0 on lg where the nav is hidden. Previously
+  // used `bottom-[var(--nav-height)]` but --nav-height is never defined
+  // anywhere in the app, so the arbitrary property resolved to `auto`
+  // and the composer collapsed behind the nav bar. zIndex.nav + 1 keeps
+  // it above the 72px nav (z-50) without fighting the toast layer above.
   return (
-    <div className="fixed inset-x-0 bottom-[var(--nav-height)] z-20 border-t border-[color:var(--rule)]/80 bg-[color:var(--canvas)]/94 backdrop-blur-xl">
+    <div
+      className="fixed inset-x-0 border-t border-[color:var(--rule)]/80 bg-[color:var(--canvas)]/94 backdrop-blur-xl bottom-[calc(72px+env(safe-area-inset-bottom,0px))] lg:bottom-0"
+      style={{ zIndex: zIndex.nav + 1 }}
+    >
       <div className="container-editorial py-[var(--space-3)]">
         {showEmojis ? (
           <div className="mb-[var(--space-3)] flex flex-wrap gap-[var(--space-2)]">
