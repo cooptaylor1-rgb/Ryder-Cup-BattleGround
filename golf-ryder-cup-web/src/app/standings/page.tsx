@@ -103,9 +103,13 @@ export default function StandingsPage() {
         ? await db.holeResults.where('matchId').anyOf(matchIds).toArray()
         : [];
       const completed = matches.filter((m) => m.status === 'completed').length;
-      const latestUpdate = [...matches, ...holeResults]
-        .map((row) => row.updatedAt ?? '')
-        .reduce((max, current) => (current > max ? current : max), '');
+      const matchTimestamps = matches.map((m) => m.updatedAt ?? '');
+      // HoleResult doesn't carry an updatedAt; use its edit or create stamp.
+      const holeTimestamps = holeResults.map((h) => h.lastEditedAt ?? h.timestamp ?? '');
+      const latestUpdate = [...matchTimestamps, ...holeTimestamps].reduce(
+        (max, current) => (current > max ? current : max),
+        '',
+      );
       return `${matches.length}|${completed}|${holeResults.length}|${latestUpdate}`;
     },
     [tripId],
