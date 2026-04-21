@@ -211,11 +211,21 @@ export function queueSyncOperation(
   }
 }
 
+/**
+ * Throttle (not debounce) the queue drain so active scoring doesn't
+ * starve sync. The previous implementation cleared the timer on every
+ * enqueue, which meant a captain entering scores for seven straight
+ * holes inside the SYNC_DEBOUNCE_MS window kept deferring sync to
+ * after they stopped typing — so the badge read "Syncing (7)" for
+ * as long as they stayed active. Leading-edge throttle fires a sync
+ * SYNC_DEBOUNCE_MS after the *first* edit and ignores subsequent
+ * enqueues until the timer fires, guaranteeing the queue drains at
+ * least once per SYNC_DEBOUNCE_MS during a scoring burst.
+ */
 export function scheduleSyncQueueProcessing(): void {
-  if (tripSyncRuntime.syncDebounceTimer) {
-    clearTimeout(tripSyncRuntime.syncDebounceTimer);
-  }
+  if (tripSyncRuntime.syncDebounceTimer) return;
   tripSyncRuntime.syncDebounceTimer = setTimeout(() => {
+    tripSyncRuntime.syncDebounceTimer = null;
     processSyncQueue().catch((err) => {
       logger.error('Queue processing error:', err);
     });
@@ -272,7 +282,13 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
       });
     }
 
-    for (const item of pendingItems) {
+    // Sync a single item: flip to syncing, run the retry backoff
+    // (if any), push to cloud, flip to completed or bump the retry
+    // counter. Extracted so the outer loop can run items in parallel
+    // within a dependency rank. Keeps the persist-before-mutate
+    // invariant from the original loop so a crashed process never
+    // loses the updated retry budget.
+    const syncOne = async (item: SyncQueueItem): Promise<void> => {
       item.status = 'syncing';
       item.lastAttemptAt = new Date().toISOString();
       await persistQueueItem(item);
@@ -287,11 +303,6 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
         await persistQueueItem(item);
         synced++;
       } catch (err) {
-        // Persist the new retry state before mutating the in-memory item.
-        // If the process dies between bumping memory and persisting, disk
-        // would keep the old retryCount and the item would retry forever;
-        // persist-first keeps disk as the source of truth so the retry
-        // budget survives crashes and tab reloads.
         const nextRetryCount = item.retryCount + 1;
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         const nextStatus: SyncQueueItem['status'] =
@@ -319,6 +330,34 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
             error: errorMessage,
           });
         }
+      }
+    };
+
+    // Process items in dependency ranks — parents first, children
+    // after — but run items *within* the same rank concurrently.
+    // Before this, seven queued hole_results would run strictly
+    // serially: one slow upload (or a single item waiting out its
+    // exponential retry backoff) blocked the other six behind it.
+    // compareByDependency already groups by entity+operation, so
+    // adjacent items in pendingItems share a dependency rank; we
+    // collect them into contiguous buckets and then fan out each
+    // bucket with a 4-way concurrency cap so the anon Supabase
+    // client and mobile radio don't thrash on bigger bursts.
+    const CONCURRENCY = 4;
+    const bucketKey = (item: SyncQueueItem) => `${item.entity}:${item.operation}`;
+    const buckets: SyncQueueItem[][] = [];
+    for (const item of pendingItems) {
+      const last = buckets[buckets.length - 1];
+      if (last && bucketKey(last[0]) === bucketKey(item)) {
+        last.push(item);
+      } else {
+        buckets.push([item]);
+      }
+    }
+
+    for (const bucket of buckets) {
+      for (let i = 0; i < bucket.length; i += CONCURRENCY) {
+        await Promise.all(bucket.slice(i, i + CONCURRENCY).map(syncOne));
       }
     }
 
