@@ -72,6 +72,7 @@ interface ScheduleSessionLike {
   name: string;
   scheduledDate?: string;
   timeSlot?: 'AM' | 'PM';
+  firstTeeTime?: string;
   sessionNumber: number;
   sessionType: string;
   status: 'scheduled' | 'inProgress' | 'paused' | 'completed' | 'cancelled';
