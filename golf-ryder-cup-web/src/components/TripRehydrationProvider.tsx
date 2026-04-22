@@ -5,6 +5,7 @@ import { useTripStore, useAuthStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { db } from '@/lib/db';
 import { ensureCurrentUserTripPlayerLink } from '@/lib/services/tripPlayerLinkService';
+import { useTripRosterRefresh } from '@/lib/hooks/useTripRosterRefresh';
 import { tripLogger } from '@/lib/utils/logger';
 import { withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 
@@ -148,6 +149,13 @@ export function TripRehydrationProvider({ children }: { children: React.ReactNod
 
         findAndLoadUserTrip();
     }, [authUserId, isAuthenticated, currentUser, currentTrip, loadTrip]);
+
+    // App-wide roster poll: re-pull the trip from Supabase every 15s while
+    // a trip is loaded, regardless of which page the user is on. Before
+    // this lived only on /captain/invites and /players; a captain sitting
+    // on the home page never saw new joiners because tripStore.loadTrip
+    // reads Dexie only and Dexie never got the joiner's Player row.
+    useTripRosterRefresh(currentTrip?.id ?? null, { toastOnManualRefresh: false });
 
     useEffect(() => {
         if (!isAuthenticated || !currentUser || !currentTrip || isEnsuringTripPlayer.current) {

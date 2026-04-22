@@ -87,18 +87,43 @@ export async function syncTripToCloudFull(tripId: string): Promise<TripSyncResul
 }
 
 export async function pullTripByShareCode(shareCode: string): Promise<TripSyncResult> {
+  return pullTripCore({ shareCode });
+}
+
+/**
+ * Pull a trip and its children from Supabase by tripId. Mirrors
+ * pullTripByShareCode but skips the share-code lookup — used by the
+ * app-wide roster poll, where the captain already knows their own
+ * tripId and may or may not have their share code cached in
+ * localStorage. Without this, a captain whose localStorage was
+ * cleared (or who created the trip on a different browser) stayed
+ * on a frozen roster forever because the share-code fallback would
+ * silently no-op.
+ */
+export async function pullTripById(tripId: string): Promise<TripSyncResult> {
+  return pullTripCore({ tripId });
+}
+
+async function pullTripCore(lookup: {
+  shareCode?: string;
+  tripId?: string;
+}): Promise<TripSyncResult> {
   if (!canSync()) {
     return { success: false, tripId: '', error: 'Offline' };
   }
 
   try {
-    const { data: trip, error: tripError } = await getTable('trips')
-      .select('*')
-      .eq('share_code', shareCode.toUpperCase())
-      .single();
+    const tripQuery = getTable('trips').select('*');
+    const { data: trip, error: tripError } = lookup.shareCode
+      ? await tripQuery.eq('share_code', lookup.shareCode.toUpperCase()).single()
+      : await tripQuery.eq('id', lookup.tripId).single();
 
     if (tripError || !trip) {
-      throw new Error('Trip not found with that share code');
+      throw new Error(
+        lookup.shareCode
+          ? 'Trip not found with that share code'
+          : 'Trip not found with that id'
+      );
     }
 
     const [{ data: teams }, { data: sessions }] = await Promise.all([
@@ -267,7 +292,11 @@ export async function pullTripByShareCode(shareCode: string): Promise<TripSyncRe
       }
     );
 
-    storeTripShareCode(trip.id, shareCode);
+    const resolvedShareCode =
+      lookup.shareCode ?? (typeof trip.share_code === 'string' ? trip.share_code : undefined);
+    if (resolvedShareCode) {
+      storeTripShareCode(trip.id, resolvedShareCode);
+    }
     logger.log(`Pulled trip ${trip.id} from cloud`);
     return { success: true, tripId: trip.id, cloudId: trip.id };
   } catch (error) {
