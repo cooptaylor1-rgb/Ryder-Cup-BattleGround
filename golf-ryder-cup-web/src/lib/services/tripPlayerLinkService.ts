@@ -156,6 +156,37 @@ export async function ensureCurrentUserTripPlayerLink(
   currentUser: CurrentTripPlayerIdentity | null,
   isAuthenticated = true
 ): Promise<TripPlayerLinkResult> {
+  // JoinTripModal and TripRehydrationProvider both call this concurrently:
+  // the modal fires it inline after pullTripByShareCode populates the
+  // trip store, and the provider's useEffect refires as soon as
+  // `currentTrip`/`players` change. Before this guard, both runs raced
+  // the "no existing match → create Player" branch and each called
+  // buildTripPlayerFromIdentity (which mints a fresh UUID), producing
+  // two Player rows 1-8ms apart that both got pushed to Supabase.
+  // Share a single in-flight promise per (tripId, user) so the second
+  // caller reuses the first caller's result.
+  const userKey =
+    currentUser?.authUserId ?? currentUser?.id ?? normalizeEmail(currentUser?.email) ?? 'anonymous';
+  const inFlightKey = `${tripId}:${userKey}`;
+  const inFlight = inFlightTripPlayerLinks.get(inFlightKey);
+  if (inFlight) return inFlight;
+
+  const run = ensureCurrentUserTripPlayerLinkImpl(tripId, players, currentUser, isAuthenticated)
+    .finally(() => {
+      inFlightTripPlayerLinks.delete(inFlightKey);
+    });
+  inFlightTripPlayerLinks.set(inFlightKey, run);
+  return run;
+}
+
+const inFlightTripPlayerLinks = new Map<string, Promise<TripPlayerLinkResult>>();
+
+async function ensureCurrentUserTripPlayerLinkImpl(
+  tripId: string,
+  players: Player[],
+  currentUser: CurrentTripPlayerIdentity | null,
+  isAuthenticated = true
+): Promise<TripPlayerLinkResult> {
   const initialResult = assessTripPlayerLink(players, currentUser, isAuthenticated);
 
   if (
