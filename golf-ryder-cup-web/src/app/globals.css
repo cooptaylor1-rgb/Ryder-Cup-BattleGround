@@ -50,7 +50,7 @@
   --ink: #1A1815;
   --ink-primary: var(--ink);
   --ink-secondary: #6B6560;
-  --ink-tertiary: #7A7570;
+  --ink-tertiary: #66615B;
   --ink-faint: #D4CFC9;
 
   /* ---- RULE ----
@@ -5939,6 +5939,5 @@ html.dark body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
-
 
 

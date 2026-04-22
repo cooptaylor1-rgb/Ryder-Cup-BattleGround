@@ -14,7 +14,7 @@ export function ManageFactCard({
   valueClassName?: string;
 }) {
   return (
-    <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-4)] py-[var(--space-4)] shadow-[0_12px_24px_rgba(46,34,18,0.05)]">
+    <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-4)] py-[var(--space-4)] shadow-[0_10px_20px_rgba(46,34,18,0.05)]">
       <p className="type-overline text-[var(--ink-tertiary)]">{label}</p>
       <p
         className={cn(
