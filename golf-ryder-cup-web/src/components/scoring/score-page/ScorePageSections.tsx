@@ -98,23 +98,26 @@ export function ScorePageSections({
               <ScoreSessionStat label="Your Matches" value={sessionStats.userMatches} />
             </div>
 
-            {quickContinueMatchId ? (
-              <button
-                onClick={() => onSelectMatch(quickContinueMatchId)}
-                className="mt-[var(--space-5)] flex w-full items-center justify-between gap-[var(--space-4)] rounded-[24px] border border-[color:rgba(0,102,68,0.2)] bg-[linear-gradient(135deg,rgba(0,102,68,0.14)_0%,rgba(255,255,255,0.8)_100%)] px-[var(--space-5)] py-[var(--space-4)] text-left shadow-[0_8px_20px_rgba(0,102,68,0.08)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--masters)]/40 active:scale-[0.99]"
-                aria-label="Continue scoring active match"
-              >
-                <div>
-                  <p className="type-overline text-[var(--masters)]">Quick Action</p>
-                  <p className="mt-[var(--space-1)] type-title-sm text-[var(--ink)]">
-                    Continue live match
-                  </p>
-                  <p className="mt-1 text-sm text-[var(--ink-secondary)]">
-                    Jump straight back into the only match currently underway.
-                  </p>
-                </div>
-                <ChevronRight size={18} className="text-[var(--ink-tertiary)]" />
-              </button>
+                        {quickContinueMatchId ? (
+                            <button
+                                onClick={() => onSelectMatch(quickContinueMatchId)}
+                                className="mt-[var(--space-5)] flex w-full items-center justify-between gap-[var(--space-4)] rounded-[24px] border border-[color:rgba(0,102,68,0.2)] bg-[linear-gradient(135deg,rgba(0,102,68,0.14)_0%,rgba(255,255,255,0.8)_100%)] px-[var(--space-5)] py-[var(--space-4)] text-left shadow-[0_8px_20px_rgba(0,102,68,0.08)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--masters)]/40 active:scale-[0.99]"
+                                aria-label="Continue scoring active match"
+                            >
+                                <div>
+                                    <p className="type-overline text-[var(--masters)]">Quick Action</p>
+                                    <p className="mt-[var(--space-1)] type-title-sm text-[var(--ink)]">
+                                        Continue live match
+                                    </p>
+                                    <p className="mt-1 text-sm text-[var(--ink-secondary)]">
+                                        Jump straight back into the only match currently underway.
+                                    </p>
+                                </div>
+                                <ChevronRight size={18} className="text-[var(--ink-tertiary)]" />
+                            </button>
+                        ) : null}
+                    </div>
+                </section>
             ) : null}
           </div>
         </section>
@@ -267,30 +270,45 @@ const MatchRow = React.memo(function MatchRow({
         <div>
           <span
             className={cn(
-              'type-overline',
-              isUserMatch ? 'text-[var(--masters)]' : 'text-[var(--ink-tertiary)]'
+                'card-editorial card-interactive relative w-full overflow-hidden text-left transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--masters)]/35',
+                isActive ? 'p-[var(--space-6)]' : 'p-[var(--space-5)]',
+                isUserMatch && 'border-2 border-[var(--masters)]'
             )}
-          >
-            Match {matchNumber}
-          </span>
-          <p className="mt-2 text-sm font-medium text-[var(--ink-secondary)]">
-            {status === 'inProgress'
-              ? 'Currently being scored'
-              : status === 'completed'
-                ? 'Card closed'
-                : 'Waiting to start'}
-          </p>
-        </div>
-        <SessionStatusPill
-          status={
-            status === 'inProgress'
-              ? 'inProgress'
-              : status === 'completed'
-                ? 'completed'
-                : 'scheduled'
-          }
-        />
-      </div>
+        >
+            {isUserMatch ? (
+                <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[var(--masters)] px-3 py-[3px] text-[10px] font-bold uppercase leading-none tracking-[0.08em] text-[var(--canvas)]">
+                    Your Match
+                </div>
+            ) : null}
+
+            <div className="mb-[var(--space-4)] flex items-center justify-between">
+                <div>
+                    <span
+                        className={cn(
+                            'type-overline',
+                            isUserMatch ? 'text-[var(--masters)]' : 'text-[var(--ink-tertiary)]'
+                        )}
+                    >
+                        Match {matchNumber}
+                    </span>
+                    <p className="mt-2 text-sm font-medium text-[var(--ink-secondary)]">
+                        {status === 'inProgress'
+                            ? 'Currently being scored'
+                            : status === 'completed'
+                              ? 'Card closed'
+                              : 'Waiting to start'}
+                    </p>
+                </div>
+                <SessionStatusPill
+                    status={
+                        status === 'inProgress'
+                            ? 'inProgress'
+                            : status === 'completed'
+                              ? 'completed'
+                              : 'scheduled'
+                    }
+                />
+            </div>
 
       <div className="flex items-center gap-4">
         <div className="min-w-0 flex-1">
@@ -329,29 +347,29 @@ const MatchRow = React.memo(function MatchRow({
           </div>
         </div>
 
-        <div className="min-w-[92px] rounded-[22px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/78 px-3 py-3 text-right">
-          <span
-            className={cn(
-              'block font-serif font-normal leading-none tracking-[-0.02em]',
-              isActive ? 'score-monumental' : 'text-2xl',
-              currentScore > 0
-                ? 'text-[var(--team-usa)]'
-                : currentScore < 0
-                  ? 'text-[var(--team-europe)]'
-                  : 'text-[var(--ink-tertiary)]'
-            )}
-          >
-            {displayScore}
-          </span>
-          {holesPlayed > 0 && status !== 'completed' ? (
-            <p className="mt-1 text-sm font-semibold text-[var(--ink-secondary)]">
-              thru {holesPlayed}
-            </p>
-          ) : null}
-          {status === 'scheduled' && holesPlayed === 0 ? (
-            <p className="text-sm font-medium text-[var(--ink-secondary)]">Not started</p>
-          ) : null}
-        </div>
+                <div className="min-w-[92px] rounded-[22px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/78 px-3 py-3 text-right">
+                    <span
+                        className={cn(
+                            'block font-serif font-normal leading-none tracking-[-0.02em]',
+                            isActive ? 'score-monumental' : 'text-2xl',
+                            currentScore > 0
+                                ? 'text-[var(--team-usa)]'
+                                : currentScore < 0
+                                  ? 'text-[var(--team-europe)]'
+                                  : 'text-[var(--ink-tertiary)]'
+                        )}
+                    >
+                        {displayScore}
+                    </span>
+                    {holesPlayed > 0 && status !== 'completed' ? (
+                        <p className="mt-1 text-sm font-semibold text-[var(--ink-secondary)]">
+                            thru {holesPlayed}
+                        </p>
+                    ) : null}
+                    {status === 'scheduled' && holesPlayed === 0 ? (
+                        <p className="text-sm font-medium text-[var(--ink-secondary)]">Not started</p>
+                    ) : null}
+                </div>
 
         <ChevronRight size={18} strokeWidth={1.5} className="shrink-0 text-[var(--ink-tertiary)]" />
       </div>

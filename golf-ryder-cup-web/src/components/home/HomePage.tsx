@@ -204,33 +204,15 @@ export default function HomePage() {
               {/* Persistent "New Trip" action — the most important captain
                 action should never be more than one tap from home,
                 whether there's an active trip or not. */}
-              <Link
-                href="/trip/new"
-                aria-label="Create a new trip"
-                title="Create a new trip"
-                className="press-scale p-2 rounded-[var(--radius-md)] border border-[color:var(--rule)] bg-[var(--canvas-raised)] text-[var(--masters-deep)] shadow-[0_2px_8px_rgba(26,24,21,0.05)] hover:bg-[var(--masters-subtle)] hover:border-[color:var(--masters)]/25 transition-colors"
-              >
-                <Plus size={20} strokeWidth={1.75} />
-              </Link>
-              {hasTrips ? <CaptainToggle /> : null}
-            </div>
-          }
-        />
-
-        {/* ── CONTINUE SCORING BANNER ── */}
-        {userMatchData?.match?.status === 'inProgress' && (
-          <div className="sticky top-0 z-40 border-y border-[var(--rule-faint)] bg-[color:var(--canvas)]/95 py-[var(--space-2)] px-[var(--space-4)] backdrop-blur-sm">
-            <ContinueScoringBanner
-              match={userMatchData.match}
-              matchState={userMatchData.matchState || undefined}
-              matchDescription={
-                userMatchData.session?.sessionType === 'fourball'
-                  ? 'Four-Ball'
-                  : userMatchData.session?.sessionType === 'foursomes'
-                    ? 'Foursomes'
-                    : 'Singles'
-              }
-            />
+            <Link
+              href="/trip/new"
+              aria-label="Create a new trip"
+              title="Create a new trip"
+              className="press-scale p-2 rounded-[var(--radius-md)] border border-[color:var(--rule)] bg-[var(--canvas-raised)] text-[var(--masters-deep)] shadow-[0_2px_8px_rgba(26,24,21,0.05)] hover:bg-[var(--masters-subtle)] hover:border-[color:var(--masters)]/25 transition-colors"
+            >
+              <Plus size={20} strokeWidth={1.75} />
+            </Link>
+            {hasTrips ? <CaptainToggle /> : null}
           </div>
         )}
 
