@@ -205,7 +205,7 @@ export default function HomePage() {
               href="/trip/new"
               aria-label="Create a new trip"
               title="Create a new trip"
-              className="press-scale p-2 rounded-[var(--radius-md)] text-[var(--ink-secondary)] hover:bg-[var(--canvas-sunken)] transition-colors"
+              className="press-scale p-2 rounded-[var(--radius-md)] border border-[color:var(--rule)] bg-[var(--canvas-raised)] text-[var(--masters-deep)] shadow-[0_2px_8px_rgba(26,24,21,0.05)] hover:bg-[var(--masters-subtle)] hover:border-[color:var(--masters)]/25 transition-colors"
             >
               <Plus size={20} strokeWidth={1.75} />
             </Link>

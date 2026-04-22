@@ -107,7 +107,7 @@ export function ScorePageSections({
                         {quickContinueMatchId ? (
                             <button
                                 onClick={() => onSelectMatch(quickContinueMatchId)}
-                                className="mt-[var(--space-5)] flex w-full items-center justify-between gap-[var(--space-4)] rounded-[24px] border border-[color:rgba(0,102,68,0.15)] bg-[linear-gradient(135deg,rgba(0,102,68,0.12)_0%,rgba(255,255,255,0.72)_100%)] px-[var(--space-5)] py-[var(--space-4)] text-left transition-transform active:scale-[0.99]"
+                                className="mt-[var(--space-5)] flex w-full items-center justify-between gap-[var(--space-4)] rounded-[24px] border border-[color:rgba(0,102,68,0.2)] bg-[linear-gradient(135deg,rgba(0,102,68,0.14)_0%,rgba(255,255,255,0.8)_100%)] px-[var(--space-5)] py-[var(--space-4)] text-left shadow-[0_8px_20px_rgba(0,102,68,0.08)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--masters)]/40 active:scale-[0.99]"
                                 aria-label="Continue scoring active match"
                             >
                                 <div>
@@ -256,7 +256,7 @@ const MatchRow = React.memo(function MatchRow({
             onClick={onClick}
             aria-label={`Open Match ${matchNumber}${isUserMatch ? ' (Your Match)' : ''}`}
             className={cn(
-                'card-editorial card-interactive relative w-full overflow-hidden text-left transition-shadow',
+                'card-editorial card-interactive relative w-full overflow-hidden text-left transition-shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--masters)]/35',
                 isActive ? 'p-[var(--space-6)]' : 'p-[var(--space-5)]',
                 isUserMatch && 'border-2 border-[var(--masters)]'
             )}
@@ -277,7 +277,7 @@ const MatchRow = React.memo(function MatchRow({
                     >
                         Match {matchNumber}
                     </span>
-                    <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+                    <p className="mt-2 text-sm font-medium text-[var(--ink-secondary)]">
                         {status === 'inProgress'
                             ? 'Currently being scored'
                             : status === 'completed'
@@ -333,7 +333,7 @@ const MatchRow = React.memo(function MatchRow({
                     </div>
                 </div>
 
-                <div className="min-w-[86px] rounded-[22px] border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/72 px-3 py-3 text-right">
+                <div className="min-w-[92px] rounded-[22px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/78 px-3 py-3 text-right">
                     <span
                         className={cn(
                             'block font-serif font-normal leading-none tracking-[-0.02em]',
@@ -348,12 +348,12 @@ const MatchRow = React.memo(function MatchRow({
                         {displayScore}
                     </span>
                     {holesPlayed > 0 && status !== 'completed' ? (
-                        <p className="mt-1 text-sm font-medium text-[var(--ink-tertiary)]">
+                        <p className="mt-1 text-sm font-semibold text-[var(--ink-secondary)]">
                             thru {holesPlayed}
                         </p>
                     ) : null}
                     {status === 'scheduled' && holesPlayed === 0 ? (
-                        <p className="text-sm text-[var(--ink-tertiary)]">Not started</p>
+                        <p className="text-sm font-medium text-[var(--ink-secondary)]">Not started</p>
                     ) : null}
                 </div>
 
