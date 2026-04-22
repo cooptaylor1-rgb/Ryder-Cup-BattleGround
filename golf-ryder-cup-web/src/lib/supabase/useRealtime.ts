@@ -14,11 +14,13 @@ import {
     subscribeTripChannel,
     unsubscribeChannel,
     trackPresence,
+    fetchTripRosterFromCloud,
     ConnectionStatus,
 } from './client';
 import { db } from '../db';
 import { useScoringStore } from '../stores/scoringStore';
-import type { HoleResult, Match } from '../types/models';
+import { useTripStore } from '../stores/tripStore';
+import type { HoleResult, Match, Player, Team, TeamMember } from '../types/models';
 import { createLogger } from '../utils/logger';
 
 const logger = createLogger('Realtime');
@@ -110,6 +112,60 @@ export function useRealtime(
         await refreshAllMatchStates();
     }, [refreshAllMatchStates]);
 
+    // Roster updates (players + team_members) land in Dexie, then the
+    // trip store reads fresh rows. Without these subscriptions the
+    // captain stayed on a stale roster until an app restart — new
+    // signups from other devices were invisible. Complements the
+    // 15-second pullTripByShareCode poll by delivering updates
+    // instantly on the trip channel.
+    const handlePlayerUpdate = useCallback(
+        async (payload: unknown) => {
+            const typedPayload = payload as {
+                eventType: string;
+                new: Record<string, unknown>;
+                old: Record<string, unknown>;
+            };
+
+            try {
+                if (typedPayload.eventType === 'DELETE') {
+                    const old = typedPayload.old as { id?: string };
+                    if (old?.id) await db.players.delete(old.id);
+                } else if (typedPayload.new) {
+                    const playerData = convertKeysToCamelCase(typedPayload.new) as unknown as Player;
+                    await db.players.put(playerData);
+                }
+                if (tripId) await useTripStore.getState().refreshRoster(tripId);
+            } catch (err) {
+                logger.error('Failed to process player update:', err);
+            }
+        },
+        [tripId]
+    );
+
+    const handleTeamMemberUpdate = useCallback(
+        async (payload: unknown) => {
+            const typedPayload = payload as {
+                eventType: string;
+                new: Record<string, unknown>;
+                old: Record<string, unknown>;
+            };
+
+            try {
+                if (typedPayload.eventType === 'DELETE') {
+                    const old = typedPayload.old as { id?: string };
+                    if (old?.id) await db.teamMembers.delete(old.id);
+                } else if (typedPayload.new) {
+                    const memberData = convertKeysToCamelCase(typedPayload.new) as unknown as TeamMember;
+                    await db.teamMembers.put(memberData);
+                }
+                if (tripId) await useTripStore.getState().refreshRoster(tripId);
+            } catch (err) {
+                logger.error('Failed to process team member update:', err);
+            }
+        },
+        [tripId]
+    );
+
     // Handle presence sync
     const handlePresenceSync = useCallback((state: Record<string, unknown>) => {
         const typedState = state as Record<string, unknown[]>;
@@ -150,6 +206,8 @@ export function useRealtime(
             onMatchUpdate: handleMatchUpdate,
             onHoleResultUpdate: handleHoleResultUpdate,
             onSessionUpdate: handleSessionUpdate,
+            onPlayerUpdate: handlePlayerUpdate,
+            onTeamMemberUpdate: handleTeamMemberUpdate,
             onPresenceSync: handlePresenceSync,
         });
 
@@ -167,11 +225,46 @@ export function useRealtime(
             if (userInfo) {
                 void trackPresence(channel, userInfo);
             }
+
+            // Catch-up pull: anyone who joined before the channel
+            // subscribed wouldn't fire an INSERT for us. One-shot
+            // fetch the current roster and merge into Dexie so those
+            // rows appear immediately on connect.
+            void (async () => {
+                try {
+                    const roster = await fetchTripRosterFromCloud(tripId);
+                    if (!roster) return;
+                    const playerRows = roster.players.map((row) =>
+                        convertKeysToCamelCase(row)
+                    ) as unknown as Player[];
+                    const teamRows = roster.teams.map((row) =>
+                        convertKeysToCamelCase(row)
+                    ) as unknown as Team[];
+                    const memberRows = roster.teamMembers.map((row) =>
+                        convertKeysToCamelCase(row)
+                    ) as unknown as TeamMember[];
+                    if (playerRows.length > 0) await db.players.bulkPut(playerRows);
+                    if (teamRows.length > 0) await db.teams.bulkPut(teamRows);
+                    if (memberRows.length > 0) await db.teamMembers.bulkPut(memberRows);
+                    await useTripStore.getState().refreshRoster(tripId);
+                } catch (err) {
+                    logger.error('Failed to catch up roster on connect:', err);
+                }
+            })();
         } else {
             setError('Failed to connect to real-time channel');
             setConnectionStatus('error');
         }
-    }, [tripId, userInfo, handleMatchUpdate, handleHoleResultUpdate, handleSessionUpdate, handlePresenceSync]);
+    }, [
+        tripId,
+        userInfo,
+        handleMatchUpdate,
+        handleHoleResultUpdate,
+        handleSessionUpdate,
+        handlePlayerUpdate,
+        handleTeamMemberUpdate,
+        handlePresenceSync,
+    ]);
 
     // Reconnect function
     const reconnect = useCallback(() => {

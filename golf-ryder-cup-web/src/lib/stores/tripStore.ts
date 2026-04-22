@@ -60,6 +60,7 @@ interface TripState {
 
   // Actions
   loadTrip: (tripId: string) => Promise<void>;
+  refreshRoster: (tripId: string) => Promise<void>;
   clearTrip: () => void;
   syncToCloud: () => Promise<void>;
   getSyncStatus: () => SyncStatus;
@@ -173,6 +174,38 @@ export const useTripStore = create<TripState>()(
             error: appError.userMessage,
             isLoading: false,
           });
+        }
+      },
+
+      // Re-read roster tables from Dexie without touching isLoading.
+      // Used by realtime handlers (e.g. another device's joiner insert
+      // arriving on the trip channel) to pull the fresh row into the
+      // active view without flashing the full-trip loading state.
+      refreshRoster: async (tripId: string) => {
+        try {
+          const teams = await db.teams.where('tripId').equals(tripId).toArray();
+          const teamIds = teams.map((t) => t.id);
+          const teamMembers =
+            teamIds.length === 0
+              ? []
+              : await db.teamMembers.where('teamId').anyOf(teamIds).toArray();
+
+          const playerIds = [...new Set(teamMembers.map((tm) => tm.playerId))];
+          const [tripPlayers, linkedPlayers] = await Promise.all([
+            db.players.where('tripId').equals(tripId).toArray(),
+            playerIds.length === 0 ? [] : db.players.where('id').anyOf(playerIds).toArray(),
+          ]);
+          const { players, backfilledPlayers } = mergeTripPlayers(
+            tripId,
+            tripPlayers,
+            linkedPlayers
+          );
+          if (backfilledPlayers.length > 0) {
+            await db.players.bulkPut(backfilledPlayers);
+          }
+          set({ teams, teamMembers, players });
+        } catch (error) {
+          logger.warn('refreshRoster failed:', error);
         }
       },
 
