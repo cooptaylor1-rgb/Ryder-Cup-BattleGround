@@ -41,9 +41,7 @@ const BASE_NAV_ITEMS: NavItem[] = [
 function getNavItemsForMode(isCaptainMode: boolean): NavItem[] {
   if (!isCaptainMode) return BASE_NAV_ITEMS;
   return BASE_NAV_ITEMS.map((item) =>
-    item.href === '/more'
-      ? { href: '/captain', label: 'Captain', icon: Shield }
-      : item
+    item.href === '/more' ? { href: '/captain', label: 'Captain', icon: Shield } : item
   );
 }
 
@@ -58,7 +56,7 @@ export interface NavBadges {
 export function BottomNav() {
   const router = useRouter();
   const pathname = usePathname();
-  const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+  const { isCaptainMode } = useAccessStore(useShallow((s) => ({ isCaptainMode: s.isCaptainMode })));
 
   const navItems = getNavItemsForMode(isCaptainMode);
 
@@ -73,7 +71,7 @@ export function BottomNav() {
         'nav-premium lg:hidden',
         'fixed bottom-0 left-0 right-0 z-50',
         'flex items-stretch justify-around',
-        'h-[72px] px-[var(--space-1)]',
+        'h-[72px] px-[var(--space-1)] border-t border-[var(--rule)] bg-[color:var(--canvas)]/92 backdrop-blur-md',
         'pb-[env(safe-area-inset-bottom,0px)]'
       )}
       aria-label="Main navigation"
@@ -89,12 +87,14 @@ export function BottomNav() {
             className={cn(
               'relative flex flex-col items-center justify-center',
               'flex-1 min-w-[56px] min-h-[56px] py-1.5',
-              'bg-transparent border-none cursor-pointer',
+              'border-none cursor-pointer',
               'transition-all duration-150',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gold)]/40 focus-visible:ring-inset',
               'active:scale-95 active:opacity-80',
               'rounded-xl [-webkit-tap-highlight-color:transparent]',
-              active ? 'text-[var(--masters)]' : 'text-[var(--ink-tertiary)]'
+              active
+                ? 'bg-[color:rgba(0,102,68,0.1)] text-[var(--masters)] shadow-[inset_0_0_0_1px_rgba(0,102,68,0.15)]'
+                : 'bg-transparent text-[var(--ink-secondary)] hover:bg-[color:rgba(26,24,21,0.04)]'
             )}
             aria-current={active ? 'page' : undefined}
             aria-label={item.label}
@@ -130,7 +130,7 @@ export function BottomNav() {
             <span
               className={cn(
                 'text-[11px] mt-0.5 tracking-[0.02em] font-sans',
-                active ? 'font-bold' : 'font-medium'
+                active ? 'font-bold' : 'font-semibold'
               )}
             >
               {item.label}

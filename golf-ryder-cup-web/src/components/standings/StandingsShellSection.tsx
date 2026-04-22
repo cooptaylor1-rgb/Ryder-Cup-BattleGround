@@ -28,12 +28,14 @@ export function StandingsMasthead({
         : 'Everything is level.';
 
   const progress =
-    totalMatches > 0 ? `${matchesCompleted} of ${totalMatches} matches complete` : 'Awaiting scores';
+    totalMatches > 0
+      ? `${matchesCompleted} of ${totalMatches} matches complete`
+      : 'Awaiting scores';
 
   return (
     <div className="overflow-hidden rounded-[2rem] border border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(248,244,237,0.94))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
       <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
-        <p className="type-overline tracking-[0.18em] text-[var(--ink-tertiary)]">Leaderboard</p>
+        <p className="type-overline tracking-[0.2em] text-[var(--ink-tertiary)]">Leaderboard</p>
         <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,8vw,3.3rem)] italic leading-[1.02] text-[var(--ink)]">
           {currentTripName}
         </h1>
@@ -121,7 +123,7 @@ export function StandingsFactCard({
   valueClassName?: string;
 }) {
   return (
-    <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.68)] px-[var(--space-4)] py-[var(--space-3)]">
+    <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-4)] py-[var(--space-3)] shadow-[0_10px_20px_rgba(46,34,18,0.05)]">
       <p className="type-micro uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">{label}</p>
       <p
         className={`mt-[2px] font-serif text-[1.25rem] italic leading-[1.2] text-[var(--ink)] ${valueClassName ?? ''}`}
