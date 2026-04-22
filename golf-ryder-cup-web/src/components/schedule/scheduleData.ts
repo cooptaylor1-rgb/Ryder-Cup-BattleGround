@@ -20,6 +20,28 @@ function tripDayToLocalDate(input: string | Date | undefined): Date | null {
   return parseDateInLocalZone(datePart);
 }
 
+// Session.firstTeeTime is stored as a 24-hour "HH:MM" string. Parse
+// defensively so a malformed value (empty, "invalid", out of range)
+// falls back to `null` and lets the caller use the AM/PM default.
+function parseFirstTeeHour(value: string | undefined): number | null {
+  if (!value) return null;
+  const [rawH] = value.split(':').map(Number);
+  if (!Number.isFinite(rawH) || rawH < 0 || rawH > 23) return null;
+  return rawH;
+}
+function parseFirstTeeMinute(value: string | undefined): number | null {
+  if (!value) return null;
+  const [, rawM] = value.split(':').map(Number);
+  if (!Number.isFinite(rawM) || rawM < 0 || rawM > 59) return null;
+  return rawM;
+}
+function formatHourMinute(hour: number | null, minute: number | null): string | null {
+  if (hour === null) return null;
+  const d = new Date();
+  d.setHours(hour, minute ?? 0, 0, 0);
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
 export interface ScheduleEntry {
   id: string;
   type: 'session' | 'teeTime' | 'event';
@@ -148,14 +170,19 @@ export function buildScheduleByDay({
     for (const session of daySessions) {
       const sessionMatches = matches.filter((match) => match.sessionId === session.id);
 
-      // Prefer the real first-tee time when the lineup builder has
-      // stamped one on Match 1 — captains set actual clock times
-      // during lineup publish and the UI should show those, not a
-      // hard-coded 8:00 / 1:00 pair. Fall back to the AM/PM
-      // convention only when no match has a start_time yet.
+      // Preference order for the displayed session time:
+      //   1. session.firstTeeTime  — captain-set clock time ("07:30")
+      //   2. firstMatch.startTime  — stamped when the lineup published
+      //   3. AM/PM convention      — 8:00 / 1:00 fallback for 0-match sessions
+      // Without (1) the schedule showed a stale 8:00/1:00 pair for
+      // sessions created before any matches existed, even when the
+      // captain had a specific tee time in mind.
       const firstMatch = sessionMatches
         .slice()
         .sort((a, b) => a.matchOrder - b.matchOrder)[0];
+      const sessionBaseHour = parseFirstTeeHour(session.firstTeeTime);
+      const sessionBaseMinute = parseFirstTeeMinute(session.firstTeeTime);
+      const explicitSessionTime = formatHourMinute(sessionBaseHour, sessionBaseMinute);
       const firstMatchTime = firstMatch?.startTime
         ? new Date(firstMatch.startTime).toLocaleTimeString('en-US', {
             hour: 'numeric',
@@ -163,7 +190,9 @@ export function buildScheduleByDay({
           })
         : null;
       const sessionTime =
-        firstMatchTime ?? (session.timeSlot === 'AM' ? '8:00 AM' : '1:00 PM');
+        explicitSessionTime ??
+        firstMatchTime ??
+        (session.timeSlot === 'AM' ? '8:00 AM' : '1:00 PM');
 
       entries.push({
         id: session.id,
@@ -196,10 +225,14 @@ export function buildScheduleByDay({
         const course = (match.courseId ? courseById.get(match.courseId) : undefined) ??
           (teeSet?.courseId ? courseById.get(teeSet.courseId) : undefined);
 
-        const baseHour = session.timeSlot === 'AM' ? 8 : 13;
+        // Base the match tee-time stream on the session's explicit
+        // firstTeeTime when set; only fall back to the AM/PM default
+        // when the captain hasn't specified a clock time.
+        const baseHour = sessionBaseHour ?? (session.timeSlot === 'AM' ? 8 : 13);
+        const baseMinute = sessionBaseMinute ?? 0;
         const interval = session.sessionType === 'singles' ? 8 : 10;
         const matchTime = new Date(day);
-        matchTime.setHours(baseHour, (match.matchOrder - 1) * interval, 0, 0);
+        matchTime.setHours(baseHour, baseMinute + (match.matchOrder - 1) * interval, 0, 0);
 
         entries.push({
           id: match.id,

@@ -348,6 +348,15 @@ export interface RyderCupSession {
    */
   isPracticeSession?: boolean;
   /**
+   * Captain-specified first tee time for the session, in "HH:MM" 24-hour
+   * format (e.g. "07:30"). Used by the schedule view to render exact
+   * clock times for sessions that don't have any matches yet, and to
+   * seed match startTime calculations when the lineup is published.
+   * When absent, the schedule falls back to an 8:00 AM / 1:00 PM default
+   * inferred from timeSlot.
+   */
+  firstTeeTime?: string;
+  /**
    * Default course + tee set the captain intends to play for this
    * session. Stored at the session level so the captain can set them
    * once (even before matches exist) and have every match created

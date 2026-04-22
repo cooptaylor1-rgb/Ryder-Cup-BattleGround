@@ -243,6 +243,7 @@ export async function syncSessionToCloud(
     session_type: session.sessionType,
     scheduled_date: session.scheduledDate?.split('T')[0] || null,
     time_slot: session.timeSlot || null,
+    first_tee_time: session.firstTeeTime || null,
     points_per_match: session.pointsPerMatch || 1.0,
     notes: session.notes || null,
     status: session.status || 'scheduled',
