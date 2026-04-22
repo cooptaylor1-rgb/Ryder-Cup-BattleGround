@@ -8,6 +8,7 @@ import {
   completeSupabaseAuthFromUrl,
   getSupabaseSession,
 } from '@/lib/supabase/auth';
+import { safeNextPath } from '@/lib/utils/navigation';
 
 type CallbackState = 'processing' | 'success' | 'error' | 'noop';
 
@@ -46,7 +47,7 @@ function AuthCallbackContent() {
 
       useAuthStore.getState().syncSupabaseSession(session);
       const authState = useAuthStore.getState();
-      const nextPath = searchParams?.get('next') || '/';
+      const nextPath = safeNextPath(searchParams?.get('next'));
       const nextParam = `?next=${encodeURIComponent(nextPath)}`;
 
       let destination = nextPath;
@@ -89,8 +90,8 @@ function AuthCallbackContent() {
     );
   }
 
-  const nextPath = searchParams?.get('next');
-  const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
+  const nextPath = safeNextPath(searchParams?.get('next'));
+  const nextParam = nextPath !== '/' ? `?next=${encodeURIComponent(nextPath)}` : '';
 
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-canvas">

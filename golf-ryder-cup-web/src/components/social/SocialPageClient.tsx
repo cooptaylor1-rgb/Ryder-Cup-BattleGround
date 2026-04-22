@@ -52,7 +52,14 @@ export default function SocialPageClient() {
         return [];
       }
 
-      return db.banterPosts.where('tripId').equals(currentTrip.id).reverse().sortBy('timestamp');
+      // Dexie `.sortBy('timestamp')` is unstable when two posts share a
+      // millisecond; a secondary sort on id keeps render order stable
+      // and stops the feed from flickering on every live-query refresh.
+      const posts = await db.banterPosts.where('tripId').equals(currentTrip.id).toArray();
+      return posts.sort((a, b) => {
+        if (a.timestamp !== b.timestamp) return b.timestamp.localeCompare(a.timestamp);
+        return b.id.localeCompare(a.id);
+      });
     },
     [currentTrip?.id],
     []

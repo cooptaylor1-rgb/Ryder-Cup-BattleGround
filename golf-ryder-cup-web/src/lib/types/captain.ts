@@ -426,74 +426,6 @@ export interface SettlementSummary {
 }
 
 // ============================================
-// AWARDS & STATISTICS
-// ============================================
-
-export type AwardType =
-    | 'mvp'                    // Most points
-    | 'iron_man'              // Most matches played
-    | 'clutch_performer'      // Won deciding match
-    | 'hot_streak'            // Best single session
-    | 'consistent'            // Best win percentage
-    | 'comeback_kid'          // Biggest comeback win
-    | 'halve_master'          // Most halved matches
-    | 'best_partner'          // Best record as partner
-    | 'giant_killer'          // Beat higher ranked opponent
-    | 'anchor'                // Most losses (fun award)
-    | 'close_call'            // Most matches decided on 18
-    | 'dormie_escape';        // Came back from dormie
-
-export interface TripAward {
-    id: UUID;
-    tripId: UUID;
-    type: AwardType;
-    playerId: UUID;
-    playerName: string;
-    value: string; // "3.5 points", "4-1-0 record"
-    description: string;
-    rank?: number; // For leaderboard awards
-    calculatedAt: ISODateString;
-}
-
-export interface PlayerStatistics {
-    playerId: UUID;
-    tripId: UUID;
-    // Overall record
-    matchesPlayed: number;
-    wins: number;
-    losses: number;
-    halves: number;
-    points: number;
-    winPercentage: number;
-    // By format
-    singlesRecord: { w: number; l: number; h: number };
-    foursomesRecord: { w: number; l: number; h: number };
-    fourballRecord: { w: number; l: number; h: number };
-    // Advanced stats
-    holesWon: number;
-    holesLost: number;
-    holesHalved: number;
-    biggestWin: number; // Margin
-    comebacks: number; // Times came back from 2+ down
-    closingRate: number; // % of matches closed when 2+ up
-    // Partnership stats
-    bestPartner?: { playerId: UUID; record: string };
-    worstMatchup?: { playerId: UUID; record: string };
-}
-
-export interface TripRecords {
-    tripId: UUID;
-    records: {
-        type: string;
-        description: string;
-        playerId: UUID;
-        playerName: string;
-        value: string;
-        matchId?: UUID;
-    }[];
-}
-
-// ============================================
 // SPECTATOR MODE
 // ============================================
 
@@ -521,61 +453,6 @@ export interface SpectatorMatch {
     currentScore: string; // "2 UP", "AS", "3&2"
     thruHole: number;
     result?: string;
-}
-
-// ============================================
-// HISTORICAL ARCHIVE
-// ============================================
-
-export interface TripArchive {
-    id: UUID;
-    tripId: UUID;
-    tripName: string;
-    year: number;
-    winner: 'A' | 'B' | 'tie';
-    winningTeamName: string;
-    finalScore: string; // "15.5 - 12.5"
-    mvpPlayerId: UUID;
-    mvpName: string;
-    highlights: string[];
-    archivedAt: ISODateString;
-}
-
-export interface PlayerCareerStats {
-    playerId: UUID;
-    playerName: string;
-    tripsPlayed: number;
-    totalMatches: number;
-    totalWins: number;
-    totalLosses: number;
-    totalHalves: number;
-    totalPoints: number;
-    cupWins: number;
-    mvpAwards: number;
-    byYear: {
-        year: number;
-        tripId: UUID;
-        record: string;
-        points: number;
-    }[];
-}
-
-export interface RivalryRecord {
-    player1Id: UUID;
-    player1Name: string;
-    player2Id: UUID;
-    player2Name: string;
-    totalMatches: number;
-    player1Wins: number;
-    player2Wins: number;
-    halves: number;
-    lastMatch: ISODateString;
-    matchHistory: {
-        tripId: UUID;
-        year: number;
-        result: 'player1' | 'player2' | 'halved';
-        score: string;
-    }[];
 }
 
 // ============================================
@@ -639,7 +516,7 @@ export interface TripBackup {
     matches: unknown[];
     holeResults: unknown[];
     courses: unknown[];
-    awards?: TripAward[];
+    awards?: unknown[];
     sideGames?: SideGame[];
     checksum: string;
 }

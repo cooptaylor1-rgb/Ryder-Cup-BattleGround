@@ -20,6 +20,7 @@ import {
   signUpWithEmailPassword,
 } from '@/lib/supabase/auth';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
+import { safeNextPath } from '@/lib/utils/navigation';
 
 /**
  * LOGIN PAGE — Fried Egg Editorial
@@ -60,12 +61,12 @@ function LoginPageContent() {
 
   useEffect(() => {
     if (isAuthenticated && currentUser) {
-      const nextPath = searchParams?.get('next');
+      const nextPath = safeNextPath(searchParams?.get('next'));
       if (!currentUser.hasCompletedOnboarding) {
-        const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
+        const nextParam = nextPath !== '/' ? `?next=${encodeURIComponent(nextPath)}` : '';
         router.push(`/profile/complete${nextParam}`);
       } else {
-        router.push(nextPath || '/');
+        router.push(nextPath);
       }
     }
   }, [isAuthenticated, currentUser, router, searchParams]);
@@ -75,8 +76,8 @@ function LoginPageContent() {
       return;
     }
 
-    const nextPath = searchParams?.get('next');
-    const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
+    const nextPath = safeNextPath(searchParams?.get('next'));
+    const nextParam = nextPath !== '/' ? `?next=${encodeURIComponent(nextPath)}` : '';
     router.replace(`/profile/create${nextParam}`);
   }, [authEmail, currentUser, hasResolvedSupabaseSession, router, searchParams]);
 
@@ -118,8 +119,8 @@ function LoginPageContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, password, pin]);
 
-  const nextPath = searchParams?.get('next');
-  const nextParam = nextPath ? `?next=${encodeURIComponent(nextPath)}` : '';
+  const nextPath = safeNextPath(searchParams?.get('next'));
+  const nextParam = nextPath !== '/' ? `?next=${encodeURIComponent(nextPath)}` : '';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

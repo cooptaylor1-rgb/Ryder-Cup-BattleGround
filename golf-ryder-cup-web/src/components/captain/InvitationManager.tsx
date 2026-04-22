@@ -57,6 +57,12 @@ interface InvitationManagerProps {
   onResendInvite?: (inviteId: string) => void;
   onRevokeInvite?: (inviteId: string) => void;
   onCopyLink?: (url: string) => void;
+  /**
+   * Invalidate the current share code and mint a new one. When provided,
+   * a "Regenerate code" button appears in the share card so a captain
+   * can revoke an accidentally-leaked code without deleting the trip.
+   */
+  onRegenerateCode?: () => Promise<void> | void;
   className?: string;
 }
 
@@ -114,10 +120,12 @@ export function InvitationManager({
   onResendInvite,
   onRevokeInvite,
   onCopyLink,
+  onRegenerateCode,
   className,
 }: InvitationManagerProps) {
   const [copiedLink, setCopiedLink] = useState(false);
   const [showComposer, setShowComposer] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
 
   const stats = useMemo(
     () => ({
@@ -241,6 +249,30 @@ export function InvitationManager({
                 onClick={() => setShowComposer(true)}
               >
                 Personal invite
+              </Button>
+            ) : null}
+            {onRegenerateCode ? (
+              <Button
+                variant="ghost"
+                className="bg-[color:var(--canvas)]/8 text-[var(--canvas)] hover:bg-[color:var(--canvas)]/16 hover:text-[var(--canvas)]"
+                leftIcon={<RefreshCw size={16} />}
+                isLoading={isRegenerating}
+                loadingText="Regenerating"
+                onClick={() => {
+                  if (
+                    typeof window !== 'undefined' &&
+                    !window.confirm(
+                      'Invalidate the current code? Anyone who still has it will be locked out and you will need to reshare the new one.',
+                    )
+                  ) {
+                    return;
+                  }
+                  setIsRegenerating(true);
+                  void Promise.resolve(onRegenerateCode())
+                    .finally(() => setIsRegenerating(false));
+                }}
+              >
+                Regenerate code
               </Button>
             ) : null}
           </div>

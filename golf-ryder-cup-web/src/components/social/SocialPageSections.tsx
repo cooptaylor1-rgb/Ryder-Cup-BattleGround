@@ -149,7 +149,7 @@ export function PostCard({
             </div>
           </div>
 
-          <p className="mt-[var(--space-4)] text-sm leading-7 text-[var(--ink)]">{stripHtml(post.content)}</p>
+          <p className="mt-[var(--space-4)] text-sm leading-7 text-[var(--ink)] whitespace-pre-wrap break-words">{stripHtml(post.content)}</p>
 
           {post.emoji ? <div className="mt-[var(--space-2)] text-[1.4rem]">{post.emoji}</div> : null}
 

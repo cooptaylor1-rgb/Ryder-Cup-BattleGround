@@ -443,7 +443,10 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
 
     setIsCreating(true);
     try {
-      const [hours] = nextTeeTime.split(':').map(Number);
+      // Same defensive parse as handlePublish: a malformed tee time must
+      // not silently land every session in the PM slot.
+      const [rawHours] = nextTeeTime.split(':').map(Number);
+      const hours = Number.isFinite(rawHours) ? Math.max(0, Math.min(23, rawHours)) : 8;
       const derivedTimeSlot: 'AM' | 'PM' = hours < 12 ? 'AM' : 'PM';
 
       await addSession({

@@ -31,6 +31,7 @@ export {
 export {
   ensureTripShareCode,
   getTripShareCode,
+  regenerateTripShareCode,
   removeTripShareCode,
 } from './trip-sync/tripSyncShareCodes';
 export { pullTripByShareCode, syncTripToCloudFull } from './trip-sync/tripSyncTripTransfer';

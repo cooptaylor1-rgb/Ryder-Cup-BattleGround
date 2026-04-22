@@ -15,6 +15,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { isSupabaseConfigured, supabase } from '../supabase/client';
 import { authLogger } from '../utils/logger';
+import { clearQueue as clearSyncQueue } from '../services/trip-sync/tripSyncQueue';
 
 // Re-export the UserProfile type so existing imports still work
 export type { UserProfile } from './auth/authTypes';
@@ -74,6 +75,14 @@ export const useAuthStore = create<AuthState>()(
               authLogger.warn('Failed to sign out Supabase session:', error);
             });
           }
+
+          // Drop any pending sync operations queued under the outgoing
+          // session. Without this, writes authored by user A stay in
+          // local Dexie and attempt to drain under user B's credentials
+          // after they sign in on the same device.
+          void clearSyncQueue().catch((error) => {
+            authLogger.warn('Failed to clear sync queue on logout:', error);
+          });
 
           set({
             currentUser: null,

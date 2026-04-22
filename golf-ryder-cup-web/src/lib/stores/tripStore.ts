@@ -505,7 +505,24 @@ export const useTripStore = create<TripState>()(
           updatedAt: now,
         };
 
-        await db.sessions.add(session);
+        // Wrap the read+write in a Dexie transaction so two captains
+        // on two devices can't both compute sessionNumber=N in memory
+        // and both commit it — when we detect a conflict we bump to
+        // the next free number before writing. The caller's stale
+        // cache loses, which is what we want.
+        await db.transaction('rw', db.sessions, async () => {
+          const existing = await db.sessions
+            .where('tripId')
+            .equals(session.tripId)
+            .toArray();
+          const taken = new Set(existing.map((s) => s.sessionNumber));
+          if (taken.has(session.sessionNumber)) {
+            let candidate = session.sessionNumber + 1;
+            while (taken.has(candidate)) candidate += 1;
+            session.sessionNumber = candidate;
+          }
+          await db.sessions.add(session);
+        });
 
         // Queue sync
         const { currentTrip } = get();
