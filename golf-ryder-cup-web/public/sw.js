@@ -91,6 +91,17 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Never intercept Supabase traffic. The PostgREST and auth paths
+  // (/rest/v1/*, /auth/v1/*, /realtime/v1/*) are not under /api/, so
+  // without this they fell into staleWhileRevalidate and the app kept
+  // receiving cached roster responses forever — new joiners never
+  // appeared on the captain's screen until the cache was manually
+  // cleared. Let the browser handle these directly; Dexie is our
+  // offline layer, not the SW cache.
+  if (url.hostname.endsWith('.supabase.co') || url.hostname.endsWith('.supabase.in')) {
+    return;
+  }
+
   // Network first for API calls
   if (NETWORK_FIRST.some((path) => url.pathname.startsWith(path))) {
     event.respondWith(networkFirst(request));
