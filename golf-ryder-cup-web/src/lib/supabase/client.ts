@@ -49,7 +49,7 @@ export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'er
 
 const EMPTY_FILTER_UUID = '00000000-0000-0000-0000-000000000000';
 
-export function buildUuidInFilter(column: 'session_id' | 'match_id', ids: string[]): string {
+export function buildUuidInFilter(column: 'session_id' | 'match_id' | 'team_id', ids: string[]): string {
     const uniqueIds = Array.from(new Set(ids.filter(Boolean)));
 
     if (uniqueIds.length === 0) {
@@ -69,6 +69,8 @@ export async function subscribeTripChannel(
         onMatchUpdate?: (payload: unknown) => void;
         onHoleResultUpdate?: (payload: unknown) => void;
         onSessionUpdate?: (payload: unknown) => void;
+        onPlayerUpdate?: (payload: unknown) => void;
+        onTeamMemberUpdate?: (payload: unknown) => void;
         onPresenceSync?: (state: Record<string, unknown>) => void;
         onPresenceJoin?: (key: string, presence: unknown) => void;
         onPresenceLeave?: (key: string, presence: unknown) => void;
@@ -103,6 +105,17 @@ export async function subscribeTripChannel(
     const matchIds = ((matches ?? []) as Array<{ id: string }>).map((match) => match.id);
     const matchesFilter = buildUuidInFilter('session_id', sessionIds);
     const holeResultsFilter = buildUuidInFilter('match_id', matchIds);
+
+    // Team-member changes need a team_id filter. Pull the trip's teams
+    // up front so joiners assigned by another device propagate without
+    // a page reload. Teams are rare compared to matches, so one extra
+    // select on subscribe is cheap.
+    const { data: teams } = await supabase
+        .from('teams')
+        .select('id')
+        .eq('trip_id', tripId);
+    const teamIds = ((teams ?? []) as Array<{ id: string }>).map((team) => team.id);
+    const teamMembersFilter = buildUuidInFilter('team_id', teamIds);
 
     const channel = supabase
         .channel(`trip:${tripId}`, {
@@ -158,6 +171,30 @@ export async function subscribeTripChannel(
                 handlers.onSessionUpdate?.(payload);
             }
         )
+        .on(
+            'postgres_changes',
+            {
+                event: '*',
+                schema: 'public',
+                table: 'players',
+                filter: `trip_id=eq.${tripId}`,
+            },
+            (payload) => {
+                handlers.onPlayerUpdate?.(payload);
+            }
+        )
+        .on(
+            'postgres_changes',
+            {
+                event: '*',
+                schema: 'public',
+                table: 'team_members',
+                filter: teamMembersFilter,
+            },
+            (payload) => {
+                handlers.onTeamMemberUpdate?.(payload);
+            }
+        )
         .subscribe((status) => {
             if (status === 'SUBSCRIBED') {
                 onStatusChange('connected');
@@ -179,6 +216,36 @@ export async function subscribeTripChannel(
 export async function unsubscribeChannel(channel: RealtimeChannel): Promise<void> {
     if (!supabase) return;
     await supabase.removeChannel(channel);
+}
+
+/**
+ * Pull the current roster rows for a trip from Supabase. The realtime
+ * channel only delivers events that fire *after* subscribe — anyone
+ * who joined the trip before the captain's device connected would
+ * otherwise stay invisible until their own row changed again. Callers
+ * invoke this once on connect and push the rows into Dexie to catch up.
+ */
+export async function fetchTripRosterFromCloud(tripId: string): Promise<{
+    players: Array<Record<string, unknown>>;
+    teams: Array<Record<string, unknown>>;
+    teamMembers: Array<Record<string, unknown>>;
+} | null> {
+    if (!supabase) return null;
+    const [playersResult, teamsResult] = await Promise.all([
+        supabase.from('players').select('*').eq('trip_id', tripId),
+        supabase.from('teams').select('*').eq('trip_id', tripId),
+    ]);
+    const players = (playersResult.data ?? []) as Array<Record<string, unknown>>;
+    const teams = (teamsResult.data ?? []) as Array<Record<string, unknown>>;
+    const teamIds = teams
+        .map((t) => t.id)
+        .filter((id): id is string => typeof id === 'string');
+    let teamMembers: Array<Record<string, unknown>> = [];
+    if (teamIds.length > 0) {
+        const { data } = await supabase.from('team_members').select('*').in('team_id', teamIds);
+        teamMembers = (data ?? []) as Array<Record<string, unknown>>;
+    }
+    return { players, teams, teamMembers };
 }
 
 /**
