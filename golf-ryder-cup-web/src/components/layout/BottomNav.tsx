@@ -41,9 +41,7 @@ const BASE_NAV_ITEMS: NavItem[] = [
 function getNavItemsForMode(isCaptainMode: boolean): NavItem[] {
   if (!isCaptainMode) return BASE_NAV_ITEMS;
   return BASE_NAV_ITEMS.map((item) =>
-    item.href === '/more'
-      ? { href: '/captain', label: 'Captain', icon: Shield }
-      : item
+    item.href === '/more' ? { href: '/captain', label: 'Captain', icon: Shield } : item
   );
 }
 
@@ -58,7 +56,7 @@ export interface NavBadges {
 export function BottomNav() {
   const router = useRouter();
   const pathname = usePathname();
-  const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+  const { isCaptainMode } = useAccessStore(useShallow((s) => ({ isCaptainMode: s.isCaptainMode })));
 
   const navItems = getNavItemsForMode(isCaptainMode);
 
@@ -73,7 +71,7 @@ export function BottomNav() {
         'nav-premium lg:hidden',
         'fixed bottom-0 left-0 right-0 z-50',
         'flex items-stretch justify-around',
-        'h-[72px] px-[var(--space-1)]',
+        'h-[72px] px-[var(--space-1)] border-t border-[var(--rule)] bg-[color:var(--canvas)]/92 backdrop-blur-md',
         'pb-[env(safe-area-inset-bottom,0px)]'
       )}
       aria-label="Main navigation"
