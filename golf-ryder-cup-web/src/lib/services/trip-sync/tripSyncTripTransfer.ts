@@ -217,6 +217,7 @@ export async function pullTripByShareCode(shareCode: string): Promise<TripSyncRe
             sessionType: session.session_type,
             scheduledDate: session.scheduled_date,
             timeSlot: session.time_slot,
+            firstTeeTime: session.first_tee_time || undefined,
             pointsPerMatch: session.points_per_match,
             notes: session.notes,
             status: session.status,

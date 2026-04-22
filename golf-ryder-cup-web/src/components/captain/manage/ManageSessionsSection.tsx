@@ -390,6 +390,7 @@ function SessionSettingsEditor({
     session.scheduledDate ? session.scheduledDate.slice(0, 10) : '',
   );
   const [timeSlot, setTimeSlot] = useState<'' | 'AM' | 'PM'>(session.timeSlot ?? '');
+  const [firstTeeTime, setFirstTeeTime] = useState(session.firstTeeTime ?? '');
   const [defaultCourseId, setDefaultCourseId] = useState(session.defaultCourseId ?? '');
   const [defaultTeeSetId, setDefaultTeeSetId] = useState(session.defaultTeeSetId ?? '');
   // useLiveQuery in the parent store refreshes `courses`/`teeSets` on
@@ -438,6 +439,7 @@ function SessionSettingsEditor({
     defaultTeeSetId !== (session.defaultTeeSetId ?? '') ||
     scheduledDate !== (session.scheduledDate ? session.scheduledDate.slice(0, 10) : '') ||
     timeSlot !== (session.timeSlot ?? '') ||
+    firstTeeTime !== (session.firstTeeTime ?? '') ||
     pointsPerMatch !==
       (session.pointsPerMatch !== undefined ? String(session.pointsPerMatch) : '');
 
@@ -606,6 +608,21 @@ function SessionSettingsEditor({
 
         <div className="grid grid-cols-2 gap-[var(--space-3)]">
           <label className="space-y-[var(--space-2)]">
+            <span className="type-meta font-semibold text-[var(--ink)]">First tee time</span>
+            <input
+              type="time"
+              value={firstTeeTime}
+              onChange={(event) => setFirstTeeTime(event.target.value)}
+              className="input"
+            />
+            <span className="block type-caption text-[var(--ink-tertiary)]">
+              Shown on the schedule and used to stagger match tee times.
+            </span>
+          </label>
+        </div>
+
+        <div className="grid grid-cols-2 gap-[var(--space-3)]">
+          <label className="space-y-[var(--space-2)]">
             <span className="type-meta font-semibold text-[var(--ink)]">Status</span>
             <select
               value={status}
@@ -754,6 +771,7 @@ function SessionSettingsEditor({
               isPracticeSession,
               scheduledDate: scheduledDate || undefined,
               timeSlot: timeSlot || undefined,
+              firstTeeTime: firstTeeTime || undefined,
               defaultCourseId: defaultCourseId || undefined,
               defaultTeeSetId: defaultTeeSetId || undefined,
             });
