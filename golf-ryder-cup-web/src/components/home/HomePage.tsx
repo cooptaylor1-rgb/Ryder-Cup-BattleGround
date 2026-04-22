@@ -204,17 +204,18 @@ export default function HomePage() {
               {/* Persistent "New Trip" action — the most important captain
                 action should never be more than one tap from home,
                 whether there's an active trip or not. */}
-            <Link
-              href="/trip/new"
-              aria-label="Create a new trip"
-              title="Create a new trip"
-              className="press-scale p-2 rounded-[var(--radius-md)] border border-[color:var(--rule)] bg-[var(--canvas-raised)] text-[var(--masters-deep)] shadow-[0_2px_8px_rgba(26,24,21,0.05)] hover:bg-[var(--masters-subtle)] hover:border-[color:var(--masters)]/25 transition-colors"
-            >
-              <Plus size={20} strokeWidth={1.75} />
-            </Link>
-            {hasTrips ? <CaptainToggle /> : null}
-          </div>
-        )}
+              <Link
+                href="/trip/new"
+                aria-label="Create a new trip"
+                title="Create a new trip"
+                className="press-scale p-2 rounded-[var(--radius-md)] border border-[color:var(--rule)] bg-[var(--canvas-raised)] text-[var(--masters-deep)] shadow-[0_2px_8px_rgba(26,24,21,0.05)] hover:bg-[var(--masters-subtle)] hover:border-[color:var(--masters)]/25 transition-colors"
+              >
+                <Plus size={20} strokeWidth={1.75} />
+              </Link>
+              {hasTrips ? <CaptainToggle /> : null}
+            </div>
+          }
+        />
 
         <main className="container-editorial">
           {/* ── ACTIVE TOURNAMENT ── */}
