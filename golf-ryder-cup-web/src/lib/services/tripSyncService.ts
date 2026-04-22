@@ -34,7 +34,7 @@ export {
   regenerateTripShareCode,
   removeTripShareCode,
 } from './trip-sync/tripSyncShareCodes';
-export { pullTripByShareCode, syncTripToCloudFull } from './trip-sync/tripSyncTripTransfer';
+export { pullTripByShareCode, pullTripById, syncTripToCloudFull } from './trip-sync/tripSyncTripTransfer';
 
 let unregisterHandler: (() => void) | null = null;
 

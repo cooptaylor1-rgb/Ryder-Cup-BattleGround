@@ -17,10 +17,9 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { pullTripByShareCode } from '@/lib/services/tripSyncService';
+import { pullTripById } from '@/lib/services/tripSyncService';
 import { useToastStore, useTripStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
-import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
 
 export const ROSTER_REFRESH_INTERVAL_MS = 15_000;
 
@@ -50,12 +49,15 @@ export function useTripRosterRefresh(
   const runRefresh = useCallback(
     async ({ silent }: { silent: boolean }): Promise<void> => {
       if (!tripId) return;
-      const code = getStoredTripShareCode(tripId);
-      if (!code) return;
 
       if (!silent) setIsRefreshing(true);
       try {
-        const result = await pullTripByShareCode(code);
+        // Pull by tripId instead of share_code so this works even when
+        // the captain's localStorage doesn't have a cached share_code —
+        // e.g. a captain who created the trip on a different browser,
+        // or had their storage cleared. The trips RLS policy is open
+        // read, so filtering by id behaves identically.
+        const result = await pullTripById(tripId);
         if (result.success) {
           await loadTrip(tripId);
           if (!silent && toastOnManualRefresh) {
