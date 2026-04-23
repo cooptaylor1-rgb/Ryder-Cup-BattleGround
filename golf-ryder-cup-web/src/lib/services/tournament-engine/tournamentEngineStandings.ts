@@ -141,10 +141,26 @@ export async function calculateTeamStandings(tripId: string): Promise<TeamStandi
 }
 
 export async function calculateSessionStandings(sessionId: string): Promise<SessionStandings> {
-    const matches = await db.matches
+    const session = await db.sessions.get(sessionId);
+    // A practice session is scored but does NOT contribute points to
+    // any leaderboard — a warm-up round can't rack up "session
+    // points" that might then show up in widgets that aggregate
+    // session totals. Returning zeroed counts also keeps any caller
+    // that divides by totalMatches or renders "2 of 4 matches
+    // played" well-defined rather than silently accumulating.
+    if (session?.isPracticeSession) {
+        return { teamAPoints: 0, teamBPoints: 0, matchesCompleted: 0, totalMatches: 0 };
+    }
+
+    const rawMatches = await db.matches
         .where('sessionId')
         .equals(sessionId)
         .toArray();
+    // Belt-and-suspenders: also filter by match.mode in case the
+    // session flag and match flag ever disagree (e.g. a captain
+    // flipped the session's isPracticeSession after matches were
+    // already created and those matches kept their practice mode).
+    const matches = rawMatches.filter((m) => m.mode !== 'practice');
 
     let teamAPoints = 0;
     let teamBPoints = 0;
@@ -183,11 +199,18 @@ export async function calculatePlayerRecord(
         .equals(tripId)
         .toArray();
 
-    const sessionIds = sessions.map((session) => session.id);
-    const allMatches = await db.matches
+    // Practice sessions are excluded from the player's W-L-H record.
+    // Without this filter, a player who wins their Thursday warm-up
+    // round appears as "1-0" on the cup leaderboard before the cup
+    // even starts. Mirrors calculateTeamStandings' belt-and-
+    // suspenders filtering on both session flag and match.mode.
+    const cupSessions = sessions.filter((s) => !s.isPracticeSession);
+    const sessionIds = cupSessions.map((session) => session.id);
+    const allMatchesRaw = await db.matches
         .where('sessionId')
         .anyOf(sessionIds)
         .toArray();
+    const allMatches = allMatchesRaw.filter((m) => m.mode !== 'practice');
 
     const playerMatches = allMatches.filter(
         (match) => match.teamAPlayerIds.includes(playerId) || match.teamBPlayerIds.includes(playerId)

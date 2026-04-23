@@ -9,7 +9,11 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { db } from '@/lib/db';
-import { calculateTeamStandings } from '@/lib/services/tournamentEngine';
+import {
+  calculatePlayerRecord,
+  calculateSessionStandings,
+  calculateTeamStandings,
+} from '@/lib/services/tournamentEngine';
 import type { HoleResult, Match, RyderCupSession, Trip } from '@/lib/types/models';
 
 function isoNow() {
@@ -199,5 +203,178 @@ describe('calculateTeamStandings — practice exclusion', () => {
     expect(standings.totalMatches).toBe(1);
     expect(standings.teamAPoints).toBe(0.5);
     expect(standings.teamBPoints).toBe(0.5);
+  });
+});
+
+describe('calculateSessionStandings — practice exclusion', () => {
+  beforeEach(async () => {
+    await db.delete();
+    await db.open();
+  });
+  afterEach(async () => {
+    await db.delete();
+  });
+
+  it('returns zeroed counts for a practice session regardless of match scores', async () => {
+    const now = isoNow();
+    const session: RyderCupSession = {
+      id: 'prac',
+      tripId: 'trip-x',
+      name: 'Warm-up',
+      sessionNumber: 1,
+      sessionType: 'fourBall',
+      pointsPerMatch: 1,
+      status: 'completed',
+      isPracticeSession: true,
+      createdAt: now,
+    };
+    await db.sessions.add(session);
+    const match: Match = {
+      id: 'm-prac',
+      sessionId: session.id,
+      mode: 'practice',
+      matchOrder: 1,
+      status: 'completed',
+      currentHole: 18,
+      teamAPlayerIds: ['a1'],
+      teamBPlayerIds: ['b1'],
+      teamAHandicapAllowance: 0,
+      teamBHandicapAllowance: 0,
+      result: 'notFinished',
+      margin: 0,
+      holesRemaining: 0,
+      createdAt: now,
+      updatedAt: now,
+    };
+    await db.matches.add(match);
+    await db.holeResults.bulkAdd(
+      createHoleResults(match.id, new Array(18).fill('teamA'))
+    );
+
+    const result = await calculateSessionStandings(session.id);
+    expect(result).toEqual({
+      teamAPoints: 0,
+      teamBPoints: 0,
+      matchesCompleted: 0,
+      totalMatches: 0,
+    });
+  });
+
+  it('filters practice-mode matches even inside a cup session', async () => {
+    const now = isoNow();
+    const session: RyderCupSession = {
+      id: 'mixed',
+      tripId: 'trip-y',
+      name: 'Cup',
+      sessionNumber: 1,
+      sessionType: 'fourBall',
+      pointsPerMatch: 1,
+      status: 'completed',
+      createdAt: now,
+    };
+    await db.sessions.add(session);
+    const practiceMatch: Match = {
+      id: 'm1',
+      sessionId: session.id,
+      mode: 'practice',
+      matchOrder: 1,
+      status: 'completed',
+      currentHole: 18,
+      teamAPlayerIds: ['a1'],
+      teamBPlayerIds: ['b1'],
+      teamAHandicapAllowance: 0,
+      teamBHandicapAllowance: 0,
+      result: 'notFinished',
+      margin: 0,
+      holesRemaining: 0,
+      createdAt: now,
+      updatedAt: now,
+    };
+    const cupMatch: Match = { ...practiceMatch, id: 'm2', matchOrder: 2, mode: 'ryderCup' };
+    await db.matches.bulkAdd([practiceMatch, cupMatch]);
+    await db.holeResults.bulkAdd([
+      ...createHoleResults(practiceMatch.id, new Array(18).fill('teamA')),
+      ...createHoleResults(cupMatch.id, new Array(18).fill('halved')),
+    ]);
+
+    const result = await calculateSessionStandings(session.id);
+    expect(result.totalMatches).toBe(1);
+    expect(result.teamAPoints).toBe(0.5);
+    expect(result.teamBPoints).toBe(0.5);
+  });
+});
+
+describe('calculatePlayerRecord — practice exclusion', () => {
+  beforeEach(async () => {
+    await db.delete();
+    await db.open();
+  });
+  afterEach(async () => {
+    await db.delete();
+  });
+
+  it('does not count practice match wins on the player record', async () => {
+    const now = isoNow();
+    const trip: Trip = {
+      id: 'trip-pr',
+      name: 'T',
+      startDate: now,
+      endDate: now,
+      isCaptainModeEnabled: true,
+      createdAt: now,
+      updatedAt: now,
+    };
+    await db.trips.add(trip);
+    const practiceSession: RyderCupSession = {
+      id: 's-prac',
+      tripId: trip.id,
+      name: 'Warm-up',
+      sessionNumber: 1,
+      sessionType: 'fourBall',
+      pointsPerMatch: 1,
+      status: 'completed',
+      isPracticeSession: true,
+      createdAt: now,
+    };
+    const cupSession: RyderCupSession = {
+      ...practiceSession,
+      id: 's-cup',
+      name: 'Cup',
+      sessionNumber: 2,
+      isPracticeSession: undefined,
+    };
+    await db.sessions.bulkAdd([practiceSession, cupSession]);
+    const practiceMatch: Match = {
+      id: 'mp',
+      sessionId: practiceSession.id,
+      mode: 'practice',
+      matchOrder: 1,
+      status: 'completed',
+      currentHole: 18,
+      teamAPlayerIds: ['p1'],
+      teamBPlayerIds: ['opp'],
+      teamAHandicapAllowance: 0,
+      teamBHandicapAllowance: 0,
+      result: 'notFinished',
+      margin: 0,
+      holesRemaining: 0,
+      createdAt: now,
+      updatedAt: now,
+    };
+    const cupMatch: Match = {
+      ...practiceMatch,
+      id: 'mc',
+      sessionId: cupSession.id,
+      mode: 'ryderCup',
+      matchOrder: 1,
+    };
+    await db.matches.bulkAdd([practiceMatch, cupMatch]);
+    await db.holeResults.bulkAdd([
+      ...createHoleResults(practiceMatch.id, new Array(18).fill('teamA')),
+      ...createHoleResults(cupMatch.id, new Array(18).fill('halved')),
+    ]);
+
+    const record = await calculatePlayerRecord('p1', trip.id);
+    expect(record).toEqual({ wins: 0, losses: 0, halves: 1, points: 0.5 });
   });
 });
