@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { NoStandingsEmpty } from '@/components/ui';
 import { PathToVictoryCard } from '@/components/gamification/PathToVictoryCard';
+import { TeamLogo } from '@/components/team/TeamLogo';
 import type { MagicNumber, PlayerLeaderboard, TeamStandings } from '@/lib/types/computed';
 import { PartyPopper, Share2, Trophy } from 'lucide-react';
 
@@ -9,12 +10,14 @@ import { StandingsFactCard, StandingsSectionHeading } from './StandingsShellSect
 
 function StandingsScoreBlock({
   teamName,
+  teamIcon,
   score,
   color,
   isLeading,
   animate,
 }: {
   teamName: string;
+  teamIcon?: string;
   score: number;
   color: 'usa' | 'europe';
   isLeading: boolean;
@@ -34,9 +37,19 @@ function StandingsScoreBlock({
         background: gradient,
       }}
     >
-      <span
-        className={`team-dot team-dot-xl team-dot-${color} mb-[var(--space-4)] inline-block ${animate ? 'team-dot-pulse' : ''}`}
-      />
+      {teamIcon ? (
+        <TeamLogo
+          src={teamIcon}
+          alt={teamName}
+          size={88}
+          rounded={false}
+          className="mb-[var(--space-4)]"
+        />
+      ) : (
+        <span
+          className={`team-dot team-dot-xl team-dot-${color} mb-[var(--space-4)] inline-block ${animate ? 'team-dot-pulse' : ''}`}
+        />
+      )}
       <p
         className="score-monumental"
         style={{ color: isLeading ? teamColor : 'var(--ink-tertiary)' }}
@@ -112,6 +125,8 @@ export function CompetitionTab({
   leaderboard,
   teamAName,
   teamBName,
+  teamAIcon,
+  teamBIcon,
   teamAId,
   pointsToWin,
   onShareStandings,
@@ -122,6 +137,8 @@ export function CompetitionTab({
   leaderboard: PlayerLeaderboard[];
   teamAName: string;
   teamBName: string;
+  teamAIcon?: string;
+  teamBIcon?: string;
   teamAId?: string;
   pointsToWin: number;
   onShareStandings: () => Promise<void> | void;
@@ -155,6 +172,7 @@ export function CompetitionTab({
           <div className="mt-[var(--space-5)] grid grid-cols-[1fr_auto_1fr] items-end gap-[var(--space-4)]">
             <StandingsScoreBlock
               teamName={teamAName}
+              teamIcon={teamAIcon}
               score={standings.teamAPoints}
               color="usa"
               isLeading={standings.teamAPoints >= standings.teamBPoints}
@@ -170,6 +188,7 @@ export function CompetitionTab({
 
             <StandingsScoreBlock
               teamName={teamBName}
+              teamIcon={teamBIcon}
               score={standings.teamBPoints}
               color="europe"
               isLeading={standings.teamBPoints > standings.teamAPoints}

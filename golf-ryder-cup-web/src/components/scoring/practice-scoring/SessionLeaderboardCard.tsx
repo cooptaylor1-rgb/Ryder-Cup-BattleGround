@@ -42,13 +42,13 @@ export function SessionLeaderboardCard({ session, matches }: SessionLeaderboardC
     [] as PracticeScore[]
   );
 
-  const teeSet = useLiveQuery<TeeSet | null>(
+  const teeSet = useLiveQuery(
     async () => {
       if (!session.defaultTeeSetId) return null;
       return (await db.teeSets.get(session.defaultTeeSetId)) ?? null;
     },
     [session.defaultTeeSetId],
-    null
+    null as TeeSet | null
   );
 
   const leaderboard = useMemo(

@@ -434,6 +434,8 @@ export default function StandingsPage() {
               leaderboard={leaderboard}
               teamAName={teamAName}
               teamBName={teamBName}
+              teamAIcon={teamA?.icon}
+              teamBIcon={teamB?.icon}
               teamAId={teamA?.id}
               pointsToWin={currentTrip.settings?.pointsToWin ?? 14.5}
               onShareStandings={handleShareStandings}
