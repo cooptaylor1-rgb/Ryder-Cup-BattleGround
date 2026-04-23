@@ -113,6 +113,9 @@ const ENTITY_DEPENDENCY_ORDER: Record<SyncEntity, number> = {
   // reference matches — so sideBet lives at rank 4 alongside
   // holeResult; both trip and match are guaranteed present by then.
   sideBet: 4,
+  // practice_scores.match_id and player_id both FK to tables already
+  // at rank <= 3, so rank 4 is safe — matches the holeResult tier.
+  practiceScore: 4,
 };
 
 export function compareByDependency(a: SyncQueueItem, b: SyncQueueItem): number {
