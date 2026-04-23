@@ -491,6 +491,34 @@ export function getSyncQueueStatus(): {
   };
 }
 
+/**
+ * Returns the set of entity ids that have a pending or syncing
+ * operation queued for a given trip + entity. Used by pullTripCore
+ * to gate the orphan-row cleanup — local rows that exist ONLY
+ * locally because a create hasn't synced yet must not be deleted
+ * just because the cloud response doesn't include them.
+ *
+ * Accepts 'pending' and 'syncing' statuses (not 'failed') because
+ * failed items will eventually retry; if they retry successfully
+ * the row lands in cloud and the next pull keeps it. If they retry
+ * to final failure, subsequent pulls removing the orphan is the
+ * right call — the user's explicit clearFailedQueue is the
+ * escape hatch.
+ */
+export function getPendingSyncIdsForTrip(
+  tripId: string,
+  entity: SyncEntity
+): Set<string> {
+  const ids = new Set<string>();
+  for (const item of tripSyncRuntime.syncQueue) {
+    if (item.tripId !== tripId) continue;
+    if (item.entity !== entity) continue;
+    if (item.status !== 'pending' && item.status !== 'syncing') continue;
+    ids.add(item.entityId);
+  }
+  return ids;
+}
+
 export function getTripSyncStatus(tripId: string): SyncStatus {
   if (!tripSyncRuntime.isOnline) return 'offline';
 

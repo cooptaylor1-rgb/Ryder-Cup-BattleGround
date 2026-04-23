@@ -20,6 +20,7 @@ export {
   buildSyncOperationKey,
   clearFailedQueue,
   clearQueue,
+  getPendingSyncIdsForTrip,
   getSyncQueueStatus,
   getTripSyncStatus,
   processSyncQueue,
