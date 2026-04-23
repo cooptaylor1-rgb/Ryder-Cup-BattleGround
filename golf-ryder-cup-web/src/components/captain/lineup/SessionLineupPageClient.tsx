@@ -19,6 +19,7 @@ import {
     PracticeGroupsEditor,
     type PracticeGroupsTemplate,
 } from './PracticeGroupsEditor';
+import { SessionLeaderboardCard } from '@/components/scoring/practice-scoring/SessionLeaderboardCard';
 import { db as dexieDb } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { createLogger } from '@/lib/utils/logger';
@@ -389,6 +390,10 @@ export default function SessionLineupPageClient({ sessionId }: { sessionId: stri
 
                 {canStart && viewMode === 'matches' ? (
                     <SessionStartButton onStart={handleStartSession} />
+                ) : null}
+
+                {viewMode === 'matches' && session.isPracticeSession && matches.length > 0 ? (
+                    <SessionLeaderboardCard session={session} matches={matches} />
                 ) : null}
 
                 {viewMode === 'matches' || !canEdit ? (
