@@ -347,7 +347,7 @@ async function pullTripCore(lookup: {
     // applied the migration) Supabase returns a 404 and we treat the
     // data as empty rather than bubbling the error — pre-migration
     // clients just won't see practice leaderboards.
-    const { data: practiceScores } =
+    const { data: practiceScoresRaw } =
       matchIds.length === 0
         ? { data: [] as Array<Record<string, unknown>> }
         : await getTable('practice_scores')
@@ -360,6 +360,8 @@ async function pullTripCore(lookup: {
                   : (response as { data: Array<Record<string, unknown>> }),
               () => ({ data: [] as Array<Record<string, unknown>> })
             );
+    const practiceScores =
+      (practiceScoresRaw as Array<Record<string, unknown>> | null) ?? [];
 
     // Side bets scoped to this trip. Writes already sync up via
     // queueSyncOperation at every UI mutation site; this is the
@@ -630,7 +632,7 @@ async function pullTripCore(lookup: {
       cloudSessionIds: (sessions ?? []).map((s: { id: string }) => String(s.id)),
       cloudMatchIds: (matches ?? []).map((m: { id: string }) => String(m.id)),
       cloudHoleResultIds: (holeResults ?? []).map((hr: { id: string }) => String(hr.id)),
-      cloudPracticeScoreIds: (practiceScores ?? []).map((ps) => String(ps.id)),
+      cloudPracticeScoreIds: practiceScores.map((ps) => String(ps.id)),
       cloudSideBetIds: sideBets.map((b) => String(b.id)),
       cloudBanterPostIds: banterPosts.map((p) => String(p.id)),
     });
