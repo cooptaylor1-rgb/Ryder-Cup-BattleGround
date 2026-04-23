@@ -16,6 +16,7 @@ import type {
   Trip,
 } from '../../types/models';
 import type { SyncOperation, SyncQueueItem } from '../../types/sync';
+import { assertExhaustive } from '../../utils/exhaustive';
 import { isServerNewer } from './tripSyncLww';
 import { getTable } from './tripSyncShared';
 import {
@@ -67,13 +68,8 @@ export async function syncEntityToCloud(item: SyncQueueItem): Promise<void> {
     case 'banterPost':
       await syncBanterPostToCloud(item.entityId, item.operation, item.data);
       break;
-    default: {
-      // Exhaustiveness check: if a SyncEntity variant is added
-      // without a writer case, this assignment to `never` fails
-      // compilation, surfacing the missing dispatch branch.
-      const _exhaustive: never = item;
-      throw new Error(`Unhandled sync entity: ${JSON.stringify(_exhaustive)}`);
-    }
+    default:
+      assertExhaustive(item, 'Unhandled sync entity');
   }
 }
 
