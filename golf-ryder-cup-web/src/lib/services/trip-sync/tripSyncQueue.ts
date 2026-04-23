@@ -364,6 +364,15 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
         item.error = errorMessage;
         item.status = nextStatus;
 
+        // Surface every failure to the console (not just terminal
+        // ones) so "N sync operations failed" is actually debuggable
+        // from devtools. Before this, the error was stored on the
+        // item but only emitted as a Sentry breadcrumb, leaving
+        // users staring at a red badge with zero visibility.
+        logger.warn(
+          `[sync] ${item.operation} ${item.entity}:${item.entityId} failed (attempt ${nextRetryCount}/${MAX_RETRY_COUNT}): ${errorMessage}`
+        );
+
         if (nextStatus === 'failed') {
           failed++;
           errors.push(`${item.entity}:${item.entityId} - ${errorMessage}`);
@@ -481,6 +490,34 @@ export async function purgeQueueForTrip(tripId: string): Promise<number> {
   }
 
   return removed;
+}
+
+/**
+ * Dumps every failed queue item's entity/operation/error to the
+ * console. Surfaced as window.__dumpSyncFailures() so a captain
+ * staring at "N failed" can hand us the actual error messages
+ * without needing a remote-debug handshake.
+ */
+export function dumpSyncFailures(): Array<{
+  entity: SyncEntity;
+  entityId: string;
+  operation: SyncOperation;
+  retryCount: number;
+  error?: string;
+  lastAttemptAt?: string;
+}> {
+  const failures = tripSyncRuntime.syncQueue
+    .filter((item) => item.status === 'failed')
+    .map((item) => ({
+      entity: item.entity,
+      entityId: item.entityId,
+      operation: item.operation,
+      retryCount: item.retryCount,
+      error: item.error,
+      lastAttemptAt: item.lastAttemptAt,
+    }));
+  logger.log('[sync] failed items:', failures);
+  return failures;
 }
 
 export function getSyncQueueStatus(): {

@@ -31,10 +31,53 @@ import { deleteTripCascade } from '../services/cascadeDelete';
 import { buildMatchHandicapContext } from '../services/matchHandicapService';
 import { createLogger } from '../utils/logger';
 import { handleError } from '../utils/errorHandling';
-import { mergeTripPlayers } from '../utils/tripPlayers';
+import { dedupePlayersByIdentity, mergeTripPlayers } from '../utils/tripPlayers';
 import { useAccessStore } from './accessStore';
 
 const logger = createLogger('TripStore');
+
+/**
+ * Collapses local-only duplicate player rows for a trip. Two
+ * Thomas Watkins rows with different ids but the same email were
+ * surviving in Dexie even though Supabase only had one, because
+ * the pull path's orphan reconcile only fires after a successful
+ * pull — if the pull was slow, failing, or on an older build, the
+ * dupe persisted in the UI. Running dedup on every loadTrip /
+ * refreshRoster self-heals without waiting on the network.
+ *
+ * We pick the winner by latest updatedAt and delete the losers
+ * from Dexie + from team_members. We intentionally do NOT queue a
+ * cloud delete for the loser id: if it's purely local-stale
+ * (typical case), there's nothing to delete in cloud; if it
+ * somehow IS in cloud, the next pull will bring it back and we'll
+ * dedup it again next load — idempotent.
+ */
+async function reconcileLocalPlayerDupes(
+  players: Player[]
+): Promise<Player[]> {
+  const { kept, losers } = dedupePlayersByIdentity(players);
+  if (losers.length === 0) return kept;
+
+  for (const loser of losers) {
+    logger.warn('Collapsing duplicate player row', {
+      id: loser.id,
+      tripId: loser.tripId,
+      firstName: loser.firstName,
+      lastName: loser.lastName,
+      email: loser.email,
+    });
+    try {
+      await db.players.delete(loser.id);
+      const memberships = await db.teamMembers.where('playerId').equals(loser.id).toArray();
+      for (const m of memberships) {
+        await db.teamMembers.delete(m.id);
+      }
+    } catch (err) {
+      logger.warn('Failed to delete duplicate player', { id: loser.id, err });
+    }
+  }
+  return kept;
+}
 
 // ============================================
 // TYPES
@@ -141,7 +184,7 @@ export const useTripStore = create<TripState>()(
             db.players.where('tripId').equals(tripId).toArray(),
             playerIds.length === 0 ? [] : db.players.where('id').anyOf(playerIds).toArray(),
           ]);
-          const { players, backfilledPlayers } = mergeTripPlayers(
+          const { players: mergedPlayers, backfilledPlayers } = mergeTripPlayers(
             tripId,
             tripPlayers,
             linkedPlayers
@@ -149,6 +192,7 @@ export const useTripStore = create<TripState>()(
           if (backfilledPlayers.length > 0) {
             await db.players.bulkPut(backfilledPlayers);
           }
+          const players = await reconcileLocalPlayerDupes(mergedPlayers);
 
           // Load tee sets for courses
           const courseIds = courses.map((c) => c.id);
@@ -195,7 +239,7 @@ export const useTripStore = create<TripState>()(
             db.players.where('tripId').equals(tripId).toArray(),
             playerIds.length === 0 ? [] : db.players.where('id').anyOf(playerIds).toArray(),
           ]);
-          const { players, backfilledPlayers } = mergeTripPlayers(
+          const { players: mergedPlayers, backfilledPlayers } = mergeTripPlayers(
             tripId,
             tripPlayers,
             linkedPlayers
@@ -203,6 +247,7 @@ export const useTripStore = create<TripState>()(
           if (backfilledPlayers.length > 0) {
             await db.players.bulkPut(backfilledPlayers);
           }
+          const players = await reconcileLocalPlayerDupes(mergedPlayers);
           set({ teams, teamMembers, players });
         } catch (error) {
           logger.warn('refreshRoster failed:', error);
