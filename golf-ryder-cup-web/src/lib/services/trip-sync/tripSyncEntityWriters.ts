@@ -2,6 +2,7 @@ import { storeTripShareCode } from '@/lib/utils/tripShareCodeStore';
 
 import { db } from '../../db';
 import type {
+  BanterPost,
   Course,
   HoleResult,
   Match,
@@ -81,6 +82,9 @@ export async function syncEntityToCloud(item: SyncQueueItem): Promise<void> {
       break;
     case 'practiceScore':
       await syncPracticeScoreToCloud(entityId, operation, data as PracticeScore);
+      break;
+    case 'banterPost':
+      await syncBanterPostToCloud(entityId, operation, data as BanterPost);
       break;
   }
 }
@@ -582,5 +586,43 @@ export async function syncPracticeScoreToCloud(
   };
 
   const { error } = await getTable('practice_scores').upsert(cloudData, { onConflict: 'id' });
+  if (error) throw new Error(error.message);
+}
+
+
+/**
+ * Banter post sync. One-line shape — no JSON blob hack needed since
+ * the table has first-class columns for every field. Upsert by id so
+ * reaction edits on the same post update in place.
+ */
+export async function syncBanterPostToCloud(
+  banterPostId: string,
+  operation: SyncOperation,
+  data?: BanterPost
+): Promise<void> {
+  if (operation === 'delete') {
+    const { error } = await getTable('banter_posts').delete().eq('id', banterPostId);
+    if (error) throw new Error(error.message);
+    return;
+  }
+
+  const post = data || (await db.banterPosts.get(banterPostId));
+  if (!post) throw new Error('BanterPost not found locally');
+
+  const cloudData = {
+    id: post.id,
+    trip_id: post.tripId,
+    author_id: post.authorId ?? null,
+    author_name: post.authorName,
+    content: post.content,
+    post_type: post.postType,
+    emoji: post.emoji ?? null,
+    reactions: post.reactions ?? null,
+    related_match_id: post.relatedMatchId ?? null,
+    timestamp: post.timestamp,
+    updated_at: new Date().toISOString(),
+  };
+
+  const { error } = await getTable('banter_posts').upsert(cloudData, { onConflict: 'id' });
   if (error) throw new Error(error.message);
 }

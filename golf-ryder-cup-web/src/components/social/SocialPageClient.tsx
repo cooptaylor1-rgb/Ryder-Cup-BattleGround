@@ -15,6 +15,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { ConfirmDialog, EmptyStatePremium } from '@/components/ui';
 import { db } from '@/lib/db';
+import { queueSyncOperation } from '@/lib/services/tripSyncService';
 import { useAuthStore, useTripStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { uiLogger } from '@/lib/utils/logger';
@@ -114,6 +115,7 @@ export default function SocialPageClient() {
 
     try {
       await db.banterPosts.add(newPost);
+      queueSyncOperation('banterPost', newPost.id, 'create', currentTrip.id, newPost);
       setMessage('');
       setShowEmojis(false);
     } catch (error) {
@@ -136,9 +138,9 @@ export default function SocialPageClient() {
         // overwrote User B's 🔥 reaction (or vice versa) and one
         // thumbs-up silently vanished. Transaction serializes the
         // pair so both reactors end up in the array.
-        await db.transaction('rw', db.banterPosts, async () => {
+        const updated = await db.transaction('rw', db.banterPosts, async () => {
           const post = await db.banterPosts.get(postId);
-          if (!post) return;
+          if (!post) return null;
 
           const reactions = { ...(post.reactions || {}) };
           const currentReactors = reactions[emoji] ? [...reactions[emoji]] : [];
@@ -154,7 +156,11 @@ export default function SocialPageClient() {
           }
 
           await db.banterPosts.update(postId, { reactions });
+          return { ...post, reactions };
         });
+        if (updated) {
+          queueSyncOperation('banterPost', postId, 'update', updated.tripId, updated);
+        }
       } catch (error) {
         uiLogger.error('Failed to toggle reaction:', error);
       }
@@ -181,7 +187,11 @@ export default function SocialPageClient() {
     }
 
     try {
+      const existing = await db.banterPosts.get(pendingDeletePostId);
       await db.banterPosts.delete(pendingDeletePostId);
+      if (existing?.tripId) {
+        queueSyncOperation('banterPost', pendingDeletePostId, 'delete', existing.tripId);
+      }
       showToast('success', 'Post deleted');
     } catch (error) {
       uiLogger.error('Failed to delete post:', error);
