@@ -41,7 +41,7 @@ function StandingsScoreBlock({
         <TeamLogo
           src={teamIcon}
           alt={teamName}
-          size={120}
+          size={160}
           rounded={false}
           className="mb-[var(--space-4)]"
         />

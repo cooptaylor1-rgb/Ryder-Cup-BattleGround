@@ -892,6 +892,14 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
               roster={players}
               initialGroups={[]}
               onPublish={handlePracticePublish}
+              onFirstTeeTimeChange={(value) => {
+                // In the wizard the session doesn't exist yet, so
+                // push Group 1's tee-time edits back into the form
+                // state — the session will be created with this value
+                // at publish. Keeps Group 1 and the Step-1 "First tee
+                // time" field in sync.
+                setFirstTeeTime(value);
+              }}
               isPublishing={isCreating}
             />
           </section>

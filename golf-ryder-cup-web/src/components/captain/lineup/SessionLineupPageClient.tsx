@@ -425,6 +425,23 @@ export default function SessionLineupPageClient({ sessionId }: { sessionId: stri
                         roster={players}
                         initialGroups={practiceInitialGroups}
                         templates={practiceTemplates}
+                        onFirstTeeTimeChange={async (value) => {
+                            // Group 1's tee-time input is semantically
+                            // "the session's first tee time." Persist
+                            // any valid HH:MM (or blank) to the session
+                            // row so /schedule and the published
+                            // matches inherit the change.
+                            try {
+                                await updateSession(session.id, {
+                                    firstTeeTime: value || undefined,
+                                });
+                            } catch (error) {
+                                lineupLogger.error('Failed to sync firstTeeTime from Group 1', {
+                                    sessionId,
+                                    error,
+                                });
+                            }
+                        }}
                         onPublish={async (groups) => {
                             try {
                                 await persistPracticeLineup(groups);

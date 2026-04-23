@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Plus, Save, Trash2, Users } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
@@ -29,6 +29,16 @@ interface PracticeGroupsEditorProps {
   templates?: PracticeGroupsTemplate[];
   onPublish: (groups: PracticeGroupDraft[]) => Promise<void> | void;
   onSaveDraft?: (groups: PracticeGroupDraft[]) => Promise<void> | void;
+  /**
+   * Unified source of truth handshake: Group 1's tee time is
+   * semantically "the session's first tee time." When the captain
+   * edits Group 1 in this editor, we call this callback so the
+   * session row updates in lockstep — editing session settings or
+   * the Group 1 input lead to the same place. When the session
+   * row updates externally (e.g. captain edited session settings
+   * directly), the editor's Group 1 re-syncs via its useEffect.
+   */
+  onFirstTeeTimeChange?: (value: string) => Promise<void> | void;
   isPublishing?: boolean;
 }
 
@@ -123,6 +133,7 @@ export function PracticeGroupsEditor({
   templates = [],
   onPublish,
   onSaveDraft,
+  onFirstTeeTimeChange,
   isPublishing = false,
 }: PracticeGroupsEditorProps) {
   const defaultTeeTime = useMemo(() => resolveSessionDefaultTeeTime(session), [session]);
@@ -208,11 +219,47 @@ export function PracticeGroupsEditor({
     []
   );
 
-  const setTeeTime = useCallback((localId: string, value: string) => {
-    setGroups((current) =>
-      current.map((g) => (g.localId === localId ? { ...g, teeTime: value } : g))
-    );
-  }, []);
+  const setTeeTime = useCallback(
+    (localId: string, value: string) => {
+      setGroups((current) => {
+        const next = current.map((g) =>
+          g.localId === localId ? { ...g, teeTime: value } : g
+        );
+        // Group 1's tee time IS the session's first tee time. When the
+        // captain edits it here, push the value up so session settings,
+        // the schedule, and every downstream consumer see the same
+        // source. Only fire for actual HH:MM values or an explicit
+        // blank — don't push malformed intermediate input on every
+        // keystroke.
+        const firstGroup = next[0];
+        if (
+          firstGroup &&
+          firstGroup.localId === localId &&
+          onFirstTeeTimeChange &&
+          (value === '' || /^\d{2}:\d{2}$/.test(value))
+        ) {
+          void onFirstTeeTimeChange(value);
+        }
+        return next;
+      });
+    },
+    [onFirstTeeTimeChange]
+  );
+
+  // External sync: when the session's firstTeeTime changes elsewhere
+  // (captain edited session settings directly, or the roster poll
+  // pulled a new value), reflect it in Group 1 so the two inputs
+  // never drift. Only Group 1 — per-group overrides on Groups 2+
+  // are preserved.
+  useEffect(() => {
+    const nextDefault = resolveSessionDefaultTeeTime(session);
+    setGroups((current) => {
+      if (current.length === 0) return current;
+      const [first, ...rest] = current;
+      if (first.teeTime === nextDefault) return current;
+      return [{ ...first, teeTime: nextDefault }, ...rest];
+    });
+  }, [session.firstTeeTime, session.timeSlot]);
 
   /**
    * Load pairings from a prior practice session. Renumbers the groups
