@@ -195,11 +195,18 @@ export function buildScheduleByDay({
         firstMatchTime ??
         (session.timeSlot === 'AM' ? '8:00 AM' : '1:00 PM');
 
+      const isPractice = Boolean(session.isPracticeSession);
+      const sessionGroupWord = isPractice ? 'groups' : 'matches';
+      const sessionFormatLabel = isPractice
+        ? 'Practice round'
+        : SessionTypeDisplay[session.sessionType as keyof typeof SessionTypeDisplay] ??
+          session.sessionType;
+
       entries.push({
         id: session.id,
         type: 'session',
         title: session.name,
-        subtitle: `${SessionTypeDisplay[session.sessionType as keyof typeof SessionTypeDisplay] ?? session.sessionType} • ${sessionMatches.length} matches`,
+        subtitle: `${sessionFormatLabel} • ${sessionMatches.length} ${sessionGroupWord}`,
         time: sessionTime,
         date: dateStr,
         sessionType: session.sessionType,
@@ -212,6 +219,7 @@ export function buildScheduleByDay({
       });
 
       for (const match of sessionMatches.sort((a, b) => a.matchOrder - b.matchOrder)) {
+        const matchIsPractice = match.mode === 'practice' || isPractice;
         const teamA = match.teamAPlayerIds
           .map((playerId) => playerNameById.get(playerId) || 'Unknown')
           .join(' & ');
@@ -232,14 +240,26 @@ export function buildScheduleByDay({
         const baseHour = sessionBaseHour ?? (session.timeSlot === 'AM' ? 8 : 13);
         const baseMinute = sessionBaseMinute ?? 0;
         const interval = session.sessionType === 'singles' ? 8 : 10;
-        const matchTime = new Date(day);
-        matchTime.setHours(baseHour, baseMinute + (match.matchOrder - 1) * interval, 0, 0);
+        // Practice matches carry their own per-group tee time (captain
+        // sets it directly in the groups editor). Fall through to the
+        // staggered default only if the captain didn't set one.
+        let matchTime = new Date(day);
+        if (matchIsPractice && match.teeTime && /^\d{2}:\d{2}$/.test(match.teeTime)) {
+          const [hh, mm] = match.teeTime.split(':').map(Number);
+          matchTime.setHours(hh, mm, 0, 0);
+        } else {
+          matchTime.setHours(baseHour, baseMinute + (match.matchOrder - 1) * interval, 0, 0);
+        }
 
         entries.push({
           id: match.id,
           type: 'teeTime',
-          title: `Match ${match.matchOrder}`,
-          subtitle: `${teamA} vs ${teamB}`,
+          title: matchIsPractice ? `Group ${match.matchOrder}` : `Match ${match.matchOrder}`,
+          subtitle: matchIsPractice
+            ? [...match.teamAPlayerIds, ...match.teamBPlayerIds]
+                .map((playerId) => playerNameById.get(playerId) || 'Unknown')
+                .join(', ')
+            : `${teamA} vs ${teamB}`,
           time: matchTime.toLocaleTimeString('en-US', {
             hour: 'numeric',
             minute: '2-digit',

@@ -11,6 +11,11 @@ import {
     type LineupPlayer as PersistedLineupPlayer,
     type LineupState,
 } from '@/lib/services/lineupBuilderService';
+import {
+    savePracticeLineup,
+    type PracticeGroupDraft,
+} from '@/lib/services/lineup-builder/practiceLineupPersistence';
+import { PracticeGroupsEditor } from './PracticeGroupsEditor';
 import { createLogger } from '@/lib/utils/logger';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
@@ -207,6 +212,45 @@ export default function SessionLineupPageClient({ sessionId }: { sessionId: stri
         [buildPersistedLineupState, currentTrip, loadMatches]
     );
 
+    // Practice-round branch: captains build groups of 2-4 players with
+    // tee times and no team split. Persists via savePracticeLineup,
+    // which writes Match rows with mode='practice' so the matches
+    // show on the schedule and can host side bets but stay out of cup
+    // standings. Uses the full trip roster (teamMembers aren't required
+    // for practice — players don't need a Ryder Cup team assignment).
+    const isPracticeSession = Boolean(session?.isPracticeSession);
+
+    const practiceInitialGroups = useMemo<PracticeGroupDraft[]>(() => {
+        if (!isPracticeSession) return [];
+        return matches
+            .slice()
+            .sort((a, b) => a.matchOrder - b.matchOrder)
+            .map((match, index) => ({
+                localId: match.id,
+                groupNumber: match.matchOrder || index + 1,
+                // Practice matches fold everyone into teamAPlayerIds, but
+                // fall back to the union in case a legacy cup match got
+                // flipped to practice without a re-publish.
+                playerIds:
+                    match.teamAPlayerIds.length > 0 || match.teamBPlayerIds.length > 0
+                        ? [...match.teamAPlayerIds, ...match.teamBPlayerIds]
+                        : [],
+                teeTime: match.teeTime ?? '',
+            }));
+    }, [isPracticeSession, matches]);
+
+    const persistPracticeLineup = useCallback(
+        async (groups: PracticeGroupDraft[]) => {
+            if (!session) throw new Error('Session not loaded');
+            const result = await savePracticeLineup(session.id, groups);
+            if (!result.success) {
+                throw new Error('Practice lineup persistence failed');
+            }
+            await loadMatches();
+        },
+        [loadMatches, session]
+    );
+
     const getMatchPlayerNames = useCallback(
         (playerIds: string[]) => getSessionMatchPlayerNames(playerIds, players),
         [players]
@@ -304,6 +348,37 @@ export default function SessionLineupPageClient({ sessionId }: { sessionId: stri
                         getMatchPlayerNames={getMatchPlayerNames}
                         getMatchScoreDisplay={getMatchScoreDisplay}
                         onOpenMatch={openMatch}
+                    />
+                ) : isPracticeSession ? (
+                    <PracticeGroupsEditor
+                        session={session}
+                        roster={players}
+                        initialGroups={practiceInitialGroups}
+                        onPublish={async (groups) => {
+                            try {
+                                await persistPracticeLineup(groups);
+                                showToast('success', 'Practice groups published');
+                                setViewMode('matches');
+                            } catch (error) {
+                                lineupLogger.error('Failed to publish practice groups', {
+                                    sessionId,
+                                    error,
+                                });
+                                showToast('error', 'Failed to publish practice groups');
+                            }
+                        }}
+                        onSaveDraft={async (groups) => {
+                            try {
+                                await persistPracticeLineup(groups);
+                                showToast('info', 'Practice groups saved');
+                            } catch (error) {
+                                lineupLogger.error('Failed to save practice groups', {
+                                    sessionId,
+                                    error,
+                                });
+                                showToast('error', 'Failed to save practice groups');
+                            }
+                        }}
                     />
                 ) : (
                     <SessionLineupEditorSection

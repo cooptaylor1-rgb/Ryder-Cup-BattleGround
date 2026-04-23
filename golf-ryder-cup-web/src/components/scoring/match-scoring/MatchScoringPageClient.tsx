@@ -26,6 +26,7 @@ import {
   MatchScoringPageSections,
   MatchScoringUnauthenticatedState,
   MatchScoringUnavailableState,
+  PracticeMatchEmptyState,
 } from './MatchScoringPageSections';
 import { normalizeScoringMode, useMatchScoringPageModel } from './matchScoringPageModel';
 import { type ScoringMode } from './matchScoringShared';
@@ -180,6 +181,19 @@ export default function MatchScoringPageClient() {
 
   if (!activeMatch || !matchState) {
     return <MatchScoringUnavailableState onBackToScore={handleBackToScore} />;
+  }
+
+  // Practice matches don't have a team to score against — short-circuit
+  // to a guidance state that points the captain at side bets, which are
+  // the scoring unit for warm-up rounds.
+  if (activeMatch.mode === 'practice') {
+    return (
+      <PracticeMatchEmptyState
+        matchId={activeMatch.id}
+        onBackToScore={handleBackToScore}
+        onOpenBets={() => router.push('/bets')}
+      />
+    );
   }
 
   // Pre-flight: warn (but don't block) when no course is assigned. Handicap

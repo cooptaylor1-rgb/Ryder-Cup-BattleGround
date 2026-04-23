@@ -328,6 +328,7 @@ export async function syncMatchToCloud(
     status: match.status,
     start_time: match.startTime || null,
     current_hole: match.currentHole || 1,
+    mode: match.mode || 'ryderCup',
     team_a_player_ids: match.teamAPlayerIds,
     team_b_player_ids: match.teamBPlayerIds,
     team_a_handicap_allowance: match.teamAHandicapAllowance || 0,

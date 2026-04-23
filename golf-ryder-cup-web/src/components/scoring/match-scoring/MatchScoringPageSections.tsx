@@ -105,6 +105,40 @@ export function MatchScoringUnavailableState({
   );
 }
 
+/**
+ * Shown in place of match-play scoring when the captain opens a
+ * practice-round group. Head-to-head scoring doesn't apply (there's no
+ * opposing team), but side bets attached to the group still score
+ * hole-by-hole via the bet detail page, so we route the captain there.
+ */
+export function PracticeMatchEmptyState({
+  matchId,
+  onBackToScore,
+  onOpenBets,
+}: {
+  matchId: string;
+  onBackToScore: () => void;
+  onOpenBets: () => void;
+}) {
+  return (
+    <div className="min-h-screen page-premium-enter texture-grain bg-canvas font-sans">
+      <main className="container-editorial py-12">
+        <EmptyStatePremium
+          illustration="flag"
+          title="Practice round — no cup points"
+          description={
+            'Warm-up groups sit outside the Ryder Cup standings. To track scoring for this group, attach a side bet (skins, CTP, long drive, nassau) from the Bets tab and record results per hole there.'
+          }
+          action={{ label: 'Open bets', onClick: onOpenBets }}
+          secondaryAction={{ label: 'Back to Score', onClick: onBackToScore }}
+          variant="large"
+        />
+        <p className="mt-6 text-center text-xs text-[var(--ink-tertiary)]">Match id: {matchId}</p>
+      </main>
+    </div>
+  );
+}
+
 interface MatchScoringPageSectionsProps {
   matchId: string;
   currentTripId?: string;

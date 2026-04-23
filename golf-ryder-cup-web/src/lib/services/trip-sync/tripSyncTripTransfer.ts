@@ -263,6 +263,12 @@ async function pullTripCore(lookup: {
             status: match.status,
             startTime: match.start_time,
             currentHole: match.current_hole,
+            // Missing mode column on older deployments should degrade
+            // to the default so pre-migration pulls still parse.
+            mode:
+              match.mode === 'practice' || match.mode === 'ryderCup'
+                ? match.mode
+                : 'ryderCup',
             teamAPlayerIds: match.team_a_player_ids,
             teamBPlayerIds: match.team_b_player_ids,
             teamAHandicapAllowance: match.team_a_handicap_allowance,
