@@ -8,7 +8,11 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { db } from '../lib/db';
-import { deleteMatchCascade, deleteTripCascade } from '../lib/services/cascadeDelete';
+import {
+  deleteMatchCascade,
+  deleteSessionCascade,
+  deleteTripCascade,
+} from '../lib/services/cascadeDelete';
 import type { Trip, RyderCupSession, Match, HoleResult } from '../lib/types/models';
 import { ScoringEventType, type ScoringEvent } from '../lib/types/events';
 
@@ -206,5 +210,207 @@ describe('cascadeDelete', () => {
 
     expect(result.tablesCleared).toBe(30);
     expect(result.recordsDeleted).toBeGreaterThan(0);
+  });
+
+  it('deleteSessionCascade removes matches, holeResults, practiceScores, and scoringEvents for the session', async () => {
+    const now = isoNow();
+
+    const trip: Trip = {
+      id: 'trip-sess',
+      name: 'Trip',
+      startDate: now,
+      endDate: now,
+      isCaptainModeEnabled: true,
+      createdAt: now,
+      updatedAt: now,
+    };
+    await db.trips.add(trip);
+
+    const session: RyderCupSession = {
+      id: 'sess-cascade',
+      tripId: trip.id,
+      name: 'Day 1 AM',
+      sessionNumber: 1,
+      sessionType: 'fourball',
+      pointsPerMatch: 1,
+      status: 'scheduled',
+      createdAt: now,
+    };
+    await db.sessions.add(session);
+
+    // Two matches under this session plus one in a DIFFERENT session to
+    // confirm the cascade doesn't over-reach and wipe unrelated rows.
+    const matches: Match[] = [
+      {
+        id: 'm-1',
+        sessionId: session.id,
+        matchOrder: 1,
+        status: 'scheduled',
+        currentHole: 1,
+        teamAPlayerIds: [],
+        teamBPlayerIds: [],
+        teamAHandicapAllowance: 0,
+        teamBHandicapAllowance: 0,
+        result: 'notFinished',
+        margin: 0,
+        holesRemaining: 18,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: 'm-2',
+        sessionId: session.id,
+        matchOrder: 2,
+        status: 'scheduled',
+        currentHole: 1,
+        teamAPlayerIds: [],
+        teamBPlayerIds: [],
+        teamAHandicapAllowance: 0,
+        teamBHandicapAllowance: 0,
+        result: 'notFinished',
+        margin: 0,
+        holesRemaining: 18,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: 'm-other',
+        sessionId: 'sess-other',
+        matchOrder: 1,
+        status: 'scheduled',
+        currentHole: 1,
+        teamAPlayerIds: [],
+        teamBPlayerIds: [],
+        teamAHandicapAllowance: 0,
+        teamBHandicapAllowance: 0,
+        result: 'notFinished',
+        margin: 0,
+        holesRemaining: 18,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ];
+    await db.matches.bulkAdd(matches);
+
+    const holeResults: HoleResult[] = [
+      { id: 'hr-1', matchId: 'm-1', holeNumber: 1, winner: 'teamA', timestamp: now },
+      { id: 'hr-2', matchId: 'm-2', holeNumber: 1, winner: 'halved', timestamp: now },
+      { id: 'hr-other', matchId: 'm-other', holeNumber: 1, winner: 'teamA', timestamp: now },
+    ];
+    await db.holeResults.bulkAdd(holeResults);
+
+    await db.practiceScores.add({
+      id: 'ps-1',
+      matchId: 'm-1',
+      playerId: 'p-1',
+      holeNumber: 1,
+      gross: 4,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    const scoringEvents: ScoringEvent[] = [
+      {
+        id: 'se-1',
+        matchId: 'm-1',
+        eventType: ScoringEventType.HoleScored,
+        timestamp: now,
+        actorName: 'Tester',
+        payload: { type: 'hole_scored', holeNumber: 1, winner: 'teamA' },
+        synced: false,
+      },
+      {
+        id: 'se-other',
+        matchId: 'm-other',
+        eventType: ScoringEventType.HoleScored,
+        timestamp: now,
+        actorName: 'Tester',
+        payload: { type: 'hole_scored', holeNumber: 1, winner: 'teamA' },
+        synced: false,
+      },
+    ];
+    await db.scoringEvents.bulkAdd(scoringEvents);
+
+    await deleteSessionCascade(session.id, { sync: false });
+
+    // Session + its two matches + their holeResults + practiceScores +
+    // scoringEvents are gone.
+    expect(await db.sessions.get(session.id)).toBeUndefined();
+    expect(await db.matches.where('sessionId').equals(session.id).count()).toBe(0);
+    expect(await db.holeResults.where('matchId').anyOf(['m-1', 'm-2']).count()).toBe(0);
+    expect(await db.practiceScores.where('matchId').equals('m-1').count()).toBe(0);
+    expect(await db.scoringEvents.where('matchId').equals('m-1').count()).toBe(0);
+
+    // Other session's match and its data survive — over-reach check.
+    expect(await db.matches.get('m-other')).toBeDefined();
+    expect(await db.holeResults.get('hr-other')).toBeDefined();
+    expect(await db.scoringEvents.get('se-other')).toBeDefined();
+  });
+
+  it('deleteMatchCascade with sync=true queues cloud deletes for match + children', async () => {
+    const now = isoNow();
+    const trip: Trip = {
+      id: 'trip-qd',
+      name: 'T',
+      startDate: now,
+      endDate: now,
+      isCaptainModeEnabled: true,
+      createdAt: now,
+      updatedAt: now,
+    };
+    await db.trips.add(trip);
+
+    const session: RyderCupSession = {
+      id: 'sess-qd',
+      tripId: trip.id,
+      name: 'S',
+      sessionNumber: 1,
+      sessionType: 'fourball',
+      pointsPerMatch: 1,
+      status: 'scheduled',
+      createdAt: now,
+    };
+    await db.sessions.add(session);
+
+    const match: Match = {
+      id: 'm-qd',
+      sessionId: session.id,
+      matchOrder: 1,
+      status: 'scheduled',
+      currentHole: 1,
+      teamAPlayerIds: [],
+      teamBPlayerIds: [],
+      teamAHandicapAllowance: 0,
+      teamBHandicapAllowance: 0,
+      result: 'notFinished',
+      margin: 0,
+      holesRemaining: 18,
+      createdAt: now,
+      updatedAt: now,
+    };
+    await db.matches.add(match);
+
+    await db.holeResults.add({
+      id: 'hr-qd',
+      matchId: match.id,
+      holeNumber: 1,
+      winner: 'teamA',
+      timestamp: now,
+    });
+
+    await deleteMatchCascade(match.id, { sync: true });
+
+    // The sync queue should carry delete ops for match + each child
+    // entity so cloud state stays consistent. Without this queueing,
+    // a device that went offline mid-delete would keep the row in
+    // Supabase and the next pull would resurrect it locally.
+    const queued = await db.tripSyncQueue
+      .where('tripId')
+      .equals(trip.id)
+      .toArray();
+    const deleteOps = queued.filter((q) => q.operation === 'delete');
+    const entities = deleteOps.map((q) => `${q.entity}:${q.entityId}`);
+    expect(entities).toContain('match:m-qd');
+    expect(entities).toContain('holeResult:hr-qd');
   });
 });
