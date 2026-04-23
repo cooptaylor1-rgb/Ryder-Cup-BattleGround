@@ -50,7 +50,7 @@ import {
 export function ManagePageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentTrip, players, teams, teamMembers, courses, teeSets } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, teams: s.teams, teamMembers: s.teamMembers, courses: s.courses, teeSets: s.teeSets })));
+  const { currentTrip, players, teams, teamMembers, courses, teeSets, updatePlayer } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, teams: s.teams, teamMembers: s.teamMembers, courses: s.courses, teeSets: s.teeSets, updatePlayer: s.updatePlayer })));
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
   const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
@@ -265,7 +265,13 @@ export function ManagePageClient() {
     setIsSubmitting(true);
 
     try {
-      await db.players.update(playerId, { ...updates, updatedAt: new Date().toISOString() });
+      // Route through the trip store so the change lands in Dexie AND
+      // gets queued for Supabase AND the Zustand roster state updates.
+      // The previous path only wrote Dexie directly, which meant the
+      // next roster poll pulled the stale row back from Supabase and
+      // wiped the edit — the Captain typed a handicap, saw the toast,
+      // then watched it snap back to "Not set" 15 seconds later.
+      await updatePlayer(playerId, { ...updates, updatedAt: new Date().toISOString() });
       showToast('success', 'Player updated');
       setEditingPlayer(null);
     } catch (error) {
