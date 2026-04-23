@@ -32,12 +32,14 @@ export async function deleteMatchCascade(
   { sync = true, tripId: tripIdOverride }: CascadeDeleteOptions = {}
 ): Promise<void> {
   // Collect related ids first (safe even if match already deleted).
-  const [match, holeResults] = await Promise.all([
+  const [match, holeResults, practiceScores] = await Promise.all([
     db.matches.get(matchId),
     db.holeResults.where('matchId').equals(matchId).toArray(),
+    db.practiceScores.where('matchId').equals(matchId).toArray(),
   ]);
 
   const holeResultIds = holeResults.map((hr) => hr.id);
+  const practiceScoreIds = practiceScores.map((ps) => ps.id);
 
   let tripId = tripIdOverride;
   if (!tripId && match) {
@@ -50,17 +52,25 @@ export async function deleteMatchCascade(
     for (const holeResultId of holeResultIds) {
       queueSyncOperation('holeResult', holeResultId, 'delete', tripId);
     }
+    for (const practiceScoreId of practiceScoreIds) {
+      queueSyncOperation('practiceScore', practiceScoreId, 'delete', tripId);
+    }
     queueSyncOperation('match', matchId, 'delete', tripId);
   } else if (sync && !tripId) {
     logger.warn('deleteMatchCascade: missing tripId; skipping sync queue', { matchId });
   }
 
-  await db.transaction('rw', [db.scoringEvents, db.holeResults, db.matches], async () => {
-    // Leaves → root
-    await db.scoringEvents.where('matchId').equals(matchId).delete();
-    await db.holeResults.where('matchId').equals(matchId).delete();
-    await db.matches.delete(matchId);
-  });
+  await db.transaction(
+    'rw',
+    [db.scoringEvents, db.holeResults, db.practiceScores, db.matches],
+    async () => {
+      // Leaves → root
+      await db.scoringEvents.where('matchId').equals(matchId).delete();
+      await db.holeResults.where('matchId').equals(matchId).delete();
+      await db.practiceScores.where('matchId').equals(matchId).delete();
+      await db.matches.delete(matchId);
+    }
+  );
 }
 
 export async function deleteSessionCascade(
@@ -78,10 +88,17 @@ export async function deleteSessionCascade(
     ? await db.holeResults.where('matchId').anyOf(matchIds).toArray()
     : [];
   const holeResultIds = holeResults.map((hr) => hr.id);
+  const practiceScores = matchIds.length
+    ? await db.practiceScores.where('matchId').anyOf(matchIds).toArray()
+    : [];
+  const practiceScoreIds = practiceScores.map((ps) => ps.id);
 
   if (sync && tripId) {
     for (const holeResultId of holeResultIds) {
       queueSyncOperation('holeResult', holeResultId, 'delete', tripId);
+    }
+    for (const practiceScoreId of practiceScoreIds) {
+      queueSyncOperation('practiceScore', practiceScoreId, 'delete', tripId);
     }
     for (const matchId of matchIds) {
       queueSyncOperation('match', matchId, 'delete', tripId);
@@ -91,14 +108,19 @@ export async function deleteSessionCascade(
     logger.warn('deleteSessionCascade: missing tripId; skipping sync queue', { sessionId });
   }
 
-  await db.transaction('rw', [db.scoringEvents, db.holeResults, db.matches, db.sessions], async () => {
-    if (matchIds.length) {
-      await db.scoringEvents.where('matchId').anyOf(matchIds).delete();
-      await db.holeResults.where('matchId').anyOf(matchIds).delete();
-      await db.matches.where('sessionId').equals(sessionId).delete();
+  await db.transaction(
+    'rw',
+    [db.scoringEvents, db.holeResults, db.practiceScores, db.matches, db.sessions],
+    async () => {
+      if (matchIds.length) {
+        await db.scoringEvents.where('matchId').anyOf(matchIds).delete();
+        await db.holeResults.where('matchId').anyOf(matchIds).delete();
+        await db.practiceScores.where('matchId').anyOf(matchIds).delete();
+        await db.matches.where('sessionId').equals(sessionId).delete();
+      }
+      await db.sessions.delete(sessionId);
     }
-    await db.sessions.delete(sessionId);
-  });
+  );
 }
 
 /**
@@ -146,6 +168,7 @@ export async function deleteTripCascade(
       // Scoring
       db.scoringEvents,
       db.holeResults,
+      db.practiceScores,
       db.matches,
       db.sessions,
       // Teams
@@ -192,6 +215,7 @@ export async function deleteTripCascade(
       if (matchIds.length) {
         recordsDeleted += await db.scoringEvents.where('matchId').anyOf(matchIds).delete();
         recordsDeleted += await db.holeResults.where('matchId').anyOf(matchIds).delete();
+        recordsDeleted += await db.practiceScores.where('matchId').anyOf(matchIds).delete();
       }
       if (sessionIds.length) {
         recordsDeleted += await db.matches.where('sessionId').anyOf(sessionIds).delete();

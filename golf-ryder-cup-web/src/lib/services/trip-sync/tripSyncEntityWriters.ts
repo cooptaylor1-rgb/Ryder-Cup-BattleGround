@@ -6,6 +6,7 @@ import type {
   HoleResult,
   Match,
   Player,
+  PracticeScore,
   RyderCupSession,
   SideBet,
   Team,
@@ -77,6 +78,9 @@ export async function syncEntityToCloud(item: SyncQueueItem): Promise<void> {
       break;
     case 'sideBet':
       await syncSideBetToCloud(entityId, operation, data as SideBet);
+      break;
+    case 'practiceScore':
+      await syncPracticeScoreToCloud(entityId, operation, data as PracticeScore);
       break;
   }
 }
@@ -544,5 +548,39 @@ export async function syncSideBetToCloud(
   };
 
   const { error } = await getTable('side_bets').upsert(cloudData, { onConflict: 'id' });
+  if (error) throw new Error(error.message);
+}
+
+
+/**
+ * Per-player practice-round stroke score. Minimal shape; upsert by id
+ * so re-entering the same hole overwrites in place (the compound
+ * unique on (match_id, player_id, hole_number) guards the database
+ * side against accidental duplicates from a bad client too).
+ */
+export async function syncPracticeScoreToCloud(
+  practiceScoreId: string,
+  operation: SyncOperation,
+  data?: PracticeScore
+): Promise<void> {
+  if (operation === 'delete') {
+    const { error } = await getTable('practice_scores').delete().eq('id', practiceScoreId);
+    if (error) throw new Error(error.message);
+    return;
+  }
+
+  const score = data || (await db.practiceScores.get(practiceScoreId));
+  if (!score) throw new Error('PracticeScore not found locally');
+
+  const cloudData = {
+    id: score.id,
+    match_id: score.matchId,
+    player_id: score.playerId,
+    hole_number: score.holeNumber,
+    gross: score.gross ?? null,
+    updated_at: score.updatedAt || new Date().toISOString(),
+  };
+
+  const { error } = await getTable('practice_scores').upsert(cloudData, { onConflict: 'id' });
   if (error) throw new Error(error.message);
 }

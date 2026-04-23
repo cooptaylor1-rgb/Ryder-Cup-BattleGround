@@ -33,6 +33,25 @@ export type MatchStatus = 'scheduled' | 'inProgress' | 'completed' | 'cancelled'
 export type MatchMode = 'ryderCup' | 'practice';
 
 /**
+ * Per-player stroke entry for a practice-round hole. Separate from
+ * HoleResult (which stores a head-to-head winner) because practice
+ * rounds don't have teams — we need a gross score per player per hole.
+ * Net scores are derived at render time from player.handicapIndex +
+ * course hole handicap; this table stays minimal and append-only so
+ * sync and offline replay are both easy.
+ */
+export interface PracticeScore {
+  id: UUID;
+  matchId: UUID;
+  playerId: UUID;
+  holeNumber: number;
+  /** Gross strokes for this hole. Undefined means "not entered yet". */
+  gross?: number;
+  createdAt: ISODateString;
+  updatedAt: ISODateString;
+}
+
+/**
  * Match result type - who won?
  */
 export type MatchResultType =
