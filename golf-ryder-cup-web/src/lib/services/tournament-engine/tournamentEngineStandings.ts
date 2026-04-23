@@ -67,13 +67,17 @@ export async function calculateTeamStandings(tripId: string): Promise<TeamStandi
     // Practice sessions are paired and scored but do NOT contribute
     // points to the cup leaderboard. Exclude them from the match pool
     // before aggregating standings so Thursday's warm-up round can't
-    // affect Friday's cup.
+    // affect Friday's cup. Belt-and-suspenders: also filter out any
+    // practice-mode match, in case a mixed session ever exists (e.g.
+    // a practice match created then the session flag flipped off —
+    // the match's own mode should still exclude it).
     const cupSessions = sessions.filter((s) => !s.isPracticeSession);
     const sessionIds = cupSessions.map((session) => session.id);
-    const matches = await db.matches
+    const rawMatches = await db.matches
         .where('sessionId')
         .anyOf(sessionIds)
         .toArray();
+    const matches = rawMatches.filter((m) => m.mode !== 'practice');
 
     const matchIds = matches.map((match) => match.id);
     const allHoleResults = await db.holeResults

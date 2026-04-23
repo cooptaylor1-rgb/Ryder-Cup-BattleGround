@@ -295,18 +295,30 @@ function validateLineups(
 
     sessions.forEach(session => {
         const sessionMatches = matches.filter(m => m.sessionId === session.id);
-        const incompleteMatches = sessionMatches.filter(m =>
-            m.teamAPlayerIds.length === 0 || m.teamBPlayerIds.length === 0
-        );
+        const isPractice = session.isPracticeSession;
+
+        // Practice sessions use flat groups (teamBPlayerIds is
+        // intentionally empty). Treat a practice group as incomplete
+        // only when it has fewer than 2 players — otherwise it will
+        // check out as scoreable.
+        const incompleteMatches = sessionMatches.filter(m => {
+            if (isPractice || m.mode === 'practice') {
+                return m.teamAPlayerIds.length < 2;
+            }
+            return m.teamAPlayerIds.length === 0 || m.teamBPlayerIds.length === 0;
+        });
 
         if (incompleteMatches.length > 0) {
+            const noun = isPractice ? 'groups' : 'lineups';
             items.push(createValidation(
                 'lineups',
                 'error',
-                `${session.name} has incomplete lineups`,
-                `${incompleteMatches.length} of ${sessionMatches.length} matches need player assignments.`,
+                `${session.name} has incomplete ${noun}`,
+                isPractice
+                    ? `${incompleteMatches.length} of ${sessionMatches.length} groups need at least two players.`
+                    : `${incompleteMatches.length} of ${sessionMatches.length} matches need player assignments.`,
                 {
-                    actionLabel: 'Set Lineup',
+                    actionLabel: isPractice ? 'Set Groups' : 'Set Lineup',
                     actionHref: buildLineupHref(session.id),
                     actionKind: 'open-lineup',
                 }
@@ -320,10 +332,15 @@ function validateLineups(
     // to replace a removed player, or slotted someone twice on one
     // side. Warn rather than error so the captain can intentionally
     // override for an odd-numbered format if needed.
+    //
+    // Practice sessions are skipped entirely here — they don't have
+    // paired sides to balance.
     sessions.forEach((session) => {
+        if (session.isPracticeSession) return;
         const sessionMatches = matches.filter((m) => m.sessionId === session.id);
         const mismatched = sessionMatches.filter(
             (m) =>
+                m.mode !== 'practice' &&
                 m.teamAPlayerIds.length > 0 &&
                 m.teamBPlayerIds.length > 0 &&
                 m.teamAPlayerIds.length !== m.teamBPlayerIds.length,

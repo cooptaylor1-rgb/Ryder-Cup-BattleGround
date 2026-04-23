@@ -122,11 +122,17 @@ function getCaptainBlockingItem(
   }
 
   const lineupBlockedSession = sessions.find((session) =>
-    matches.some(
-      (match) =>
-        match.sessionId === session.id &&
-        (match.teamAPlayerIds.length === 0 || match.teamBPlayerIds.length === 0)
-    )
+    matches.some((match) => {
+      if (match.sessionId !== session.id) return false;
+      // Practice matches live as a single group in teamAPlayerIds with
+      // teamBPlayerIds empty by design — flagging them as "missing a
+      // lineup" would nag the captain forever. Only require both teams
+      // to be populated for cup matches.
+      if (match.mode === 'practice' || session.isPracticeSession) {
+        return match.teamAPlayerIds.length === 0;
+      }
+      return match.teamAPlayerIds.length === 0 || match.teamBPlayerIds.length === 0;
+    })
   );
   if (lineupBlockedSession) {
     return {
