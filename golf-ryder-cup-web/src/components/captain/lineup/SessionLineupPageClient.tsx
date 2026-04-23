@@ -20,8 +20,15 @@ import {
     type PracticeGroupsTemplate,
 } from './PracticeGroupsEditor';
 import { SessionLeaderboardCard } from '@/components/scoring/practice-scoring/SessionLeaderboardCard';
+import { SessionSkinsCard } from '@/components/scoring/practice-scoring/SessionSkinsCard';
+import {
+    createSessionSkinsBet,
+    findSessionSkinsBet,
+} from '@/lib/services/sessionSkinsService';
 import { db as dexieDb } from '@/lib/db';
 import { useLiveQuery } from 'dexie-react-hooks';
+import { Button } from '@/components/ui/Button';
+import { Coins } from 'lucide-react';
 import { createLogger } from '@/lib/utils/logger';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
@@ -393,7 +400,11 @@ export default function SessionLineupPageClient({ sessionId }: { sessionId: stri
                 ) : null}
 
                 {viewMode === 'matches' && session.isPracticeSession && matches.length > 0 ? (
-                    <SessionLeaderboardCard session={session} matches={matches} />
+                    <>
+                        <SessionLeaderboardCard session={session} matches={matches} />
+                        <SessionSkinsCard session={session} matches={matches} />
+                        <SessionSkinsCtaOrNull session={session} matches={matches} />
+                    </>
                 ) : null}
 
                 {viewMode === 'matches' || !canEdit ? (
@@ -475,5 +486,75 @@ export default function SessionLineupPageClient({ sessionId }: { sessionId: stri
 
             {ConfirmDialogComponent}
         </div>
+    );
+}
+
+/**
+ * "Start session-wide skins" affordance. Renders only when the session
+ * is a practice session with published groups and NO session-scoped
+ * skins bet already exists. Tucked under the leaderboard so the
+ * captain's eye lands on standings first; the CTA disappears the
+ * instant the bet is created (SessionSkinsCard's live query surfaces
+ * it above).
+ */
+function SessionSkinsCtaOrNull({
+    session,
+    matches,
+}: {
+    session: import('@/lib/types').RyderCupSession;
+    matches: import('@/lib/types').Match[];
+}) {
+    const { currentTrip } = useTripStore(useShallow((s) => ({ currentTrip: s.currentTrip })));
+    const { showToast } = useToastStore(useShallow((s) => ({ showToast: s.showToast })));
+    const { isCaptainMode } = useAccessStore(useShallow((s) => ({ isCaptainMode: s.isCaptainMode })));
+
+    const existing = useLiveQuery(
+        async () => {
+            if (!currentTrip) return undefined;
+            return findSessionSkinsBet(currentTrip.id, session.id);
+        },
+        [currentTrip?.id, session.id],
+        undefined
+    );
+
+    if (!isCaptainMode) return null;
+    if (!currentTrip) return null;
+    if (existing) return null;
+
+    return (
+        <section className="rounded-[1.5rem] border border-dashed border-[color:var(--rule)]/75 bg-[color:var(--canvas)] p-[var(--space-5)]">
+            <div className="flex flex-col gap-[var(--space-3)] sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
+                        Session-wide skins
+                    </p>
+                    <h3 className="mt-[var(--space-1)] type-title-sm text-[var(--ink)]">
+                        Pool skins across every group
+                    </h3>
+                    <p className="mt-[var(--space-1)] type-body-sm text-[var(--ink-secondary)]">
+                        Best net per hole wins the skin; ties carry. Standings update live from the
+                        strokes entered in each group.
+                    </p>
+                </div>
+                <Button
+                    variant="primary"
+                    leftIcon={<Coins size={15} />}
+                    onClick={async () => {
+                        try {
+                            await createSessionSkinsBet({
+                                session,
+                                matches,
+                                perHole: 5,
+                            });
+                            showToast('success', 'Session-wide skins started');
+                        } catch {
+                            showToast('error', 'Failed to start session skins');
+                        }
+                    }}
+                >
+                    Start session skins
+                </Button>
+            </div>
+        </section>
     );
 }
