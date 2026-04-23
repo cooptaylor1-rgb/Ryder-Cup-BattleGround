@@ -20,45 +20,55 @@ import { isServerNewer } from './tripSyncLww';
 import { getTable } from './tripSyncShared';
 
 export async function syncEntityToCloud(item: SyncQueueItem): Promise<void> {
-  const { entity, entityId, operation, data } = item;
-
-  switch (entity) {
+  // The `item` variable is a discriminated union over item.entity,
+  // so each case below narrows `item.data` to the matching model
+  // type automatically. No more `as Trip` / `as HoleResult` casts —
+  // if a future writer argument goes stale (e.g. a model gets a
+  // new required field), the compiler errors at the call site.
+  switch (item.entity) {
     case 'trip':
-      await syncTripToCloud(entityId, operation, data as Trip);
+      await syncTripToCloud(item.entityId, item.operation, item.data);
       break;
     case 'player':
-      await syncPlayerToCloud(entityId, operation, data as Player, item.tripId);
+      await syncPlayerToCloud(item.entityId, item.operation, item.data, item.tripId);
       break;
     case 'team':
-      await syncTeamToCloud(entityId, operation, data as Team);
+      await syncTeamToCloud(item.entityId, item.operation, item.data);
       break;
     case 'teamMember':
-      await syncTeamMemberToCloud(entityId, operation, data as TeamMember);
+      await syncTeamMemberToCloud(item.entityId, item.operation, item.data);
       break;
     case 'session':
-      await syncSessionToCloud(entityId, operation, data as RyderCupSession);
+      await syncSessionToCloud(item.entityId, item.operation, item.data);
       break;
     case 'match':
-      await syncMatchToCloud(entityId, operation, data as Match);
+      await syncMatchToCloud(item.entityId, item.operation, item.data);
       break;
     case 'holeResult':
-      await syncHoleResultToCloud(entityId, operation, data as HoleResult);
+      await syncHoleResultToCloud(item.entityId, item.operation, item.data);
       break;
     case 'course':
-      await syncCourseToCloud(entityId, operation, data as Course);
+      await syncCourseToCloud(item.entityId, item.operation, item.data);
       break;
     case 'teeSet':
-      await syncTeeSetToCloud(entityId, operation, data as TeeSet);
+      await syncTeeSetToCloud(item.entityId, item.operation, item.data);
       break;
     case 'sideBet':
-      await syncSideBetToCloud(entityId, operation, data as SideBet);
+      await syncSideBetToCloud(item.entityId, item.operation, item.data);
       break;
     case 'practiceScore':
-      await syncPracticeScoreToCloud(entityId, operation, data as PracticeScore);
+      await syncPracticeScoreToCloud(item.entityId, item.operation, item.data);
       break;
     case 'banterPost':
-      await syncBanterPostToCloud(entityId, operation, data as BanterPost);
+      await syncBanterPostToCloud(item.entityId, item.operation, item.data);
       break;
+    default: {
+      // Exhaustiveness check: if a SyncEntity variant is added
+      // without a writer case, this assignment to `never` fails
+      // compilation, surfacing the missing dispatch branch.
+      const _exhaustive: never = item;
+      throw new Error(`Unhandled sync entity: ${JSON.stringify(_exhaustive)}`);
+    }
   }
 }
 
