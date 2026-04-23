@@ -15,7 +15,12 @@ import {
     savePracticeLineup,
     type PracticeGroupDraft,
 } from '@/lib/services/lineup-builder/practiceLineupPersistence';
-import { PracticeGroupsEditor } from './PracticeGroupsEditor';
+import {
+    PracticeGroupsEditor,
+    type PracticeGroupsTemplate,
+} from './PracticeGroupsEditor';
+import { db as dexieDb } from '@/lib/db';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { createLogger } from '@/lib/utils/logger';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
@@ -251,6 +256,55 @@ export default function SessionLineupPageClient({ sessionId }: { sessionId: stri
         [loadMatches, session]
     );
 
+    // Prior practice sessions on this trip become "Copy pairings from…"
+    // options in the editor. Sorted newest first (by scheduledDate,
+    // falling back to sessionNumber) so "Copy from last practice round"
+    // is the obvious default at the top.
+    const practiceTemplatesBase = useLiveQuery(
+        async () => {
+            if (!currentTrip || !session) return [] as PracticeGroupsTemplate[];
+            const candidateSessions = (
+                await dexieDb.sessions.where('tripId').equals(currentTrip.id).toArray()
+            )
+                .filter((s) => s.isPracticeSession && s.id !== session.id)
+                .sort((a, b) => {
+                    const dateDiff =
+                        (b.scheduledDate ?? '').localeCompare(a.scheduledDate ?? '');
+                    if (dateDiff !== 0) return dateDiff;
+                    return b.sessionNumber - a.sessionNumber;
+                });
+
+            const templates: PracticeGroupsTemplate[] = [];
+            for (const candidate of candidateSessions) {
+                const candidateMatches = await dexieDb.matches
+                    .where('sessionId')
+                    .equals(candidate.id)
+                    .toArray();
+                if (candidateMatches.length === 0) continue;
+                const groups: PracticeGroupDraft[] = candidateMatches
+                    .sort((a, b) => a.matchOrder - b.matchOrder)
+                    .map((match, index) => ({
+                        localId: `${candidate.id}-${match.id}`,
+                        groupNumber: match.matchOrder || index + 1,
+                        playerIds:
+                            match.teamAPlayerIds.length > 0 || match.teamBPlayerIds.length > 0
+                                ? [...match.teamAPlayerIds, ...match.teamBPlayerIds]
+                                : [],
+                        teeTime: match.teeTime ?? '',
+                    }));
+                templates.push({
+                    sourceId: candidate.id,
+                    label: `${candidate.name} — ${groups.length} group${groups.length === 1 ? '' : 's'}`,
+                    groups,
+                });
+            }
+            return templates;
+        },
+        [currentTrip?.id, session?.id],
+        [] as PracticeGroupsTemplate[]
+    );
+    const practiceTemplates = practiceTemplatesBase ?? [];
+
     const getMatchPlayerNames = useCallback(
         (playerIds: string[]) => getSessionMatchPlayerNames(playerIds, players),
         [players]
@@ -354,6 +408,7 @@ export default function SessionLineupPageClient({ sessionId }: { sessionId: stri
                         session={session}
                         roster={players}
                         initialGroups={practiceInitialGroups}
+                        templates={practiceTemplates}
                         onPublish={async (groups) => {
                             try {
                                 await persistPracticeLineup(groups);

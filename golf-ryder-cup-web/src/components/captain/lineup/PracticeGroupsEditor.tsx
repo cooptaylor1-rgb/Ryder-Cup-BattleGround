@@ -8,10 +8,25 @@ import { cn, formatPlayerName } from '@/lib/utils';
 import type { Player, RyderCupSession } from '@/lib/types/models';
 import type { PracticeGroupDraft } from '@/lib/services/lineup-builder/practiceLineupPersistence';
 
+export interface PracticeGroupsTemplate {
+  /** e.g. the source session's id — used only for the React key. */
+  sourceId: string;
+  /** Human label shown in the dropdown ("Thursday practice — 4 groups"). */
+  label: string;
+  groups: PracticeGroupDraft[];
+}
+
 interface PracticeGroupsEditorProps {
   session: RyderCupSession;
   roster: Player[];
   initialGroups: PracticeGroupDraft[];
+  /**
+   * Prior practice sessions whose groups the captain can copy as a
+   * starting point. Rendered as a "Copy from…" dropdown; picking one
+   * overwrites the current draft (the captain gets a confirm toast
+   * via the existing save-draft flow if they then edit).
+   */
+  templates?: PracticeGroupsTemplate[];
   onPublish: (groups: PracticeGroupDraft[]) => Promise<void> | void;
   onSaveDraft?: (groups: PracticeGroupDraft[]) => Promise<void> | void;
   isPublishing?: boolean;
@@ -81,6 +96,7 @@ export function PracticeGroupsEditor({
   session,
   roster,
   initialGroups,
+  templates = [],
   onPublish,
   onSaveDraft,
   isPublishing = false,
@@ -172,6 +188,22 @@ export function PracticeGroupsEditor({
     );
   }, []);
 
+  /**
+   * Load pairings from a prior practice session. Renumbers the groups
+   * and generates fresh localIds so React keys stay unique and group
+   * numbering starts at 1 regardless of what the source used.
+   */
+  const applyTemplate = useCallback((template: PracticeGroupsTemplate) => {
+    setGroups(
+      template.groups.map((g, index) => ({
+        ...g,
+        localId:
+          typeof crypto !== 'undefined' ? crypto.randomUUID() : `${template.sourceId}-${index}`,
+        groupNumber: index + 1,
+      }))
+    );
+  }, []);
+
   // Auto-stagger before filtering: blank tee times get filled from
   // Group 1's time so a captain setting only the first tee time still
   // gets a reasonable schedule for Groups 2, 3, 4 without per-row
@@ -196,6 +228,42 @@ export function PracticeGroupsEditor({
           any group.
         </p>
       </div>
+
+      {templates.length > 0 ? (
+        <div className="rounded-[1.25rem] border border-[color:var(--rule)] bg-[color:var(--canvas)] px-[var(--space-4)] py-[var(--space-3)]">
+          <label className="flex items-center justify-between gap-[var(--space-3)]">
+            <span className="type-meta font-semibold text-[var(--ink)]">
+              Copy pairings from
+            </span>
+            <select
+              value=""
+              onChange={(event) => {
+                const match = templates.find((t) => t.sourceId === event.target.value);
+                if (match) applyTemplate(match);
+                // Reset the select back to the placeholder so the same
+                // template can be chosen again if the captain edited
+                // and wants to restart.
+                event.currentTarget.value = '';
+              }}
+              className="input max-w-[20rem]"
+              aria-label="Copy pairings from a prior practice session"
+            >
+              <option value="">Select a prior session…</option>
+              {templates.map((template) => (
+                <option key={template.sourceId} value={template.sourceId}>
+                  {template.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      ) : null}
+
+      <UnassignedPool
+        players={availablePlayers}
+        groups={groups}
+        onAssign={(playerId, toLocalId) => addPlayer(toLocalId, playerId)}
+      />
 
       <div className="space-y-[var(--space-3)]">
         {groups.map((group) => (
@@ -422,6 +490,82 @@ function GroupCard({
           No unassigned players. Remove a player from another group to reassign.
         </p>
       ) : null}
+    </div>
+  );
+}
+
+/**
+ * Surfaced pool of trip players not yet in any group. The captain
+ * can tap a player to push them into a group without opening that
+ * group's dropdown first; shows at a glance who's still unassigned
+ * so no one gets dropped from the tee sheet.
+ */
+interface UnassignedPoolProps {
+  players: Player[];
+  groups: PracticeGroupDraft[];
+  onAssign: (playerId: string, toLocalId: string) => void;
+}
+
+function UnassignedPool({ players, groups, onAssign }: UnassignedPoolProps) {
+  if (players.length === 0 && groups.every((g) => g.playerIds.length > 0)) {
+    return (
+      <div className="rounded-[1.25rem] border border-dashed border-[color:var(--rule)] bg-[color:var(--canvas)] px-[var(--space-4)] py-[var(--space-3)]">
+        <p className="type-meta text-[var(--ink-tertiary)]">
+          All players assigned. Every trip roster member is in a group.
+        </p>
+      </div>
+    );
+  }
+
+  if (players.length === 0) {
+    return null;
+  }
+
+  const openGroups = groups.filter((g) => g.playerIds.length < MAX_GROUP_SIZE);
+
+  return (
+    <div className="rounded-[1.25rem] border border-[color:var(--rule)] bg-[linear-gradient(180deg,rgba(201,162,39,0.06),rgba(255,255,255,0.96))] px-[var(--space-4)] py-[var(--space-3)]">
+      <div className="flex items-center justify-between gap-[var(--space-3)]">
+        <div>
+          <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">Unassigned</p>
+          <p className="type-title-sm text-[var(--ink)]">
+            {players.length} player{players.length === 1 ? '' : 's'} still need a group
+          </p>
+        </div>
+      </div>
+      <div className="mt-[var(--space-3)] flex flex-wrap gap-[var(--space-2)]">
+        {players.map((player) => {
+          const label = formatPlayerName(player.firstName, player.lastName);
+          return (
+            <label
+              key={player.id}
+              className="flex items-center gap-[var(--space-2)] rounded-full border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-3)] py-[5px]"
+            >
+              <span className="type-meta text-[var(--ink)]">{label}</span>
+              {openGroups.length > 0 ? (
+                <select
+                  value=""
+                  onChange={(event) => {
+                    const toId = event.target.value;
+                    if (toId) onAssign(player.id, toId);
+                  }}
+                  aria-label={`Assign ${label} to a group`}
+                  className="rounded-[0.5rem] border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-2)] py-[1px] text-xs"
+                >
+                  <option value="">→ group</option>
+                  {openGroups.map((target) => (
+                    <option key={target.localId} value={target.localId}>
+                      Group {target.groupNumber}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span className="type-micro text-[var(--ink-tertiary)]">no open group</span>
+              )}
+            </label>
+          );
+        })}
+      </div>
     </div>
   );
 }
