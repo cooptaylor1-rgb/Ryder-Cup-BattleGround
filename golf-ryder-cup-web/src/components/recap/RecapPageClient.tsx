@@ -14,7 +14,6 @@ import {
   LeaderboardSection,
   MatchesSection,
   OverviewSection,
-  PhotosSection,
   RECAP_SECTIONS,
   StatsSection,
   type RecapSection,
@@ -170,7 +169,6 @@ export default function RecapPageClient() {
           {activeSection === 'matches' ? <MatchesSection recap={recap} /> : null}
           {activeSection === 'stats' ? <StatsSection recap={recap} /> : null}
           {activeSection === 'banter' ? <BanterSection recap={recap} /> : null}
-          {activeSection === 'photos' ? <PhotosSection recap={recap} /> : null}
         </div>
       </main>
     </div>

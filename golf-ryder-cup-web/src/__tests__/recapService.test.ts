@@ -59,7 +59,6 @@ describe('recapService', () => {
         playerLeaderboard: [],
         funStats: [],
         topTrashTalk: [],
-        topPhotos: [],
         highlights: [],
         matchResults: [],
       })
