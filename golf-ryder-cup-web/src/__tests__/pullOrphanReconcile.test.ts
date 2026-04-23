@@ -151,7 +151,7 @@ describe('getPendingSyncIdsForTrip — filtering semantics', () => {
     await db.open();
   });
 
-  it('filters to pending/syncing items only, scoped by trip and entity', async () => {
+  it('filters to pending/syncing/failed items, scoped by trip and entity', async () => {
     await db.trips.bulkAdd([seedTrip('trip-1'), seedTrip('trip-2')]);
     queueSyncOperation('player', 'p-t1', 'create', 'trip-1', {} as Player);
     queueSyncOperation('team', 'team-t1', 'update', 'trip-1', {} as Team);
@@ -161,6 +161,23 @@ describe('getPendingSyncIdsForTrip — filtering semantics', () => {
     expect(playersT1.has('p-t1')).toBe(true);
     expect(playersT1.has('team-t1')).toBe(false);
     expect(playersT1.has('p-t2')).toBe(false);
+  });
+
+  it('includes failed items so a failed create does not get swept on the next pull', async () => {
+    await db.trips.add(seedTrip('trip-1'));
+    queueSyncOperation('session', 'sess-a', 'create', 'trip-1', {} as never);
+    // Simulate the item terminal-failing after MAX_RETRY_COUNT by
+    // editing the runtime queue directly — the important invariant
+    // is that a 'failed' entity id still reports as "owned locally"
+    // so the orphan reconcile leaves it alone.
+    const { tripSyncRuntime } = await import('@/lib/services/trip-sync/tripSyncShared');
+    const queued = tripSyncRuntime.syncQueue.find(
+      (i) => i.entityId === 'sess-a' && i.tripId === 'trip-1'
+    );
+    if (queued) queued.status = 'failed';
+
+    const sessionIds = getPendingSyncIdsForTrip('trip-1', 'session');
+    expect(sessionIds.has('sess-a')).toBe(true);
   });
 
   it('returns an empty set when nothing is queued', async () => {

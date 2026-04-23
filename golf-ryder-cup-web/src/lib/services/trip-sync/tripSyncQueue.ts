@@ -39,6 +39,58 @@ async function persistQueueItem(item: SyncQueueItem): Promise<void> {
   }
 }
 
+/**
+ * For every queued create/update with a preserved data payload,
+ * ensures the corresponding Dexie row exists. Used once on queue
+ * hydrate to undo damage from an earlier orphan-reconcile bug
+ * that deleted local rows whose sync op was in a 'failed' state.
+ * Idempotent: a row that already exists is untouched.
+ */
+async function restoreOrphanedQueueEntities(): Promise<void> {
+  const tableFor: Partial<Record<SyncEntity, keyof typeof db>> = {
+    trip: 'trips',
+    player: 'players',
+    team: 'teams',
+    teamMember: 'teamMembers',
+    session: 'sessions',
+    match: 'matches',
+    holeResult: 'holeResults',
+    course: 'courses',
+    teeSet: 'teeSets',
+    sideBet: 'sideBets',
+    practiceScore: 'practiceScores',
+    banterPost: 'banterPosts',
+  };
+
+  for (const item of tripSyncRuntime.syncQueue) {
+    if (item.operation === 'delete') continue;
+    if (!item.data) continue;
+    if (item.status === 'completed') continue;
+
+    const tableKey = tableFor[item.entity];
+    if (!tableKey) continue;
+
+    try {
+      const table = (db as unknown as Record<string, { get: (id: string) => Promise<unknown>; put: (row: unknown) => Promise<unknown> }>)[tableKey];
+      if (!table) continue;
+      const existing = await table.get(item.entityId);
+      if (existing) continue;
+      await table.put(item.data);
+      logger.warn('Restored Dexie row from queued payload', {
+        entity: item.entity,
+        entityId: item.entityId,
+        operation: item.operation,
+      });
+    } catch (err) {
+      logger.warn('Failed to restore queued entity', {
+        entity: item.entity,
+        entityId: item.entityId,
+        err,
+      });
+    }
+  }
+}
+
 async function removeQueueItem(id: string): Promise<void> {
   try {
     await db.tripSyncQueue.delete(id);
@@ -110,6 +162,17 @@ async function ensureQueueHydrated(): Promise<void> {
             await persistQueueItem(item);
           }
         }
+
+        // Self-heal rows that were erroneously swept by an earlier
+        // orphan reconcile. If a queue item carries a full data
+        // payload for a create/update but the Dexie row is gone,
+        // put it back. Practice sessions disappeared for one
+        // captain because a transient trigger error left the
+        // session's create op "failed" and the pull-time reconcile
+        // (which ignored failed items) deleted the only copy.
+        // Restoring here means the next page render shows the row
+        // again and the next sync attempt pushes it to cloud.
+        await restoreOrphanedQueueEntities();
       }
     } catch (error) {
       logger.warn('Failed to hydrate sync queue:', error);
@@ -548,18 +611,23 @@ export function getSyncQueueStatus(): {
 }
 
 /**
- * Returns the set of entity ids that have a pending or syncing
- * operation queued for a given trip + entity. Used by pullTripCore
- * to gate the orphan-row cleanup — local rows that exist ONLY
- * locally because a create hasn't synced yet must not be deleted
- * just because the cloud response doesn't include them.
+ * Returns the set of entity ids that have a pending, syncing, OR
+ * failed operation queued for a given trip + entity. Used by
+ * pullTripCore to gate the orphan-row cleanup — local rows that
+ * exist ONLY locally because a create hasn't reached the cloud
+ * must not be deleted just because the cloud response doesn't
+ * include them.
  *
- * Accepts 'pending' and 'syncing' statuses (not 'failed') because
- * failed items will eventually retry; if they retry successfully
- * the row lands in cloud and the next pull keeps it. If they retry
- * to final failure, subsequent pulls removing the orphan is the
- * right call — the user's explicit clearFailedQueue is the
- * escape hatch.
+ * CRITICAL: we include 'failed' too. Earlier this only returned
+ * pending+syncing ids on the theory that failed items would
+ * either eventually retry to success or be explicitly cleared by
+ * the user. In practice that meant a failed create erased the
+ * only copy of the user's data on the next pull — a captain's
+ * practice rounds silently disappeared after a transient trigger
+ * error blocked the create from ever reaching Supabase. Treating
+ * 'failed' as still-owned-locally keeps the row alive until the
+ * sync pipeline either succeeds on a later retry or the user
+ * explicitly discards it via clearFailedQueue.
  */
 export function getPendingSyncIdsForTrip(
   tripId: string,
@@ -569,7 +637,13 @@ export function getPendingSyncIdsForTrip(
   for (const item of tripSyncRuntime.syncQueue) {
     if (item.tripId !== tripId) continue;
     if (item.entity !== entity) continue;
-    if (item.status !== 'pending' && item.status !== 'syncing') continue;
+    if (
+      item.status !== 'pending' &&
+      item.status !== 'syncing' &&
+      item.status !== 'failed'
+    ) {
+      continue;
+    }
     ids.add(item.entityId);
   }
   return ids;
