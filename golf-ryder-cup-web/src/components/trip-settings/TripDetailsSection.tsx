@@ -7,6 +7,7 @@ import { db } from '@/lib/db';
 import { useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { Team, Trip } from '@/lib/types/models';
+import { queueSyncOperation } from '@/lib/services/tripSyncService';
 
 interface TripDetailsSectionProps {
     trip: Trip;
@@ -35,8 +36,10 @@ export function TripDetailsSection({ trip }: TripDetailsSectionProps) {
     const [teams, setTeams] = useState<Team[]>([]);
     const [teamAName, setTeamAName] = useState('');
     const [teamAColor, setTeamAColor] = useState('');
+    const [teamAIcon, setTeamAIcon] = useState('');
     const [teamBName, setTeamBName] = useState('');
     const [teamBColor, setTeamBColor] = useState('');
+    const [teamBIcon, setTeamBIcon] = useState('');
 
     const [isSaving, setIsSaving] = useState(false);
 
@@ -55,8 +58,10 @@ export function TripDetailsSection({ trip }: TripDetailsSectionProps) {
                 const b = rows.find((t) => t.color === 'europe');
                 setTeamAName(a?.name ?? 'Team USA');
                 setTeamAColor(a?.colorHex ?? '#1E3A5F');
+                setTeamAIcon(a?.icon ?? '');
                 setTeamBName(b?.name ?? 'Team Europe');
                 setTeamBColor(b?.colorHex ?? '#722F37');
+                setTeamBIcon(b?.icon ?? '');
             });
 
         return () => {
@@ -89,20 +94,52 @@ export function TripDetailsSection({ trip }: TripDetailsSectionProps) {
 
             const teamA = teams.find((t) => t.color === 'usa');
             const teamB = teams.find((t) => t.color === 'europe');
+            const nextTeamAIcon = teamAIcon.trim() || undefined;
+            const nextTeamBIcon = teamBIcon.trim() || undefined;
 
-            if (teamA && (teamA.name !== teamAName.trim() || teamA.colorHex !== teamAColor)) {
-                await db.teams.update(teamA.id, {
-                    name: teamAName.trim() || 'Team USA',
+            if (
+                teamA &&
+                (teamA.name !== teamAName.trim() ||
+                    teamA.colorHex !== teamAColor ||
+                    teamA.icon !== nextTeamAIcon)
+            ) {
+                const nextName = teamAName.trim() || 'Team USA';
+                const updated = {
+                    ...teamA,
+                    name: nextName,
                     colorHex: teamAColor,
+                    icon: nextTeamAIcon,
+                    updatedAt: now,
+                };
+                await db.teams.update(teamA.id, {
+                    name: nextName,
+                    colorHex: teamAColor,
+                    icon: nextTeamAIcon,
                     updatedAt: now,
                 });
+                queueSyncOperation('team', teamA.id, 'update', trip.id, updated);
             }
-            if (teamB && (teamB.name !== teamBName.trim() || teamB.colorHex !== teamBColor)) {
-                await db.teams.update(teamB.id, {
-                    name: teamBName.trim() || 'Team Europe',
+            if (
+                teamB &&
+                (teamB.name !== teamBName.trim() ||
+                    teamB.colorHex !== teamBColor ||
+                    teamB.icon !== nextTeamBIcon)
+            ) {
+                const nextName = teamBName.trim() || 'Team Europe';
+                const updated = {
+                    ...teamB,
+                    name: nextName,
                     colorHex: teamBColor,
+                    icon: nextTeamBIcon,
+                    updatedAt: now,
+                };
+                await db.teams.update(teamB.id, {
+                    name: nextName,
+                    colorHex: teamBColor,
+                    icon: nextTeamBIcon,
                     updatedAt: now,
                 });
+                queueSyncOperation('team', teamB.id, 'update', trip.id, updated);
             }
 
             showToast('success', 'Trip details saved');
@@ -223,6 +260,16 @@ export function TripDetailsSection({ trip }: TripDetailsSectionProps) {
                                         aria-label="Team 1 color"
                                     />
                                 </label>
+                                <label className="block">
+                                    <span className="type-micro text-[var(--ink-tertiary)]">Logo URL</span>
+                                    <input
+                                        type="url"
+                                        value={teamAIcon}
+                                        onChange={(e) => setTeamAIcon(e.target.value)}
+                                        placeholder="https://…/logo.png"
+                                        className="input mt-1 w-full"
+                                    />
+                                </label>
                             </div>
 
                             <div className="space-y-2">
@@ -244,6 +291,16 @@ export function TripDetailsSection({ trip }: TripDetailsSectionProps) {
                                         onChange={(e) => setTeamBColor(e.target.value)}
                                         className="h-8 w-16 rounded cursor-pointer border border-[var(--rule)]"
                                         aria-label="Team 2 color"
+                                    />
+                                </label>
+                                <label className="block">
+                                    <span className="type-micro text-[var(--ink-tertiary)]">Logo URL</span>
+                                    <input
+                                        type="url"
+                                        value={teamBIcon}
+                                        onChange={(e) => setTeamBIcon(e.target.value)}
+                                        placeholder="https://…/logo.png"
+                                        className="input mt-1 w-full"
                                     />
                                 </label>
                             </div>

@@ -31,6 +31,7 @@ import {
   TripCompetitionRulesSection,
   TripDangerZoneSection,
 } from '@/components/trip-settings';
+import { queueSyncOperation } from '@/lib/services/tripSyncService';
 
 export default function CaptainSettingsPage() {
   const router = useRouter();
@@ -44,6 +45,8 @@ export default function CaptainSettingsPage() {
   const [location, setLocation] = useState(currentTrip?.location || '');
   const [teamAName, setTeamAName] = useState('');
   const [teamBName, setTeamBName] = useState('');
+  const [teamAIcon, setTeamAIcon] = useState('');
+  const [teamBIcon, setTeamBIcon] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
   const teams = useLiveQuery(
@@ -70,6 +73,8 @@ export default function CaptainSettingsPage() {
   useEffect(() => {
     setTeamAName(teamA?.name || '');
     setTeamBName(teamB?.name || '');
+    setTeamAIcon(teamA?.icon || '');
+    setTeamBIcon(teamB?.icon || '');
   }, [teamA, teamB]);
 
   const normalizedStartDate = normalizeDateValue(startDate);
@@ -82,7 +87,9 @@ export default function CaptainSettingsPage() {
       normalizedEndDate !== savedEndDate ||
       location !== (currentTrip.location || '') ||
       teamAName !== (teamA?.name || '') ||
-      teamBName !== (teamB?.name || '')
+      teamBName !== (teamB?.name || '') ||
+      teamAIcon !== (teamA?.icon || '') ||
+      teamBIcon !== (teamB?.icon || '')
     : false;
   const isReadyToPublish = Boolean(
     tripName.trim() && normalizedStartDate && normalizedEndDate && teamAName.trim() && teamBName.trim()
@@ -105,18 +112,49 @@ export default function CaptainSettingsPage() {
         location,
       });
 
-      if (teamA && teamAName !== teamA.name) {
+      // Persist team edits to Dexie AND cloud. The previous path only
+      // wrote Dexie, so a captain renaming a team or pasting a logo URL
+      // saw it locally while every other device stayed on the stale
+      // name — the app-wide roster poll re-pulled the old row from
+      // Supabase and wiped the edit on the captain's screen too.
+      const now = new Date().toISOString();
+      const nextTeamAIcon = teamAIcon.trim() || undefined;
+      const nextTeamBIcon = teamBIcon.trim() || undefined;
+
+      if (
+        teamA &&
+        (teamAName !== teamA.name || nextTeamAIcon !== teamA.icon)
+      ) {
+        const updated = {
+          ...teamA,
+          name: teamAName,
+          icon: nextTeamAIcon,
+          updatedAt: now,
+        };
         await db.teams.update(teamA.id, {
           name: teamAName,
-          updatedAt: new Date().toISOString(),
+          icon: nextTeamAIcon,
+          updatedAt: now,
         });
+        queueSyncOperation('team', teamA.id, 'update', currentTrip.id, updated);
       }
 
-      if (teamB && teamBName !== teamB.name) {
+      if (
+        teamB &&
+        (teamBName !== teamB.name || nextTeamBIcon !== teamB.icon)
+      ) {
+        const updated = {
+          ...teamB,
+          name: teamBName,
+          icon: nextTeamBIcon,
+          updatedAt: now,
+        };
         await db.teams.update(teamB.id, {
           name: teamBName,
-          updatedAt: new Date().toISOString(),
+          icon: nextTeamBIcon,
+          updatedAt: now,
         });
+        queueSyncOperation('team', teamB.id, 'update', currentTrip.id, updated);
       }
 
       showToast('success', 'Trip settings saved');
@@ -234,27 +272,51 @@ export default function CaptainSettingsPage() {
               icon={<Palette size={18} />}
             >
               <div className="grid gap-[var(--space-4)] sm:grid-cols-2">
-                <FormField label="Team A">
-                  <input
-                    type="text"
-                    value={teamAName}
-                    onChange={(event) => setTeamAName(event.target.value)}
-                    className="input border-[var(--team-usa)] focus:border-[var(--team-usa)]"
-                    placeholder="Team USA"
-                  />
-                </FormField>
-                <FormField label="Team B">
-                  <input
-                    type="text"
-                    value={teamBName}
-                    onChange={(event) => setTeamBName(event.target.value)}
-                    className="input border-[var(--team-europe)] focus:border-[var(--team-europe)]"
-                    placeholder="Team Europe"
-                  />
-                </FormField>
+                <div className="space-y-[var(--space-3)]">
+                  <FormField label="Team A">
+                    <input
+                      type="text"
+                      value={teamAName}
+                      onChange={(event) => setTeamAName(event.target.value)}
+                      className="input border-[var(--team-usa)] focus:border-[var(--team-usa)]"
+                      placeholder="Team USA"
+                    />
+                  </FormField>
+                  <FormField label="Team A logo URL">
+                    <input
+                      type="url"
+                      value={teamAIcon}
+                      onChange={(event) => setTeamAIcon(event.target.value)}
+                      className="input"
+                      placeholder="https://…/logo.png"
+                    />
+                  </FormField>
+                </div>
+                <div className="space-y-[var(--space-3)]">
+                  <FormField label="Team B">
+                    <input
+                      type="text"
+                      value={teamBName}
+                      onChange={(event) => setTeamBName(event.target.value)}
+                      className="input border-[var(--team-europe)] focus:border-[var(--team-europe)]"
+                      placeholder="Team Europe"
+                    />
+                  </FormField>
+                  <FormField label="Team B logo URL">
+                    <input
+                      type="url"
+                      value={teamBIcon}
+                      onChange={(event) => setTeamBIcon(event.target.value)}
+                      className="input"
+                      placeholder="https://…/logo.png"
+                    />
+                  </FormField>
+                </div>
               </div>
               <p className="mt-[var(--space-3)] text-sm text-[var(--ink-secondary)]">
                 Name them well once and the rest of the app feels more intentional immediately.
+                Paste a public image URL to show a logo on the Home score card and the captain
+                fact cards.
               </p>
             </SettingsPanel>
           </div>
