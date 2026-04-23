@@ -349,7 +349,7 @@ async function pullTripCore(lookup: {
     // clients just won't see practice leaderboards.
     const { data: practiceScores } =
       matchIds.length === 0
-        ? { data: [] }
+        ? { data: [] as Array<Record<string, unknown>> }
         : await getTable('practice_scores')
             .select('*')
             .in('match_id', matchIds)
