@@ -129,7 +129,6 @@ interface TripState {
   updateSession: (sessionId: string, updates: Partial<RyderCupSession>) => Promise<void>;
 
   // Selectors (computed)
-  getTeamPlayers: (teamId: string) => Player[];
   getTeamByColor: (color: 'usa' | 'europe') => Team | null;
   getActiveSession: () => RyderCupSession | null;
   getSessionMatches: (sessionId: string) => Promise<Match[]>;
@@ -677,14 +676,6 @@ export const useTripStore = create<TripState>()(
       },
 
       // Selectors
-      getTeamPlayers: (teamId) => {
-        const { teamMembers, players } = get();
-        const memberPlayerIds = teamMembers
-          .filter((tm) => tm.teamId === teamId)
-          .map((tm) => tm.playerId);
-        return players.filter((p) => memberPlayerIds.includes(p.id));
-      },
-
       getTeamByColor: (color) => {
         const { teams } = get();
         return teams.find((t) => t.color === color) || null;
