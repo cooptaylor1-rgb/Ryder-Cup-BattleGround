@@ -3,6 +3,151 @@ import { mergeTripPlayers } from '@/lib/utils/tripPlayers';
 
 import { db } from '../../db';
 import type { SideBet, Trip } from '../../types/models';
+import { getPendingSyncIdsForTrip } from './tripSyncQueue';
+
+/**
+ * Per-entity local orphan cleanup: for each entity we pulled, delete
+ * the local Dexie rows scoped to this trip that are NOT in the cloud
+ * response AND do NOT have a pending sync op. The pending-op gate is
+ * what makes this safe against "local-only-awaiting-push" rows — an
+ * offline-created player whose create hasn't synced yet would
+ * otherwise vanish the moment the captain came back online, before
+ * the queue had a chance to push it.
+ */
+async function reconcileLocalOrphans({
+  tripId,
+  cloudPlayerIds,
+  cloudTeamIds,
+  cloudTeamMemberIds,
+  cloudSessionIds,
+  cloudMatchIds,
+  cloudHoleResultIds,
+  cloudPracticeScoreIds,
+  cloudSideBetIds,
+}: {
+  tripId: string;
+  cloudPlayerIds: string[];
+  cloudTeamIds: string[];
+  cloudTeamMemberIds: string[];
+  cloudSessionIds: string[];
+  cloudMatchIds: string[];
+  cloudHoleResultIds: string[];
+  cloudPracticeScoreIds: string[];
+  cloudSideBetIds: string[];
+}): Promise<void> {
+  // Snapshot the pending sync-queue ids once so we don't repeatedly
+  // walk the queue inside the per-entity filters.
+  const pendingByEntity = {
+    player: getPendingSyncIdsForTrip(tripId, 'player'),
+    team: getPendingSyncIdsForTrip(tripId, 'team'),
+    teamMember: getPendingSyncIdsForTrip(tripId, 'teamMember'),
+    session: getPendingSyncIdsForTrip(tripId, 'session'),
+    match: getPendingSyncIdsForTrip(tripId, 'match'),
+    holeResult: getPendingSyncIdsForTrip(tripId, 'holeResult'),
+    practiceScore: getPendingSyncIdsForTrip(tripId, 'practiceScore'),
+    sideBet: getPendingSyncIdsForTrip(tripId, 'sideBet'),
+  };
+
+  const cloud = {
+    player: new Set(cloudPlayerIds),
+    team: new Set(cloudTeamIds),
+    teamMember: new Set(cloudTeamMemberIds),
+    session: new Set(cloudSessionIds),
+    match: new Set(cloudMatchIds),
+    holeResult: new Set(cloudHoleResultIds),
+    practiceScore: new Set(cloudPracticeScoreIds),
+    sideBet: new Set(cloudSideBetIds),
+  };
+
+  // Players scoped to this trip.
+  const localPlayers = await db.players.where('tripId').equals(tripId).toArray();
+  for (const player of localPlayers) {
+    if (cloud.player.has(player.id)) continue;
+    if (pendingByEntity.player.has(player.id)) continue;
+    await db.players.delete(player.id);
+  }
+
+  // Teams scoped to this trip.
+  const localTeams = await db.teams.where('tripId').equals(tripId).toArray();
+  const localTeamIds: string[] = [];
+  for (const team of localTeams) {
+    localTeamIds.push(team.id);
+    if (cloud.team.has(team.id)) continue;
+    if (pendingByEntity.team.has(team.id)) continue;
+    await db.teams.delete(team.id);
+  }
+
+  // Team members: scoped by team id (they have no tripId column of
+  // their own). Use the captured local team ids to avoid wiping
+  // team members for OTHER trips sharing this client.
+  if (localTeamIds.length > 0) {
+    const localTeamMembers = await db.teamMembers.where('teamId').anyOf(localTeamIds).toArray();
+    for (const member of localTeamMembers) {
+      if (cloud.teamMember.has(member.id)) continue;
+      if (pendingByEntity.teamMember.has(member.id)) continue;
+      await db.teamMembers.delete(member.id);
+    }
+  }
+
+  // Sessions scoped to this trip.
+  const localSessions = await db.sessions.where('tripId').equals(tripId).toArray();
+  const localSessionIds: string[] = [];
+  for (const session of localSessions) {
+    localSessionIds.push(session.id);
+    if (cloud.session.has(session.id)) continue;
+    if (pendingByEntity.session.has(session.id)) continue;
+    await db.sessions.delete(session.id);
+  }
+
+  // Matches: scoped by sessionId (no tripId column). Collect ids
+  // before any deletes so hole_results / practice_scores below can
+  // filter by match id too.
+  let localMatchIds: string[] = [];
+  if (localSessionIds.length > 0) {
+    const localMatches = await db.matches.where('sessionId').anyOf(localSessionIds).toArray();
+    for (const match of localMatches) {
+      localMatchIds.push(match.id);
+      if (cloud.match.has(match.id)) continue;
+      if (pendingByEntity.match.has(match.id)) continue;
+      await db.matches.delete(match.id);
+    }
+    // Refresh the list to the matches that survived the delete.
+    localMatchIds = (
+      await db.matches.where('sessionId').anyOf(localSessionIds).toArray()
+    ).map((m) => m.id);
+  }
+
+  // Hole results / practice scores scoped by match id.
+  if (localMatchIds.length > 0) {
+    const localHoleResults = await db.holeResults
+      .where('matchId')
+      .anyOf(localMatchIds)
+      .toArray();
+    for (const hr of localHoleResults) {
+      if (cloud.holeResult.has(hr.id)) continue;
+      if (pendingByEntity.holeResult.has(hr.id)) continue;
+      await db.holeResults.delete(hr.id);
+    }
+
+    const localPracticeScores = await db.practiceScores
+      .where('matchId')
+      .anyOf(localMatchIds)
+      .toArray();
+    for (const ps of localPracticeScores) {
+      if (cloud.practiceScore.has(ps.id)) continue;
+      if (pendingByEntity.practiceScore.has(ps.id)) continue;
+      await db.practiceScores.delete(ps.id);
+    }
+  }
+
+  // Side bets scoped to this trip.
+  const localSideBets = await db.sideBets.where('tripId').equals(tripId).toArray();
+  for (const bet of localSideBets) {
+    if (cloud.sideBet.has(bet.id)) continue;
+    if (pendingByEntity.sideBet.has(bet.id)) continue;
+    await db.sideBets.delete(bet.id);
+  }
+}
 
 /**
  * syncSideBetToCloud folds richer fields (perHole, participantIds,
@@ -420,6 +565,26 @@ async function pullTripCore(lookup: {
         }
       }
     );
+
+    // Orphan-row cleanup: local Dexie accumulates rows the cloud no
+    // longer has (e.g. a duplicate player deleted server-side, a
+    // session deleted on another device). Without cleanup, the
+    // captain keeps seeing ghost entries forever because
+    // pullTripCore only ever does db.<table>.put. The cleanup is
+    // gated per-entity on the sync queue: we never delete a local
+    // row whose id has a pending create/update op, because that
+    // row is local-only-awaiting-push, not genuinely orphaned.
+    await reconcileLocalOrphans({
+      tripId: trip.id,
+      cloudPlayerIds: Array.from(playerRows.keys()),
+      cloudTeamIds: (teams ?? []).map((t: { id: string }) => String(t.id)),
+      cloudTeamMemberIds: (teamMembers ?? []).map((tm: { id: string }) => String(tm.id)),
+      cloudSessionIds: (sessions ?? []).map((s: { id: string }) => String(s.id)),
+      cloudMatchIds: (matches ?? []).map((m: { id: string }) => String(m.id)),
+      cloudHoleResultIds: (holeResults ?? []).map((hr: { id: string }) => String(hr.id)),
+      cloudPracticeScoreIds: (practiceScores ?? []).map((ps) => String(ps.id)),
+      cloudSideBetIds: sideBets.map((b) => String(b.id)),
+    });
 
     const resolvedShareCode =
       lookup.shareCode ?? (typeof trip.share_code === 'string' ? trip.share_code : undefined);
