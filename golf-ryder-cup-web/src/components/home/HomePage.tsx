@@ -296,7 +296,8 @@ export default function HomePage() {
                               <TeamLogo
                                 src={teamAIcon}
                                 alt={teamAName || 'Team A'}
-                                size={56}
+                                size={96}
+                                rounded={false}
                                 className="mb-[var(--space-3)]"
                               />
                             ) : (
@@ -330,7 +331,8 @@ export default function HomePage() {
                               <TeamLogo
                                 src={teamBIcon}
                                 alt={teamBName || 'Team B'}
-                                size={56}
+                                size={96}
+                                rounded={false}
                                 className="mb-[var(--space-3)]"
                               />
                             ) : (

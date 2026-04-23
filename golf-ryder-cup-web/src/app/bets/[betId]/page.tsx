@@ -21,7 +21,16 @@ import { db } from '@/lib/db';
 import { queueSyncOperation } from '@/lib/services/tripSyncService';
 import { useTripStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
-import type { Match, NassauResults, Player, SideBet } from '@/lib/types/models';
+import type {
+  Match,
+  NassauResults,
+  Player,
+  PracticeScore,
+  RyderCupSession,
+  SideBet,
+  TeeSet,
+} from '@/lib/types/models';
+import { computeSessionSkinsBoard } from '@/components/scoring/practice-scoring/sessionSkins';
 import {
   calculateNextSkinValue,
   calculateSkinsStandings,
@@ -51,6 +60,76 @@ export default function BetDetailPage() {
     [bet?.matchId],
     undefined as Match | null | undefined
   );
+
+  // Session-scoped skins bets need the session, the matches in the
+  // session, practice scores across them, and the session's tee set
+  // so computeSessionSkinsBoard can render the live standings. All
+  // pulled as live queries so the board updates the moment anyone
+  // enters a stroke in any group.
+  const isSessionScopedSkins = Boolean(
+    bet && bet.type === 'skins' && bet.sessionId && !bet.matchId
+  );
+
+  const linkedSession = useLiveQuery<RyderCupSession | null>(
+    async () => {
+      if (!bet?.sessionId) return null;
+      return (await db.sessions.get(bet.sessionId)) ?? null;
+    },
+    [bet?.sessionId],
+    null
+  );
+
+  const sessionMatches = useLiveQuery<Match[]>(
+    async () => {
+      if (!bet?.sessionId) return [];
+      return db.matches.where('sessionId').equals(bet.sessionId).toArray();
+    },
+    [bet?.sessionId],
+    [] as Match[]
+  );
+
+  const sessionMatchIds = useMemo(
+    () => sessionMatches?.map((m) => m.id) ?? [],
+    [sessionMatches]
+  );
+
+  const sessionScores = useLiveQuery<PracticeScore[]>(
+    async () => {
+      if (sessionMatchIds.length === 0) return [] as PracticeScore[];
+      return db.practiceScores.where('matchId').anyOf(sessionMatchIds).toArray();
+    },
+    [sessionMatchIds.join(',')],
+    [] as PracticeScore[]
+  );
+
+  const sessionTeeSet = useLiveQuery<TeeSet | null>(
+    async () => {
+      if (!linkedSession?.defaultTeeSetId) return null;
+      return (await db.teeSets.get(linkedSession.defaultTeeSetId)) ?? null;
+    },
+    [linkedSession?.defaultTeeSetId],
+    null
+  );
+
+  const sessionSkinsBoard = useMemo(() => {
+    if (!isSessionScopedSkins || !bet || !linkedSession) return null;
+    return computeSessionSkinsBoard({
+      bet,
+      session: linkedSession,
+      matches: sessionMatches ?? [],
+      scores: sessionScores ?? [],
+      players,
+      teeSet: sessionTeeSet ?? null,
+    });
+  }, [
+    isSessionScopedSkins,
+    bet,
+    linkedSession,
+    sessionMatches,
+    sessionScores,
+    players,
+    sessionTeeSet,
+  ]);
 
   const playerById = useMemo(
     () => new Map(players.map((player) => [player.id, player])),
@@ -237,7 +316,63 @@ export default function BetDetailPage() {
           <div className="space-y-[var(--space-4)]">
             <LinkedMatchPanel linkedMatch={linkedMatch} />
 
-            {isSkins ? (
+            {isSkins && isSessionScopedSkins && sessionSkinsBoard && linkedSession ? (
+              // Session-scoped skins: render the auto-derived board
+              // from practice scores instead of the manual hole-by-hole
+              // SkinsBoard. Captain can't manually pick a winner —
+              // every skin falls out of the live stroke data.
+              <section className="rounded-[1.5rem] border border-[color:var(--rule)]/75 bg-[color:var(--canvas-raised)] p-[var(--space-5)]">
+                <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
+                  Session-wide skins · {linkedSession.name}
+                </p>
+                <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">
+                  Skins settle automatically from the strokes entered in each group. A hole pays out
+                  only when every player has a score; ties carry to the next hole.
+                </p>
+                {sessionSkinsBoard.standings.every((s) => s.skins === 0) ? (
+                  <p className="mt-[var(--space-4)] type-body-sm text-[var(--ink-tertiary)]">
+                    No skins settled yet. Enter strokes on any group to start the board.
+                  </p>
+                ) : (
+                  <div className="mt-[var(--space-4)] space-y-[var(--space-2)]">
+                    {sessionSkinsBoard.standings
+                      .filter((s) => s.skins > 0)
+                      .map((row, index) => (
+                        <div
+                          key={row.playerId}
+                          className="flex items-center justify-between gap-[var(--space-3)] rounded-[1rem] border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-3)] py-[var(--space-2)]"
+                        >
+                          <div className="flex items-center gap-[var(--space-3)]">
+                            <span className="font-serif text-[1rem] italic text-[var(--ink-tertiary)] min-w-[1.5rem] text-center">
+                              {index + 1}
+                            </span>
+                            <div>
+                              <p className="type-body text-[var(--ink)]">{row.playerName}</p>
+                              <p className="type-micro text-[var(--ink-tertiary)]">
+                                Won holes: {row.holesWon.join(', ')}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="type-micro text-[var(--ink-tertiary)]">Skins · Winnings</p>
+                            <p className="font-serif text-[1.2rem] italic text-[var(--ink)]">
+                              {row.skins} · ${row.winnings}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+                {sessionSkinsBoard.carryingHoles.length > 0 ? (
+                  <p className="mt-[var(--space-3)] type-micro text-[var(--ink-tertiary)]">
+                    Holes carrying: {sessionSkinsBoard.carryingHoles.join(', ')} · next clean win
+                    pays $
+                    {sessionSkinsBoard.perHoleValue *
+                      (1 + sessionSkinsBoard.carryingHoles.length)}
+                  </p>
+                ) : null}
+              </section>
+            ) : isSkins ? (
               <SkinsBoard
                 bet={bet}
                 standings={skinsStandings}

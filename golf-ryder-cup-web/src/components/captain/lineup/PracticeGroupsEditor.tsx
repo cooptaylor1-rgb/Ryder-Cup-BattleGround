@@ -230,14 +230,23 @@ export function PracticeGroupsEditor({
     );
   }, []);
 
-  // Auto-stagger before filtering: blank tee times get filled from
-  // Group 1's time so a captain setting only the first tee time still
-  // gets a reasonable schedule for Groups 2, 3, 4 without per-row
-  // busywork.
-  const publishableGroups = applyAutoStagger(
-    groups.filter((g) => g.playerIds.length >= 2)
-  );
+  // Unified source of truth: session.firstTeeTime owns the base time.
+  // We do NOT bake an auto-staggered value into every group at publish
+  // any more — that used to persist stale times on the match rows and
+  // meant a later edit to session.firstTeeTime was ignored by the
+  // schedule. Now blank group tee times publish as undefined, and the
+  // schedule renderer falls back to session.firstTeeTime + per-hole
+  // stagger. Explicit per-group edits are preserved as overrides.
+  const publishableGroups = groups.filter((g) => g.playerIds.length >= 2);
   const canPublish = publishableGroups.length > 0 && !isPublishing;
+
+  // For the UI preview only — show the computed stagger in each row's
+  // placeholder text so the captain can see where Group N will land
+  // even though we don't persist it.
+  const uiPreviewWithStagger = applyAutoStagger(publishableGroups);
+  const previewTeeByLocalId = new Map(
+    uiPreviewWithStagger.map((g) => [g.localId, g.teeTime ?? ''])
+  );
 
   return (
     <section className="space-y-[var(--space-4)]">
@@ -299,6 +308,7 @@ export function PracticeGroupsEditor({
             allGroups={groups}
             playerById={playerById}
             availablePlayers={availablePlayers}
+            inheritedTeeTime={previewTeeByLocalId.get(group.localId) ?? ''}
             onAddPlayer={(playerId) => addPlayer(group.localId, playerId)}
             onRemovePlayer={(playerId) => removePlayer(group.localId, playerId)}
             onMovePlayer={(playerId, toLocalId) =>
@@ -355,6 +365,12 @@ interface GroupCardProps {
   allGroups: PracticeGroupDraft[];
   playerById: Map<string, Player>;
   availablePlayers: Player[];
+  /**
+   * The computed tee time this group will land on at render time
+   * (from session.firstTeeTime + stagger). Shown as placeholder when
+   * the captain hasn't typed an explicit override for the group.
+   */
+  inheritedTeeTime: string;
   onAddPlayer: (playerId: string) => void;
   onRemovePlayer: (playerId: string) => void;
   onMovePlayer: (playerId: string, toLocalId: string) => void;
@@ -368,6 +384,7 @@ function GroupCard({
   allGroups,
   playerById,
   availablePlayers,
+  inheritedTeeTime,
   onAddPlayer,
   onRemovePlayer,
   onMovePlayer,
@@ -415,9 +432,16 @@ function GroupCard({
             value={group.teeTime ?? ''}
             onChange={(event) => onTeeTimeChange(event.target.value)}
             className="input mt-[var(--space-1)]"
-            placeholder="Auto"
+            placeholder={inheritedTeeTime || 'Auto'}
           />
-          {group.groupNumber > 1 ? (
+          {group.teeTime ? null : (
+            <span className="mt-[var(--space-1)] block type-micro text-[var(--ink-tertiary)]">
+              {inheritedTeeTime
+                ? `Will render as ${inheritedTeeTime} from the session's first tee time.`
+                : 'Inherits from the session’s first tee time.'}
+            </span>
+          )}
+          {group.groupNumber > 1 && !group.teeTime ? (
             <span className="mt-[var(--space-1)] block type-micro text-[var(--ink-tertiary)]">
               Leave blank to stagger from Group 1.
             </span>
