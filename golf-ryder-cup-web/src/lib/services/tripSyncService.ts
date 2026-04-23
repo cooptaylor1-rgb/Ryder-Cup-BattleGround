@@ -7,6 +7,7 @@
 
 import {
   clearScheduledSyncQueueProcessing,
+  dumpSyncFailures,
   processSyncQueue,
   scheduleSyncQueueProcessing,
 } from './trip-sync/tripSyncQueue';
@@ -20,6 +21,7 @@ export {
   buildSyncOperationKey,
   clearFailedQueue,
   clearQueue,
+  dumpSyncFailures,
   getPendingSyncIdsForTrip,
   getSyncQueueStatus,
   getTripSyncStatus,
@@ -70,6 +72,14 @@ export function cleanupTripSyncNetworkListeners(): void {
 
 export function initTripSyncService(): () => void {
   const cleanupNetworkListeners = initTripSyncNetworkListeners();
+
+  // Expose a debug hook in the browser so a captain staring at
+  // "N sync operations failed" can run __dumpSyncFailures() in
+  // devtools and see the actual error messages.
+  if (typeof window !== 'undefined') {
+    (window as unknown as { __dumpSyncFailures?: () => unknown }).__dumpSyncFailures =
+      dumpSyncFailures;
+  }
 
   if (canSync()) {
     setTimeout(() => {
