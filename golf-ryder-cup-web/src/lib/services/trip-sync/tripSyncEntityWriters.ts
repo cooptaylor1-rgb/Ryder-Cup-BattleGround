@@ -344,6 +344,10 @@ export async function syncMatchToCloud(
     result: match.result || 'notFinished',
     margin: match.margin || 0,
     holes_remaining: match.holesRemaining || 0,
+    // version is client-incremented on every scoring write; persisting
+    // it server-side lets other devices detect they raced a stale copy
+    // and reconcile instead of silently overwriting.
+    version: typeof match.version === 'number' ? match.version : 0,
     notes: match.notes || null,
     updated_at: incomingUpdatedAt,
   };
@@ -400,6 +404,19 @@ export async function syncHoleResultToCloud(
     winner: holeResult.winner,
     team_a_strokes: holeResult.teamAStrokes || null,
     team_b_strokes: holeResult.teamBStrokes || null,
+    // Per-player arrays survive the round-trip as jsonb. Previously
+    // only the aggregate team_a_strokes / team_b_strokes were synced
+    // so fourball / best-ball matches silently lost the individual
+    // player gross scores after a refresh or device swap.
+    team_a_player_scores: holeResult.teamAPlayerScores ?? null,
+    team_b_player_scores: holeResult.teamBPlayerScores ?? null,
+    // Audit trail — captains need this to reconstruct disputed
+    // scores after a device swap. Kept nullable so older clients
+    // without audit data still write fine.
+    edit_history: holeResult.editHistory ?? null,
+    last_edited_by: holeResult.lastEditedBy ?? null,
+    last_edited_at: holeResult.lastEditedAt ?? null,
+    edit_reason: holeResult.editReason ?? null,
     scored_by: holeResult.scoredBy || null,
     notes: holeResult.notes || null,
     timestamp: incomingTimestamp,

@@ -509,6 +509,10 @@ async function pullTripCore(lookup: {
             result: match.result,
             margin: match.margin,
             holesRemaining: match.holes_remaining,
+            // Carry the server-side version into Dexie so the next
+            // write can bump from a known-fresh baseline. Pre-
+            // migration servers return undefined here; start at 0.
+            version: typeof match.version === 'number' ? match.version : 0,
             notes: match.notes,
             createdAt: match.created_at,
             updatedAt: match.updated_at,
@@ -523,6 +527,32 @@ async function pullTripCore(lookup: {
             winner: holeResult.winner,
             teamAStrokes: holeResult.team_a_strokes,
             teamBStrokes: holeResult.team_b_strokes,
+            // Fourball per-player scores + audit trail. Older
+            // deployments return undefined; we coerce to undefined
+            // so the Dexie row stays clean rather than carrying a
+            // literal null that later comparisons would have to
+            // special-case.
+            teamAPlayerScores: Array.isArray(holeResult.team_a_player_scores)
+              ? holeResult.team_a_player_scores
+              : undefined,
+            teamBPlayerScores: Array.isArray(holeResult.team_b_player_scores)
+              ? holeResult.team_b_player_scores
+              : undefined,
+            editHistory: Array.isArray(holeResult.edit_history)
+              ? holeResult.edit_history
+              : undefined,
+            lastEditedBy:
+              typeof holeResult.last_edited_by === 'string'
+                ? holeResult.last_edited_by
+                : undefined,
+            lastEditedAt:
+              typeof holeResult.last_edited_at === 'string'
+                ? holeResult.last_edited_at
+                : undefined,
+            editReason:
+              typeof holeResult.edit_reason === 'string'
+                ? holeResult.edit_reason
+                : undefined,
             scoredBy: holeResult.scored_by,
             notes: holeResult.notes,
             timestamp: holeResult.timestamp,
