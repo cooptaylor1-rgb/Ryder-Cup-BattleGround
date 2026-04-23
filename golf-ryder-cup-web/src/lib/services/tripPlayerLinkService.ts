@@ -163,20 +163,51 @@ export async function ensureCurrentUserTripPlayerLink(
   // the "no existing match → create Player" branch and each called
   // buildTripPlayerFromIdentity (which mints a fresh UUID), producing
   // two Player rows 1-8ms apart that both got pushed to Supabase.
-  // Share a single in-flight promise per (tripId, user) so the second
-  // caller reuses the first caller's result.
-  const userKey =
-    currentUser?.authUserId ?? currentUser?.id ?? normalizeEmail(currentUser?.email) ?? 'anonymous';
-  const inFlightKey = `${tripId}:${userKey}`;
-  const inFlight = inFlightTripPlayerLinks.get(inFlightKey);
-  if (inFlight) return inFlight;
+  //
+  // The original single-key variant of this guard missed the race
+  // when authUserId resolved asynchronously between calls — Call 1
+  // might run with authUserId=undefined (keying on profile id) and
+  // Call 2 with authUserId set (keying on auth id), bypassing the
+  // shared promise. Register the in-flight promise under EVERY
+  // stable identifier we know so any subsequent call sharing any
+  // one identifier picks up the same promise. Empty keys are
+  // dropped so "anonymous" doesn't collide across unrelated users.
+  const keys = buildInFlightKeys(tripId, currentUser);
+  for (const key of keys) {
+    const inFlight = inFlightTripPlayerLinks.get(key);
+    if (inFlight) return inFlight;
+  }
 
   const run = ensureCurrentUserTripPlayerLinkImpl(tripId, players, currentUser, isAuthenticated)
     .finally(() => {
-      inFlightTripPlayerLinks.delete(inFlightKey);
+      for (const key of keys) inFlightTripPlayerLinks.delete(key);
     });
-  inFlightTripPlayerLinks.set(inFlightKey, run);
+  for (const key of keys) inFlightTripPlayerLinks.set(key, run);
   return run;
+}
+
+function buildInFlightKeys(
+  tripId: string,
+  currentUser: CurrentTripPlayerIdentity | null
+): string[] {
+  const keys = new Set<string>();
+  if (currentUser?.authUserId) {
+    keys.add(`${tripId}:auth:${currentUser.authUserId}`);
+  }
+  if (currentUser?.id) {
+    keys.add(`${tripId}:profile:${currentUser.id}`);
+  }
+  const email = normalizeEmail(currentUser?.email);
+  if (email) {
+    keys.add(`${tripId}:email:${email}`);
+  }
+  if (keys.size === 0) {
+    // Falling back to a single "anonymous" bucket is still better
+    // than no guard at all — at worst, two anonymous callers share
+    // a promise that returns 'missing-user' for both of them.
+    keys.add(`${tripId}:anonymous`);
+  }
+  return Array.from(keys);
 }
 
 const inFlightTripPlayerLinks = new Map<string, Promise<TripPlayerLinkResult>>();
