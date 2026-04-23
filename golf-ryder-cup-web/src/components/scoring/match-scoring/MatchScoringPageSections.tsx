@@ -105,6 +105,52 @@ export function MatchScoringUnavailableState({
   );
 }
 
+/**
+ * Shown in place of match-play scoring when the captain opens a
+ * practice-round group. Head-to-head scoring doesn't apply (there's no
+ * opposing team), but side bets attached to the group still score
+ * hole-by-hole via the bet detail page, so we route the captain there.
+ */
+export function PracticeMatchEmptyState({
+  matchId,
+  onBackToScore,
+  onOpenBets,
+  onNewBet,
+}: {
+  matchId: string;
+  onBackToScore: () => void;
+  onOpenBets: () => void;
+  onNewBet?: () => void;
+}) {
+  // The primary CTA puts a new bet on *this group* directly; the
+  // "Open bets" secondary action takes the captain to the trip-wide
+  // bet board so they can see what already exists on the group first.
+  const primary = onNewBet
+    ? { label: 'New bet on this group', onClick: onNewBet }
+    : { label: 'Open bets', onClick: onOpenBets };
+  const secondary = onNewBet
+    ? { label: 'All bets', onClick: onOpenBets }
+    : { label: 'Back to Score', onClick: onBackToScore };
+
+  return (
+    <div className="min-h-screen page-premium-enter texture-grain bg-canvas font-sans">
+      <main className="container-editorial py-12">
+        <EmptyStatePremium
+          illustration="flag"
+          title="Practice round — no cup points"
+          description={
+            'Warm-up groups sit outside the Ryder Cup standings. Attach a side bet — skins, CTP, long drive, nassau — to score this group hole-by-hole.'
+          }
+          action={primary}
+          secondaryAction={secondary}
+          variant="large"
+        />
+        <p className="mt-6 text-center text-xs text-[var(--ink-tertiary)]">Match id: {matchId}</p>
+      </main>
+    </div>
+  );
+}
+
 interface MatchScoringPageSectionsProps {
   matchId: string;
   currentTripId?: string;

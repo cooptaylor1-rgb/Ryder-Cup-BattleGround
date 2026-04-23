@@ -186,17 +186,27 @@ export function SessionLineupMatchesSection({
                         style={{ color: 'var(--ink-tertiary)', margin: '0 auto var(--space-3)' }}
                     />
                     <p className="type-title-sm" style={{ marginBottom: 'var(--space-2)' }}>
-                        No Matches Yet
+                        {session.isPracticeSession ? 'No groups yet' : 'No Matches Yet'}
                     </p>
                     <p className="type-caption">
-                        {canEdit ? 'Switch to Edit mode to build the lineup' : 'Lineup not yet created'}
+                        {canEdit
+                            ? session.isPracticeSession
+                                ? 'Switch to Edit mode to set up practice groups and tee times'
+                                : 'Switch to Edit mode to build the lineup'
+                            : session.isPracticeSession
+                              ? 'Practice groups not yet created'
+                              : 'Lineup not yet created'}
                     </p>
                 </div>
             ) : (
                 <div className="space-y-3">
                     {matches.map((match, index) => {
+                        const isPractice = match.mode === 'practice' || session.isPracticeSession;
                         const teamANames = getMatchPlayerNames(match.teamAPlayerIds);
                         const teamBNames = getMatchPlayerNames(match.teamBPlayerIds);
+                        const groupNames = isPractice
+                            ? getMatchPlayerNames([...match.teamAPlayerIds, ...match.teamBPlayerIds])
+                            : '';
                         const canScore = match.status === 'inProgress' || session.status === 'inProgress';
 
                         return (
@@ -207,7 +217,7 @@ export function SessionLineupMatchesSection({
                                     canScore ? 'press-scale' : ''
                                 }`}
                             >
-                                <div className="mb-3 flex items-center justify-between">
+                                <div className="mb-3 flex items-center justify-between gap-2">
                                     <span
                                         className="flex h-10 w-10 items-center justify-center rounded-2xl text-sm font-bold"
                                         style={{
@@ -225,42 +235,58 @@ export function SessionLineupMatchesSection({
                                     >
                                         {index + 1}
                                     </span>
-                                    <span
-                                        className="rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]"
-                                        style={{
-                                            background:
-                                                match.status === 'completed'
-                                                    ? 'rgba(76, 175, 80, 0.12)'
-                                                    : match.status === 'inProgress'
-                                                      ? 'rgba(0, 102, 68, 0.12)'
-                                                      : 'rgba(26, 24, 21, 0.08)',
-                                            color:
-                                                match.status === 'completed'
-                                                    ? 'var(--success)'
-                                                    : match.status === 'inProgress'
-                                                      ? 'var(--masters)'
-                                                      : 'var(--ink-tertiary)',
-                                        }}
-                                    >
-                                        {getMatchScoreDisplay(match)}
-                                    </span>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="rounded-[20px] border border-[color:rgba(20,92,163,0.16)] bg-[linear-gradient(180deg,rgba(20,92,163,0.10)_0%,rgba(255,255,255,0.72)_100%)] p-3">
-                                        <p className="type-micro mb-1" style={{ color: 'var(--team-usa)' }}>
-                                            {teamAName}
-                                        </p>
-                                        <p className="type-title-sm">{teamANames || 'TBD'}</p>
-                                    </div>
-
-                                    <div className="rounded-[20px] border border-[color:rgba(114,47,55,0.16)] bg-[linear-gradient(180deg,rgba(114,47,55,0.10)_0%,rgba(255,255,255,0.72)_100%)] p-3">
-                                        <p className="type-micro mb-1" style={{ color: 'var(--team-europe)' }}>
-                                            {teamBName}
-                                        </p>
-                                        <p className="type-title-sm">{teamBNames || 'TBD'}</p>
+                                    <div className="flex items-center gap-2">
+                                        {isPractice ? (
+                                            <span className="rounded-full border border-[color:var(--rule)] bg-[var(--canvas)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+                                                Practice
+                                            </span>
+                                        ) : null}
+                                        <span
+                                            className="rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]"
+                                            style={{
+                                                background:
+                                                    match.status === 'completed'
+                                                        ? 'rgba(76, 175, 80, 0.12)'
+                                                        : match.status === 'inProgress'
+                                                          ? 'rgba(0, 102, 68, 0.12)'
+                                                          : 'rgba(26, 24, 21, 0.08)',
+                                                color:
+                                                    match.status === 'completed'
+                                                        ? 'var(--success)'
+                                                        : match.status === 'inProgress'
+                                                          ? 'var(--masters)'
+                                                          : 'var(--ink-tertiary)',
+                                            }}
+                                        >
+                                            {isPractice ? `Group ${match.matchOrder}` : getMatchScoreDisplay(match)}
+                                        </span>
                                     </div>
                                 </div>
+
+                                {isPractice ? (
+                                    <div className="rounded-[20px] border border-[var(--rule)] bg-[rgba(255,255,255,0.74)] p-3">
+                                        <p className="type-micro mb-1 text-[var(--ink-tertiary)]">
+                                            Group
+                                        </p>
+                                        <p className="type-title-sm">{groupNames || 'No players yet'}</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="rounded-[20px] border border-[color:rgba(20,92,163,0.16)] bg-[linear-gradient(180deg,rgba(20,92,163,0.10)_0%,rgba(255,255,255,0.72)_100%)] p-3">
+                                            <p className="type-micro mb-1" style={{ color: 'var(--team-usa)' }}>
+                                                {teamAName}
+                                            </p>
+                                            <p className="type-title-sm">{teamANames || 'TBD'}</p>
+                                        </div>
+
+                                        <div className="rounded-[20px] border border-[color:rgba(114,47,55,0.16)] bg-[linear-gradient(180deg,rgba(114,47,55,0.10)_0%,rgba(255,255,255,0.72)_100%)] p-3">
+                                            <p className="type-micro mb-1" style={{ color: 'var(--team-europe)' }}>
+                                                {teamBName}
+                                            </p>
+                                            <p className="type-title-sm">{teamBNames || 'TBD'}</p>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {canScore ? (
                                     <button
@@ -272,7 +298,11 @@ export function SessionLineupMatchesSection({
                                         style={{ borderColor: 'var(--rule)' }}
                                     >
                                         <span className="type-meta" style={{ color: 'var(--masters)' }}>
-                                            {match.status === 'inProgress' ? 'Continue Scoring' : 'Start Scoring'}
+                                            {isPractice
+                                                ? 'Open group'
+                                                : match.status === 'inProgress'
+                                                  ? 'Continue Scoring'
+                                                  : 'Start Scoring'}
                                         </span>
                                         <ChevronRight size={16} style={{ color: 'var(--masters)' }} />
                                     </button>

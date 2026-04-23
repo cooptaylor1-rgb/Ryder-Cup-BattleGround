@@ -62,11 +62,13 @@ export function LiveJumbotron({ tripId, sessionId: _sessionId, className }: Live
         return states;
     }, [matches, holeResults]);
 
-    // Separate matches by status (memoized to avoid re-filtering on every render)
+    // Separate matches by status (memoized to avoid re-filtering on every render).
+    // Practice matches are excluded from the Live Jumbotron — they have no
+    // team-vs-team score to project and would render with empty team cards.
     const { activeMatches, completedMatches, upcomingMatches } = useMemo(() => ({
-        activeMatches: matches?.filter(m => m.status === 'inProgress') || [],
-        completedMatches: matches?.filter(m => m.status === 'completed') || [],
-        upcomingMatches: matches?.filter(m => m.status === 'scheduled') || [],
+        activeMatches: matches?.filter(m => m.status === 'inProgress' && m.mode !== 'practice') || [],
+        completedMatches: matches?.filter(m => m.status === 'completed' && m.mode !== 'practice') || [],
+        upcomingMatches: matches?.filter(m => m.status === 'scheduled' && m.mode !== 'practice') || [],
     }), [matches]);
 
     // Calculate team totals (memoized)

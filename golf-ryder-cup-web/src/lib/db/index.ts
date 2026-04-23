@@ -24,6 +24,7 @@ import type {
   AuditLogEntry,
   BanterPost,
   SideBet,
+  PracticeScore,
   SyncMetadata,
 } from '@/lib/types/models';
 import type { ScoringEvent } from '@/lib/types/events';
@@ -105,6 +106,9 @@ export class GolfTripDB extends Dexie {
 
   // Side bets
   sideBets!: Table<SideBet>;
+
+  // Practice round per-player stroke entries (v14)
+  practiceScores!: Table<PracticeScore>;
 
   // Extended side games (v7)
   wolfGames!: Table<WolfGame>;
@@ -291,6 +295,17 @@ export class GolfTripDB extends Dexie {
     this.version(13).stores({
       sessions:
         'id, tripId, scheduledDate, [tripId+scheduledDate], [tripId+status], [tripId+sessionNumber]',
+    });
+
+    // Schema version 14 - Practice score table
+    // Stores per-player gross strokes for practice rounds. Cup matches
+    // still use hole_results; this table only fills in for sessions
+    // flagged isPracticeSession or matches with mode='practice'.
+    // Compound [matchId+playerId+holeNumber] is UNIQUE so re-entries
+    // update the same row instead of duplicating.
+    this.version(14).stores({
+      practiceScores:
+        'id, matchId, [matchId+playerId+holeNumber], [matchId+playerId], [matchId+holeNumber]',
     });
   }
 }

@@ -166,9 +166,38 @@ async function pullTripCore(lookup: {
         ? { data: [] }
         : await getTable('hole_results').select('*').in('match_id', matchIds);
 
+    // Practice-round per-player strokes. Keyed by match_id just like
+    // hole_results so we fetch the full set in one round-trip. If the
+    // practice_scores table doesn't exist yet (e.g. captain hasn't
+    // applied the migration) Supabase returns a 404 and we treat the
+    // data as empty rather than bubbling the error — pre-migration
+    // clients just won't see practice leaderboards.
+    const { data: practiceScores } =
+      matchIds.length === 0
+        ? { data: [] }
+        : await getTable('practice_scores')
+            .select('*')
+            .in('match_id', matchIds)
+            .then(
+              (response: { data: unknown; error: { code?: string } | null }) =>
+                response.error
+                  ? { data: [] as Array<Record<string, unknown>> }
+                  : (response as { data: Array<Record<string, unknown>> }),
+              () => ({ data: [] as Array<Record<string, unknown>> })
+            );
+
     await db.transaction(
       'rw',
-      [db.trips, db.teams, db.teamMembers, db.players, db.sessions, db.matches, db.holeResults],
+      [
+        db.trips,
+        db.teams,
+        db.teamMembers,
+        db.players,
+        db.sessions,
+        db.matches,
+        db.holeResults,
+        db.practiceScores,
+      ],
       async () => {
         const localTrip: Trip = {
           id: trip.id,
@@ -263,6 +292,12 @@ async function pullTripCore(lookup: {
             status: match.status,
             startTime: match.start_time,
             currentHole: match.current_hole,
+            // Missing mode column on older deployments should degrade
+            // to the default so pre-migration pulls still parse.
+            mode:
+              match.mode === 'practice' || match.mode === 'ryderCup'
+                ? match.mode
+                : 'ryderCup',
             teamAPlayerIds: match.team_a_player_ids,
             teamBPlayerIds: match.team_b_player_ids,
             teamAHandicapAllowance: match.team_a_handicap_allowance,
@@ -287,6 +322,20 @@ async function pullTripCore(lookup: {
             scoredBy: holeResult.scored_by,
             notes: holeResult.notes,
             timestamp: holeResult.timestamp,
+          });
+        }
+
+        for (const score of practiceScores || []) {
+          await db.practiceScores.put({
+            id: String(score.id),
+            matchId: String(score.match_id),
+            playerId: String(score.player_id),
+            holeNumber: Number(score.hole_number),
+            gross: typeof score.gross === 'number' ? score.gross : undefined,
+            createdAt:
+              typeof score.created_at === 'string' ? score.created_at : new Date().toISOString(),
+            updatedAt:
+              typeof score.updated_at === 'string' ? score.updated_at : new Date().toISOString(),
           });
         }
       }

@@ -27,6 +27,7 @@ import {
   MatchScoringUnauthenticatedState,
   MatchScoringUnavailableState,
 } from './MatchScoringPageSections';
+import { PracticeScoringPage } from '../practice-scoring/PracticeScoringPage';
 import { normalizeScoringMode, useMatchScoringPageModel } from './matchScoringPageModel';
 import { type ScoringMode } from './matchScoringShared';
 import { useMatchPressTracking } from './useMatchPressTracking';
@@ -180,6 +181,18 @@ export default function MatchScoringPageClient() {
 
   if (!activeMatch || !matchState) {
     return <MatchScoringUnavailableState onBackToScore={handleBackToScore} />;
+  }
+
+  // Practice matches don't have a team to score against — short-circuit
+  // to a guidance state that points the captain at side bets, which are
+  // the scoring unit for warm-up rounds.
+  if (activeMatch.mode === 'practice') {
+    // Practice matches now get their own scoring UI: per-player
+    // stroke entry plus a live gross/net leaderboard. The previous
+    // empty-state screen that punted to "go attach a side bet" is
+    // superseded by PracticeScoringPage, which still links out to
+    // the bets composer but actually lets the captain record scores.
+    return <PracticeScoringPage matchId={activeMatch.id} />;
   }
 
   // Pre-flight: warn (but don't block) when no course is assigned. Handicap

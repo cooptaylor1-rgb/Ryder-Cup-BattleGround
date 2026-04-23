@@ -45,6 +45,19 @@ export function findNextSessionNeedingLineup(
       return session;
     }
 
+    // Practice sessions use a flat group model (2-4 players in
+    // teamAPlayerIds, teamB empty) — the cup's "need N per side" rule
+    // doesn't apply. Treat a practice group as complete when it has
+    // at least two players; less than that can't host a meaningful
+    // round anyway.
+    if (session.isPracticeSession) {
+      const needsGroups = sessionMatches.some((match) => match.teamAPlayerIds.length < 2);
+      if (needsGroups) {
+        return session;
+      }
+      continue;
+    }
+
     const requiredPlayersPerTeam = session.sessionType === 'singles' ? 1 : 2;
     const needsLineup = sessionMatches.some(
       (match) =>

@@ -7,6 +7,11 @@ import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { db } from '@/lib/db';
 import { saveLineup, type LineupPlayer as PersistedLineupPlayer, type LineupState } from '@/lib/services/lineupBuilderService';
+import {
+  savePracticeLineup,
+  type PracticeGroupDraft,
+} from '@/lib/services/lineup-builder/practiceLineupPersistence';
+import { PracticeGroupsEditor } from './PracticeGroupsEditor';
 import { createLogger } from '@/lib/utils/logger';
 import { normalizeError } from '@/lib/utils/errorHandling';
 import { shuffle } from '@/lib/utils/shuffle';
@@ -419,6 +424,89 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
     ]
   );
 
+  // Practice-round publish. Mirrors handlePublish above but routes
+  // through the team-agnostic persistence path; practice sessions
+  // don't need fairness validation or allowance math.
+  const handlePracticePublish = useCallback(
+    async (groups: PracticeGroupDraft[]) => {
+      if (!currentTrip) return;
+
+      const trimmedName = sessionName.trim();
+      if (!trimmedName) {
+        showToast('error', 'Give the session a name before publishing');
+        return;
+      }
+      if (groups.length === 0) {
+        showToast('error', 'Add at least one group before publishing');
+        return;
+      }
+
+      setIsCreating(true);
+      try {
+        const [rawHours] = firstTeeTime.split(':').map(Number);
+        const hours = Number.isFinite(rawHours)
+          ? Math.max(0, Math.min(23, rawHours))
+          : 8;
+        const derivedTimeSlot: 'AM' | 'PM' = hours < 12 ? 'AM' : 'PM';
+
+        const session = await addSession({
+          tripId: currentTrip.id,
+          name: trimmedName,
+          sessionNumber: nextSessionNumber,
+          sessionType,
+          scheduledDate: scheduledDate || undefined,
+          timeSlot: derivedTimeSlot,
+          firstTeeTime: firstTeeTime || undefined,
+          pointsPerMatch: 0,
+          status: 'scheduled',
+          isLocked: true,
+          isPracticeSession: true,
+        });
+
+        const result = await savePracticeLineup(session.id, groups);
+        if (!result.success) {
+          throw new Error('Failed to persist practice groups');
+        }
+
+        if (mode === 'session') {
+          showToast('success', 'Practice session created. Build the next one below.');
+          setStep('setup');
+          setShowAdvanced(false);
+        } else {
+          showToast('success', 'Practice session created and groups published!');
+          setTimeout(() => {
+            router.push(`/lineup/${session.id}`);
+          }, 1500);
+        }
+      } catch (error) {
+        const appError = normalizeError(error, {
+          component: 'NewLineupPageClient',
+          action: 'publishPracticeSession',
+          tripId: currentTrip.id,
+        });
+        logger.error('Failed to create practice session', {
+          code: appError.code,
+          message: appError.message,
+        });
+        showToast('error', appError.userMessage);
+      } finally {
+        setIsCreating(false);
+      }
+    },
+    [
+      currentTrip,
+      sessionName,
+      nextSessionNumber,
+      sessionType,
+      scheduledDate,
+      firstTeeTime,
+      addSession,
+      showToast,
+      router,
+      mode,
+    ]
+  );
+
   const handleCreateSessionShell = useCallback(async (
     overrides?: Partial<{
       sessionName: string;
@@ -775,6 +863,38 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
             isPracticeSession={isPracticeSession}
             onPracticeSessionChange={setIsPracticeSession}
           />
+        ) : isPracticeSession ? (
+          <section className="section">
+            <div className="mb-[var(--space-5)]">
+              <p className="type-overline text-[var(--ink-secondary)]">Build the groups</p>
+              <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+                Practice rounds ignore Ryder Cup sides — pick 2-4 players per group, set a
+                tee time, and publish.
+              </p>
+            </div>
+            <PracticeGroupsEditor
+              session={{
+                id: 'new',
+                tripId: currentTrip?.id ?? '',
+                name: sessionName,
+                sessionNumber: nextSessionNumber,
+                sessionType,
+                scheduledDate: scheduledDate || undefined,
+                timeSlot: firstTeeTime && Number(firstTeeTime.split(':')[0]) < 12 ? 'AM' : 'PM',
+                firstTeeTime: firstTeeTime || undefined,
+                pointsPerMatch: 0,
+                status: 'scheduled',
+                isLocked: true,
+                isPracticeSession: true,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              }}
+              roster={players}
+              initialGroups={[]}
+              onPublish={handlePracticePublish}
+              isPublishing={isCreating}
+            />
+          </section>
         ) : (
           <section className="section">
             <div className="mb-[var(--space-5)]">

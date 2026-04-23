@@ -16,7 +16,8 @@ export type SyncEntity =
   | 'holeResult'
   | 'course'
   | 'teeSet'
-  | 'sideBet';
+  | 'sideBet'
+  | 'practiceScore';
 
 export interface SyncQueueItem {
   id: string;

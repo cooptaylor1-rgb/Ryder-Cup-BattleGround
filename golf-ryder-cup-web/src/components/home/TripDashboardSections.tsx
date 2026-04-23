@@ -23,7 +23,7 @@ import {
   getNextSession,
 } from './tripDashboardModel';
 
-interface UserMatchData {
+export interface UserMatchData {
   match: Match;
   session: RyderCupSession;
   matchState: MatchState | null;
@@ -281,19 +281,26 @@ function buildStandingsNarrative(
   return `${leader} leads by ${diff} point${diff === 1 ? '' : 's'}.`;
 }
 
-function buildUserMatchTitle(
+export function buildUserMatchTitle(
   userMatchData: UserMatchData | null,
   currentUserPlayer: Player | null,
   fallbackTitle?: string
 ): string {
   if (userMatchData?.match.status === 'inProgress') return 'Your match is live';
-  if (userMatchData) return `Match ${userMatchData.match.matchOrder} is on your card`;
+  if (userMatchData) {
+    // Practice groups aren't matches — call them groups in the UI so
+    // players don't think a cup score is about to post.
+    if (userMatchData.match.mode === 'practice' || userMatchData.session.isPracticeSession) {
+      return `Practice group ${userMatchData.match.matchOrder} is on your card`;
+    }
+    return `Match ${userMatchData.match.matchOrder} is on your card`;
+  }
   if (fallbackTitle) return fallbackTitle;
   if (currentUserPlayer) return 'Your tee sheet lives here';
   return 'Link your profile to personalize';
 }
 
-function buildUserMatchBody(
+export function buildUserMatchBody(
   userMatchData: UserMatchData | null,
   currentUserPlayer: Player | null,
   players: Player[],
@@ -303,6 +310,23 @@ function buildUserMatchBody(
     return fallbackBody ?? (currentUserPlayer
       ? 'Open the schedule to see your upcoming matches and assigned pairings.'
       : 'Connect your profile so the app can find your matches and tee times.');
+  }
+
+  // Practice path — describe the group rather than an opponent split,
+  // since the whole group plays together without a head-to-head.
+  if (userMatchData.match.mode === 'practice' || userMatchData.session.isPracticeSession) {
+    const playerLookup = new Map(players.map((p) => [p.id, p]));
+    const roster = [...userMatchData.match.teamAPlayerIds, ...userMatchData.match.teamBPlayerIds]
+      .filter((id) => id !== currentUserPlayer?.id)
+      .map((id) => playerLookup.get(id))
+      .filter((p): p is Player => Boolean(p))
+      .map((p) => `${p.firstName} ${p.lastName}`);
+    const rosterLine = roster.length > 0 ? `Playing with ${roster.join(', ')}.` : 'Group TBD.';
+    const teeTimeLine =
+      userMatchData.match.status === 'inProgress'
+        ? 'Warm-up in progress.'
+        : `Tee time ${formatSessionTiming(userMatchData.session)}.`;
+    return `Practice round — ${rosterLine} ${teeTimeLine}`;
   }
 
   const opponents = resolveOpponents(userMatchData.match, currentUserPlayer, players);

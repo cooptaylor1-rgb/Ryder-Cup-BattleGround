@@ -22,6 +22,36 @@ export type ISODateString = string;
 export type MatchStatus = 'scheduled' | 'inProgress' | 'completed' | 'cancelled';
 
 /**
+ * Match mode. "ryderCup" is the default head-to-head cup match and is what
+ * every pre-existing match row is; "practice" is a free-form pairing built
+ * for a warm-up round where players aren't yet split onto cup teams. In
+ * practice mode `teamAPlayerIds` holds the whole group (2-4 players) and
+ * `teamBPlayerIds` is empty; standings skip them, and the match-scoring
+ * UI routes to a side-bet-only screen because there's no team to score
+ * against.
+ */
+export type MatchMode = 'ryderCup' | 'practice';
+
+/**
+ * Per-player stroke entry for a practice-round hole. Separate from
+ * HoleResult (which stores a head-to-head winner) because practice
+ * rounds don't have teams — we need a gross score per player per hole.
+ * Net scores are derived at render time from player.handicapIndex +
+ * course hole handicap; this table stays minimal and append-only so
+ * sync and offline replay are both easy.
+ */
+export interface PracticeScore {
+  id: UUID;
+  matchId: UUID;
+  playerId: UUID;
+  holeNumber: number;
+  /** Gross strokes for this hole. Undefined means "not entered yet". */
+  gross?: number;
+  createdAt: ISODateString;
+  updatedAt: ISODateString;
+}
+
+/**
  * Match result type - who won?
  */
 export type MatchResultType =
@@ -392,6 +422,14 @@ export interface Match {
   /** Captain-set tee time (actual time from the pro shop) */
   teeTime?: ISODateString;
   currentHole: number;
+
+  /**
+   * "ryderCup" (default when absent, for backward compatibility) renders
+   * the familiar head-to-head. "practice" means this is a free-form
+   * warm-up group — all group members live in teamAPlayerIds, teamB is
+   * empty, and the match is excluded from cup standings.
+   */
+  mode?: MatchMode;
 
   // Player IDs for each team
   teamAPlayerIds: UUID[];
