@@ -18,6 +18,7 @@ interface PracticeGroupsEditorProps {
 }
 
 const MAX_GROUP_SIZE = 4;
+const DEFAULT_STAGGER_MINUTES = 10;
 
 function createEmptyGroup(groupNumber: number): PracticeGroupDraft {
   return {
@@ -26,6 +27,47 @@ function createEmptyGroup(groupNumber: number): PracticeGroupDraft {
     playerIds: [],
     teeTime: '',
   };
+}
+
+/**
+ * Given a HH:MM string and an offset in minutes, return HH:MM shifted
+ * forward. Used to auto-stagger group tee times from Group 1's time.
+ * Guards against malformed input (returns empty so we don't emit
+ * "NaN:NaN" into a <input type="time">).
+ */
+export function staggerTeeTime(baseHHMM: string, offsetMinutes: number): string {
+  if (!/^\d{2}:\d{2}$/.test(baseHHMM)) return '';
+  const [h, m] = baseHHMM.split(':').map(Number);
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return '';
+  const totalMinutes = Math.max(0, Math.min(23 * 60 + 59, h * 60 + m + offsetMinutes));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
+
+/**
+ * Fill in missing tee times by staggering from the first populated
+ * group. Groups that already have a tee time are left alone — we only
+ * touch the blanks. This is a pure function; the editor calls it at
+ * publish time so the captain can still override any single tee time
+ * individually.
+ */
+export function applyAutoStagger(
+  groups: PracticeGroupDraft[],
+  staggerMinutes = DEFAULT_STAGGER_MINUTES
+): PracticeGroupDraft[] {
+  const firstWithTime = groups.find((g) => g.teeTime && /^\d{2}:\d{2}$/.test(g.teeTime));
+  if (!firstWithTime) return groups;
+
+  const anchorIndex = groups.indexOf(firstWithTime);
+  const anchorTime = firstWithTime.teeTime!;
+
+  return groups.map((group, index) => {
+    if (group.teeTime && /^\d{2}:\d{2}$/.test(group.teeTime)) return group;
+    const offsetGroups = index - anchorIndex;
+    if (offsetGroups <= 0) return group;
+    return { ...group, teeTime: staggerTeeTime(anchorTime, offsetGroups * staggerMinutes) };
+  });
 }
 
 /**
@@ -98,13 +140,45 @@ export function PracticeGroupsEditor({
     );
   }, []);
 
+  // Move a player from one group to another in a single state update,
+  // so a re-render can't land with the player missing from both sides.
+  // Skips the move when the destination is already full; the editor's
+  // per-group UI disables the option in that case too, but this is
+  // the belt against a stale click.
+  const movePlayer = useCallback(
+    (fromLocalId: string, playerId: string, toLocalId: string) => {
+      setGroups((current) => {
+        const destination = current.find((g) => g.localId === toLocalId);
+        if (!destination || destination.playerIds.length >= MAX_GROUP_SIZE) {
+          return current;
+        }
+        return current.map((g) => {
+          if (g.localId === fromLocalId) {
+            return { ...g, playerIds: g.playerIds.filter((id) => id !== playerId) };
+          }
+          if (g.localId === toLocalId) {
+            return { ...g, playerIds: [...g.playerIds, playerId] };
+          }
+          return g;
+        });
+      });
+    },
+    []
+  );
+
   const setTeeTime = useCallback((localId: string, value: string) => {
     setGroups((current) =>
       current.map((g) => (g.localId === localId ? { ...g, teeTime: value } : g))
     );
   }, []);
 
-  const publishableGroups = groups.filter((g) => g.playerIds.length >= 2);
+  // Auto-stagger before filtering: blank tee times get filled from
+  // Group 1's time so a captain setting only the first tee time still
+  // gets a reasonable schedule for Groups 2, 3, 4 without per-row
+  // busywork.
+  const publishableGroups = applyAutoStagger(
+    groups.filter((g) => g.playerIds.length >= 2)
+  );
   const canPublish = publishableGroups.length > 0 && !isPublishing;
 
   return (
@@ -128,10 +202,14 @@ export function PracticeGroupsEditor({
           <GroupCard
             key={group.localId}
             group={group}
+            allGroups={groups}
             playerById={playerById}
             availablePlayers={availablePlayers}
             onAddPlayer={(playerId) => addPlayer(group.localId, playerId)}
             onRemovePlayer={(playerId) => removePlayer(group.localId, playerId)}
+            onMovePlayer={(playerId, toLocalId) =>
+              movePlayer(group.localId, playerId, toLocalId)
+            }
             onTeeTimeChange={(value) => setTeeTime(group.localId, value)}
             onRemoveGroup={() => removeGroup(group.localId)}
             canRemove={groups.length > 1}
@@ -180,10 +258,12 @@ export function PracticeGroupsEditor({
 
 interface GroupCardProps {
   group: PracticeGroupDraft;
+  allGroups: PracticeGroupDraft[];
   playerById: Map<string, Player>;
   availablePlayers: Player[];
   onAddPlayer: (playerId: string) => void;
   onRemovePlayer: (playerId: string) => void;
+  onMovePlayer: (playerId: string, toLocalId: string) => void;
   onTeeTimeChange: (value: string) => void;
   onRemoveGroup: () => void;
   canRemove: boolean;
@@ -191,10 +271,12 @@ interface GroupCardProps {
 
 function GroupCard({
   group,
+  allGroups,
   playerById,
   availablePlayers,
   onAddPlayer,
   onRemovePlayer,
+  onMovePlayer,
   onTeeTimeChange,
   onRemoveGroup,
   canRemove,
@@ -239,7 +321,13 @@ function GroupCard({
             value={group.teeTime ?? ''}
             onChange={(event) => onTeeTimeChange(event.target.value)}
             className="input mt-[var(--space-1)]"
+            placeholder="Auto"
           />
+          {group.groupNumber > 1 ? (
+            <span className="mt-[var(--space-1)] block type-micro text-[var(--ink-tertiary)]">
+              Leave blank to stagger from Group 1.
+            </span>
+          ) : null}
         </label>
       </div>
 
@@ -247,29 +335,58 @@ function GroupCard({
         {groupPlayers.length === 0 ? (
           <p className="type-body-sm text-[var(--ink-tertiary)]">No players yet.</p>
         ) : (
-          groupPlayers.map((player) => (
-            <div
-              key={player.id}
-              className="flex items-center justify-between gap-[var(--space-3)] rounded-[1rem] border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-3)] py-[var(--space-2)]"
-            >
-              <span className="type-body text-[var(--ink)]">
-                {formatPlayerName(player.firstName, player.lastName)}
-                {player.handicapIndex !== undefined ? (
-                  <span className="ml-[var(--space-2)] type-micro text-[var(--ink-tertiary)]">
-                    HCP {player.handicapIndex}
-                  </span>
-                ) : null}
-              </span>
-              <Button
-                variant="secondary"
-                size="icon"
-                onClick={() => onRemovePlayer(player.id)}
-                aria-label={`Remove ${formatPlayerName(player.firstName, player.lastName)} from group ${group.groupNumber}`}
+          groupPlayers.map((player) => {
+            const moveTargets = allGroups.filter(
+              (candidate) =>
+                candidate.localId !== group.localId &&
+                candidate.playerIds.length < MAX_GROUP_SIZE
+            );
+            return (
+              <div
+                key={player.id}
+                className="flex items-center justify-between gap-[var(--space-3)] rounded-[1rem] border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-3)] py-[var(--space-2)]"
               >
-                <Trash2 size={13} />
-              </Button>
-            </div>
-          ))
+                <span className="type-body text-[var(--ink)]">
+                  {formatPlayerName(player.firstName, player.lastName)}
+                  {player.handicapIndex !== undefined ? (
+                    <span className="ml-[var(--space-2)] type-micro text-[var(--ink-tertiary)]">
+                      HCP {player.handicapIndex}
+                    </span>
+                  ) : null}
+                </span>
+                <div className="flex items-center gap-[var(--space-2)]">
+                  {moveTargets.length > 0 ? (
+                    <select
+                      value=""
+                      onChange={(event) => {
+                        const toId = event.target.value;
+                        if (toId) onMovePlayer(player.id, toId);
+                      }}
+                      aria-label={`Move ${formatPlayerName(player.firstName, player.lastName)} to another group`}
+                      className={cn(
+                        'rounded-[0.75rem] border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-2)] py-[3px] text-xs'
+                      )}
+                    >
+                      <option value="">Move…</option>
+                      {moveTargets.map((target) => (
+                        <option key={target.localId} value={target.localId}>
+                          Group {target.groupNumber}
+                        </option>
+                      ))}
+                    </select>
+                  ) : null}
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    onClick={() => onRemovePlayer(player.id)}
+                    aria-label={`Remove ${formatPlayerName(player.firstName, player.lastName)} from group ${group.groupNumber}`}
+                  >
+                    <Trash2 size={13} />
+                  </Button>
+                </div>
+              </div>
+            );
+          })
         )}
       </div>
 

@@ -192,6 +192,12 @@ export default function MatchScoringPageClient() {
         matchId={activeMatch.id}
         onBackToScore={handleBackToScore}
         onOpenBets={() => router.push('/bets')}
+        // `?matchId=` is threaded through so the bets board can
+        // eventually auto-open the composer on this group — today the
+        // param is passed but not read, so the captain lands on /bets
+        // and taps "New bet" manually. Non-breaking: BetsPageClient
+        // ignores the unknown query param.
+        onNewBet={() => router.push(`/bets?matchId=${encodeURIComponent(activeMatch.id)}`)}
       />
     );
   }

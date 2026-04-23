@@ -186,10 +186,16 @@ export function SessionLineupMatchesSection({
                         style={{ color: 'var(--ink-tertiary)', margin: '0 auto var(--space-3)' }}
                     />
                     <p className="type-title-sm" style={{ marginBottom: 'var(--space-2)' }}>
-                        No Matches Yet
+                        {session.isPracticeSession ? 'No groups yet' : 'No Matches Yet'}
                     </p>
                     <p className="type-caption">
-                        {canEdit ? 'Switch to Edit mode to build the lineup' : 'Lineup not yet created'}
+                        {canEdit
+                            ? session.isPracticeSession
+                                ? 'Switch to Edit mode to set up practice groups and tee times'
+                                : 'Switch to Edit mode to build the lineup'
+                            : session.isPracticeSession
+                              ? 'Practice groups not yet created'
+                              : 'Lineup not yet created'}
                     </p>
                 </div>
             ) : (

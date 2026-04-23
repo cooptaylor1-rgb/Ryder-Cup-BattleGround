@@ -2,8 +2,8 @@
 
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { PageHeader } from '@/components/layout';
 import { EmptyStatePremium } from '@/components/ui';
@@ -41,6 +41,7 @@ type BetsTab = 'active' | 'completed' | 'settle';
 
 export default function BetsPageClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { currentTrip, players, sessions } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, sessions: s.sessions })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
@@ -66,6 +67,24 @@ export default function BetsPageClient() {
     [currentTrip?.id],
     [] as SideBet[]
   );
+
+  // Deep-link support: `/bets?matchId=...` lands here from the practice
+  // scoring screen ("New bet on this group"). Auto-open the composer
+  // and pre-select that match so the captain lands mid-flow instead of
+  // having to find the match again. Runs once after matches resolve —
+  // re-running on every render would re-open the modal after the
+  // captain explicitly closes it.
+  const matchIdFromQuery = searchParams?.get('matchId') ?? null;
+  const hasAppliedQueryMatch = React.useRef(false);
+  useEffect(() => {
+    if (hasAppliedQueryMatch.current) return;
+    if (!matchIdFromQuery || matches.length === 0) return;
+    const target = matches.find((m) => m.id === matchIdFromQuery);
+    if (!target) return;
+    hasAppliedQueryMatch.current = true;
+    setSelectedMatch(target);
+    setShowCreateModal(true);
+  }, [matchIdFromQuery, matches]);
 
   if (!currentTrip) {
     return (
