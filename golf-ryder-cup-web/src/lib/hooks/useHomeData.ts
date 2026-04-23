@@ -69,6 +69,8 @@ interface HomeData {
     tripAwards: TripAward[];
     teamAName: string;
     teamBName: string;
+    teamAIcon?: string;
+    teamBIcon?: string;
 }
 
 export function shouldRecoverToDateActiveTrip(
@@ -192,6 +194,8 @@ export function useTeamNames() {
         return {
             teamAName: teamA?.name || 'USA',
             teamBName: teamB?.name || 'Europe',
+            teamAIcon: teamA?.icon,
+            teamBIcon: teamB?.icon,
         };
     }, [teams]);
 }
@@ -330,7 +334,7 @@ export function useHomeData(): HomeData {
     const data = useConsolidatedTripData();
     const tripInfo = useTrips(data);
     const standings = useStandings(data?.activeTrip?.id);
-    const { teamAName, teamBName } = useTeamNames();
+    const { teamAName, teamBName, teamAIcon, teamBIcon } = useTeamNames();
     const { currentUserPlayer, tripPlayerLink } = useCurrentUserPlayer();
     const userMatchData = useUserMatch(data, currentUserPlayer);
     const { liveMatches, liveMatchesCount } = useLiveMatches(data);
@@ -356,5 +360,7 @@ export function useHomeData(): HomeData {
         tripAwards,
         teamAName,
         teamBName,
+        teamAIcon,
+        teamBIcon,
     };
 }

@@ -26,6 +26,7 @@ import { TripDashboardSections } from './TripDashboardSections';
 import { HeroMetaPill, HeroMetaStat, HomeSectionHeader } from './HomeSharedComponents';
 import { TripCard } from './TripCard';
 import { CaptainSetupGuide } from './CaptainSetupGuide';
+import { TeamLogo } from '@/components/team/TeamLogo';
 
 function readPendingJoinCode(): string | undefined {
   if (typeof window === 'undefined') {
@@ -87,6 +88,8 @@ export default function HomePage() {
     isLoading,
     teamAName,
     teamBName,
+    teamAIcon,
+    teamBIcon,
   } = useHomeData();
 
   const handleSelectTrip = async (tripId: string) => {
@@ -289,7 +292,16 @@ export default function HomePage() {
                       >
                         <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-[var(--space-4)]">
                           <div className="rounded-[1.5rem] border border-[color:var(--team-usa)]/16 bg-[linear-gradient(180deg,rgba(27,59,119,0.08),rgba(255,255,255,0.62))] px-[var(--space-4)] py-[var(--space-5)] text-center shadow-[0_12px_24px_rgba(27,59,119,0.08)]">
-                            <span className="team-dot team-dot-lg team-dot-usa inline-block mb-[var(--space-3)]" />
+                            {teamAIcon ? (
+                              <TeamLogo
+                                src={teamAIcon}
+                                alt={teamAName || 'Team A'}
+                                size={56}
+                                className="mb-[var(--space-3)]"
+                              />
+                            ) : (
+                              <span className="team-dot team-dot-lg team-dot-usa inline-block mb-[var(--space-3)]" />
+                            )}
                             <p
                               className="score-monumental"
                               style={{
@@ -314,7 +326,16 @@ export default function HomePage() {
                           </div>
 
                           <div className="rounded-[1.5rem] border border-[color:var(--team-europe)]/16 bg-[linear-gradient(180deg,rgba(160,42,63,0.08),rgba(255,255,255,0.62))] px-[var(--space-4)] py-[var(--space-5)] text-center shadow-[0_12px_24px_rgba(114,47,55,0.08)]">
-                            <span className="team-dot team-dot-lg team-dot-europe inline-block mb-[var(--space-3)]" />
+                            {teamBIcon ? (
+                              <TeamLogo
+                                src={teamBIcon}
+                                alt={teamBName || 'Team B'}
+                                size={56}
+                                className="mb-[var(--space-3)]"
+                              />
+                            ) : (
+                              <span className="team-dot team-dot-lg team-dot-europe inline-block mb-[var(--space-3)]" />
+                            )}
                             <p
                               className="score-monumental"
                               style={{

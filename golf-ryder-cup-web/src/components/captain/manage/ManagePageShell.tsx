@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Plus } from 'lucide-react';
 import { LinkButton } from '@/components/ui/LinkButton';
+import { TeamLogo } from '@/components/team/TeamLogo';
 
 import { cn } from '@/lib/utils';
 
@@ -8,14 +9,21 @@ export function ManageFactCard({
   label,
   value,
   valueClassName,
+  logoUrl,
 }: {
   label: string;
   value: string | number;
   valueClassName?: string;
+  logoUrl?: string;
 }) {
   return (
     <div className="rounded-[1.1rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] px-[var(--space-4)] py-[var(--space-4)] shadow-[0_10px_20px_rgba(46,34,18,0.05)]">
-      <p className="type-overline text-[var(--ink-tertiary)]">{label}</p>
+      <div className="flex items-start justify-between gap-[var(--space-3)]">
+        <p className="type-overline text-[var(--ink-tertiary)]">{label}</p>
+        {logoUrl ? (
+          <TeamLogo src={logoUrl} alt={label} size={32} className="shrink-0" />
+        ) : null}
+      </div>
       <p
         className={cn(
           'mt-[var(--space-2)] font-serif text-[1.7rem] italic leading-none text-[var(--ink)]',

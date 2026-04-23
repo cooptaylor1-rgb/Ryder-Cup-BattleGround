@@ -451,12 +451,14 @@ export function ManagePageClient() {
             <ManageFactCard
               label={teamAName}
               value={players.filter((player) => getTeamForPlayer(player.id)?.color === 'usa').length}
+              logoUrl={teamA?.icon}
             />
             <ManageFactCard
               label={teamBName}
               value={
                 players.filter((player) => getTeamForPlayer(player.id)?.color === 'europe').length
               }
+              logoUrl={teamB?.icon}
             />
             <ManageFactCard label="Locked Sessions" value={lockedSessions} />
             <ManageFactCard label="Completed Sessions" value={completedSessions} />
