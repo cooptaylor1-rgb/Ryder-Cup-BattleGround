@@ -11,6 +11,7 @@ import {
 } from '@/components/bets/BetsPageSections';
 import { getSideBetDefinition, SIDE_BET_DEFINITIONS } from '@/lib/constants/sideBets';
 import { db } from '@/lib/db';
+import { queueSyncOperation } from '@/lib/services/tripSyncService';
 import {
   buildCustomSideBet,
   buildNassauSideBet,
@@ -149,6 +150,7 @@ export function MatchInsideGamesPanel({
             });
 
       await db.sideBets.add(newBet);
+      queueSyncOperation('sideBet', newBet.id, 'create', newBet.tripId, newBet);
       showToast('success', `${newBet.name} added to this match`);
       closeComposer();
       router.push(`/bets/${newBet.id}`);

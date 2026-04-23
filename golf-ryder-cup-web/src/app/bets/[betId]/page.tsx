@@ -18,6 +18,7 @@ import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { getSideBetDefinition } from '@/lib/constants';
 import { db } from '@/lib/db';
+import { queueSyncOperation } from '@/lib/services/tripSyncService';
 import { useTripStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { Match, NassauResults, Player, SideBet } from '@/lib/types/models';
@@ -136,16 +137,22 @@ export default function BetDetailPage() {
     );
 
     await db.sideBets.update(bet.id, { results: nextResults });
+    queueSyncOperation('sideBet', bet.id, 'update', bet.tripId, {
+      ...bet,
+      results: nextResults,
+    });
     setSelectedHole(null);
     showToast('success', winnerId ? 'Hole winner recorded' : 'Hole pushed to the next skin');
   };
 
   const setOverallWinner = async (winnerId: string) => {
-    await db.sideBets.update(bet.id, {
+    const updates = {
       winnerId,
-      status: 'completed',
+      status: 'completed' as const,
       completedAt: new Date().toISOString(),
-    });
+    };
+    await db.sideBets.update(bet.id, updates);
+    queueSyncOperation('sideBet', bet.id, 'update', bet.tripId, { ...bet, ...updates });
     showToast('success', 'Winner recorded');
   };
 
@@ -161,20 +168,24 @@ export default function BetDetailPage() {
       nextResults.front9Winner && nextResults.back9Winner && nextResults.overallWinner
     );
 
-    await db.sideBets.update(bet.id, {
+    const updates = {
       nassauResults: nextResults,
-      status: isComplete ? 'completed' : 'active',
+      status: (isComplete ? 'completed' : 'active') as 'completed' | 'active',
       completedAt: isComplete ? new Date().toISOString() : undefined,
-    });
+    };
+    await db.sideBets.update(bet.id, updates);
+    queueSyncOperation('sideBet', bet.id, 'update', bet.tripId, { ...bet, ...updates });
     showToast('success', 'Segment result recorded');
   };
 
   const reopenBet = async () => {
-    await db.sideBets.update(bet.id, {
-      status: 'active',
+    const updates = {
+      status: 'active' as const,
       winnerId: undefined,
       completedAt: undefined,
-    });
+    };
+    await db.sideBets.update(bet.id, updates);
+    queueSyncOperation('sideBet', bet.id, 'update', bet.tripId, { ...bet, ...updates });
     showToast('success', 'Bet reopened');
   };
 
@@ -186,7 +197,9 @@ export default function BetDetailPage() {
       cancelLabel: 'Cancel',
       variant: 'danger',
       onConfirm: async () => {
+        const tripId = bet.tripId;
         await db.sideBets.delete(bet.id);
+        queueSyncOperation('sideBet', bet.id, 'delete', tripId);
         showToast('info', 'Bet deleted');
         router.push('/bets');
       },
