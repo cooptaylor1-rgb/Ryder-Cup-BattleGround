@@ -15,6 +15,7 @@ import {
   buildNassauSideBet,
   buildQuickSideBet,
 } from '@/lib/services/sideBetBuilders';
+import { queueSyncOperation } from '@/lib/services/tripSyncService';
 import { useTripScopedMatches } from '@/lib/hooks/useTripScopedMatches';
 import { useTripStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
@@ -141,6 +142,7 @@ export default function BetsPageClient() {
     try {
       setIsSubmitting(true);
       await db.sideBets.add(newBet);
+      queueSyncOperation('sideBet', newBet.id, 'create', currentTrip.id, newBet);
       showToast('success', `${definition.label} added`);
     } catch {
       showToast('error', 'Failed to create bet. Please try again.');
@@ -205,6 +207,7 @@ export default function BetsPageClient() {
         });
 
         await db.sideBets.add(newBet);
+        queueSyncOperation('sideBet', newBet.id, 'create', currentTrip.id, newBet);
         showToast('success', `${name} created`);
         closeCreateModal();
         router.push(`/bets/${newBet.id}`);
@@ -236,6 +239,7 @@ export default function BetsPageClient() {
       });
 
       await db.sideBets.add(newBet);
+      queueSyncOperation('sideBet', newBet.id, 'create', currentTrip.id, newBet);
       showToast('success', `${name} created`);
       closeCreateModal();
       router.push(`/bets/${newBet.id}`);
