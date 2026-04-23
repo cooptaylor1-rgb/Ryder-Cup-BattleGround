@@ -95,10 +95,14 @@ export default function CaptainSettingsPage() {
     tripName.trim() && normalizedStartDate && normalizedEndDate && teamAName.trim() && teamBName.trim()
   );
 
-  const handleSave = async () => {
+  // Core persist — runs both for an explicit Save click and for
+  // auto-save-on-blur. Pass silent=true to suppress the toast so
+  // tabbing between fields doesn't spam the UI with "saved"
+  // confirmations.
+  const persistSettings = async ({ silent }: { silent: boolean }) => {
     if (!currentTrip || isSaving) return;
     if (!tripName.trim()) {
-      showToast('error', 'Trip name is required');
+      if (!silent) showToast('error', 'Trip name is required');
       return;
     }
 
@@ -153,14 +157,22 @@ export default function CaptainSettingsPage() {
         queueSyncOperation('team', teamB.id, 'update', currentTrip.id, updated);
       }
 
-      showToast('success', 'Trip settings saved');
+      if (!silent) showToast('success', 'Trip settings saved');
     } catch (error) {
       captainLogger.error('Failed to save settings:', error);
-      showToast('error', 'Failed to save settings. Please try again.');
+      if (!silent) showToast('error', 'Failed to save settings. Please try again.');
     } finally {
       setIsSaving(false);
     }
   };
+
+  const handleSave = () => persistSettings({ silent: false });
+
+  // Auto-save on blur. Fires when the captain tabs out of a field or
+  // clicks elsewhere — no "Save" round-trip needed to commit a logo
+  // URL paste or a team-name tweak. Toast is suppressed so tabbing
+  // through fields stays quiet.
+  const handleFieldBlur = () => persistSettings({ silent: true });
 
   if (!currentTrip) {
     return <CaptainNoTripState description="Start or select a trip to configure captain settings." />;
@@ -231,6 +243,7 @@ export default function CaptainSettingsPage() {
                     type="text"
                     value={tripName}
                     onChange={(event) => setTripName(event.target.value)}
+                    onBlur={handleFieldBlur}
                     className="input"
                     placeholder="Ryder Cup 2026"
                   />
@@ -241,6 +254,7 @@ export default function CaptainSettingsPage() {
                     type="text"
                     value={location}
                     onChange={(event) => setLocation(event.target.value)}
+                    onBlur={handleFieldBlur}
                     className="input"
                     placeholder="Pinehurst, NC"
                   />
@@ -252,6 +266,7 @@ export default function CaptainSettingsPage() {
                     type="date"
                     value={normalizedStartDate}
                     onChange={(event) => setStartDate(event.target.value)}
+                    onBlur={handleFieldBlur}
                     className="input"
                   />
                 </FormField>
@@ -260,6 +275,7 @@ export default function CaptainSettingsPage() {
                     type="date"
                     value={normalizedEndDate}
                     onChange={(event) => setEndDate(event.target.value)}
+                    onBlur={handleFieldBlur}
                     className="input"
                   />
                 </FormField>
@@ -279,6 +295,7 @@ export default function CaptainSettingsPage() {
                       type="text"
                       value={teamAName}
                       onChange={(event) => setTeamAName(event.target.value)}
+                      onBlur={handleFieldBlur}
                       className="input border-[var(--team-usa)] focus:border-[var(--team-usa)]"
                       placeholder="Team USA"
                     />
@@ -288,6 +305,7 @@ export default function CaptainSettingsPage() {
                       type="url"
                       value={teamAIcon}
                       onChange={(event) => setTeamAIcon(event.target.value)}
+                      onBlur={handleFieldBlur}
                       className="input"
                       placeholder="https://…/logo.png"
                     />
@@ -299,6 +317,7 @@ export default function CaptainSettingsPage() {
                       type="text"
                       value={teamBName}
                       onChange={(event) => setTeamBName(event.target.value)}
+                      onBlur={handleFieldBlur}
                       className="input border-[var(--team-europe)] focus:border-[var(--team-europe)]"
                       placeholder="Team Europe"
                     />
@@ -308,6 +327,7 @@ export default function CaptainSettingsPage() {
                       type="url"
                       value={teamBIcon}
                       onChange={(event) => setTeamBIcon(event.target.value)}
+                      onBlur={handleFieldBlur}
                       className="input"
                       placeholder="https://…/logo.png"
                     />
