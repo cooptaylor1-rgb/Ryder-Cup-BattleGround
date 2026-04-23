@@ -7,6 +7,8 @@
 import { db } from '../../db';
 import { authLogger } from '../../utils/logger';
 import { hashPin } from '../../utils/crypto';
+import { queueSyncOperation } from '../../services/tripSyncService';
+import type { Player } from '../../types/models';
 import type { AuthState, UserProfile } from './authTypes';
 import {
   readStoredUsers,
@@ -132,18 +134,53 @@ export function createUpdateProfileAction({ set, get }: StoreApi) {
         writeStoredUsers(users);
       }
 
-      // Update IndexedDB
-      await db.players.update(currentUser.id, {
-        linkedProfileId: currentUser.id,
-        linkedAuthUserId: get().authUserId ?? undefined,
-        firstName: updatedProfile.firstName,
-        lastName: updatedProfile.lastName,
-        email: updatedProfile.email,
-        handicapIndex: updatedProfile.handicapIndex,
-        ghin: updatedProfile.ghin,
-        teePreference: updatedProfile.preferredTees,
-        avatarUrl: updatedProfile.avatarUrl,
+      // Propagate profile edits to every linked Player row (across all
+      // trips) AND queue a cloud sync per player. Two bugs this
+      // replaces:
+      //   1. The previous code ran db.players.update(currentUser.id,
+      //      ...) which treats the user's profile id as the Player
+      //      primary key — but player PKs are random UUIDs assigned
+      //      at trip creation. So the update almost always hit zero
+      //      rows, and a profile edit never reached any of the user's
+      //      trip rosters.
+      //   2. No queueSyncOperation, so even in the rare orphan case
+      //      where the ids coincided, the change never synced and
+      //      the next roster poll wiped the local edit.
+      //
+      // Fix: locate linked players by linkedProfileId OR
+      // linkedAuthUserId (not by primary key), dedupe, write Dexie +
+      // queue sync per player. Linked-id fields aren't indexed but
+      // player rosters are small enough for a full scan here.
+      const authUserId = get().authUserId ?? undefined;
+      const allPlayers = await db.players.toArray();
+      const linkedPlayers = allPlayers.filter((p) => {
+        if (currentUser.id && p.linkedProfileId === currentUser.id) return true;
+        if (authUserId && p.linkedAuthUserId === authUserId) return true;
+        return false;
       });
+
+      const now = new Date().toISOString();
+      for (const player of linkedPlayers) {
+        const patch: Partial<Player> = {
+          linkedProfileId: currentUser.id,
+          linkedAuthUserId: authUserId,
+          firstName: updatedProfile.firstName,
+          lastName: updatedProfile.lastName,
+          email: updatedProfile.email,
+          handicapIndex: updatedProfile.handicapIndex,
+          ghin: updatedProfile.ghin,
+          teePreference: updatedProfile.preferredTees,
+          avatarUrl: updatedProfile.avatarUrl,
+          updatedAt: now,
+        };
+        await db.players.update(player.id, patch);
+        if (player.tripId) {
+          queueSyncOperation('player', player.id, 'update', player.tripId, {
+            ...player,
+            ...patch,
+          });
+        }
+      }
 
       set({
         currentUser: updatedProfile,
