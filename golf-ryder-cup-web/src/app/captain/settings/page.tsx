@@ -112,45 +112,41 @@ export default function CaptainSettingsPage() {
         location,
       });
 
-      // Persist team edits to Dexie AND cloud. The previous path only
-      // wrote Dexie, so a captain renaming a team or pasting a logo URL
-      // saw it locally while every other device stayed on the stale
-      // name — the app-wide roster poll re-pulled the old row from
-      // Supabase and wiped the edit on the captain's screen too.
+      // Persist team edits to Dexie AND cloud.
+      // The "Save" button represents "commit current state to cloud";
+      // it must not depend on whether the form value differs from the
+      // Dexie row, because Dexie and Supabase can be out of sync
+      // (local-first create, cloud-side delete, earlier sync failure,
+      // etc.). Queuing an identical upsert is safe — syncTeamToCloud
+      // upserts by id, so a no-op write just lands as the same row.
       const now = new Date().toISOString();
       const nextTeamAIcon = teamAIcon.trim() || undefined;
       const nextTeamBIcon = teamBIcon.trim() || undefined;
 
-      if (
-        teamA &&
-        (teamAName !== teamA.name || nextTeamAIcon !== teamA.icon)
-      ) {
+      if (teamA) {
         const updated = {
           ...teamA,
-          name: teamAName,
+          name: teamAName || teamA.name,
           icon: nextTeamAIcon,
           updatedAt: now,
         };
         await db.teams.update(teamA.id, {
-          name: teamAName,
+          name: updated.name,
           icon: nextTeamAIcon,
           updatedAt: now,
         });
         queueSyncOperation('team', teamA.id, 'update', currentTrip.id, updated);
       }
 
-      if (
-        teamB &&
-        (teamBName !== teamB.name || nextTeamBIcon !== teamB.icon)
-      ) {
+      if (teamB) {
         const updated = {
           ...teamB,
-          name: teamBName,
+          name: teamBName || teamB.name,
           icon: nextTeamBIcon,
           updatedAt: now,
         };
         await db.teams.update(teamB.id, {
-          name: teamBName,
+          name: updated.name,
           icon: nextTeamBIcon,
           updatedAt: now,
         });
@@ -187,7 +183,12 @@ export default function CaptainSettingsPage() {
             variant="primary"
             size="sm"
             onClick={handleSave}
-            disabled={isSaving || !hasUnsavedChanges}
+            // Button stays clickable even when the form matches Dexie
+            // because Dexie and Supabase can diverge — the captain
+            // needs a way to re-commit state when the cloud is behind.
+            // syncTeamToCloud is an idempotent upsert, so a no-change
+            // click is safe.
+            disabled={isSaving}
             leftIcon={<Save size={16} />}
           >
             {isSaving ? 'Saving...' : hasUnsavedChanges ? 'Save Changes' : 'Saved'}
