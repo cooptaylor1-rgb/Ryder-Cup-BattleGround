@@ -16,35 +16,8 @@ import type {
   Trip,
 } from '../../types/models';
 import type { SyncOperation, SyncQueueItem } from '../../types/sync';
+import { isServerNewer } from './tripSyncLww';
 import { getTable } from './tripSyncShared';
-
-/**
- * Returns true if the row already in Supabase has a newer (or equal)
- * updated_at than the incoming write. Used to implement last-write-wins
- * for mutable tables — without this, two offline devices editing the
- * same entity silently overwrite each other based on sync arrival
- * order, not actual edit time. There is still a narrow race between
- * the select and the upsert, but it closes the worst of the
- * offline-replay data-loss window.
- */
-async function isCloudNewer(
-  table: 'matches' | 'sessions',
-  id: string,
-  incomingUpdatedAt: string
-): Promise<boolean> {
-  const { data: existing } = await getTable(table)
-    .select('updated_at')
-    .eq('id', id)
-    .maybeSingle();
-
-  const existingUpdatedAt =
-    existing && typeof (existing as { updated_at?: string }).updated_at === 'string'
-      ? (existing as { updated_at: string }).updated_at
-      : null;
-
-  if (!existingUpdatedAt) return false;
-  return new Date(existingUpdatedAt).getTime() >= new Date(incomingUpdatedAt).getTime();
-}
 
 export async function syncEntityToCloud(item: SyncQueueItem): Promise<void> {
   const { entity, entityId, operation, data } = item;
@@ -265,7 +238,16 @@ export async function syncSessionToCloud(
   // Last-write-wins by updated_at. Two offline devices editing the same
   // session (e.g. captain locking while player edits notes) would otherwise
   // silently overwrite each other based on whichever sync ran last.
-  if (await isCloudNewer('sessions', session.id, incomingUpdatedAt)) return;
+  if (
+    await isServerNewer({
+      table: 'sessions',
+      timestampColumn: 'updated_at',
+      where: { id: session.id },
+      incoming: incomingUpdatedAt,
+    })
+  ) {
+    return;
+  }
 
   const { data: returned, error } = await getTable('sessions')
     .upsert(cloudData, { onConflict: 'id' })
@@ -355,7 +337,16 @@ export async function syncMatchToCloud(
   // Last-write-wins by updated_at. Two offline phones editing the same
   // match (captain advancing the hole while player submits a score) would
   // otherwise silently overwrite each other based on sync arrival order.
-  if (await isCloudNewer('matches', match.id, incomingUpdatedAt)) return;
+  if (
+    await isServerNewer({
+      table: 'matches',
+      timestampColumn: 'updated_at',
+      where: { id: match.id },
+      incoming: incomingUpdatedAt,
+    })
+  ) {
+    return;
+  }
 
   const { data: returned, error } = await getTable('matches')
     .upsert(cloudData, { onConflict: 'id' })
@@ -422,27 +413,19 @@ export async function syncHoleResultToCloud(
     timestamp: incomingTimestamp,
   };
 
-  // Last-write-wins by timestamp, not by arrival order. Without this check
-  // an offline phone that reconnects hours later can silently overwrite a
-  // fresher score entered by another device during the offline window —
-  // the upsert did not consider timestamps, so whichever write hit Supabase
-  // last wrote. There is still a narrow race between the select and the
-  // upsert, but it closes the worst of the offline-replay data loss.
-  const { data: existing } = await getTable('hole_results')
-    .select('timestamp')
-    .eq('match_id', holeResult.matchId)
-    .eq('hole_number', holeResult.holeNumber)
-    .maybeSingle();
-
-  const existingTimestamp =
-    existing && typeof (existing as { timestamp?: string }).timestamp === 'string'
-      ? (existing as { timestamp: string }).timestamp
-      : null;
+  // Last-write-wins by timestamp — an offline phone reconnecting
+  // hours later must not overwrite a fresher score entered by
+  // another device during the offline window. hole_results keys
+  // on (match_id, hole_number) rather than id, so the shared
+  // helper takes the composite where clause.
   if (
-    existingTimestamp &&
-    new Date(existingTimestamp).getTime() >= new Date(incomingTimestamp).getTime()
+    await isServerNewer({
+      table: 'hole_results',
+      timestampColumn: 'timestamp',
+      where: { match_id: holeResult.matchId, hole_number: holeResult.holeNumber },
+      incoming: incomingTimestamp,
+    })
   ) {
-    // Cloud already has a newer (or equal) version; keep it.
     return;
   }
 
