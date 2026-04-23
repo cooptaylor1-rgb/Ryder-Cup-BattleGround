@@ -18,6 +18,7 @@ import type {
 import type { SyncOperation, SyncQueueItem } from '../../types/sync';
 import { assertExhaustive } from '../../utils/exhaustive';
 import { isServerNewer } from './tripSyncLww';
+import { holeResultToCloud, matchToCloud, sessionToCloud } from './tripSyncMappers';
 import { getTable } from './tripSyncShared';
 import {
   deleteEntityByKey,
@@ -235,25 +236,8 @@ export async function syncSessionToCloud(
     fallback: () => db.sessions.get(sessionId),
   });
 
-  const incomingUpdatedAt = session.updatedAt || new Date().toISOString();
-  const cloudData = {
-    id: session.id,
-    trip_id: session.tripId,
-    name: session.name,
-    session_number: session.sessionNumber,
-    session_type: session.sessionType,
-    scheduled_date: session.scheduledDate?.split('T')[0] || null,
-    time_slot: session.timeSlot || null,
-    first_tee_time: session.firstTeeTime || null,
-    points_per_match: session.pointsPerMatch || 1.0,
-    notes: session.notes || null,
-    status: session.status || 'scheduled',
-    is_locked: session.isLocked || false,
-    is_practice_session: session.isPracticeSession || false,
-    default_course_id: session.defaultCourseId || null,
-    default_tee_set_id: session.defaultTeeSetId || null,
-    updated_at: incomingUpdatedAt,
-  };
+  const cloudData = sessionToCloud(session);
+  const incomingUpdatedAt = cloudData.updated_at as string;
 
   // Last-write-wins by updated_at. Two offline devices editing the same
   // session (e.g. captain locking while player edits notes) would otherwise
@@ -331,31 +315,8 @@ export async function syncMatchToCloud(
     fallback: () => db.matches.get(matchId),
   });
 
-  const incomingUpdatedAt = match.updatedAt || new Date().toISOString();
-  const cloudData = {
-    id: match.id,
-    session_id: match.sessionId,
-    course_id: match.courseId || null,
-    tee_set_id: match.teeSetId || null,
-    match_order: match.matchOrder || 0,
-    status: match.status,
-    start_time: match.startTime || null,
-    current_hole: match.currentHole || 1,
-    mode: match.mode || 'ryderCup',
-    team_a_player_ids: match.teamAPlayerIds,
-    team_b_player_ids: match.teamBPlayerIds,
-    team_a_handicap_allowance: match.teamAHandicapAllowance || 0,
-    team_b_handicap_allowance: match.teamBHandicapAllowance || 0,
-    result: match.result || 'notFinished',
-    margin: match.margin || 0,
-    holes_remaining: match.holesRemaining || 0,
-    // version is client-incremented on every scoring write; persisting
-    // it server-side lets other devices detect they raced a stale copy
-    // and reconcile instead of silently overwriting.
-    version: typeof match.version === 'number' ? match.version : 0,
-    notes: match.notes || null,
-    updated_at: incomingUpdatedAt,
-  };
+  const cloudData = matchToCloud(match);
+  const incomingUpdatedAt = cloudData.updated_at as string;
 
   // Last-write-wins by updated_at. Two offline phones editing the same
   // match (captain advancing the hole while player submits a score) would
@@ -413,31 +374,8 @@ export async function syncHoleResultToCloud(
     throw new Error(`Invalid hole winner: ${holeResult.winner}`);
   }
 
-  const incomingTimestamp = holeResult.timestamp || new Date().toISOString();
-  const cloudData = {
-    id: holeResult.id,
-    match_id: holeResult.matchId,
-    hole_number: holeResult.holeNumber,
-    winner: holeResult.winner,
-    team_a_strokes: holeResult.teamAStrokes || null,
-    team_b_strokes: holeResult.teamBStrokes || null,
-    // Per-player arrays survive the round-trip as jsonb. Previously
-    // only the aggregate team_a_strokes / team_b_strokes were synced
-    // so fourball / best-ball matches silently lost the individual
-    // player gross scores after a refresh or device swap.
-    team_a_player_scores: holeResult.teamAPlayerScores ?? null,
-    team_b_player_scores: holeResult.teamBPlayerScores ?? null,
-    // Audit trail — captains need this to reconstruct disputed
-    // scores after a device swap. Kept nullable so older clients
-    // without audit data still write fine.
-    edit_history: holeResult.editHistory ?? null,
-    last_edited_by: holeResult.lastEditedBy ?? null,
-    last_edited_at: holeResult.lastEditedAt ?? null,
-    edit_reason: holeResult.editReason ?? null,
-    scored_by: holeResult.scoredBy || null,
-    notes: holeResult.notes || null,
-    timestamp: incomingTimestamp,
-  };
+  const cloudData = holeResultToCloud(holeResult);
+  const incomingTimestamp = cloudData.timestamp as string;
 
   // Last-write-wins by timestamp — an offline phone reconnecting
   // hours later must not overwrite a fresher score entered by
