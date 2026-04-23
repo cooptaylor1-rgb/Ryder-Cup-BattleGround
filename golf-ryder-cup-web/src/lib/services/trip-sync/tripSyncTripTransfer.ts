@@ -2,7 +2,7 @@ import { storeTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import { mergeTripPlayers } from '@/lib/utils/tripPlayers';
 
 import { db } from '../../db';
-import type { SideBet, Trip } from '../../types/models';
+import type { BanterPost, SideBet, Trip } from '../../types/models';
 import { getPendingSyncIdsForTrip } from './tripSyncQueue';
 
 /**
@@ -24,6 +24,7 @@ async function reconcileLocalOrphans({
   cloudHoleResultIds,
   cloudPracticeScoreIds,
   cloudSideBetIds,
+  cloudBanterPostIds,
 }: {
   tripId: string;
   cloudPlayerIds: string[];
@@ -34,6 +35,7 @@ async function reconcileLocalOrphans({
   cloudHoleResultIds: string[];
   cloudPracticeScoreIds: string[];
   cloudSideBetIds: string[];
+  cloudBanterPostIds: string[];
 }): Promise<void> {
   // Snapshot the pending sync-queue ids once so we don't repeatedly
   // walk the queue inside the per-entity filters.
@@ -46,6 +48,7 @@ async function reconcileLocalOrphans({
     holeResult: getPendingSyncIdsForTrip(tripId, 'holeResult'),
     practiceScore: getPendingSyncIdsForTrip(tripId, 'practiceScore'),
     sideBet: getPendingSyncIdsForTrip(tripId, 'sideBet'),
+    banterPost: getPendingSyncIdsForTrip(tripId, 'banterPost'),
   };
 
   const cloud = {
@@ -57,6 +60,7 @@ async function reconcileLocalOrphans({
     holeResult: new Set(cloudHoleResultIds),
     practiceScore: new Set(cloudPracticeScoreIds),
     sideBet: new Set(cloudSideBetIds),
+    banterPost: new Set(cloudBanterPostIds),
   };
 
   // Players scoped to this trip.
@@ -146,6 +150,14 @@ async function reconcileLocalOrphans({
     if (cloud.sideBet.has(bet.id)) continue;
     if (pendingByEntity.sideBet.has(bet.id)) continue;
     await db.sideBets.delete(bet.id);
+  }
+
+  // Banter posts scoped to this trip.
+  const localBanterPosts = await db.banterPosts.where('tripId').equals(tripId).toArray();
+  for (const post of localBanterPosts) {
+    if (cloud.banterPost.has(post.id)) continue;
+    if (pendingByEntity.banterPost.has(post.id)) continue;
+    await db.banterPosts.delete(post.id);
   }
 }
 
@@ -360,6 +372,20 @@ async function pullTripCore(lookup: {
       .eq('trip_id', trip.id);
     const sideBets = (sideBetsRaw as Array<Record<string, unknown>> | null) ?? [];
 
+    // Banter posts. Tolerate a missing banter_posts table (migration
+    // not yet applied) the same way practice_scores does.
+    const { data: banterRaw } = await getTable('banter_posts')
+      .select('*')
+      .eq('trip_id', trip.id)
+      .then(
+        (response: { data: unknown; error: { code?: string } | null }) =>
+          response.error
+            ? { data: [] as Array<Record<string, unknown>> }
+            : (response as { data: Array<Record<string, unknown>> }),
+        () => ({ data: [] as Array<Record<string, unknown>> })
+      );
+    const banterPosts = (banterRaw as Array<Record<string, unknown>> | null) ?? [];
+
     await db.transaction(
       'rw',
       [
@@ -372,6 +398,7 @@ async function pullTripCore(lookup: {
         db.holeResults,
         db.practiceScores,
         db.sideBets,
+        db.banterPosts,
       ],
       async () => {
         const localTrip: Trip = {
@@ -563,6 +590,27 @@ async function pullTripCore(lookup: {
                 : undefined,
           });
         }
+
+        for (const post of banterPosts) {
+          await db.banterPosts.put({
+            id: String(post.id),
+            tripId: String(post.trip_id),
+            authorId:
+              typeof post.author_id === 'string' ? post.author_id : undefined,
+            authorName: String(post.author_name ?? ''),
+            content: String(post.content ?? ''),
+            postType: (post.post_type as BanterPost['postType']) || 'message',
+            emoji: typeof post.emoji === 'string' ? post.emoji : undefined,
+            reactions:
+              post.reactions && typeof post.reactions === 'object'
+                ? (post.reactions as BanterPost['reactions'])
+                : undefined,
+            relatedMatchId:
+              typeof post.related_match_id === 'string' ? post.related_match_id : undefined,
+            timestamp:
+              typeof post.timestamp === 'string' ? post.timestamp : new Date().toISOString(),
+          });
+        }
       }
     );
 
@@ -584,6 +632,7 @@ async function pullTripCore(lookup: {
       cloudHoleResultIds: (holeResults ?? []).map((hr: { id: string }) => String(hr.id)),
       cloudPracticeScoreIds: (practiceScores ?? []).map((ps) => String(ps.id)),
       cloudSideBetIds: sideBets.map((b) => String(b.id)),
+      cloudBanterPostIds: banterPosts.map((p) => String(p.id)),
     });
 
     const resolvedShareCode =

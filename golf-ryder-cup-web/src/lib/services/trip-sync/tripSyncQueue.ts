@@ -68,8 +68,24 @@ async function ensureQueueHydrated(): Promise<void> {
           // On hydrate we assume any syncing row was interrupted and
           // retry it — the sync writers are idempotent (upsert by id)
           // so double-applying is safe.
-          const resurrected: SyncQueueItem =
-            item.status === 'syncing' ? { ...item, status: 'pending' } : item;
+          //
+          // Also reset terminally-failed items (status='failed' with
+          // retryCount >= MAX_RETRY_COUNT) to pending with a fresh
+          // budget. A page reload is the captain's implicit "try
+          // again" — if the earlier failure was a server-side bug
+          // that's since been fixed (missing trigger, tight RLS, FK
+          // violation that got cleaned up), the retry succeeds and
+          // the banner clears. If the underlying issue is genuinely
+          // persistent, the items fail again and land in the same
+          // visible-failed state on the new session.
+          let resurrected: SyncQueueItem;
+          if (item.status === 'syncing') {
+            resurrected = { ...item, status: 'pending' };
+          } else if (item.status === 'failed') {
+            resurrected = { ...item, status: 'pending', retryCount: 0, error: undefined };
+          } else {
+            resurrected = item;
+          }
           const hydratedItem = resurrected.idempotencyKey
             ? resurrected
             : {
@@ -135,6 +151,9 @@ const ENTITY_DEPENDENCY_ORDER: Record<SyncEntity, number> = {
   // practice_scores.match_id and player_id both FK to tables already
   // at rank <= 3, so rank 4 is safe — matches the holeResult tier.
   practiceScore: 4,
+  // banter_posts.trip_id FKs to trips (rank 0), so rank 4 sits
+  // alongside sideBet — tripping a post after its trip row is safe.
+  banterPost: 4,
 };
 
 export function compareByDependency(a: SyncQueueItem, b: SyncQueueItem): number {

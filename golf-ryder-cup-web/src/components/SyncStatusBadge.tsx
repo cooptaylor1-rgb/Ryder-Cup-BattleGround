@@ -12,6 +12,7 @@ import {
     getSyncQueueStatus,
     getTripSyncStatus,
     processSyncQueue,
+    retryFailedQueue,
     type SyncStatus,
 } from '@/lib/services/tripSyncService';
 import { useTripStore } from '@/lib/stores/tripStore';
@@ -81,6 +82,13 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
     const handleManualSync = async () => {
         setIsSyncing(true);
         try {
+            // Reset ALL failed items — including the ones that
+            // already burned through MAX_RETRY_COUNT — so clicking
+            // the banner actually gives them another shot. Before
+            // this, processSyncQueue alone would skip items at the
+            // retry ceiling, and the banner would keep showing "N
+            // failed" forever with the user's click doing nothing.
+            await retryFailedQueue();
             await processSyncQueue();
             setStatus(currentTrip ? getTripSyncStatus(currentTrip.id) : 'unknown');
             setQueueInfo(getSyncQueueStatus());
