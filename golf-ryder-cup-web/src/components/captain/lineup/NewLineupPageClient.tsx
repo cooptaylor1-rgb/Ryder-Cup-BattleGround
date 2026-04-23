@@ -44,6 +44,7 @@ import {
   getDefaultTeeTimeForSessionNumber,
   getNextSessionNumber,
 } from './newLineupSessions';
+import { useTeeTimeSchedule } from './useTeeTimeSchedule';
 
 type Step = 'setup' | 'lineup';
 type NewLineupMode = 'lineup' | 'session';
@@ -158,30 +159,12 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
 
   const selectedType = ALL_FORMATS.find((format) => format.value === sessionType) || ALL_FORMATS[0];
 
-  // Real golf groups four players per tee time. Singles (1 player per
-  // team, two head-to-head per group of four) gets two matches per tee
-  // time; team formats (foursomes, fourball, pinehurst, …) get one
-  // match per tee time. Other formats fall through to one-per-tee-time
-  // by default. Without this, a 12-singles session printed twelve
-  // separate tee times when the course only needs six.
-  const teeTimes = useMemo(() => {
-    if (!firstTeeTime) return [];
-
-    const [hours, minutes] = firstTeeTime.split(':').map(Number);
-    const baseTime = new Date();
-    baseTime.setHours(hours, minutes, 0, 0);
-
-    const playersPerMatch = Math.max(2, selectedType.playersPerTeam * 2);
-    const matchesPerTeeTime = Math.max(1, Math.floor(4 / playersPerMatch));
-
-    return Array.from({ length: matchCount }, (_, index) => {
-      const teeTimeIndex = Math.floor(index / matchesPerTeeTime);
-      const matchTime = new Date(
-        baseTime.getTime() + teeTimeIndex * teeTimeInterval * 60 * 1000
-      );
-      return matchTime.toTimeString().slice(0, 5);
-    });
-  }, [firstTeeTime, teeTimeInterval, matchCount, selectedType.playersPerTeam]);
+  const teeTimes = useTeeTimeSchedule({
+    firstTeeTime,
+    teeTimeInterval,
+    matchCount,
+    playersPerTeam: selectedType.playersPerTeam,
+  });
 
   const teamA = teams.find((team) => team.color === 'usa');
   const teamB = teams.find((team) => team.color === 'europe');
