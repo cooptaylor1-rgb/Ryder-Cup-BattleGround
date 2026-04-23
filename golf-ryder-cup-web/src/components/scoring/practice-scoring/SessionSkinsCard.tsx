@@ -30,7 +30,7 @@ export function SessionSkinsCard({ session, matches }: SessionSkinsCardProps) {
     useShallow((s) => ({ currentTrip: s.currentTrip, players: s.players }))
   );
 
-  const sessionSkinsBet = useLiveQuery<SideBet | undefined>(
+  const sessionSkinsBet = useLiveQuery(
     async () => {
       if (!currentTrip) return undefined;
       const bets = await db.sideBets
@@ -55,13 +55,13 @@ export function SessionSkinsCard({ session, matches }: SessionSkinsCardProps) {
     [] as PracticeScore[]
   );
 
-  const teeSet = useLiveQuery<TeeSet | null>(
+  const teeSet = useLiveQuery(
     async () => {
       if (!session.defaultTeeSetId) return null;
       return (await db.teeSets.get(session.defaultTeeSetId)) ?? null;
     },
     [session.defaultTeeSetId],
-    null
+    null as TeeSet | null
   );
 
   const board = useMemo(() => {

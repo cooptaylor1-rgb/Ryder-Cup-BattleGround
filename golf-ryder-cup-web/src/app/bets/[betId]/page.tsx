@@ -70,18 +70,18 @@ export default function BetDetailPage() {
     bet && bet.type === 'skins' && bet.sessionId && !bet.matchId
   );
 
-  const linkedSession = useLiveQuery<RyderCupSession | null>(
+  const linkedSession = useLiveQuery(
     async () => {
       if (!bet?.sessionId) return null;
       return (await db.sessions.get(bet.sessionId)) ?? null;
     },
     [bet?.sessionId],
-    null
+    null as RyderCupSession | null
   );
 
-  const sessionMatches = useLiveQuery<Match[]>(
+  const sessionMatches = useLiveQuery(
     async () => {
-      if (!bet?.sessionId) return [];
+      if (!bet?.sessionId) return [] as Match[];
       return db.matches.where('sessionId').equals(bet.sessionId).toArray();
     },
     [bet?.sessionId],
@@ -93,7 +93,7 @@ export default function BetDetailPage() {
     [sessionMatches]
   );
 
-  const sessionScores = useLiveQuery<PracticeScore[]>(
+  const sessionScores = useLiveQuery(
     async () => {
       if (sessionMatchIds.length === 0) return [] as PracticeScore[];
       return db.practiceScores.where('matchId').anyOf(sessionMatchIds).toArray();
@@ -102,13 +102,13 @@ export default function BetDetailPage() {
     [] as PracticeScore[]
   );
 
-  const sessionTeeSet = useLiveQuery<TeeSet | null>(
+  const sessionTeeSet = useLiveQuery(
     async () => {
       if (!linkedSession?.defaultTeeSetId) return null;
       return (await db.teeSets.get(linkedSession.defaultTeeSetId)) ?? null;
     },
     [linkedSession?.defaultTeeSetId],
-    null
+    null as TeeSet | null
   );
 
   const sessionSkinsBoard = useMemo(() => {
