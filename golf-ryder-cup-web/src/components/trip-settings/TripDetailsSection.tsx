@@ -102,12 +102,12 @@ export function TripDetailsSection({ trip }: TripDetailsSectionProps) {
             const nextTeamAIcon = teamAIcon.trim() || undefined;
             const nextTeamBIcon = teamBIcon.trim() || undefined;
 
-            if (
-                teamA &&
-                (teamA.name !== teamAName.trim() ||
-                    teamA.colorHex !== teamAColor ||
-                    teamA.icon !== nextTeamAIcon)
-            ) {
+            // Save = commit current state to cloud. No local-vs-form
+            // comparison: Dexie and Supabase can be out of sync, and
+            // guarding the sync queue on "local changed" meant the UI
+            // couldn't reconcile divergence. syncTeamToCloud upserts
+            // by id, so an identical write is a safe no-op.
+            if (teamA) {
                 const nextName = teamAName.trim() || 'Team USA';
                 const updated = {
                     ...teamA,
@@ -124,12 +124,7 @@ export function TripDetailsSection({ trip }: TripDetailsSectionProps) {
                 });
                 queueSyncOperation('team', teamA.id, 'update', trip.id, updated);
             }
-            if (
-                teamB &&
-                (teamB.name !== teamBName.trim() ||
-                    teamB.colorHex !== teamBColor ||
-                    teamB.icon !== nextTeamBIcon)
-            ) {
+            if (teamB) {
                 const nextName = teamBName.trim() || 'Team Europe';
                 const updated = {
                     ...teamB,

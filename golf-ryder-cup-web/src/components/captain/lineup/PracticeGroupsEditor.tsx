@@ -32,15 +32,39 @@ interface PracticeGroupsEditorProps {
   isPublishing?: boolean;
 }
 
+/**
+ * Returns the most useful default tee time for Group 1 — the session's
+ * explicit firstTeeTime when set, else a sensible fallback for the
+ * session's AM/PM slot. Keeps the initial editor state aligned with
+ * what the captain already configured at trip-setup time.
+ */
+function resolveSessionDefaultTeeTime(session: RyderCupSession): string {
+  const firstTee = session.firstTeeTime?.trim();
+  if (firstTee) return firstTee.slice(0, 5);
+  return session.timeSlot === 'PM' ? '13:00' : '08:00';
+}
+
 const MAX_GROUP_SIZE = 4;
 const DEFAULT_STAGGER_MINUTES = 10;
 
-function createEmptyGroup(groupNumber: number): PracticeGroupDraft {
+function createEmptyGroup(
+  groupNumber: number,
+  defaultTeeTime?: string
+): PracticeGroupDraft {
+  // Only Group 1 seeds from the session's first tee time; Groups 2+
+  // stay blank so applyAutoStagger can fill them relative to Group 1.
+  // Accepts either "HH:MM" or "HH:MM:SS" from the session config;
+  // the <input type="time"> only cares about HH:MM.
+  const seededTee =
+    groupNumber === 1 && defaultTeeTime
+      ? defaultTeeTime.slice(0, 5)
+      : '';
+
   return {
     localId: typeof crypto !== 'undefined' ? crypto.randomUUID() : `group-${groupNumber}`,
     groupNumber,
     playerIds: [],
-    teeTime: '',
+    teeTime: seededTee,
   };
 }
 
@@ -101,8 +125,10 @@ export function PracticeGroupsEditor({
   onSaveDraft,
   isPublishing = false,
 }: PracticeGroupsEditorProps) {
+  const defaultTeeTime = useMemo(() => resolveSessionDefaultTeeTime(session), [session]);
+
   const [groups, setGroups] = useState<PracticeGroupDraft[]>(() =>
-    initialGroups.length > 0 ? initialGroups : [createEmptyGroup(1)]
+    initialGroups.length > 0 ? initialGroups : [createEmptyGroup(1, defaultTeeTime)]
   );
 
   const playerById = useMemo(() => new Map(roster.map((p) => [p.id, p])), [roster]);
@@ -132,9 +158,9 @@ export function PracticeGroupsEditor({
   const removeGroup = useCallback((localId: string) => {
     setGroups((current) => {
       const next = current.filter((g) => g.localId !== localId);
-      return next.length > 0 ? renumber(next) : [createEmptyGroup(1)];
+      return next.length > 0 ? renumber(next) : [createEmptyGroup(1, defaultTeeTime)];
     });
-  }, []);
+  }, [defaultTeeTime]);
 
   const addPlayer = useCallback((localId: string, playerId: string) => {
     setGroups((current) =>

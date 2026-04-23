@@ -95,10 +95,14 @@ export default function CaptainSettingsPage() {
     tripName.trim() && normalizedStartDate && normalizedEndDate && teamAName.trim() && teamBName.trim()
   );
 
-  const handleSave = async () => {
+  // Core persist — runs both for an explicit Save click and for
+  // auto-save-on-blur. Pass silent=true to suppress the toast so
+  // tabbing between fields doesn't spam the UI with "saved"
+  // confirmations.
+  const persistSettings = async ({ silent }: { silent: boolean }) => {
     if (!currentTrip || isSaving) return;
     if (!tripName.trim()) {
-      showToast('error', 'Trip name is required');
+      if (!silent) showToast('error', 'Trip name is required');
       return;
     }
 
@@ -112,59 +116,63 @@ export default function CaptainSettingsPage() {
         location,
       });
 
-      // Persist team edits to Dexie AND cloud. The previous path only
-      // wrote Dexie, so a captain renaming a team or pasting a logo URL
-      // saw it locally while every other device stayed on the stale
-      // name — the app-wide roster poll re-pulled the old row from
-      // Supabase and wiped the edit on the captain's screen too.
+      // Persist team edits to Dexie AND cloud.
+      // The "Save" button represents "commit current state to cloud";
+      // it must not depend on whether the form value differs from the
+      // Dexie row, because Dexie and Supabase can be out of sync
+      // (local-first create, cloud-side delete, earlier sync failure,
+      // etc.). Queuing an identical upsert is safe — syncTeamToCloud
+      // upserts by id, so a no-op write just lands as the same row.
       const now = new Date().toISOString();
       const nextTeamAIcon = teamAIcon.trim() || undefined;
       const nextTeamBIcon = teamBIcon.trim() || undefined;
 
-      if (
-        teamA &&
-        (teamAName !== teamA.name || nextTeamAIcon !== teamA.icon)
-      ) {
+      if (teamA) {
         const updated = {
           ...teamA,
-          name: teamAName,
+          name: teamAName || teamA.name,
           icon: nextTeamAIcon,
           updatedAt: now,
         };
         await db.teams.update(teamA.id, {
-          name: teamAName,
+          name: updated.name,
           icon: nextTeamAIcon,
           updatedAt: now,
         });
         queueSyncOperation('team', teamA.id, 'update', currentTrip.id, updated);
       }
 
-      if (
-        teamB &&
-        (teamBName !== teamB.name || nextTeamBIcon !== teamB.icon)
-      ) {
+      if (teamB) {
         const updated = {
           ...teamB,
-          name: teamBName,
+          name: teamBName || teamB.name,
           icon: nextTeamBIcon,
           updatedAt: now,
         };
         await db.teams.update(teamB.id, {
-          name: teamBName,
+          name: updated.name,
           icon: nextTeamBIcon,
           updatedAt: now,
         });
         queueSyncOperation('team', teamB.id, 'update', currentTrip.id, updated);
       }
 
-      showToast('success', 'Trip settings saved');
+      if (!silent) showToast('success', 'Trip settings saved');
     } catch (error) {
       captainLogger.error('Failed to save settings:', error);
-      showToast('error', 'Failed to save settings. Please try again.');
+      if (!silent) showToast('error', 'Failed to save settings. Please try again.');
     } finally {
       setIsSaving(false);
     }
   };
+
+  const handleSave = () => persistSettings({ silent: false });
+
+  // Auto-save on blur. Fires when the captain tabs out of a field or
+  // clicks elsewhere — no "Save" round-trip needed to commit a logo
+  // URL paste or a team-name tweak. Toast is suppressed so tabbing
+  // through fields stays quiet.
+  const handleFieldBlur = () => persistSettings({ silent: true });
 
   if (!currentTrip) {
     return <CaptainNoTripState description="Start or select a trip to configure captain settings." />;
@@ -187,7 +195,12 @@ export default function CaptainSettingsPage() {
             variant="primary"
             size="sm"
             onClick={handleSave}
-            disabled={isSaving || !hasUnsavedChanges}
+            // Button stays clickable even when the form matches Dexie
+            // because Dexie and Supabase can diverge — the captain
+            // needs a way to re-commit state when the cloud is behind.
+            // syncTeamToCloud is an idempotent upsert, so a no-change
+            // click is safe.
+            disabled={isSaving}
             leftIcon={<Save size={16} />}
           >
             {isSaving ? 'Saving...' : hasUnsavedChanges ? 'Save Changes' : 'Saved'}
@@ -230,6 +243,7 @@ export default function CaptainSettingsPage() {
                     type="text"
                     value={tripName}
                     onChange={(event) => setTripName(event.target.value)}
+                    onBlur={handleFieldBlur}
                     className="input"
                     placeholder="Ryder Cup 2026"
                   />
@@ -240,6 +254,7 @@ export default function CaptainSettingsPage() {
                     type="text"
                     value={location}
                     onChange={(event) => setLocation(event.target.value)}
+                    onBlur={handleFieldBlur}
                     className="input"
                     placeholder="Pinehurst, NC"
                   />
@@ -251,6 +266,7 @@ export default function CaptainSettingsPage() {
                     type="date"
                     value={normalizedStartDate}
                     onChange={(event) => setStartDate(event.target.value)}
+                    onBlur={handleFieldBlur}
                     className="input"
                   />
                 </FormField>
@@ -259,6 +275,7 @@ export default function CaptainSettingsPage() {
                     type="date"
                     value={normalizedEndDate}
                     onChange={(event) => setEndDate(event.target.value)}
+                    onBlur={handleFieldBlur}
                     className="input"
                   />
                 </FormField>
@@ -278,6 +295,7 @@ export default function CaptainSettingsPage() {
                       type="text"
                       value={teamAName}
                       onChange={(event) => setTeamAName(event.target.value)}
+                      onBlur={handleFieldBlur}
                       className="input border-[var(--team-usa)] focus:border-[var(--team-usa)]"
                       placeholder="Team USA"
                     />
@@ -287,6 +305,7 @@ export default function CaptainSettingsPage() {
                       type="url"
                       value={teamAIcon}
                       onChange={(event) => setTeamAIcon(event.target.value)}
+                      onBlur={handleFieldBlur}
                       className="input"
                       placeholder="https://…/logo.png"
                     />
@@ -298,6 +317,7 @@ export default function CaptainSettingsPage() {
                       type="text"
                       value={teamBName}
                       onChange={(event) => setTeamBName(event.target.value)}
+                      onBlur={handleFieldBlur}
                       className="input border-[var(--team-europe)] focus:border-[var(--team-europe)]"
                       placeholder="Team Europe"
                     />
@@ -307,6 +327,7 @@ export default function CaptainSettingsPage() {
                       type="url"
                       value={teamBIcon}
                       onChange={(event) => setTeamBIcon(event.target.value)}
+                      onBlur={handleFieldBlur}
                       className="input"
                       placeholder="https://…/logo.png"
                     />

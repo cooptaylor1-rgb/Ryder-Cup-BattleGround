@@ -60,21 +60,40 @@ async function ensureQueueHydrated(): Promise<void> {
           merged.set(item.id, item);
         }
         for (const item of storedItems) {
-          const hydratedItem = item.idempotencyKey
-            ? item
+          // Reset stuck 'syncing' items to 'pending'. syncOne persists
+          // status='syncing' BEFORE the Supabase call; a tab close,
+          // crash, or radio drop between persist and success/failure
+          // leaves the row orphaned in that state forever, because
+          // processSyncQueue's filter only picks 'pending' or 'failed'.
+          // On hydrate we assume any syncing row was interrupted and
+          // retry it — the sync writers are idempotent (upsert by id)
+          // so double-applying is safe.
+          const resurrected: SyncQueueItem =
+            item.status === 'syncing' ? { ...item, status: 'pending' } : item;
+          const hydratedItem = resurrected.idempotencyKey
+            ? resurrected
             : {
-                ...item,
+                ...resurrected,
                 idempotencyKey: buildSyncOperationKey(
-                  item.entity,
-                  item.entityId,
-                  item.operation,
-                  item.tripId
+                  resurrected.entity,
+                  resurrected.entityId,
+                  resurrected.operation,
+                  resurrected.tripId
                 ),
               };
           merged.set(item.id, hydratedItem);
         }
         tripSyncRuntime.syncQueue.length = 0;
         tripSyncRuntime.syncQueue.push(...merged.values());
+
+        // Persist any status fixups we made during hydration so the
+        // next reload doesn't have to redo them.
+        for (const item of tripSyncRuntime.syncQueue) {
+          const original = storedItems.find((s) => s.id === item.id);
+          if (original && original.status !== item.status) {
+            await persistQueueItem(item);
+          }
+        }
       }
     } catch (error) {
       logger.warn('Failed to hydrate sync queue:', error);
