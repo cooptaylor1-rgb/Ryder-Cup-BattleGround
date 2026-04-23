@@ -76,6 +76,7 @@ interface ScheduleSessionLike {
   sessionNumber: number;
   sessionType: string;
   status: 'scheduled' | 'inProgress' | 'paused' | 'completed' | 'cancelled';
+  isPracticeSession?: boolean;
 }
 
 export function resolveCurrentUserPlayer(
