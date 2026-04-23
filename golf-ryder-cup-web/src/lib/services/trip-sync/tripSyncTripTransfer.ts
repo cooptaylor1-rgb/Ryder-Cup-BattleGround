@@ -2,7 +2,25 @@ import { storeTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import { mergeTripPlayers } from '@/lib/utils/tripPlayers';
 
 import { db } from '../../db';
-import type { Trip } from '../../types/models';
+import type { SideBet, Trip } from '../../types/models';
+
+/**
+ * syncSideBetToCloud folds richer fields (perHole, participantIds,
+ * results, sessionId, nassauResults, etc.) into the `notes` column
+ * as JSON because the table only has a single `amount` column. The
+ * pull path reverses that: parse the blob back, tolerating any
+ * malformed / empty string so a captain who typed free-text notes
+ * on an old bet doesn't break the roster pull.
+ */
+function parseBetNotes(raw: unknown): Record<string, unknown> {
+  if (typeof raw !== 'string' || raw.trim() === '') return {};
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : {};
+  } catch {
+    return {};
+  }
+}
 import { canSync, getTable, logger } from './tripSyncShared';
 import {
   syncHoleResultToCloud,
@@ -186,6 +204,17 @@ async function pullTripCore(lookup: {
               () => ({ data: [] as Array<Record<string, unknown>> })
             );
 
+    // Side bets scoped to this trip. Writes already sync up via
+    // queueSyncOperation at every UI mutation site; this is the
+    // missing pull half — without it, a bet created on one device
+    // reached Supabase but never appeared on other devices until
+    // those devices hit a page that read Supabase directly. Now
+    // every 15s roster poll brings them along.
+    const { data: sideBetsRaw } = await getTable('side_bets')
+      .select('*')
+      .eq('trip_id', trip.id);
+    const sideBets = (sideBetsRaw as Array<Record<string, unknown>> | null) ?? [];
+
     await db.transaction(
       'rw',
       [
@@ -197,6 +226,7 @@ async function pullTripCore(lookup: {
         db.matches,
         db.holeResults,
         db.practiceScores,
+        db.sideBets,
       ],
       async () => {
         const localTrip: Trip = {
@@ -336,6 +366,56 @@ async function pullTripCore(lookup: {
               typeof score.created_at === 'string' ? score.created_at : new Date().toISOString(),
             updatedAt:
               typeof score.updated_at === 'string' ? score.updated_at : new Date().toISOString(),
+          });
+        }
+
+        // Side bets: reverse the syncSideBetToCloud projection. The
+        // cloud schema has a single `amount` column and a JSON `notes`
+        // blob — syncSideBetToCloud folds the rich shape (perHole,
+        // participantIds, results, nassauResults, sessionId, etc.)
+        // into the notes blob; here we parse it back out so clients
+        // that pulled the bet see the same data model the creator
+        // wrote.
+        for (const bet of sideBets) {
+          const parsedNotes = parseBetNotes(bet.notes);
+          await db.sideBets.put({
+            id: String(bet.id),
+            tripId: String(bet.trip_id),
+            matchId: typeof bet.match_id === 'string' ? bet.match_id : undefined,
+            sessionId:
+              typeof parsedNotes.sessionId === 'string' ? parsedNotes.sessionId : undefined,
+            type: (bet.bet_type as SideBet['type']) || 'custom',
+            name: String(bet.name ?? ''),
+            description:
+              typeof parsedNotes.description === 'string' ? parsedNotes.description : '',
+            status: (parsedNotes.status as SideBet['status']) || 'active',
+            pot: typeof bet.amount === 'number' ? bet.amount : undefined,
+            perHole:
+              typeof parsedNotes.perHole === 'number' ? parsedNotes.perHole : undefined,
+            winnerId: typeof bet.winner_player_id === 'string' ? bet.winner_player_id : undefined,
+            hole: typeof bet.hole_number === 'number' ? bet.hole_number : undefined,
+            participantIds: Array.isArray(parsedNotes.participantIds)
+              ? (parsedNotes.participantIds as string[])
+              : [],
+            results: Array.isArray(parsedNotes.results)
+              ? (parsedNotes.results as SideBet['results'])
+              : undefined,
+            nassauTeamA: Array.isArray(parsedNotes.nassauTeamA)
+              ? (parsedNotes.nassauTeamA as string[])
+              : undefined,
+            nassauTeamB: Array.isArray(parsedNotes.nassauTeamB)
+              ? (parsedNotes.nassauTeamB as string[])
+              : undefined,
+            nassauResults:
+              parsedNotes.nassauResults && typeof parsedNotes.nassauResults === 'object'
+                ? (parsedNotes.nassauResults as SideBet['nassauResults'])
+                : undefined,
+            createdAt:
+              typeof bet.created_at === 'string' ? bet.created_at : new Date().toISOString(),
+            completedAt:
+              typeof parsedNotes.completedAt === 'string'
+                ? parsedNotes.completedAt
+                : undefined,
           });
         }
       }
