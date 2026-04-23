@@ -30,6 +30,7 @@ import {
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { db } from '@/lib/db';
 import { deleteMatchCascade, deleteSessionCascade } from '@/lib/services/cascadeDelete';
+import { queueSyncOperation } from '@/lib/services/tripSyncService';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { Match, Player, RyderCupSession } from '@/lib/types/models';
@@ -50,7 +51,7 @@ import {
 export function ManagePageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentTrip, players, teams, teamMembers, courses, teeSets, updatePlayer } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, teams: s.teams, teamMembers: s.teamMembers, courses: s.courses, teeSets: s.teeSets, updatePlayer: s.updatePlayer })));
+  const { currentTrip, players, teams, teamMembers, courses, teeSets, updatePlayer, updateSession } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, teams: s.teams, teamMembers: s.teamMembers, courses: s.courses, teeSets: s.teeSets, updatePlayer: s.updatePlayer, updateSession: s.updateSession })));
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
   const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
@@ -234,7 +235,12 @@ export function ManagePageClient() {
     setIsSubmitting(true);
 
     try {
-      await db.sessions.update(sessionId, { ...updates, updatedAt: new Date().toISOString() });
+      // Route through tripStore so Dexie, Zustand, and the Supabase
+      // sync queue all move together. Previously this wrote Dexie
+      // only — so a captain setting firstTeeTime saw the row update
+      // locally, but the next 15s roster poll pulled the stale
+      // Supabase session back and overwrote the new tee time.
+      await updateSession(sessionId, updates);
       showToast('success', 'Session updated');
     } catch (error) {
       captainLogger.error('Failed to update session:', error);
@@ -249,7 +255,18 @@ export function ManagePageClient() {
     setIsSubmitting(true);
 
     try {
-      await db.matches.update(matchId, { ...updates, updatedAt: new Date().toISOString() });
+      // Same pattern as session/player updates — write Dexie AND
+      // queue the Supabase sync so the next roster pull doesn't
+      // undo the local change.
+      const now = new Date().toISOString();
+      const nextUpdates = { ...updates, updatedAt: now };
+      await db.matches.update(matchId, nextUpdates);
+      if (currentTrip) {
+        const latest = await db.matches.get(matchId);
+        if (latest) {
+          queueSyncOperation('match', matchId, 'update', currentTrip.id, latest);
+        }
+      }
       showToast('success', 'Match updated');
       setEditingMatch(null);
     } catch (error) {
