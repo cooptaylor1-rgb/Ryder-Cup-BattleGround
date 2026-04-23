@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Calendar, ChevronDown, ChevronUp, Flag, MapPin, Users } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { db } from '@/lib/db';
-import { useToastStore } from '@/lib/stores';
+import { useToastStore, useTripStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { Team, Trip } from '@/lib/types/models';
 import { queueSyncOperation } from '@/lib/services/tripSyncService';
@@ -24,6 +24,7 @@ interface TripDetailsSectionProps {
  */
 export function TripDetailsSection({ trip }: TripDetailsSectionProps) {
     const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
+    const { updateTrip } = useTripStore(useShallow(s => ({ updateTrip: s.updateTrip })));
 
     const [open, setOpen] = useState(false);
     const [name, setName] = useState(trip.name);
@@ -84,12 +85,16 @@ export function TripDetailsSection({ trip }: TripDetailsSectionProps) {
         try {
             const now = new Date().toISOString();
 
-            await db.trips.update(trip.id, {
+            // Route through tripStore.updateTrip so the change queues a
+            // Supabase sync and updates the in-memory currentTrip. The
+            // previous db.trips.update path only wrote Dexie, so the
+            // next roster poll pulled the stale trip row back and
+            // wiped the captain's edit.
+            await updateTrip(trip.id, {
                 name: name.trim(),
                 startDate: `${startDate}T00:00:00.000Z`,
                 endDate: `${endDate || startDate}T23:59:59.000Z`,
                 location: location.trim() || undefined,
-                updatedAt: now,
             });
 
             const teamA = teams.find((t) => t.color === 'usa');

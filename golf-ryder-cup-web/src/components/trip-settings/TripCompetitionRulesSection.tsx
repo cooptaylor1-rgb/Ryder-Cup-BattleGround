@@ -12,8 +12,7 @@ import {
     type ScoringSettings,
     type HandicapSettings,
 } from '@/components/trip-setup';
-import { db } from '@/lib/db';
-import { useToastStore } from '@/lib/stores';
+import { useToastStore, useTripStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { Trip } from '@/lib/types/models';
 
@@ -28,6 +27,7 @@ interface TripCompetitionRulesSectionProps {
  */
 export function TripCompetitionRulesSection({ trip }: TripCompetitionRulesSectionProps) {
     const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
+    const { updateTrip } = useTripStore(useShallow(s => ({ updateTrip: s.updateTrip })));
 
     const [scoringOpen, setScoringOpen] = useState(false);
     const [handicapOpen, setHandicapOpen] = useState(false);
@@ -42,10 +42,13 @@ export function TripCompetitionRulesSection({ trip }: TripCompetitionRulesSectio
     const handleSave = async () => {
         setIsSavingRules(true);
         try {
-            await db.trips.update(trip.id, {
+            // Route through tripStore.updateTrip so the rules change
+            // queues a Supabase sync. db.trips.update alone leaves
+            // Supabase holding the old rules, and the next roster
+            // poll pulls that row back and wipes the captain's edit.
+            await updateTrip(trip.id, {
                 scoringSettings: localScoring,
                 handicapSettings: localHandicap,
-                updatedAt: new Date().toISOString(),
             });
             showToast('success', 'Competition rules saved');
         } catch {
