@@ -320,6 +320,8 @@ function MagicNumberBanner({
     points: number;
     teamColor: string;
 }) {
+    const hasClinched = points <= 0;
+
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -333,8 +335,18 @@ function MagicNumberBanner({
             <div className="flex items-center justify-center gap-3">
                 <Target className="h-5 w-5" style={{ color: teamColor }} />
                 <span className="text-[var(--ink-primary)]">
-                    <strong style={{ color: teamColor }}>{team}</strong> needs{' '}
-                    <strong className="text-[var(--warning)]">{points}</strong> points to clinch
+                    {hasClinched ? (
+                        <>
+                            <strong style={{ color: teamColor }}>{team}</strong> has clinched
+                            the cup
+                        </>
+                    ) : (
+                        <>
+                            <strong style={{ color: teamColor }}>{team}</strong> needs{' '}
+                            <strong className="text-[var(--warning)]">{points}</strong> points
+                            to clinch
+                        </>
+                    )}
                 </span>
             </div>
         </motion.div>
@@ -342,18 +354,15 @@ function MagicNumberBanner({
 }
 
 const LiveMatchCard = React.memo(function LiveMatchCard({ match }: { match: SpectatorMatch }) {
-    const scoreNum =
-        match.currentScore === 'AS'
-            ? 0
-            : match.currentScore.includes('UP')
-              ? parseInt(match.currentScore, 10) || 0
-              : 0;
+    const leadingTeam = match.leadingTeam;
     const scoreColor =
-        scoreNum > 0
+        leadingTeam === 'teamA'
             ? colors.team.usa.light
-            : scoreNum < 0
+            : leadingTeam === 'teamB'
               ? colors.team.europe.light
               : colors.text.secondary;
+    const isTeamALeading = leadingTeam === 'teamA';
+    const isTeamBLeading = leadingTeam === 'teamB';
 
     return (
         <motion.div
@@ -361,9 +370,16 @@ const LiveMatchCard = React.memo(function LiveMatchCard({ match }: { match: Spec
             animate={{ opacity: 1 }}
             className="relative overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--surface-raised)] p-4"
         >
-            <div className="absolute right-3 top-3 flex items-center gap-1 rounded bg-[color:var(--success)]/15 px-2 py-0.5 text-xs font-medium text-[var(--success)]">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--success)]" />
-                LIVE
+            <div className="absolute right-3 top-3 flex items-center gap-1">
+                {match.isDormie ? (
+                    <span className="rounded bg-[color:var(--warning)]/15 px-2 py-0.5 text-xs font-medium text-[var(--warning)]">
+                        DORMIE
+                    </span>
+                ) : null}
+                <span className="flex items-center gap-1 rounded bg-[color:var(--success)]/15 px-2 py-0.5 text-xs font-medium text-[var(--success)]">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[var(--success)]" />
+                    LIVE
+                </span>
             </div>
 
             <div className="mb-3">
@@ -380,10 +396,10 @@ const LiveMatchCard = React.memo(function LiveMatchCard({ match }: { match: Spec
                         className="w-8 text-center font-mono"
                         style={{
                             color:
-                                scoreNum > 0 ? colors.team.usa.light : colors.text.secondary,
+                                isTeamALeading ? colors.team.usa.light : colors.text.secondary,
                         }}
                     >
-                        {scoreNum > 0 ? '●' : ''}
+                        {isTeamALeading ? '●' : ''}
                     </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -394,10 +410,10 @@ const LiveMatchCard = React.memo(function LiveMatchCard({ match }: { match: Spec
                         className="w-8 text-center font-mono"
                         style={{
                             color:
-                                scoreNum < 0 ? colors.team.europe.light : colors.text.secondary,
+                                isTeamBLeading ? colors.team.europe.light : colors.text.secondary,
                         }}
                     >
-                        {scoreNum < 0 ? '●' : ''}
+                        {isTeamBLeading ? '●' : ''}
                     </span>
                 </div>
             </div>
@@ -413,15 +429,10 @@ const LiveMatchCard = React.memo(function LiveMatchCard({ match }: { match: Spec
 
 const CompletedMatchCard = React.memo(function CompletedMatchCard({ match }: { match: SpectatorMatch }) {
     const result = match.result || '';
-    const isHalved = result.toLowerCase() === 'halved' || result === '';
-    const scoreNum =
-        match.currentScore === 'AS'
-            ? 0
-            : match.currentScore.includes('UP')
-              ? parseInt(match.currentScore, 10) || 0
-              : 0;
-    const isTeamAWin = match.status === 'completed' && scoreNum > 0;
-    const isTeamBWin = match.status === 'completed' && scoreNum < 0;
+    const leadingTeam = match.leadingTeam;
+    const isHalved = leadingTeam === 'halved' || result.toLowerCase() === 'halved' || result === '';
+    const isTeamAWin = match.status === 'completed' && leadingTeam === 'teamA';
+    const isTeamBWin = match.status === 'completed' && leadingTeam === 'teamB';
 
     return (
         <div className="rounded-xl border border-[var(--rule)] bg-[var(--surface-raised)] p-4 opacity-80">

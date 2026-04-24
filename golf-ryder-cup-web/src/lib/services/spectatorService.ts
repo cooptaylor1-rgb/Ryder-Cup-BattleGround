@@ -198,6 +198,10 @@ function buildSpectatorMatch(
         status,
         currentScore,
         thruHole,
+        holesRemaining: summary.holesRemaining,
+        leadingTeam: summary.winningTeam,
+        isDormie: summary.isDormie,
+        isClosedOut: summary.isClosedOut,
         result: status === 'completed' ? currentScore : undefined,
     };
 }
@@ -228,10 +232,12 @@ export function calculateProjectedScore(
     let projectedB = currentTeamBPoints;
 
     for (const match of liveMatches) {
-        // Assume current leader wins
-        if (match.currentScore.includes('A')) {
+        const leader = getSpectatorProjectedLeader(match);
+
+        // Assume current leader wins.
+        if (leader === 'teamA') {
             projectedA += 1;
-        } else if (match.currentScore.includes('B')) {
+        } else if (leader === 'teamB') {
             projectedB += 1;
         } else {
             // All square - split
@@ -241,6 +247,22 @@ export function calculateProjectedScore(
     }
 
     return { teamA: projectedA, teamB: projectedB };
+}
+
+function getSpectatorProjectedLeader(match: SpectatorMatch): 'teamA' | 'teamB' | 'halved' | null {
+    if (match.leadingTeam !== undefined) {
+        return match.leadingTeam;
+    }
+
+    if (match.currentScore.startsWith('A ')) {
+        return 'teamA';
+    }
+
+    if (match.currentScore.startsWith('B ')) {
+        return 'teamB';
+    }
+
+    return 'halved';
 }
 
 /**

@@ -463,6 +463,10 @@ export interface SpectatorMatch {
     status: MatchStatus;
     currentScore: string; // "2 UP", "AS", "3&2"
     thruHole: number;
+    holesRemaining?: number;
+    leadingTeam?: 'teamA' | 'teamB' | 'halved' | null;
+    isDormie?: boolean;
+    isClosedOut?: boolean;
     result?: string;
 }
 

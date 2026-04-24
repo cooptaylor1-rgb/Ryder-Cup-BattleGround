@@ -43,6 +43,49 @@ describe('Spectator Service', () => {
             expect(projected.teamA).toBe(10);
             expect(projected.teamB).toBe(8);
         });
+
+        it('uses structured leader metadata instead of parsing display text', () => {
+            const projected = calculateProjectedScore(10, 8, [
+                {
+                    id: 'm-live-b',
+                    sessionName: 'Singles',
+                    teamAPlayers: 'A. Player',
+                    teamBPlayers: 'B. Player',
+                    status: 'inProgress',
+                    currentScore: 'B 1 UP',
+                    thruHole: 7,
+                    leadingTeam: 'teamB',
+                },
+                {
+                    id: 'm-live-as',
+                    sessionName: 'Singles',
+                    teamAPlayers: 'C. Player',
+                    teamBPlayers: 'D. Player',
+                    status: 'inProgress',
+                    currentScore: 'AS',
+                    thruHole: 5,
+                    leadingTeam: 'halved',
+                },
+            ]);
+
+            expect(projected).toEqual({ teamA: 10.5, teamB: 9.5 });
+        });
+
+        it('keeps all-square legacy display text from projecting as a Team A win', () => {
+            const projected = calculateProjectedScore(10, 8, [
+                {
+                    id: 'm-live-as',
+                    sessionName: 'Singles',
+                    teamAPlayers: 'A. Player',
+                    teamBPlayers: 'B. Player',
+                    status: 'inProgress',
+                    currentScore: 'AS',
+                    thruHole: 5,
+                },
+            ]);
+
+            expect(projected).toEqual({ teamA: 10.5, teamB: 8.5 });
+        });
     });
 
 
@@ -232,6 +275,89 @@ describe('Spectator Service', () => {
             expect(view.liveMatches[0]).toMatchObject({
                 id: 'm1',
                 currentScore: 'B 1 UP',
+                leadingTeam: 'teamB',
+                holesRemaining: 15,
+                isDormie: false,
+            });
+        });
+
+        it('carries dormie metadata into live spectator matches', () => {
+            const trip = {
+                id: 'trip-dormie',
+                name: 'Trip',
+                startDate: '2026-06-01',
+                endDate: '2026-06-03',
+                createdAt: '2026-01-01T00:00:00.000Z',
+                updatedAt: '2026-01-01T00:00:00.000Z',
+            } as const;
+
+            const teams = [
+                { id: 't1', tripId: 'trip-dormie', name: 'USA', color: 'usa', createdAt: '', updatedAt: '' },
+                { id: 't2', tripId: 'trip-dormie', name: 'EUR', color: 'europe', createdAt: '', updatedAt: '' },
+            ] as const;
+
+            const sessions = [
+                {
+                    id: 's1',
+                    tripId: 'trip-dormie',
+                    name: 'Singles',
+                    sessionNumber: 1,
+                    sessionType: 'singles',
+                    isPracticeSession: false,
+                    status: 'inProgress',
+                    createdAt: '',
+                    updatedAt: '',
+                },
+            ] as const;
+
+            const matches = [
+                {
+                    id: 'm-dormie',
+                    sessionId: 's1',
+                    matchOrder: 1,
+                    status: 'inProgress',
+                    currentHole: 15,
+                    teamAPlayerIds: ['p1'],
+                    teamBPlayerIds: ['p2'],
+                    teamAHandicapAllowance: 0,
+                    teamBHandicapAllowance: 0,
+                    result: 'notFinished',
+                    margin: 3,
+                    holesRemaining: 3,
+                    createdAt: '2026-01-01T00:00:00.000Z',
+                    updatedAt: '2026-01-01T00:03:00.000Z',
+                },
+            ] as const;
+
+            const holeResults = Array.from({ length: 15 }, (_, index) => ({
+                id: `dormie-${index + 1}`,
+                matchId: 'm-dormie',
+                holeNumber: index + 1,
+                winner: (index < 3 ? 'teamA' : 'halved') as 'teamA' | 'halved',
+                timestamp: `2026-01-01T00:${String(index).padStart(2, '0')}:00.000Z`,
+            }));
+
+            const players = [
+                { id: 'p1', firstName: 'Ann', lastName: 'A', createdAt: '', updatedAt: '' },
+                { id: 'p2', firstName: 'Bob', lastName: 'B', createdAt: '', updatedAt: '' },
+            ] as const;
+
+            const view = buildSpectatorView(
+                trip as never,
+                teams as never,
+                sessions as never,
+                matches as never,
+                holeResults as never,
+                players as never
+            );
+
+            expect(view.liveMatches[0]).toMatchObject({
+                id: 'm-dormie',
+                currentScore: 'A 3 UP',
+                leadingTeam: 'teamA',
+                holesRemaining: 3,
+                isDormie: true,
+                isClosedOut: false,
             });
         });
 
@@ -370,6 +496,10 @@ describe('Spectator Service', () => {
             expect(view.currentStatus).toBe('completed');
             expect(view.liveMatches).toHaveLength(0);
             expect(view.recentResults.map((match) => match.id)).toEqual(['m-cup']);
+            expect(view.recentResults[0]).toMatchObject({
+                leadingTeam: 'teamB',
+                isClosedOut: true,
+            });
         });
 
         it('treats a score-complete match as completed before the stored status catches up', () => {
