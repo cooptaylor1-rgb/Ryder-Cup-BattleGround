@@ -24,7 +24,7 @@ const tripRow = {
 function createRequest(method: 'GET' | 'POST', body?: unknown, token = 'token') {
   const url =
     method === 'GET'
-      ? 'http://localhost:3000/api/trips/join?code=ABCD1234'
+      ? 'http://localhost:3000/api/trips/join?code=ABCD1234&invite=550e8400-e29b-41d4-a716-446655440011'
       : 'http://localhost:3000/api/trips/join';
 
   return new NextRequest(url, {
@@ -61,8 +61,10 @@ function createAdminClient(options?: {
   insertError?: { message: string } | null;
 }) {
   const insertedMemberships: Array<Record<string, unknown>> = [];
+  const invitationUpdates: Array<Record<string, unknown>> = [];
   const admin = {
     insertedMemberships,
+    invitationUpdates,
     from: vi.fn((table: string) => {
       if (table === 'trips') {
         return {
@@ -132,14 +134,16 @@ function createAdminClient(options?: {
       }
 
       if (table === 'trip_invitations') {
+        const updateFilter = {
+          eq: vi.fn(() => updateFilter),
+          in: vi.fn(() => updateFilter),
+          ilike: vi.fn(() => Promise.resolve({ data: null, error: null })),
+        };
         return {
-          update: vi.fn(() => ({
-            eq: vi.fn(() => ({
-              eq: vi.fn(() => ({
-                ilike: vi.fn().mockResolvedValue({ data: null, error: null }),
-              })),
-            })),
-          })),
+          update: vi.fn((row: Record<string, unknown>) => {
+            invitationUpdates.push(row);
+            return updateFilter;
+          }),
         };
       }
 

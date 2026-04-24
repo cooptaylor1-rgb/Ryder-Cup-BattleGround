@@ -179,6 +179,7 @@ describe('Trip Sync Service', () => {
         'banterPost',
         'duesLineItem',
         'paymentRecord',
+        'tripInvitation',
         'announcement',
         'attendanceRecord',
         'cartAssignment',

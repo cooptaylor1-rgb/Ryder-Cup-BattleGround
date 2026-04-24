@@ -16,7 +16,7 @@ import type {
   Trip,
 } from '../../types/models';
 import type { DuesLineItem, PaymentRecord } from '../../types/finances';
-import type { Announcement, AttendanceRecord, CartAssignment } from '../../types/logistics';
+import type { Announcement, AttendanceRecord, CartAssignment, TripInvitation } from '../../types/logistics';
 import type { SyncOperation, SyncQueueItem } from '../../types/sync';
 import { assertExhaustive } from '../../utils/exhaustive';
 import { isServerNewer } from './tripSyncLww';
@@ -38,6 +38,7 @@ import {
   teamMemberToCloud,
   teamToCloud,
   teeSetToCloud,
+  tripInvitationToCloud,
   tripToCloud,
 } from './tripSyncMappers';
 import { getTable } from './tripSyncShared';
@@ -157,6 +158,9 @@ export async function syncEntityToCloud(item: SyncQueueItem): Promise<void> {
       break;
     case 'paymentRecord':
       await syncPaymentRecordToCloud(item.entityId, item.operation, item.data);
+      break;
+    case 'tripInvitation':
+      await syncTripInvitationToCloud(item.entityId, item.operation, item.data);
       break;
     case 'announcement':
       await syncAnnouncementToCloud(item.entityId, item.operation, item.data);
@@ -664,6 +668,27 @@ export async function syncPaymentRecordToCloud(
 
   throwIfSupabaseError(
     await getTable('payment_records').upsert(paymentRecordToCloud(record), { onConflict: 'id' })
+  );
+}
+
+export async function syncTripInvitationToCloud(
+  invitationId: string,
+  operation: SyncOperation,
+  data?: TripInvitation
+): Promise<void> {
+  if (operation === 'delete') {
+    await deleteEntityByKey({ table: 'trip_invitations', column: 'id', value: invitationId });
+    return;
+  }
+
+  const invitation = await loadEntityForSync({
+    data,
+    entityName: 'TripInvitation',
+    fallback: () => db.tripInvitations.get(invitationId),
+  });
+
+  throwIfSupabaseError(
+    await getTable('trip_invitations').upsert(tripInvitationToCloud(invitation), { onConflict: 'id' })
   );
 }
 

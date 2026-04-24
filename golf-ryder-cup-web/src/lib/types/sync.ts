@@ -19,7 +19,7 @@ import type {
   Trip,
 } from './models';
 import type { DuesLineItem, PaymentRecord } from './finances';
-import type { Announcement, AttendanceRecord, CartAssignment } from './logistics';
+import type { Announcement, AttendanceRecord, CartAssignment, TripInvitation } from './logistics';
 
 export type SyncOperation = 'create' | 'update' | 'delete';
 
@@ -38,6 +38,7 @@ export type SyncEntity =
   | 'banterPost'
   | 'duesLineItem'
   | 'paymentRecord'
+  | 'tripInvitation'
   | 'announcement'
   | 'attendanceRecord'
   | 'cartAssignment';
@@ -65,6 +66,7 @@ export interface SyncEntityPayloadMap {
   banterPost: BanterPost;
   duesLineItem: DuesLineItem;
   paymentRecord: PaymentRecord;
+  tripInvitation: TripInvitation;
   announcement: Announcement;
   attendanceRecord: AttendanceRecord;
   cartAssignment: CartAssignment;

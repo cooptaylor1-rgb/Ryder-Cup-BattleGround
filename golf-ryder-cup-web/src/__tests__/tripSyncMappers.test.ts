@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { DuesLineItem, PaymentRecord } from '@/lib/types/finances';
-import type { Announcement, AttendanceRecord, CartAssignment } from '@/lib/types/logistics';
+import type { Announcement, AttendanceRecord, CartAssignment, TripInvitation } from '@/lib/types/logistics';
 import type {
   BanterPost,
   Course,
@@ -58,6 +58,8 @@ import {
   teamToCloud,
   teeSetFromCloud,
   teeSetToCloud,
+  tripInvitationFromCloud,
+  tripInvitationToCloud,
   tripFromCloud,
   tripToCloud,
 } from '@/lib/services/trip-sync/tripSyncMappers';
@@ -246,7 +248,26 @@ describe('canonical non-scoring sync mappers', () => {
     expect(paymentRecordFromCloud(paymentRecordToCloud(payment))).toEqual(payment);
   });
 
-  it('round-trips announcements, attendance records, and cart assignments', () => {
+  it('round-trips invitations, announcements, attendance records, and cart assignments', () => {
+    const invitation: TripInvitation = {
+      id: 'invite-1',
+      tripId: 'trip-1',
+      recipientName: 'Jordan',
+      recipientEmail: 'jordan@example.com',
+      recipientPhone: '555-555-1212',
+      inviteCode: 'ABCD1234',
+      inviteUrl: 'https://example.com/join?code=ABCD1234&invite=invite-1',
+      assignedTeam: 'A',
+      role: 'player',
+      status: 'opened',
+      createdByAuthUserId: 'auth-captain',
+      openedAt: '2026-04-23T13:05:00Z',
+      expiresAt: '2026-05-01T13:00:00Z',
+      createdAt: '2026-04-23T13:00:00Z',
+      updatedAt: '2026-04-23T13:05:00Z',
+    };
+    expect(tripInvitationFromCloud(tripInvitationToCloud(invitation))).toEqual(invitation);
+
     const announcement: Announcement = {
       id: 'announcement-1',
       tripId: 'trip-1',

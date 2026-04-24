@@ -173,6 +173,7 @@ describe('cascadeDelete', () => {
     await db.paymentRecords.put({ id: 'pr-1', tripId, fromPlayerId: 'p-1', amount: 50, method: 'cash', lineItemIds: ['dl-1'], createdAt: now });
 
     // Trip logistics
+    await db.tripInvitations.put({ id: 'invite-1', tripId, recipientName: 'Player', recipientEmail: 'player@example.com', inviteCode: 'ABCD1234', inviteUrl: '/join?code=ABCD1234&invite=invite-1', role: 'player', status: 'sent', createdAt: now, updatedAt: now } as never);
     await db.announcements.put({ id: 'ann-1', tripId, title: 'Tee times', message: 'Arrive early', priority: 'normal', category: 'schedule', status: 'sent', author: { name: 'Captain', role: 'captain' }, createdAt: now, updatedAt: now } as never);
     await db.attendanceRecords.put({ id: 'att-1', tripId, playerId: 'p-1', sessionId: 'sess-1', status: 'checked-in', createdAt: now, updatedAt: now });
     await db.cartAssignments.put({ id: 'cart-1', tripId, sessionId: 'sess-1', cartNumber: 'Cart 1', playerIds: ['p-1'], maxCapacity: 2, createdAt: now, updatedAt: now });
@@ -210,11 +211,12 @@ describe('cascadeDelete', () => {
     expect(await db.tripSyncQueue.where('tripId').equals(tripId).count()).toBe(0);
     expect(await db.duesLineItems.where('tripId').equals(tripId).count()).toBe(0);
     expect(await db.paymentRecords.where('tripId').equals(tripId).count()).toBe(0);
+    expect(await db.tripInvitations.where('tripId').equals(tripId).count()).toBe(0);
     expect(await db.announcements.where('tripId').equals(tripId).count()).toBe(0);
     expect(await db.attendanceRecords.where('tripId').equals(tripId).count()).toBe(0);
     expect(await db.cartAssignments.where('tripId').equals(tripId).count()).toBe(0);
 
-    expect(result.tablesCleared).toBe(31);
+    expect(result.tablesCleared).toBe(32);
     expect(result.recordsDeleted).toBeGreaterThan(0);
   });
 

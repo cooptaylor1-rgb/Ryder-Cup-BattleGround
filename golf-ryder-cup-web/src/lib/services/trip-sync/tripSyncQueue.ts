@@ -67,6 +67,7 @@ async function restoreOrphanedQueueEntities(): Promise<void> {
     banterPost: 'banterPosts',
     duesLineItem: 'duesLineItems',
     paymentRecord: 'paymentRecords',
+    tripInvitation: 'tripInvitations',
     announcement: 'announcements',
     attendanceRecord: 'attendanceRecords',
     cartAssignment: 'cartAssignments',
@@ -231,6 +232,7 @@ const ENTITY_DEPENDENCY_ORDER: Record<SyncEntity, number> = {
   // after dues because a payment can point at one or more line-item ids.
   duesLineItem: 4,
   paymentRecord: 5,
+  tripInvitation: 4,
   announcement: 4,
   attendanceRecord: 4,
   cartAssignment: 4,

@@ -26,9 +26,11 @@ interface JoinTripModalProps {
   onSuccess?: (tripId: string) => void;
   /** Pre-fill the share code input (e.g. from a deep link) */
   initialCode?: string;
+  /** Personal invite row id from a deep link, used for accepted-state tracking. */
+  initialInviteId?: string;
 }
 
-export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinTripModalProps) {
+export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode, initialInviteId }: JoinTripModalProps) {
   const [shareCode, setShareCode] = useState(initialCode || '');
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -97,7 +99,7 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode }: JoinT
     setError(null);
 
     try {
-      const result = await pullTripByShareCode(trimmedCode);
+      const result = await pullTripByShareCode(trimmedCode, initialInviteId);
 
       if (result.success && result.tripId) {
         storeTripShareCode(result.tripId, shareCode.trim());

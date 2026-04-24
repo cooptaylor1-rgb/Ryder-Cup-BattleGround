@@ -36,6 +36,16 @@ function normalizeJoinCode(raw: unknown): string | null {
   return /^[A-Z0-9]{4,16}$/.test(normalized) ? normalized : null;
 }
 
+function normalizeInvitationId(raw: unknown): string | null {
+  if (typeof raw !== 'string') return null;
+  const normalized = raw.trim();
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    normalized
+  )
+    ? normalized
+    : null;
+}
+
 function createAdminClient():
   | {
       client: AdminClient;
@@ -234,6 +244,21 @@ export async function GET(request: NextRequest) {
   const { trip, response: lookupResponse } = await findTripByCode(admin, code);
   if (!trip) return lookupResponse;
 
+  const invitationId = normalizeInvitationId(request.nextUrl.searchParams.get('invite'));
+  if (invitationId) {
+    await admin
+      .from('trip_invitations')
+      .update({
+        status: 'opened',
+        opened_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', invitationId)
+      .eq('trip_id', trip.id)
+      .eq('invite_code', trip.share_code ?? code)
+      .in('status', ['pending', 'sent']);
+  }
+
   return NextResponse.json({
     trip: toPreview(trip),
   });
@@ -260,6 +285,7 @@ export async function POST(request: NextRequest) {
   }
 
   const code = normalizeJoinCode((rawBody as { code?: unknown })?.code);
+  const invitationId = normalizeInvitationId((rawBody as { inviteId?: unknown })?.inviteId);
   if (!code) {
     return NextResponse.json(
       {
@@ -295,17 +321,31 @@ export async function POST(request: NextRequest) {
   });
   if (!membership) return membershipResponse;
 
-  await admin
-    .from('trip_invitations')
-    .update({
-      status: 'accepted',
-      accepted_by_auth_user_id: auth.userId,
-      accepted_player_id: membership.player_id ?? null,
-      accepted_at: new Date().toISOString(),
-    })
-    .eq('trip_id', trip.id)
-    .eq('status', 'sent')
-    .ilike('recipient_email', auth.userEmail ?? '__no_email__');
+  const acceptedAt = new Date().toISOString();
+  const acceptedPatch = {
+    status: 'accepted',
+    accepted_by_auth_user_id: auth.userId,
+    accepted_player_id: membership.player_id ?? null,
+    accepted_at: acceptedAt,
+    updated_at: acceptedAt,
+  };
+
+  if (invitationId) {
+    await admin
+      .from('trip_invitations')
+      .update(acceptedPatch)
+      .eq('id', invitationId)
+      .eq('trip_id', trip.id)
+      .eq('invite_code', trip.share_code ?? code)
+      .in('status', ['pending', 'sent', 'opened']);
+  } else {
+    await admin
+      .from('trip_invitations')
+      .update(acceptedPatch)
+      .eq('trip_id', trip.id)
+      .in('status', ['pending', 'sent', 'opened'])
+      .ilike('recipient_email', auth.userEmail ?? '__no_email__');
+  }
 
   return NextResponse.json({
     success: true,

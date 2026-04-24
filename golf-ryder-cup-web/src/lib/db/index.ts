@@ -47,7 +47,7 @@ import type {
 } from '@/lib/types/sideGames';
 import type { SyncQueueItem } from '@/lib/types/sync';
 import type { DuesLineItem, PaymentRecord } from '@/lib/types/finances';
-import type { Announcement, AttendanceRecord, CartAssignment } from '@/lib/types/logistics';
+import type { Announcement, AttendanceRecord, CartAssignment, TripInvitation } from '@/lib/types/logistics';
 import type { TripTemplate } from '@/lib/types/templates';
 
 /**
@@ -141,6 +141,7 @@ export class GolfTripDB extends Dexie {
   paymentRecords!: Table<PaymentRecord>;
 
   // Trip logistics (v16)
+  tripInvitations!: Table<TripInvitation>;
   announcements!: Table<Announcement>;
   attendanceRecords!: Table<AttendanceRecord>;
   cartAssignments!: Table<CartAssignment>;
@@ -332,6 +333,14 @@ export class GolfTripDB extends Dexie {
         'id, tripId, playerId, sessionId, status, [tripId+playerId], [tripId+sessionId], [tripId+status]',
       cartAssignments:
         'id, tripId, sessionId, matchId, cartNumber, [tripId+sessionId], [tripId+matchId], [tripId+cartNumber]',
+    });
+
+    // Schema version 17 - Persisted personal invitations
+    // The shared trip code still lives on trips, but personal invite
+    // rows track send, open, accept, and revoke state across devices.
+    this.version(17).stores({
+      tripInvitations:
+        'id, tripId, status, recipientEmail, inviteCode, createdAt, [tripId+status], [tripId+createdAt]',
     });
   }
 }

@@ -2,7 +2,9 @@
 
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLiveQuery } from 'dexie-react-hooks';
 import { InvitationManager, QRCodeCard } from '@/components/captain';
+import type { Invitation } from '@/components/captain/InvitationManager';
 import {
   CaptainModeRequiredState,
   CaptainNoTripState,
@@ -19,6 +21,12 @@ import {
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
 import { ensureTripShareCode, regenerateTripShareCode } from '@/lib/services/tripSyncService';
+import { db } from '@/lib/db';
+import {
+  createTripInvitation,
+  resendTripInvitation,
+  revokeTripInvitation,
+} from '@/lib/services/tripLogisticsService';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { getStoredTripShareCode } from '@/lib/utils/tripShareCodeStore';
@@ -42,6 +50,16 @@ export default function InvitesPage() {
   const { isRefreshing: isRefreshingRoster, refresh: refreshRosterFromCloud } = useTripRosterRefresh(
     currentTrip?.id ?? null,
   );
+  const invitations = useLiveQuery(
+    async () => {
+      if (!currentTrip) return [];
+      const rows = await db.tripInvitations.where('tripId').equals(currentTrip.id).toArray();
+      return rows.sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+    },
+    [currentTrip?.id],
+    []
+  );
+  const resolvedShareUrl = shareCode && origin ? `${origin}/join?code=${shareCode}` : '';
 
   const handleShare = useCallback(
     async (resolvedShareCode: string, tripName: string) => {
@@ -65,6 +83,72 @@ export default function InvitesPage() {
 
       await navigator.clipboard.writeText(`${payload.text}\n${payload.url}`);
       showToast('success', 'Invite copied to clipboard');
+    },
+    [showToast]
+  );
+
+  const handleSendInvite = useCallback(
+    (invite: Partial<Invitation>) => {
+      if (!currentTrip || !shareCode || !resolvedShareUrl) {
+        showToast('error', 'Publish the trip invite before creating a personal invite.');
+        return;
+      }
+
+      void createTripInvitation({
+        id: invite.id,
+        tripId: currentTrip.id,
+        recipientName: invite.recipientName,
+        recipientEmail: invite.recipientEmail,
+        recipientPhone: invite.recipientPhone,
+        assignedTeam: invite.assignedTeam,
+        inviteCode: shareCode,
+        inviteUrl: resolvedShareUrl,
+        status: 'sent',
+      })
+        .then(() => showToast('success', 'Personal invite saved'))
+        .catch((error) =>
+          showToast(
+            'error',
+            error instanceof Error ? error.message : 'Could not save personal invite.'
+          )
+        );
+    },
+    [currentTrip, resolvedShareUrl, shareCode, showToast]
+  );
+
+  const handleResendInvite = useCallback(
+    (inviteId: string) => {
+      void resendTripInvitation(inviteId)
+        .then(async (invite) => {
+          if (!invite) {
+            showToast('error', 'Invite not found.');
+            return;
+          }
+          await navigator.clipboard?.writeText(invite.inviteUrl).catch(() => undefined);
+          showToast('success', 'Invite marked sent and link copied');
+        })
+        .catch((error) =>
+          showToast(
+            'error',
+            error instanceof Error ? error.message : 'Could not resend invite.'
+          )
+        );
+    },
+    [showToast]
+  );
+
+  const handleRevokeInvite = useCallback(
+    (inviteId: string) => {
+      void revokeTripInvitation(inviteId)
+        .then((invite) => {
+          showToast(invite ? 'info' : 'error', invite ? 'Invite revoked' : 'Invite not found.');
+        })
+        .catch((error) =>
+          showToast(
+            'error',
+            error instanceof Error ? error.message : 'Could not revoke invite.'
+          )
+        );
     },
     [showToast]
   );
@@ -125,12 +209,11 @@ export default function InvitesPage() {
     return <CaptainModeRequiredState description="Turn on Captain Mode to access invitations." />;
   }
 
-  const shareUrl = shareCode && origin ? `${origin}/join?code=${shareCode}` : '';
   const tripInfo = {
     tripId: currentTrip.id,
     tripName: currentTrip.name,
     shareCode: shareCode ?? '--------',
-    shareUrl,
+    shareUrl: resolvedShareUrl,
     captainName: currentTrip.captainName || 'Captain',
     startDate: currentTrip.startDate,
     location: currentTrip.location,
@@ -231,12 +314,13 @@ export default function InvitesPage() {
 
         {shareCode ? (
           <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-            <QRCodeCard shareUrl={shareUrl} shareCode={shareCode} tripName={currentTrip.name} />
+            <QRCodeCard shareUrl={resolvedShareUrl} shareCode={shareCode} tripName={currentTrip.name} />
             <InvitationManager
               tripInfo={tripInfo}
-              invitations={[]}
-              onSendInvite={() => showToast('success', 'Invite drafted')}
-              onRevokeInvite={() => showToast('info', 'Invite revoked')}
+              invitations={invitations}
+              onSendInvite={handleSendInvite}
+              onResendInvite={handleResendInvite}
+              onRevokeInvite={handleRevokeInvite}
               onCopyLink={() => showToast('success', 'Invite copied')}
               onRegenerateCode={async () => {
                 if (!currentTrip) return;

@@ -23,7 +23,7 @@
  */
 
 import type { DuesLineItem, PaymentRecord } from '@/lib/types/finances';
-import type { Announcement, AttendanceRecord, CartAssignment } from '@/lib/types/logistics';
+import type { Announcement, AttendanceRecord, CartAssignment, TripInvitation } from '@/lib/types/logistics';
 import {
   coerceHandicapSettings,
   coerceScoringSettings,
@@ -603,6 +603,56 @@ export function banterPostFromCloud(row: Record<string, unknown>): BanterPost {
 // ---------------------------------------------------------------
 // Trip logistics
 // ---------------------------------------------------------------
+
+export function tripInvitationToCloud(invitation: TripInvitation): Record<string, unknown> {
+  return {
+    id: invitation.id,
+    trip_id: invitation.tripId,
+    recipient_name: invitation.recipientName ?? null,
+    recipient_email: invitation.recipientEmail ?? null,
+    recipient_phone: invitation.recipientPhone ?? null,
+    invite_code: invitation.inviteCode || null,
+    invite_url: invitation.inviteUrl || null,
+    assigned_team: invitation.assignedTeam ?? null,
+    role: invitation.role,
+    status: invitation.status,
+    created_by_auth_user_id: invitation.createdByAuthUserId ?? null,
+    accepted_by_auth_user_id: invitation.acceptedByAuthUserId ?? null,
+    accepted_player_id: invitation.acceptedPlayerId ?? null,
+    sent_at: invitation.sentAt ?? null,
+    opened_at: invitation.openedAt ?? null,
+    accepted_at: invitation.acceptedAt ?? null,
+    revoked_at: invitation.revokedAt ?? null,
+    expires_at: invitation.expiresAt ?? null,
+    created_at: invitation.createdAt,
+    updated_at: invitation.updatedAt,
+  };
+}
+
+export function tripInvitationFromCloud(row: Record<string, unknown>): TripInvitation {
+  return {
+    id: String(row.id),
+    tripId: String(row.trip_id),
+    recipientName: optionalString(row.recipient_name),
+    recipientEmail: optionalString(row.recipient_email),
+    recipientPhone: optionalString(row.recipient_phone),
+    inviteCode: String(row.invite_code ?? ''),
+    inviteUrl: String(row.invite_url ?? ''),
+    assignedTeam: row.assigned_team === 'A' || row.assigned_team === 'B' ? row.assigned_team : undefined,
+    role: (row.role as TripInvitation['role']) || 'player',
+    status: (row.status as TripInvitation['status']) || 'pending',
+    createdByAuthUserId: optionalString(row.created_by_auth_user_id),
+    acceptedByAuthUserId: optionalString(row.accepted_by_auth_user_id),
+    acceptedPlayerId: optionalString(row.accepted_player_id),
+    sentAt: optionalString(row.sent_at),
+    openedAt: optionalString(row.opened_at),
+    acceptedAt: optionalString(row.accepted_at),
+    revokedAt: optionalString(row.revoked_at),
+    expiresAt: optionalString(row.expires_at),
+    createdAt: String(row.created_at ?? nowIso()),
+    updatedAt: String(row.updated_at ?? nowIso()),
+  };
+}
 
 export function announcementToCloud(announcement: Announcement): Record<string, unknown> {
   return {

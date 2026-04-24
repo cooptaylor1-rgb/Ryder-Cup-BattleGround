@@ -5,9 +5,17 @@ import type {
   AttendanceRecord,
   AttendanceStatus,
   CartAssignment,
+  TripInvitation,
+  TripInvitationRole,
 } from '@/lib/types/logistics';
 
 const nowIso = () => new Date().toISOString();
+
+function withInviteId(url: string, invitationId: string): string {
+  const [base, hash = ''] = url.split('#');
+  const separator = base.includes('?') ? '&' : '?';
+  return `${base}${separator}invite=${encodeURIComponent(invitationId)}${hash ? `#${hash}` : ''}`;
+}
 
 type AnnouncementDraft = Pick<Announcement, 'tripId' | 'title' | 'message' | 'priority' | 'category'> &
   Partial<
@@ -23,6 +31,112 @@ type AnnouncementDraft = Pick<Announcement, 'tripId' | 'title' | 'message' | 'pr
       | 'sentAt'
     >
   >;
+
+type TripInvitationDraft = Pick<TripInvitation, 'tripId' | 'inviteCode' | 'inviteUrl'> &
+  Partial<
+    Pick<
+      TripInvitation,
+      | 'id'
+      | 'recipientName'
+      | 'recipientEmail'
+      | 'recipientPhone'
+      | 'assignedTeam'
+      | 'role'
+      | 'status'
+      | 'createdByAuthUserId'
+      | 'expiresAt'
+    >
+  >;
+
+export async function createTripInvitation(draft: TripInvitationDraft): Promise<TripInvitation> {
+  const timestamp = nowIso();
+  const id = draft.id ?? crypto.randomUUID();
+  const status = draft.status ?? 'sent';
+  const invitation: TripInvitation = {
+    id,
+    tripId: draft.tripId,
+    recipientName: draft.recipientName?.trim() || undefined,
+    recipientEmail: draft.recipientEmail?.trim() || undefined,
+    recipientPhone: draft.recipientPhone?.trim() || undefined,
+    inviteCode: draft.inviteCode,
+    inviteUrl: withInviteId(draft.inviteUrl, id),
+    assignedTeam: draft.assignedTeam,
+    role: draft.role ?? 'player',
+    status,
+    createdByAuthUserId: draft.createdByAuthUserId,
+    sentAt: status === 'sent' ? timestamp : undefined,
+    expiresAt: draft.expiresAt,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+
+  await db.tripInvitations.add(invitation);
+  queueSyncOperation('tripInvitation', invitation.id, 'create', invitation.tripId, invitation);
+  return invitation;
+}
+
+export async function resendTripInvitation(id: string): Promise<TripInvitation | null> {
+  const existing = await db.tripInvitations.get(id);
+  if (!existing) return null;
+
+  const timestamp = nowIso();
+  const updated: TripInvitation = {
+    ...existing,
+    status: 'sent',
+    sentAt: timestamp,
+    revokedAt: undefined,
+    updatedAt: timestamp,
+  };
+
+  await db.tripInvitations.put(updated);
+  queueSyncOperation('tripInvitation', updated.id, 'update', updated.tripId, updated);
+  return updated;
+}
+
+export async function revokeTripInvitation(id: string): Promise<TripInvitation | null> {
+  const existing = await db.tripInvitations.get(id);
+  if (!existing) return null;
+
+  const timestamp = nowIso();
+  const updated: TripInvitation = {
+    ...existing,
+    status: 'revoked',
+    revokedAt: timestamp,
+    updatedAt: timestamp,
+  };
+
+  await db.tripInvitations.put(updated);
+  queueSyncOperation('tripInvitation', updated.id, 'update', updated.tripId, updated);
+  return updated;
+}
+
+export async function setTripInvitationStatus(input: {
+  id: string;
+  status: TripInvitation['status'];
+  acceptedByAuthUserId?: string;
+  acceptedPlayerId?: string;
+  role?: TripInvitationRole;
+}): Promise<TripInvitation | null> {
+  const existing = await db.tripInvitations.get(input.id);
+  if (!existing) return null;
+
+  const timestamp = nowIso();
+  const updated: TripInvitation = {
+    ...existing,
+    status: input.status,
+    role: input.role ?? existing.role,
+    acceptedByAuthUserId: input.acceptedByAuthUserId ?? existing.acceptedByAuthUserId,
+    acceptedPlayerId: input.acceptedPlayerId ?? existing.acceptedPlayerId,
+    openedAt: input.status === 'opened' ? (existing.openedAt ?? timestamp) : existing.openedAt,
+    acceptedAt: input.status === 'accepted' ? (existing.acceptedAt ?? timestamp) : existing.acceptedAt,
+    revokedAt: input.status === 'revoked' ? (existing.revokedAt ?? timestamp) : existing.revokedAt,
+    updatedAt: timestamp,
+  };
+
+  await db.tripInvitations.put(updated);
+  queueSyncOperation('tripInvitation', updated.id, 'update', updated.tripId, updated);
+  return updated;
+}
 
 export async function createAnnouncement(draft: AnnouncementDraft): Promise<Announcement> {
   const timestamp = nowIso();

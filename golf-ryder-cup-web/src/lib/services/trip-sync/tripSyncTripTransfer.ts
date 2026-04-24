@@ -18,6 +18,7 @@ import {
   teamFromCloud,
   teamMemberFromCloud,
   teeSetFromCloud,
+  tripInvitationFromCloud,
   tripFromCloud,
 } from './tripSyncMappers';
 
@@ -47,6 +48,7 @@ async function reconcileLocalOrphans({
   cloudBanterPostIds,
   cloudDuesLineItemIds,
   cloudPaymentRecordIds,
+  cloudTripInvitationIds,
   cloudAnnouncementIds,
   cloudAttendanceRecordIds,
   cloudCartAssignmentIds,
@@ -63,6 +65,7 @@ async function reconcileLocalOrphans({
   cloudBanterPostIds: string[];
   cloudDuesLineItemIds: string[];
   cloudPaymentRecordIds: string[];
+  cloudTripInvitationIds: string[];
   cloudAnnouncementIds: string[];
   cloudAttendanceRecordIds: string[];
   cloudCartAssignmentIds: string[];
@@ -81,6 +84,7 @@ async function reconcileLocalOrphans({
     banterPost: getPendingSyncIdsForTrip(tripId, 'banterPost'),
     duesLineItem: getPendingSyncIdsForTrip(tripId, 'duesLineItem'),
     paymentRecord: getPendingSyncIdsForTrip(tripId, 'paymentRecord'),
+    tripInvitation: getPendingSyncIdsForTrip(tripId, 'tripInvitation'),
     announcement: getPendingSyncIdsForTrip(tripId, 'announcement'),
     attendanceRecord: getPendingSyncIdsForTrip(tripId, 'attendanceRecord'),
     cartAssignment: getPendingSyncIdsForTrip(tripId, 'cartAssignment'),
@@ -98,6 +102,7 @@ async function reconcileLocalOrphans({
     banterPost: new Set(cloudBanterPostIds),
     duesLineItem: new Set(cloudDuesLineItemIds),
     paymentRecord: new Set(cloudPaymentRecordIds),
+    tripInvitation: new Set(cloudTripInvitationIds),
     announcement: new Set(cloudAnnouncementIds),
     attendanceRecord: new Set(cloudAttendanceRecordIds),
     cartAssignment: new Set(cloudCartAssignmentIds),
@@ -214,6 +219,13 @@ async function reconcileLocalOrphans({
     await db.paymentRecords.delete(record.id);
   }
 
+  const localTripInvitations = await db.tripInvitations.where('tripId').equals(tripId).toArray();
+  for (const invitation of localTripInvitations) {
+    if (cloud.tripInvitation.has(invitation.id)) continue;
+    if (pendingByEntity.tripInvitation.has(invitation.id)) continue;
+    await db.tripInvitations.delete(invitation.id);
+  }
+
   const localAnnouncements = await db.announcements.where('tripId').equals(tripId).toArray();
   for (const announcement of localAnnouncements) {
     if (cloud.announcement.has(announcement.id)) continue;
@@ -265,6 +277,7 @@ import {
   syncTeamMemberToCloud,
   syncTeamToCloud,
   syncTeeSetToCloud,
+  syncTripInvitationToCloud,
   syncTripToCloud,
 } from './tripSyncEntityWriters';
 import type { TripSyncResult } from './tripSyncTypes';
@@ -338,6 +351,7 @@ export async function syncTripToCloudFull(tripId: string): Promise<TripSyncResul
       banterPosts,
       duesLineItems,
       paymentRecords,
+      tripInvitations,
       announcements,
       attendanceRecords,
       cartAssignments,
@@ -346,6 +360,7 @@ export async function syncTripToCloudFull(tripId: string): Promise<TripSyncResul
       db.banterPosts.where('tripId').equals(tripId).toArray(),
       db.duesLineItems.where('tripId').equals(tripId).toArray(),
       db.paymentRecords.where('tripId').equals(tripId).toArray(),
+      db.tripInvitations.where('tripId').equals(tripId).toArray(),
       db.announcements.where('tripId').equals(tripId).toArray(),
       db.attendanceRecords.where('tripId').equals(tripId).toArray(),
       db.cartAssignments.where('tripId').equals(tripId).toArray(),
@@ -405,6 +420,10 @@ export async function syncTripToCloudFull(tripId: string): Promise<TripSyncResul
       await syncPaymentRecordToCloud(record.id, 'update', record);
     }
 
+    for (const invitation of tripInvitations) {
+      await syncTripInvitationToCloud(invitation.id, 'update', invitation);
+    }
+
     for (const announcement of announcements) {
       await syncAnnouncementToCloud(announcement.id, 'update', announcement);
     }
@@ -438,7 +457,8 @@ async function getSupabaseAccessToken(): Promise<string | null> {
 }
 
 async function redeemShareCodeForTripId(
-  shareCode: string
+  shareCode: string,
+  invitationId?: string
 ): Promise<{ tripId: string; shareCode: string }> {
   if (typeof fetch !== 'function') {
     throw new Error('Trip join requires the app server');
@@ -451,7 +471,7 @@ async function redeemShareCodeForTripId(
       'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    body: JSON.stringify({ code: shareCode }),
+    body: JSON.stringify({ code: shareCode, inviteId: invitationId }),
   });
 
   const payload = (await response.json().catch(() => null)) as
@@ -468,13 +488,13 @@ async function redeemShareCodeForTripId(
   };
 }
 
-export async function pullTripByShareCode(shareCode: string): Promise<TripSyncResult> {
+export async function pullTripByShareCode(shareCode: string, invitationId?: string): Promise<TripSyncResult> {
   if (!canSync()) {
     return { success: false, tripId: '', error: 'Offline' };
   }
 
   try {
-    const redeemed = await redeemShareCodeForTripId(shareCode.trim().toUpperCase());
+    const redeemed = await redeemShareCodeForTripId(shareCode.trim().toUpperCase(), invitationId);
     storeTripShareCode(redeemed.tripId, redeemed.shareCode);
     return pullTripCore({ tripId: redeemed.tripId });
   } catch (error) {
@@ -696,6 +716,18 @@ async function pullTripCore(lookup: {
       );
     const paymentRecords = (paymentsRaw as Array<Record<string, unknown>> | null) ?? [];
 
+    const { data: invitationsRaw } = await getTable('trip_invitations')
+      .select('*')
+      .eq('trip_id', trip.id)
+      .then(
+        (response: { data: unknown; error: { code?: string } | null }) =>
+          response.error
+            ? { data: [] as Array<Record<string, unknown>> }
+            : (response as { data: Array<Record<string, unknown>> }),
+        () => ({ data: [] as Array<Record<string, unknown>> })
+      );
+    const tripInvitations = (invitationsRaw as Array<Record<string, unknown>> | null) ?? [];
+
     const { data: announcementsRaw } = await getTable('announcements')
       .select('*')
       .eq('trip_id', trip.id)
@@ -749,6 +781,7 @@ async function pullTripCore(lookup: {
         db.teeSets,
         db.duesLineItems,
         db.paymentRecords,
+        db.tripInvitations,
         db.announcements,
         db.attendanceRecords,
         db.cartAssignments,
@@ -815,6 +848,10 @@ async function pullTripCore(lookup: {
           await db.paymentRecords.put(paymentRecordFromCloud(record));
         }
 
+        for (const invitation of tripInvitations) {
+          await db.tripInvitations.put(tripInvitationFromCloud(invitation));
+        }
+
         for (const announcement of announcements) {
           await db.announcements.put(announcementFromCloud(announcement));
         }
@@ -850,6 +887,7 @@ async function pullTripCore(lookup: {
       cloudBanterPostIds: banterPosts.map((p) => String(p.id)),
       cloudDuesLineItemIds: duesLineItems.map((item) => String(item.id)),
       cloudPaymentRecordIds: paymentRecords.map((record) => String(record.id)),
+      cloudTripInvitationIds: tripInvitations.map((invitation) => String(invitation.id)),
       cloudAnnouncementIds: announcements.map((announcement) => String(announcement.id)),
       cloudAttendanceRecordIds: attendanceRecords.map((record) => String(record.id)),
       cloudCartAssignmentIds: cartAssignments.map((assignment) => String(assignment.id)),

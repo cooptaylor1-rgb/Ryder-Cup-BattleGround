@@ -156,6 +156,9 @@ applied in the target Supabase project.
 
 Synced logistics tables:
 
+- `trip_invitations`: personal invite sends with recipient contact, share
+  link, team preference, role, status, open/accepted/revoked timestamps, and
+  accepted user/player metadata.
 - `announcements`: captain messages with priority, category, status, author
   metadata, read counts, and sent timestamps.
 - `attendance_records`: per-player attendance status, ETA, notes, location,

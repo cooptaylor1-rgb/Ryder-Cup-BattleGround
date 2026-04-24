@@ -17,7 +17,6 @@ import {
   WhatsNew,
   YourMatchCard,
   CaptainToggle,
-  ContinueScoringBanner,
   PageLoadingSkeleton,
 } from '@/components/ui';
 import { JoinTripModal } from '@/components/ui/JoinTripModal';
@@ -34,6 +33,14 @@ function readPendingJoinCode(): string | undefined {
   }
 
   return sessionStorage.getItem('pendingJoinCode') ?? undefined;
+}
+
+function readPendingJoinInviteId(): string | undefined {
+  if (typeof window === 'undefined') {
+    return undefined;
+  }
+
+  return sessionStorage.getItem('pendingJoinInviteId') ?? undefined;
 }
 
 /**
@@ -62,6 +69,9 @@ export default function HomePage() {
   const { isCaptainMode } = useAccessStore(useShallow((s) => ({ isCaptainMode: s.isCaptainMode })));
   const { showToast } = useToastStore(useShallow((s) => ({ showToast: s.showToast })));
   const [pendingJoinCode, setPendingJoinCode] = useState<string | undefined>(readPendingJoinCode);
+  const [pendingJoinInviteId, setPendingJoinInviteId] = useState<string | undefined>(
+    readPendingJoinInviteId
+  );
   const [showJoinTrip, setShowJoinTrip] = useState(() => !!readPendingJoinCode());
   const [homeClock] = useState(() => Date.now());
 
@@ -70,7 +80,10 @@ export default function HomePage() {
     if (pendingJoinCode) {
       sessionStorage.removeItem('pendingJoinCode');
     }
-  }, [pendingJoinCode]);
+    if (pendingJoinInviteId) {
+      sessionStorage.removeItem('pendingJoinInviteId');
+    }
+  }, [pendingJoinCode, pendingJoinInviteId]);
 
   const {
     trips,
@@ -189,13 +202,16 @@ export default function HomePage() {
           onClose={() => {
             setShowJoinTrip(false);
             setPendingJoinCode(undefined);
+            setPendingJoinInviteId(undefined);
           }}
           onSuccess={() => {
             setShowJoinTrip(false);
             setPendingJoinCode(undefined);
+            setPendingJoinInviteId(undefined);
             router.push('/');
           }}
           initialCode={pendingJoinCode}
+          initialInviteId={pendingJoinInviteId}
         />
         <WhatsNew />
 

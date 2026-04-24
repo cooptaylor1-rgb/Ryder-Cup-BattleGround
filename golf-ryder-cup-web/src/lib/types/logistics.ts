@@ -7,6 +7,15 @@ import type { ISODateString, UUID } from './models';
 export type AnnouncementPriority = 'normal' | 'urgent';
 export type AnnouncementCategory = 'general' | 'schedule' | 'lineup' | 'weather' | 'results';
 export type AnnouncementStatus = 'draft' | 'sent' | 'archived';
+export type TripInvitationStatus =
+  | 'pending'
+  | 'sent'
+  | 'opened'
+  | 'accepted'
+  | 'declined'
+  | 'expired'
+  | 'revoked';
+export type TripInvitationRole = 'captain' | 'scorer' | 'player' | 'spectator';
 
 export interface Announcement {
   id: UUID;
@@ -28,6 +37,29 @@ export interface Announcement {
     role: 'captain';
   };
   metadata?: Record<string, unknown>;
+}
+
+export interface TripInvitation {
+  id: UUID;
+  tripId: UUID;
+  recipientName?: string;
+  recipientEmail?: string;
+  recipientPhone?: string;
+  inviteCode: string;
+  inviteUrl: string;
+  assignedTeam?: 'A' | 'B';
+  role: TripInvitationRole;
+  status: TripInvitationStatus;
+  createdByAuthUserId?: UUID;
+  acceptedByAuthUserId?: UUID;
+  acceptedPlayerId?: UUID;
+  sentAt?: ISODateString;
+  openedAt?: ISODateString;
+  acceptedAt?: ISODateString;
+  revokedAt?: ISODateString;
+  expiresAt?: ISODateString;
+  createdAt: ISODateString;
+  updatedAt: ISODateString;
 }
 
 export type AttendanceStatus = 'checked-in' | 'en-route' | 'not-arrived' | 'no-show';

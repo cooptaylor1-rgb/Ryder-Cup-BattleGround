@@ -16,8 +16,11 @@ interface TripPreview {
   captainName: string | null;
 }
 
-function buildJoinPath(code: string | null): string {
-  return code ? `/join?code=${encodeURIComponent(code)}` : '/join';
+function buildJoinPath(code: string | null, inviteId?: string | null): string {
+  if (!code) return '/join';
+  const params = new URLSearchParams({ code });
+  if (inviteId) params.set('invite', inviteId);
+  return `/join?${params.toString()}`;
 }
 
 function formatDateRange(start: string | null, end: string | null): string | null {
@@ -36,6 +39,7 @@ function JoinPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const code = searchParams.get('code');
+  const inviteId = searchParams.get('invite');
 
   const { isAuthenticated, currentUser, hasResolvedSupabaseSession } = useAuthStore();
   const [isHydrated, setIsHydrated] = useState(useAuthStore.persist.hasHydrated());
@@ -71,7 +75,10 @@ function JoinPageInner() {
     queueMicrotask(() => {
       if (!cancelled) setLookupState('loading');
     });
-    void fetch(`/api/trips/join?code=${encodeURIComponent(code)}`, {
+    const params = new URLSearchParams({ code });
+    if (inviteId) params.set('invite', inviteId);
+
+    void fetch(`/api/trips/join?${params.toString()}`, {
       cache: 'no-store',
     })
       .then(async (response) => {
@@ -96,7 +103,7 @@ function JoinPageInner() {
     return () => {
       cancelled = true;
     };
-  }, [code]);
+  }, [code, inviteId]);
 
   // Once the user is signed in and onboarded, hand the code off to the
   // JoinTripModal on home. Unauthenticated users wait on the preview
@@ -107,17 +114,21 @@ function JoinPageInner() {
     if (lookupState === 'loading') return;
     if (!isAuthenticated || !currentUser) return;
     if (!currentUser.hasCompletedOnboarding) {
-      router.replace(`/profile/complete?next=${encodeURIComponent(buildJoinPath(code))}`);
+      router.replace(`/profile/complete?next=${encodeURIComponent(buildJoinPath(code, inviteId))}`);
       return;
     }
     if (code) {
       sessionStorage.setItem('pendingJoinCode', code);
+    }
+    if (inviteId) {
+      sessionStorage.setItem('pendingJoinInviteId', inviteId);
     }
     router.replace('/');
   }, [
     code,
     currentUser,
     hasResolvedSupabaseSession,
+    inviteId,
     isAuthenticated,
     isHydrated,
     lookupState,
@@ -168,7 +179,7 @@ function JoinPageInner() {
 
   const dateRange = formatDateRange(trip.startDate, trip.endDate);
   const authed = isAuthenticated && currentUser && currentUser.hasCompletedOnboarding;
-  const joinPath = buildJoinPath(code);
+  const joinPath = buildJoinPath(code, inviteId);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--canvas)]">
@@ -204,6 +215,9 @@ function JoinPageInner() {
               className="w-full"
               onClick={() => {
                 sessionStorage.setItem('pendingJoinCode', code);
+                if (inviteId) {
+                  sessionStorage.setItem('pendingJoinInviteId', inviteId);
+                }
                 router.replace('/');
               }}
               rightIcon={<ChevronRight size={16} />}

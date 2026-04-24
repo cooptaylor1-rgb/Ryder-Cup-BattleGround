@@ -3,7 +3,10 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { db } from '@/lib/db';
 import {
   createAnnouncement,
+  createTripInvitation,
   replaceCartAssignmentsForScope,
+  resendTripInvitation,
+  revokeTripInvitation,
   upsertAttendanceRecord,
 } from '@/lib/services/tripLogisticsService';
 import { clearQueue, getPendingSyncIdsForTrip } from '@/lib/services/tripSyncService';
@@ -20,6 +23,35 @@ describe('tripLogisticsService', () => {
   afterEach(async () => {
     await clearQueue();
     await db.delete();
+  });
+
+  it('persists personal invitations and queues send/resend/revoke state', async () => {
+    const invitation = await createTripInvitation({
+      tripId: TRIP_ID,
+      recipientName: 'Jordan',
+      recipientEmail: 'jordan@example.com',
+      assignedTeam: 'A',
+      inviteCode: 'ABCD1234',
+      inviteUrl: 'https://example.com/join?code=ABCD1234',
+    });
+
+    expect(invitation.inviteUrl).toContain(`invite=${invitation.id}`);
+    expect(getPendingSyncIdsForTrip(TRIP_ID, 'tripInvitation').has(invitation.id)).toBe(true);
+
+    const resent = await resendTripInvitation(invitation.id);
+    expect(resent).toMatchObject({
+      id: invitation.id,
+      status: 'sent',
+      recipientEmail: 'jordan@example.com',
+    });
+
+    const revoked = await revokeTripInvitation(invitation.id);
+    expect(revoked).toMatchObject({
+      id: invitation.id,
+      status: 'revoked',
+    });
+    expect(revoked?.revokedAt).toBeDefined();
+    expect(await db.tripInvitations.where('tripId').equals(TRIP_ID).count()).toBe(1);
   });
 
   it('persists announcements and queues them for trip sync', async () => {

@@ -22,23 +22,13 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { QRCode } from '@/components/ui/QRCode';
 import { cn } from '@/lib/utils';
+import type {
+  TripInvitation,
+  TripInvitationStatus,
+} from '@/lib/types/logistics';
 
-export type InvitationStatus = 'pending' | 'sent' | 'opened' | 'accepted' | 'declined' | 'expired';
-
-export interface Invitation {
-  id: string;
-  recipientName?: string;
-  recipientEmail?: string;
-  recipientPhone?: string;
-  status: InvitationStatus;
-  createdAt: string;
-  sentAt?: string;
-  expiresAt?: string;
-  acceptedAt?: string;
-  inviteCode: string;
-  inviteUrl: string;
-  assignedTeam?: 'A' | 'B';
-}
+export type InvitationStatus = TripInvitationStatus;
+export type Invitation = TripInvitation;
 
 export interface TripInviteInfo {
   tripId: string;
@@ -110,6 +100,12 @@ const STATUS_META: Record<
     icon: Clock3,
     accent: 'var(--ink-tertiary)',
     surfaceClassName: 'bg-[color:var(--ink-tertiary)]/12 text-[var(--ink-tertiary)]',
+  },
+  revoked: {
+    label: 'Revoked',
+    icon: Trash2,
+    accent: 'var(--error)',
+    surfaceClassName: 'bg-[color:var(--error)]/10 text-[var(--error)]',
   },
 };
 
