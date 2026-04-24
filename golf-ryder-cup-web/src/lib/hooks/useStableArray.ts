@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useMemo } from 'react';
 
 /**
  * useStableArray — returns the same array reference when the element
@@ -31,14 +31,9 @@ import { useRef } from 'react';
  * constructed objects — the comparison will always report "changed".
  */
 export function useStableArray<T>(arr: T[]): T[] {
-    const ref = useRef(arr);
-
-    if (
-        ref.current.length !== arr.length ||
-        ref.current.some((item, i) => item !== arr[i])
-    ) {
-        ref.current = arr;
-    }
-
-    return ref.current;
+    // This hook deliberately treats each element as the dependency list.
+    // React will return the previous array reference while every element
+    // is strictly equal, without reading or mutating refs during render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return useMemo(() => arr, arr);
 }

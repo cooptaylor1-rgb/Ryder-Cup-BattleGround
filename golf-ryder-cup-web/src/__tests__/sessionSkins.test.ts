@@ -29,6 +29,8 @@ function match(order: number, ids: string[]): Match {
     result: 'notFinished',
     margin: 0,
     holesRemaining: 18,
+    createdAt: '2026-04-23T00:00:00Z',
+    updatedAt: '2026-04-23T00:00:00Z',
   };
 }
 

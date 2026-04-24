@@ -358,7 +358,7 @@ function resolveOpponents(
   return opponentIds
     .map((playerId) => players.find((player) => player.id === playerId))
     .filter(Boolean)
-    .map((player) => formatPlayerName(player!.firstName, player!.lastName, 'short'));
+    .map((player) => formatPlayerName(player!.firstName, player!.lastName, 'full'));
 }
 
 function formatSessionTiming(session: RyderCupSession): string {

@@ -416,8 +416,8 @@ describe('100-User × 100-Trip Stress Simulation', () => {
           matchId: match.id,
           holeNumber: hole,
           winner,
-          teamAScore: 3 + Math.floor(rng() * 4), // Realistic scores 3-6
-          teamBScore: 3 + Math.floor(rng() * 4),
+          teamAStrokes: 3 + Math.floor(rng() * 4), // Realistic scores 3-6
+          teamBStrokes: 3 + Math.floor(rng() * 4),
           timestamp: isoNow(hole * 100),
         };
         holeResults.push(holeResult);

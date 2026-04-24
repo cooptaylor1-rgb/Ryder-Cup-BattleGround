@@ -113,7 +113,7 @@ describe('computePracticeLeaderboard', () => {
     // handicapIndex 10, slope 113 → courseHandicap 10.
     // Alice gets 1 stroke on holes 1..10, 0 on 11..18.
     // Entered holes 1, 2, and 11. Net = gross - strokes =
-    //   (5 - 1) + (4 - 1) + (3 - 0) = 11
+    //   (5 - 1) + (4 - 1) + (3 - 0) = 10
     const scores: PracticeScore[] = [
       score(matchId, 'alice', 1, 5),
       score(matchId, 'alice', 2, 4),
@@ -122,7 +122,7 @@ describe('computePracticeLeaderboard', () => {
     const rows = computePracticeLeaderboard([alice], scores, teeSet());
     expect(rows[0]?.grossTotal).toBe(12);
     expect(rows[0]?.courseHandicap).toBe(10);
-    expect(rows[0]?.netTotal).toBe(11);
+    expect(rows[0]?.netTotal).toBe(10);
   });
 
   it('returns netTotal=null when no tee set is available', () => {

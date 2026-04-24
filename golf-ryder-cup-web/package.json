@@ -38,6 +38,7 @@
     "test:db": "vitest run src/__tests__/schemaVerification.test.ts",
     "qa:sim": "playwright test e2e/qa-simulation.spec.ts --workers=4 --reporter=list",
     "analyze": "ANALYZE=true next build",
+    "deploy:railway": "pnpm install --frozen-lockfile && pnpm run typecheck && pnpm run test && pnpm run build && node scripts/railway-health-smoke.mjs",
     "check:fast": "pnpm run lint && pnpm run typecheck && pnpm run test",
     "check": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test",
     "check:prepush": "pnpm -s typecheck && pnpm -s test && (test \"$SKIP_BUILD_CHECK\" = \"1\" && echo '⏭  Skipping local build (SKIP_BUILD_CHECK=1) — CI will verify.' || pnpm -s build)"

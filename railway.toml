@@ -1,10 +1,10 @@
 [build]
 builder = "nixpacks"
 watchPatterns = ["golf-ryder-cup-web/**"]
-buildCommand = "cd golf-ryder-cup-web && pnpm install --frozen-lockfile && pnpm run build"
+buildCommand = "cd golf-ryder-cup-web && pnpm run deploy:railway"
 
 [deploy]
-healthcheckPath = "/"
+healthcheckPath = "/api/health"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3

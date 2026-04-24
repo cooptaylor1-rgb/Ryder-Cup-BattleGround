@@ -178,11 +178,13 @@ async function reconcileLocalOrphans({
  * malformed / empty string so a captain who typed free-text notes
  * on an old bet doesn't break the roster pull.
  */
-function parseBetNotes(raw: unknown): Record<string, unknown> {
+export function parseBetNotes(raw: unknown): Record<string, unknown> {
   if (typeof raw !== 'string' || raw.trim() === '') return {};
   try {
     const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : {};
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+      ? (parsed as Record<string, unknown>)
+      : {};
   } catch {
     return {};
   }

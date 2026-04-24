@@ -132,7 +132,7 @@ export function buildScheduleByDay({
   const playerNameById = new Map(
     players.map((player) => [
       player.id,
-      `${player.firstName} ${player.lastName?.[0] || ''}`.trim() || 'Unknown',
+      `${player.firstName} ${player.lastName || ''}`.trim() || 'Unknown',
     ])
   );
   const courseById = new Map(courses.map((course) => [course.id, course]));
@@ -244,7 +244,7 @@ export function buildScheduleByDay({
         // Practice matches carry their own per-group tee time (captain
         // sets it directly in the groups editor). Fall through to the
         // staggered default only if the captain didn't set one.
-        let matchTime = new Date(day);
+        const matchTime = new Date(day);
         if (matchIsPractice && match.teeTime && /^\d{2}:\d{2}$/.test(match.teeTime)) {
           const [hh, mm] = match.teeTime.split(':').map(Number);
           matchTime.setHours(hh, mm, 0, 0);

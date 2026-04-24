@@ -86,7 +86,11 @@ function projectMatchToCloud(m: Match) {
   };
 }
 
-function parseCloudToMatch(row: ReturnType<typeof projectMatchToCloud>): Match {
+type CloudMatchRow = Omit<ReturnType<typeof projectMatchToCloud>, 'mode'> & {
+  mode?: Match['mode'] | string;
+};
+
+function parseCloudToMatch(row: CloudMatchRow): Match {
   return {
     id: row.id,
     sessionId: row.session_id,

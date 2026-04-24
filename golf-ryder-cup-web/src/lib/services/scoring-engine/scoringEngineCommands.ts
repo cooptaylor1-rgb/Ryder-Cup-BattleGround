@@ -22,6 +22,23 @@ import { isValidHoleNumber, isValidWinner, TOTAL_HOLES } from './scoringEngineSh
 /** Threshold for considering two scores on the same hole as a conflict (30 seconds) */
 const CONFLICT_WINDOW_MS = 30_000;
 
+type LegacyHoleResultStrokeFields = {
+  teamAScore?: number;
+  teamBScore?: number;
+  team1Score?: number;
+  team2Score?: number;
+};
+
+function getTeamAStrokes(result: HoleResult): number | undefined {
+  const legacy = result as HoleResult & LegacyHoleResultStrokeFields;
+  return result.teamAStrokes ?? legacy.teamAScore ?? legacy.team1Score;
+}
+
+function getTeamBStrokes(result: HoleResult): number | undefined {
+  const legacy = result as HoleResult & LegacyHoleResultStrokeFields;
+  return result.teamBStrokes ?? legacy.teamBScore ?? legacy.team2Score;
+}
+
 export interface ScoreConflict {
   type: 'conflict';
   matchId: string;
@@ -96,8 +113,8 @@ export async function recordHoleResult(
     if (
       existing &&
       existing.winner === winner &&
-      existing.teamAScore === teamAScore &&
-      existing.teamBScore === teamBScore
+      getTeamAStrokes(existing) === teamAScore &&
+      getTeamBStrokes(existing) === teamBScore
     ) {
       return existing;
     }
@@ -139,8 +156,8 @@ export async function recordHoleResult(
       matchId,
       holeNumber,
       winner,
-      teamAScore,
-      teamBScore,
+      teamAStrokes: teamAScore,
+      teamBStrokes: teamBScore,
       teamAPlayerScores: teamAPlayerScores ?? existing?.teamAPlayerScores,
       teamBPlayerScores: teamBPlayerScores ?? existing?.teamBPlayerScores,
       scoredBy: existing ? existing.scoredBy : scoredBy,
@@ -159,8 +176,8 @@ export async function recordHoleResult(
           holeNumber,
           previousWinner: existing.winner,
           newWinner: winner,
-          previousTeamAStrokes: existing.teamAScore,
-          previousTeamBStrokes: existing.teamBScore,
+          previousTeamAStrokes: getTeamAStrokes(existing),
+          previousTeamBStrokes: getTeamBStrokes(existing),
           newTeamAStrokes: teamAScore,
           newTeamBStrokes: teamBScore,
         }

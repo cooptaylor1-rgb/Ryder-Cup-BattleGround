@@ -1,24 +1,39 @@
-# 🚀 Golf Ryder Cup App - Production Deployment Guide
+# Golf Ryder Cup App - Railway + Supabase Deployment Guide
 
 ## Pre-Deployment Checklist
 
-### ✅ Completed
+No production deploy should run until staging Railway, staging Supabase,
+unit tests, typecheck, lint, build, `/api/health`, and smoke checks pass.
 
-- [x] Supabase credentials configured
-- [x] VAPID keys generated for push notifications
-- [x] RLS policies enabled in database schema
-- [x] API middleware with trip authorization
-- [x] Railway.toml configured
-- [x] All 677 tests passing
-- [x] Production build successful
+## Required Environments
 
-### 📋 Production Environment Variables
+Create two Railway services and two Supabase projects:
 
-Set these in your Railway/Vercel dashboard:
+- `staging`: connected to staging Supabase and a staging Redis REST database.
+- `production`: connected to production Supabase and production Redis REST.
+
+Apply Supabase migrations to staging first. Production migrations run only after
+a production database backup and a green staging deploy.
+
+## Railway Configuration
+
+`railway.toml` uses:
+
+- Build command: `cd golf-ryder-cup-web && pnpm run deploy:railway`
+- Start command: `cd golf-ryder-cup-web && pnpm start`
+- Health check path: `/api/health`
+
+`deploy:railway` runs install, typecheck, tests, production build, and a local
+`/api/health` smoke before Railway starts the deployed service.
+
+## Environment Variables
+
+Set these in each Railway environment. Use staging values in staging and
+production values only in production.
 
 ```bash
 # Required - Supabase
-NEXT_PUBLIC_SUPABASE_URL=https://mnijxtasggfxzokctuyx.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
 SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
 
@@ -26,59 +41,66 @@ SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
 NEXT_PUBLIC_APP_URL=https://your-production-domain.com
 
 # Push Notifications
-NEXT_PUBLIC_VAPID_PUBLIC_KEY=BPiTNVBf4wqzxTwRAzPLo7iBLyWMiO0COuZYXwKNSgAk6zZULc_o3n9jNo1SOATjqqkVm2GREPz_j_sTSEx6b50
-VAPID_PRIVATE_KEY=N7TDIGt0qri4vmPTUIgbE58hi3JWTsY6oltsWfzDOT4
-VAPID_SUBJECT=mailto:admin@golfrydercup.app
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=<your-vapid-public-key>
+VAPID_PRIVATE_KEY=<your-vapid-private-key>
+VAPID_SUBJECT=mailto:admin@example.com
 
-# Optional - Error Monitoring
+# Error Monitoring
 NEXT_PUBLIC_SENTRY_DSN=<your-sentry-dsn>
 SENTRY_AUTH_TOKEN=<your-sentry-auth-token>
 SENTRY_ORG=<your-sentry-org>
 SENTRY_PROJECT=golf-ryder-cup
+NEXT_PUBLIC_SENTRY_ENV=staging # or production
+# Optional: leave empty in Railway; code falls back to RAILWAY_GIT_COMMIT_SHA.
+NEXT_PUBLIC_SENTRY_RELEASE=
+
+# Strict health and distributed rate limiting
+HEALTHCHECK_STRICT=1
+RATE_LIMIT_BACKEND=redis-rest
+RATE_LIMIT_REDIS_REST_URL=<your-redis-rest-url>
+RATE_LIMIT_REDIS_REST_TOKEN=<your-redis-rest-token>
 ```
 
 ## Deployment Steps
 
-### 1. Railway Deployment
+### 1. Staging Supabase
 
 ```bash
-# Already configured via railway.toml
-git push origin main
-```
-
-Railway will automatically:
-
-- Install dependencies
-- Run production build
-- Start the app on port 3000
-- Run health checks
-
-### 2. Supabase Database Setup
-
-#### Option A: Supabase CLI (Recommended)
-
-```bash
-npm install -g supabase
-supabase login
-supabase link --project-ref mnijxtasggfxzokctuyx
+cd golf-ryder-cup-web
+supabase link --project-ref <staging-project-ref>
 supabase db push
 ```
 
-#### Option B: SQL Editor
+Confirm `deployment_migration_markers` contains the latest required marker:
+`20260424000000_add_deployment_health_markers`.
 
-1. Go to [Supabase Dashboard](https://supabase.com/dashboard)
-2. Open your project
-3. Navigate to SQL Editor
-4. Copy contents of `supabase/schema.sql`
-5. Run the SQL
+### 2. Staging Railway
 
-### 3. Post-Deployment Verification
+Push the branch connected to the staging Railway service. Verify:
 
-1. **Health Check**: Visit `https://your-domain.com/api/health`
-2. **Create a Trip**: Test trip creation flow
-3. **Test Sync**: Verify cloud sync works
-4. **Push Notifications**: Test notification delivery
-5. **Share Code**: Test joining via share code
+- Railway deploy passes.
+- `https://staging-domain/api/health` returns `status: "healthy"`.
+- Sentry shows a release matching the Railway commit SHA.
+- Redis rate limiting survives a Railway service restart.
+
+### 3. Production Supabase
+
+Before production:
+
+- Take a Supabase backup.
+- Confirm staging is healthy.
+- Apply migrations with the Supabase CLI.
+- Recheck migration drift before deploying Railway.
+
+### 4. Production Railway
+
+Deploy only after production Supabase migrations are applied. Verify:
+
+1. `https://your-domain.com/api/health` is healthy.
+2. Join flow works with a share code.
+3. Score entry updates the match and standings.
+4. Live/spectator views show the same result.
+5. Sentry release matches `RAILWAY_GIT_COMMIT_SHA`.
 
 ## Architecture Overview
 

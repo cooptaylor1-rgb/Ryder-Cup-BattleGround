@@ -9,7 +9,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildScheduleByDay } from '../components/schedule/scheduleData';
-import type { Course, Match, Player, TeeSet, Trip } from '../lib/types/models';
+import type { Course, Match, Player, SessionType, TeeSet, Trip } from '../lib/types/models';
 
 // Mirror of the internal ScheduleSessionLike shape in scheduleData.ts —
 // inlined here rather than exported from the source so the tests stay
@@ -19,11 +19,11 @@ interface ScheduleSessionLike {
   tripId: string;
   name: string;
   sessionNumber: number;
-  sessionType: string;
+  sessionType: SessionType;
   scheduledDate?: string;
   timeSlot?: 'AM' | 'PM';
   firstTeeTime?: string;
-  status: string;
+  status: 'scheduled' | 'inProgress' | 'paused' | 'completed' | 'cancelled';
   isPracticeSession?: boolean;
   defaultCourseId?: string;
   defaultTeeSetId?: string;
@@ -46,6 +46,11 @@ function player(id: string, first: string, last: string): Player {
   return { id, firstName: first, lastName: last };
 }
 
+const matchTimestamps = {
+  createdAt: '2026-04-23T00:00:00.000Z',
+  updatedAt: '2026-04-23T00:00:00.000Z',
+};
+
 describe('buildScheduleByDay — practice rendering', () => {
   it('renders practice matches as "Group N" with combined player subtitle', () => {
     const sessions: ScheduleSessionLike[] = [
@@ -54,7 +59,7 @@ describe('buildScheduleByDay — practice rendering', () => {
         tripId: 'trip-practice',
         name: 'Practice',
         sessionNumber: 1,
-        sessionType: 'fourBall',
+        sessionType: 'fourball',
         scheduledDate: '2026-04-30',
         timeSlot: 'AM',
         firstTeeTime: '08:00',
@@ -79,6 +84,7 @@ describe('buildScheduleByDay — practice rendering', () => {
         margin: 0,
         holesRemaining: 18,
         teeTime: '08:12',
+        ...matchTimestamps,
       },
       {
         id: 'm2',
@@ -95,6 +101,7 @@ describe('buildScheduleByDay — practice rendering', () => {
         margin: 0,
         holesRemaining: 18,
         teeTime: '08:24',
+        ...matchTimestamps,
       },
     ];
 
@@ -145,7 +152,7 @@ describe('buildScheduleByDay — practice rendering', () => {
         tripId: 'trip-practice',
         name: 'Practice',
         sessionNumber: 1,
-        sessionType: 'fourBall',
+        sessionType: 'fourball',
         scheduledDate: '2026-04-30',
         timeSlot: 'AM',
         firstTeeTime: '08:00',
@@ -169,6 +176,7 @@ describe('buildScheduleByDay — practice rendering', () => {
         margin: 0,
         holesRemaining: 18,
         // no teeTime
+        ...matchTimestamps,
       },
     ];
     const players = [player('p1', 'A', 'One'), player('p2', 'B', 'Two')];
@@ -194,7 +202,7 @@ describe('buildScheduleByDay — practice rendering', () => {
         tripId: 'trip-practice',
         name: 'Friday AM',
         sessionNumber: 2,
-        sessionType: 'fourBall',
+        sessionType: 'fourball',
         scheduledDate: '2026-04-30',
         timeSlot: 'AM',
         firstTeeTime: '08:00',
@@ -216,6 +224,7 @@ describe('buildScheduleByDay — practice rendering', () => {
         result: 'notFinished',
         margin: 0,
         holesRemaining: 18,
+        ...matchTimestamps,
       },
     ];
     const players = [

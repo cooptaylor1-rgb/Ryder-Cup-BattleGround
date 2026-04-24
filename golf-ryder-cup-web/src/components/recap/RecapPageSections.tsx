@@ -5,6 +5,7 @@ import {
   BarChart3,
   Medal,
   MessageSquare,
+  Star,
   Swords,
   Trophy,
   Users,
@@ -328,5 +329,4 @@ export function BanterSection({ recap }: { recap: TripRecapData }) {
     </div>
   );
 }
-
 

@@ -300,8 +300,8 @@ describe('1000-Trip Mega Stress Simulation', () => {
           matchId: match.id,
           holeNumber: hole,
           winner,
-          teamAScore: 3 + Math.floor(rng() * 4),
-          teamBScore: 3 + Math.floor(rng() * 4),
+          teamAStrokes: 3 + Math.floor(rng() * 4),
+          teamBStrokes: 3 + Math.floor(rng() * 4),
           timestamp: isoNow(hole * 10),
         });
         stats.holesScored++;
@@ -438,7 +438,7 @@ describe('1000-Trip Mega Stress Simulation', () => {
       const target = hrs[Math.floor(rng() * hrs.length)];
       const result = await recordHoleResult(
         matchId, target.holeNumber, target.winner,
-        target.teamAScore, target.teamBScore, 'dedup-tester',
+        target.teamAStrokes, target.teamBStrokes, 'dedup-tester',
       );
 
       // Should return existing result (dedup), not create a new one
@@ -570,7 +570,7 @@ describe('1000-Trip Mega Stress Simulation', () => {
 
       const edited = await recordHoleResult(
         matchId, target.holeNumber, newWinner,
-        target.teamAScore, target.teamBScore,
+        target.teamAStrokes, target.teamBStrokes,
         'captain-edit', 'score correction', true, // captain override
       );
 

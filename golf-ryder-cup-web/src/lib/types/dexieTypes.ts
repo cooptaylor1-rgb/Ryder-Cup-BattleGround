@@ -45,6 +45,8 @@ export type DexieMatch = Match & {
  */
 export type DexieHoleResult = HoleResult & {
     // Stroke scores might have different naming in legacy data
+    teamAScore?: number;
+    teamBScore?: number;
     team1Score?: number;
     team2Score?: number;
 };

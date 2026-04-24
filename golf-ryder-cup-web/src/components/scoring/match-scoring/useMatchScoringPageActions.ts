@@ -191,10 +191,8 @@ export function useMatchScoringPageActions(
       action: 'scoreUndone',
       holeNumber,
       winner: lastUndo?.previousResult?.winner,
-      teamAStrokeScore:
-        lastUndo?.previousResult?.teamAScore ?? lastUndo?.previousResult?.teamAStrokes,
-      teamBStrokeScore:
-        lastUndo?.previousResult?.teamBScore ?? lastUndo?.previousResult?.teamBStrokes,
+      teamAStrokeScore: lastUndo?.previousResult?.teamAStrokes,
+      teamBStrokeScore: lastUndo?.previousResult?.teamBStrokes,
     });
   }, [
     undoStack,

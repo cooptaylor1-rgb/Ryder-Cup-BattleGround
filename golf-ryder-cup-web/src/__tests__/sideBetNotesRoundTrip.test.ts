@@ -12,6 +12,7 @@
 
 import { describe, expect, it } from 'vitest';
 import type { SideBet } from '../lib/types/models';
+import { parseBetNotes } from '../lib/services/trip-sync/tripSyncTripTransfer';
 
 function packBetNotes(bet: SideBet): string {
   return JSON.stringify({
@@ -26,16 +27,6 @@ function packBetNotes(bet: SideBet): string {
     nassauResults: bet.nassauResults,
     completedAt: bet.completedAt,
   });
-}
-
-function parseBetNotes(raw: unknown): Record<string, unknown> {
-  if (typeof raw !== 'string' || raw.trim() === '') return {};
-  try {
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : {};
-  } catch {
-    return {};
-  }
 }
 
 function sampleBet(overrides: Partial<SideBet> = {}): SideBet {

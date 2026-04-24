@@ -74,8 +74,8 @@ export async function loadSelectedMatchData(
         matchId: event.matchId,
         holeNumber: payload.holeNumber,
         winner: payload.winner,
-        teamAScore: payload.teamAStrokes,
-        teamBScore: payload.teamBStrokes,
+        teamAStrokes: payload.teamAStrokes,
+        teamBStrokes: payload.teamBStrokes,
         timestamp: event.timestamp,
       });
       continue;
@@ -100,8 +100,8 @@ export async function loadSelectedMatchData(
           matchId: event.matchId,
           holeNumber: payload.holeNumber,
           winner: payload.previousWinner,
-          teamAScore: payload.previousTeamAStrokes,
-          teamBScore: payload.previousTeamBStrokes,
+          teamAStrokes: payload.previousTeamAStrokes,
+          teamBStrokes: payload.previousTeamBStrokes,
           timestamp: event.timestamp,
         },
       });
@@ -110,8 +110,8 @@ export async function loadSelectedMatchData(
         matchId: event.matchId,
         holeNumber: payload.holeNumber,
         winner: payload.newWinner,
-        teamAScore: payload.newTeamAStrokes,
-        teamBScore: payload.newTeamBStrokes,
+        teamAStrokes: payload.newTeamAStrokes,
+        teamBStrokes: payload.newTeamBStrokes,
         timestamp: event.timestamp,
       });
       continue;

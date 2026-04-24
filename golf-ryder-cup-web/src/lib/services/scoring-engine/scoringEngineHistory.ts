@@ -81,8 +81,8 @@ export async function undoLastScore(
       if (payload.type === 'hole_edited') {
         await db.holeResults.where({ matchId, holeNumber }).modify({
           winner: payload.previousWinner,
-          teamAScore: payload.previousTeamAStrokes,
-          teamBScore: payload.previousTeamBStrokes,
+          teamAStrokes: payload.previousTeamAStrokes,
+          teamBStrokes: payload.previousTeamBStrokes,
         });
       } else {
         await db.holeResults.where({ matchId, holeNumber }).delete();

@@ -26,6 +26,7 @@ import {
   clearFailedQueue,
 } from '../services/tripSyncService';
 import type { SyncQueueItem } from '../types/sync';
+import type { HoleResult, Match, Player } from '../types/models';
 
 const logger = createLogger('OfflineQueue');
 
@@ -198,12 +199,12 @@ export function useOfflineQueue(): UseOfflineQueueReturn {
           if (!action.matchId || !action.holeNumber) return;
           const data = action.data as { id?: string } | undefined;
           const entityId = data?.id || `${action.matchId}-hole-${action.holeNumber}`;
-          queueSyncOperation('holeResult', entityId, 'create', tripId, action.data);
+          queueSyncOperation('holeResult', entityId, 'create', tripId, action.data as HoleResult);
         } else if (action.type === 'score-update') {
           if (!action.matchId || !action.holeNumber) return;
           const data = action.data as { id?: string } | undefined;
           const entityId = data?.id || `${action.matchId}-hole-${action.holeNumber}`;
-          queueSyncOperation('holeResult', entityId, 'update', tripId, action.data);
+          queueSyncOperation('holeResult', entityId, 'update', tripId, action.data as HoleResult);
         } else if (action.type === 'score-delete') {
           if (!action.matchId || !action.holeNumber) return;
           const entityId = `${action.matchId}-hole-${action.holeNumber}`;
@@ -213,13 +214,13 @@ export function useOfflineQueue(): UseOfflineQueueReturn {
           queueSyncOperation('match', action.matchId, 'update', tripId);
         } else if (action.type === 'match-create') {
           if (!action.matchId) return;
-          queueSyncOperation('match', action.matchId, 'create', tripId, action.data);
+          queueSyncOperation('match', action.matchId, 'create', tripId, action.data as Match);
         } else if (action.type === 'player-join') {
           if (!action.playerId) return;
-          queueSyncOperation('player', action.playerId, 'create', tripId, action.data);
+          queueSyncOperation('player', action.playerId, 'create', tripId, action.data as Player);
         } else if (action.type === 'player-update') {
           if (!action.playerId) return;
-          queueSyncOperation('player', action.playerId, 'update', tripId, action.data);
+          queueSyncOperation('player', action.playerId, 'update', tripId, action.data as Player);
         } else {
           logger.warn('Offline action type not supported for sync:', action.type);
         }

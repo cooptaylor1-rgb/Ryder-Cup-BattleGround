@@ -17,8 +17,9 @@ Sentry.init({
   enabled: process.env.NODE_ENV === 'production',
 
   // Tag every event with the deploy release so errors map to commits.
-  // Set NEXT_PUBLIC_SENTRY_RELEASE in CI/Railway to the git SHA.
-  release: process.env.NEXT_PUBLIC_SENTRY_RELEASE,
+  // Railway exposes the commit SHA at build time; next.config.ts also
+  // injects it into NEXT_PUBLIC_SENTRY_RELEASE when not set explicitly.
+  release: process.env.NEXT_PUBLIC_SENTRY_RELEASE ?? process.env.RAILWAY_GIT_COMMIT_SHA,
 
   // Tag with deployment environment (production, staging, preview)
   environment: process.env.NEXT_PUBLIC_SENTRY_ENV ?? process.env.NODE_ENV,

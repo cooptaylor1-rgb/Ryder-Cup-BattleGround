@@ -157,6 +157,7 @@ export default function CaptainPageClient() {
   const { isCaptainMode, enableCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, enableCaptainMode: s.enableCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
   const [captainPin, setCaptainPin] = useState('');
+  const { teamA, teamB, teamAPlayers, teamBPlayers, unassignedPlayers } = useTeamsWithPlayers();
 
   // Matches with no course assigned are a silent blocker for
   // handicap scoring. We count them here so the dashboard can
@@ -281,8 +282,6 @@ export default function CaptainPageClient() {
       </div>
     );
   }
-
-  const { teamA, teamB, teamAPlayers, teamBPlayers, unassignedPlayers } = useTeamsWithPlayers();
 
   const activeSessions = sessions.filter((session) => session.status === 'inProgress');
   const upcomingSessions = sessions.filter((session) => session.status === 'scheduled');

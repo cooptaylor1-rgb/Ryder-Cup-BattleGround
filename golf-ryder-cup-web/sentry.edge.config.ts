@@ -14,7 +14,7 @@ Sentry.init({
     enabled: process.env.NODE_ENV === 'production',
 
     // Tag every event with the deploy release so errors map to commits.
-    release: process.env.NEXT_PUBLIC_SENTRY_RELEASE,
+    release: process.env.NEXT_PUBLIC_SENTRY_RELEASE ?? process.env.RAILWAY_GIT_COMMIT_SHA,
 
     // Tag with deployment environment (production, staging, preview)
     environment: process.env.NEXT_PUBLIC_SENTRY_ENV ?? process.env.NODE_ENV,

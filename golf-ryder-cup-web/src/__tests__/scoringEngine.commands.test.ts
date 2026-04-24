@@ -139,8 +139,8 @@ describe('scoringEngine command flows', () => {
 
     const reverted = await db.holeResults.where({ matchId: 'match-1', holeNumber: 1 }).first();
     expect(reverted?.winner).toBe('teamA');
-    expect(reverted?.teamAScore).toBe(4);
-    expect(reverted?.teamBScore).toBe(5);
+    expect(reverted?.teamAStrokes).toBe(4);
+    expect(reverted?.teamBStrokes).toBe(5);
 
     const eventsAfterUndo = (await db.scoringEvents.where('matchId').equals('match-1').toArray()).sort(
       (left, right) => (left.localId ?? 0) - (right.localId ?? 0)

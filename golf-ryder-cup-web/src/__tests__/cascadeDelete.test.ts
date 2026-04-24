@@ -342,7 +342,7 @@ describe('cascadeDelete', () => {
     // Other session's match and its data survive — over-reach check.
     expect(await db.matches.get('m-other')).toBeDefined();
     expect(await db.holeResults.get('hr-other')).toBeDefined();
-    expect(await db.scoringEvents.get('se-other')).toBeDefined();
+    expect(await db.scoringEvents.where('id').equals('se-other').first()).toBeDefined();
   });
 
   it('deleteMatchCascade with sync=true queues cloud deletes for match + children', async () => {

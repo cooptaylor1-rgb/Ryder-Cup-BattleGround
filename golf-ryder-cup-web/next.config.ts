@@ -2,9 +2,16 @@ import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs';
 import { resolve } from 'node:path';
 
+const sentryRelease =
+  process.env.NEXT_PUBLIC_SENTRY_RELEASE || process.env.RAILWAY_GIT_COMMIT_SHA || '';
+
 const nextConfig: NextConfig = {
   // Output standalone for optimized container deployments
   output: 'standalone',
+
+  env: {
+    NEXT_PUBLIC_SENTRY_RELEASE: sentryRelease,
+  },
 
   // Turbopack: explicitly set workspace root to avoid slow mis-detection
   turbopack: {

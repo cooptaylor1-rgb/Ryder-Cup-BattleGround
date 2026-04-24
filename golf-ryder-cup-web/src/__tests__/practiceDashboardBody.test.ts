@@ -22,7 +22,7 @@ function minimalSession(overrides: Partial<RyderCupSession> = {}): RyderCupSessi
     tripId: 't1',
     name: 'Thursday practice',
     sessionNumber: 1,
-    sessionType: 'fourBall',
+    sessionType: 'fourball',
     status: 'scheduled',
     createdAt: '2026-04-23T00:00:00Z',
     ...overrides,
@@ -43,6 +43,8 @@ function minimalMatch(overrides: Partial<Match> = {}): Match {
     result: 'notFinished',
     margin: 0,
     holesRemaining: 18,
+    createdAt: '2026-04-23T00:00:00Z',
+    updatedAt: '2026-04-23T00:00:00Z',
     ...overrides,
   };
 }
