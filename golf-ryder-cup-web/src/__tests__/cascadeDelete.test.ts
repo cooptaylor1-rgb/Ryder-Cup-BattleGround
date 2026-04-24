@@ -2,7 +2,7 @@
  * Cascade delete tests
  *
  * Phase 0 requirement: deleting a match must not leave orphaned scoring.
- * Phase 2 requirement: deleting a trip must leave zero orphaned rows across all 30 tables.
+ * Phase 2 requirement: deleting a trip must leave zero orphaned rows across all trip-scoped tables.
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -101,7 +101,7 @@ describe('cascadeDelete', () => {
     expect(await db.scoringEvents.where('matchId').equals(match.id).count()).toBe(0);
   });
 
-  it('deleteTripCascade removes data from all 30 tables for the trip', async () => {
+  it('deleteTripCascade removes data from all trip-scoped tables', async () => {
     const now = isoNow();
     const tripId = 'trip-cascade';
 
@@ -172,6 +172,11 @@ describe('cascadeDelete', () => {
     await db.duesLineItems.put({ id: 'dl-1', tripId, playerId: 'p-1', category: 'green_fee', amount: 50, status: 'unpaid', description: 'Greens fee' } as never);
     await db.paymentRecords.put({ id: 'pr-1', tripId, fromPlayerId: 'p-1', amount: 50, method: 'cash', lineItemIds: ['dl-1'], createdAt: now });
 
+    // Trip logistics
+    await db.announcements.put({ id: 'ann-1', tripId, title: 'Tee times', message: 'Arrive early', priority: 'normal', category: 'schedule', status: 'sent', author: { name: 'Captain', role: 'captain' }, createdAt: now, updatedAt: now } as never);
+    await db.attendanceRecords.put({ id: 'att-1', tripId, playerId: 'p-1', sessionId: 'sess-1', status: 'checked-in', createdAt: now, updatedAt: now });
+    await db.cartAssignments.put({ id: 'cart-1', tripId, sessionId: 'sess-1', cartNumber: 'Cart 1', playerIds: ['p-1'], maxCapacity: 2, createdAt: now, updatedAt: now });
+
     // Execute cascade delete
     const result = await deleteTripCascade(tripId, { sync: false });
 
@@ -205,8 +210,11 @@ describe('cascadeDelete', () => {
     expect(await db.tripSyncQueue.where('tripId').equals(tripId).count()).toBe(0);
     expect(await db.duesLineItems.where('tripId').equals(tripId).count()).toBe(0);
     expect(await db.paymentRecords.where('tripId').equals(tripId).count()).toBe(0);
+    expect(await db.announcements.where('tripId').equals(tripId).count()).toBe(0);
+    expect(await db.attendanceRecords.where('tripId').equals(tripId).count()).toBe(0);
+    expect(await db.cartAssignments.where('tripId').equals(tripId).count()).toBe(0);
 
-    expect(result.tablesCleared).toBe(28);
+    expect(result.tablesCleared).toBe(31);
     expect(result.recordsDeleted).toBeGreaterThan(0);
   });
 

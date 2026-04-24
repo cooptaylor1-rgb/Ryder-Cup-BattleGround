@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState, type ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import { useLiveQuery } from 'dexie-react-hooks';
 import {
   AnnouncementComposer,
   AnnouncementHistory,
@@ -14,6 +14,8 @@ import {
 } from '@/components/captain/CaptainAccessState';
 import { PageHeader } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
+import { db } from '@/lib/db';
+import { createAnnouncement } from '@/lib/services/tripLogisticsService';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
@@ -27,13 +29,22 @@ import {
 } from 'lucide-react';
 
 export default function MessagesPage() {
-  const router = useRouter();
   const { currentTrip, players, sessions } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, sessions: s.sessions })));
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [showComposer, setShowComposer] = useState(false);
+  const announcements = useLiveQuery(
+    async () => {
+      if (!currentTrip) return [];
+      const rows = await db.announcements.where('tripId').equals(currentTrip.id).toArray();
+      return rows
+        .filter((announcement) => announcement.status !== 'archived')
+        .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+    },
+    [currentTrip?.id],
+    []
+  );
 
   const liveOrUpcomingSession = useMemo(
     () => sessions.find((session) => session.status === 'inProgress') ?? sessions.find((session) => session.status === 'scheduled') ?? null,
@@ -42,26 +53,31 @@ export default function MessagesPage() {
   const urgentCount = announcements.filter((announcement) => announcement.priority === 'urgent').length;
   const latestAnnouncement = announcements[0] ?? null;
 
-  const handleSendAnnouncement = (
-    data: Omit<Announcement, 'id' | 'createdAt' | 'sentAt' | 'author'>
+  const handleSendAnnouncement = async (
+    data: Pick<Announcement, 'title' | 'message' | 'priority' | 'category'>
   ) => {
-    const timestamp = new Date().toISOString();
-    const nextAnnouncement: Announcement = {
-      ...data,
-      id: crypto.randomUUID(),
-      createdAt: timestamp,
-      sentAt: timestamp,
-      totalRecipients: players.length,
-      readCount: 0,
-      author: {
-        name: 'Captain',
-        role: 'captain',
-      },
-    };
+    if (!currentTrip) return;
 
-    setAnnouncements((current) => [nextAnnouncement, ...current]);
-    setShowComposer(false);
-    showToast('success', 'Announcement sent!');
+    try {
+      await createAnnouncement({
+        ...data,
+        tripId: currentTrip.id,
+        status: 'sent',
+        totalRecipients: players.length,
+        readCount: 0,
+        author: {
+          name: currentTrip.captainName || 'Captain',
+          role: 'captain',
+        },
+      });
+      setShowComposer(false);
+      showToast('success', 'Announcement sent!');
+    } catch (error) {
+      showToast(
+        'error',
+        error instanceof Error ? error.message : 'Could not send announcement.'
+      );
+    }
   };
 
   if (!currentTrip) {

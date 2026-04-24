@@ -2,15 +2,15 @@
  * Shared types, constants, and utilities for the AttendanceCheckIn component family.
  */
 
-import type { ReactNode } from 'react';
 import {
   AlertTriangle,
   Car,
   CheckCircle2,
   Circle,
 } from 'lucide-react';
+import type { AttendanceStatus } from '@/lib/types/logistics';
 
-export type AttendanceStatus = 'checked-in' | 'en-route' | 'not-arrived' | 'no-show';
+export type { AttendanceStatus };
 
 export interface AttendeePlayer {
   id: string;

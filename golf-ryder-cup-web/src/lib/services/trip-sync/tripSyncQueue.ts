@@ -67,6 +67,9 @@ async function restoreOrphanedQueueEntities(): Promise<void> {
     banterPost: 'banterPosts',
     duesLineItem: 'duesLineItems',
     paymentRecord: 'paymentRecords',
+    announcement: 'announcements',
+    attendanceRecord: 'attendanceRecords',
+    cartAssignment: 'cartAssignments',
   };
 
   for (const item of tripSyncRuntime.syncQueue) {
@@ -228,6 +231,9 @@ const ENTITY_DEPENDENCY_ORDER: Record<SyncEntity, number> = {
   // after dues because a payment can point at one or more line-item ids.
   duesLineItem: 4,
   paymentRecord: 5,
+  announcement: 4,
+  attendanceRecord: 4,
+  cartAssignment: 4,
 };
 
 export function compareByDependency(a: SyncQueueItem, b: SyncQueueItem): number {

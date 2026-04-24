@@ -16,11 +16,15 @@ import type {
   Trip,
 } from '../../types/models';
 import type { DuesLineItem, PaymentRecord } from '../../types/finances';
+import type { Announcement, AttendanceRecord, CartAssignment } from '../../types/logistics';
 import type { SyncOperation, SyncQueueItem } from '../../types/sync';
 import { assertExhaustive } from '../../utils/exhaustive';
 import { isServerNewer } from './tripSyncLww';
 import {
+  announcementToCloud,
+  attendanceRecordToCloud,
   banterPostToCloud,
+  cartAssignmentToCloud,
   courseToCloud,
   duesLineItemToCloud,
   holeResultToCloud,
@@ -153,6 +157,15 @@ export async function syncEntityToCloud(item: SyncQueueItem): Promise<void> {
       break;
     case 'paymentRecord':
       await syncPaymentRecordToCloud(item.entityId, item.operation, item.data);
+      break;
+    case 'announcement':
+      await syncAnnouncementToCloud(item.entityId, item.operation, item.data);
+      break;
+    case 'attendanceRecord':
+      await syncAttendanceRecordToCloud(item.entityId, item.operation, item.data);
+      break;
+    case 'cartAssignment':
+      await syncCartAssignmentToCloud(item.entityId, item.operation, item.data);
       break;
     default:
       assertExhaustive(item, 'Unhandled sync entity');
@@ -651,5 +664,68 @@ export async function syncPaymentRecordToCloud(
 
   throwIfSupabaseError(
     await getTable('payment_records').upsert(paymentRecordToCloud(record), { onConflict: 'id' })
+  );
+}
+
+export async function syncAnnouncementToCloud(
+  announcementId: string,
+  operation: SyncOperation,
+  data?: Announcement
+): Promise<void> {
+  if (operation === 'delete') {
+    await deleteEntityByKey({ table: 'announcements', column: 'id', value: announcementId });
+    return;
+  }
+
+  const announcement = await loadEntityForSync({
+    data,
+    entityName: 'Announcement',
+    fallback: () => db.announcements.get(announcementId),
+  });
+
+  throwIfSupabaseError(
+    await getTable('announcements').upsert(announcementToCloud(announcement), { onConflict: 'id' })
+  );
+}
+
+export async function syncAttendanceRecordToCloud(
+  attendanceRecordId: string,
+  operation: SyncOperation,
+  data?: AttendanceRecord
+): Promise<void> {
+  if (operation === 'delete') {
+    await deleteEntityByKey({ table: 'attendance_records', column: 'id', value: attendanceRecordId });
+    return;
+  }
+
+  const record = await loadEntityForSync({
+    data,
+    entityName: 'AttendanceRecord',
+    fallback: () => db.attendanceRecords.get(attendanceRecordId),
+  });
+
+  throwIfSupabaseError(
+    await getTable('attendance_records').upsert(attendanceRecordToCloud(record), { onConflict: 'id' })
+  );
+}
+
+export async function syncCartAssignmentToCloud(
+  cartAssignmentId: string,
+  operation: SyncOperation,
+  data?: CartAssignment
+): Promise<void> {
+  if (operation === 'delete') {
+    await deleteEntityByKey({ table: 'cart_assignments', column: 'id', value: cartAssignmentId });
+    return;
+  }
+
+  const assignment = await loadEntityForSync({
+    data,
+    entityName: 'CartAssignment',
+    fallback: () => db.cartAssignments.get(cartAssignmentId),
+  });
+
+  throwIfSupabaseError(
+    await getTable('cart_assignments').upsert(cartAssignmentToCloud(assignment), { onConflict: 'id' })
   );
 }

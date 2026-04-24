@@ -47,6 +47,7 @@ import type {
 } from '@/lib/types/sideGames';
 import type { SyncQueueItem } from '@/lib/types/sync';
 import type { DuesLineItem, PaymentRecord } from '@/lib/types/finances';
+import type { Announcement, AttendanceRecord, CartAssignment } from '@/lib/types/logistics';
 import type { TripTemplate } from '@/lib/types/templates';
 
 /**
@@ -138,6 +139,11 @@ export class GolfTripDB extends Dexie {
   // Finances (v10)
   duesLineItems!: Table<DuesLineItem>;
   paymentRecords!: Table<PaymentRecord>;
+
+  // Trip logistics (v16)
+  announcements!: Table<Announcement>;
+  attendanceRecords!: Table<AttendanceRecord>;
+  cartAssignments!: Table<CartAssignment>;
 
   // Trip Templates (v11)
   tripTemplates!: Table<TripTemplate>;
@@ -313,6 +319,19 @@ export class GolfTripDB extends Dexie {
     this.version(15).stores({
       photos: null,
       photoAlbums: null,
+    });
+
+    // Schema version 16 - Persisted trip logistics
+    // Captain messaging, attendance, and cart boards were originally
+    // page-local state. These stores make them offline-first and
+    // eligible for the trip sync queue.
+    this.version(16).stores({
+      announcements:
+        'id, tripId, status, createdAt, sentAt, [tripId+createdAt], [tripId+status]',
+      attendanceRecords:
+        'id, tripId, playerId, sessionId, status, [tripId+playerId], [tripId+sessionId], [tripId+status]',
+      cartAssignments:
+        'id, tripId, sessionId, matchId, cartNumber, [tripId+sessionId], [tripId+matchId], [tripId+cartNumber]',
     });
   }
 }

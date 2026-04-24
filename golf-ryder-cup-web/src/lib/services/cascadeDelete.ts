@@ -205,6 +205,10 @@ export async function deleteTripCascade(
       // Finances
       db.duesLineItems,
       db.paymentRecords,
+      // Trip logistics
+      db.announcements,
+      db.attendanceRecords,
+      db.cartAssignments,
       // Root
       db.trips,
     ],
@@ -270,13 +274,18 @@ export async function deleteTripCascade(
       recordsDeleted += await db.duesLineItems.where('tripId').equals(tripId).delete();
       recordsDeleted += await db.paymentRecords.where('tripId').equals(tripId).delete();
 
+      // --- Trip logistics ---
+      recordsDeleted += await db.announcements.where('tripId').equals(tripId).delete();
+      recordsDeleted += await db.attendanceRecords.where('tripId').equals(tripId).delete();
+      recordsDeleted += await db.cartAssignments.where('tripId').equals(tripId).delete();
+
       // --- Root ---
       await db.trips.delete(tripId);
       recordsDeleted += 1;
     }
   );
 
-  const tablesCleared = 28; // Number of tables touched
+  const tablesCleared = 31; // Number of tables touched
   logger.log('deleteTripCascade: complete', { tripId, tablesCleared, recordsDeleted });
 
   return { tablesCleared, recordsDeleted };

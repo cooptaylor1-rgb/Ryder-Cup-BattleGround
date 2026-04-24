@@ -10,6 +10,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { DuesLineItem, PaymentRecord } from '@/lib/types/finances';
+import type { Announcement, AttendanceRecord, CartAssignment } from '@/lib/types/logistics';
 import type {
   BanterPost,
   Course,
@@ -25,8 +26,14 @@ import type {
   Trip,
 } from '@/lib/types/models';
 import {
+  announcementFromCloud,
+  announcementToCloud,
+  attendanceRecordFromCloud,
+  attendanceRecordToCloud,
   banterPostFromCloud,
   banterPostToCloud,
+  cartAssignmentFromCloud,
+  cartAssignmentToCloud,
   courseFromCloud,
   courseToCloud,
   duesLineItemFromCloud,
@@ -237,6 +244,71 @@ describe('canonical non-scoring sync mappers', () => {
       createdAt: '2026-04-23T13:00:00Z',
     };
     expect(paymentRecordFromCloud(paymentRecordToCloud(payment))).toEqual(payment);
+  });
+
+  it('round-trips announcements, attendance records, and cart assignments', () => {
+    const announcement: Announcement = {
+      id: 'announcement-1',
+      tripId: 'trip-1',
+      title: 'Lineups Posted',
+      message: 'Open the app before breakfast.',
+      priority: 'urgent',
+      category: 'lineup',
+      status: 'sent',
+      author: { name: 'Coop', role: 'captain' },
+      readCount: 4,
+      totalRecipients: 12,
+      metadata: { source: 'captain-room' },
+      sentAt: '2026-04-23T13:00:00Z',
+      createdAt: '2026-04-23T12:55:00Z',
+      updatedAt: '2026-04-23T13:00:00Z',
+    };
+    const parsedAnnouncement = announcementFromCloud(announcementToCloud(announcement));
+    expect(parsedAnnouncement).toMatchObject({
+      id: announcement.id,
+      tripId: announcement.tripId,
+      title: announcement.title,
+      message: announcement.message,
+      priority: 'urgent',
+      category: 'lineup',
+      status: 'sent',
+      author: { name: 'Coop', role: 'captain' },
+      readCount: 4,
+      totalRecipients: 12,
+    });
+    expect(parsedAnnouncement.metadata?.source).toBe('captain-room');
+
+    const attendance: AttendanceRecord = {
+      id: 'attendance-1',
+      tripId: 'trip-1',
+      playerId: 'player-1',
+      sessionId: 'session-1',
+      matchId: 'match-1',
+      status: 'en-route',
+      eta: '10 min',
+      notes: 'Parking now',
+      lastLocation: 'Gate',
+      checkInTime: '2026-04-23T13:05:00Z',
+      updatedByPlayerId: 'captain-1',
+      createdAt: '2026-04-23T13:00:00Z',
+      updatedAt: '2026-04-23T13:06:00Z',
+    };
+    expect(attendanceRecordFromCloud(attendanceRecordToCloud(attendance))).toEqual(attendance);
+
+    const cart: CartAssignment = {
+      id: 'cart-1',
+      tripId: 'trip-1',
+      sessionId: 'session-1',
+      matchId: 'match-1',
+      cartNumber: 'Cart 7',
+      playerIds: ['player-1', 'player-2'],
+      maxCapacity: 2,
+      notes: 'Starter shack',
+      createdByAuthUserId: 'auth-1',
+      createdAt: '2026-04-23T13:00:00Z',
+      updatedAt: '2026-04-23T13:06:00Z',
+    };
+    expect(cartAssignmentFromCloud(cartAssignmentToCloud(cart))).toEqual(cart);
   });
 });
 

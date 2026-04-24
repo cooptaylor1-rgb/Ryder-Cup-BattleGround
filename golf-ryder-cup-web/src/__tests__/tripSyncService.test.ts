@@ -179,6 +179,9 @@ describe('Trip Sync Service', () => {
         'banterPost',
         'duesLineItem',
         'paymentRecord',
+        'announcement',
+        'attendanceRecord',
+        'cartAssignment',
       ];
 
       entities.forEach((entity) => {

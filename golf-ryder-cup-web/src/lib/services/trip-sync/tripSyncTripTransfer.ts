@@ -1,7 +1,10 @@
 import { storeTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import { mergeTripPlayers } from '@/lib/utils/tripPlayers';
 import {
+  announcementFromCloud,
+  attendanceRecordFromCloud,
   banterPostFromCloud,
+  cartAssignmentFromCloud,
   courseFromCloud,
   duesLineItemFromCloud,
   holeResultFromCloud,
@@ -44,6 +47,9 @@ async function reconcileLocalOrphans({
   cloudBanterPostIds,
   cloudDuesLineItemIds,
   cloudPaymentRecordIds,
+  cloudAnnouncementIds,
+  cloudAttendanceRecordIds,
+  cloudCartAssignmentIds,
 }: {
   tripId: string;
   cloudPlayerIds: string[];
@@ -57,6 +63,9 @@ async function reconcileLocalOrphans({
   cloudBanterPostIds: string[];
   cloudDuesLineItemIds: string[];
   cloudPaymentRecordIds: string[];
+  cloudAnnouncementIds: string[];
+  cloudAttendanceRecordIds: string[];
+  cloudCartAssignmentIds: string[];
 }): Promise<void> {
   // Snapshot the pending sync-queue ids once so we don't repeatedly
   // walk the queue inside the per-entity filters.
@@ -72,6 +81,9 @@ async function reconcileLocalOrphans({
     banterPost: getPendingSyncIdsForTrip(tripId, 'banterPost'),
     duesLineItem: getPendingSyncIdsForTrip(tripId, 'duesLineItem'),
     paymentRecord: getPendingSyncIdsForTrip(tripId, 'paymentRecord'),
+    announcement: getPendingSyncIdsForTrip(tripId, 'announcement'),
+    attendanceRecord: getPendingSyncIdsForTrip(tripId, 'attendanceRecord'),
+    cartAssignment: getPendingSyncIdsForTrip(tripId, 'cartAssignment'),
   };
 
   const cloud = {
@@ -86,6 +98,9 @@ async function reconcileLocalOrphans({
     banterPost: new Set(cloudBanterPostIds),
     duesLineItem: new Set(cloudDuesLineItemIds),
     paymentRecord: new Set(cloudPaymentRecordIds),
+    announcement: new Set(cloudAnnouncementIds),
+    attendanceRecord: new Set(cloudAttendanceRecordIds),
+    cartAssignment: new Set(cloudCartAssignmentIds),
   };
 
   // Players scoped to this trip.
@@ -198,6 +213,27 @@ async function reconcileLocalOrphans({
     if (pendingByEntity.paymentRecord.has(record.id)) continue;
     await db.paymentRecords.delete(record.id);
   }
+
+  const localAnnouncements = await db.announcements.where('tripId').equals(tripId).toArray();
+  for (const announcement of localAnnouncements) {
+    if (cloud.announcement.has(announcement.id)) continue;
+    if (pendingByEntity.announcement.has(announcement.id)) continue;
+    await db.announcements.delete(announcement.id);
+  }
+
+  const localAttendanceRecords = await db.attendanceRecords.where('tripId').equals(tripId).toArray();
+  for (const record of localAttendanceRecords) {
+    if (cloud.attendanceRecord.has(record.id)) continue;
+    if (pendingByEntity.attendanceRecord.has(record.id)) continue;
+    await db.attendanceRecords.delete(record.id);
+  }
+
+  const localCartAssignments = await db.cartAssignments.where('tripId').equals(tripId).toArray();
+  for (const assignment of localCartAssignments) {
+    if (cloud.cartAssignment.has(assignment.id)) continue;
+    if (pendingByEntity.cartAssignment.has(assignment.id)) continue;
+    await db.cartAssignments.delete(assignment.id);
+  }
 }
 
 /**
@@ -213,7 +249,10 @@ export function parseBetNotes(raw: unknown): Record<string, unknown> {
 }
 import { canSync, getTable, logger } from './tripSyncShared';
 import {
+  syncAnnouncementToCloud,
+  syncAttendanceRecordToCloud,
   syncBanterPostToCloud,
+  syncCartAssignmentToCloud,
   syncCourseToCloud,
   syncDuesLineItemToCloud,
   syncHoleResultToCloud,
@@ -294,11 +333,22 @@ export async function syncTripToCloudFull(tripId: string): Promise<TripSyncResul
       matchIds.length === 0
         ? []
         : await db.practiceScores.where('matchId').anyOf(matchIds).toArray();
-    const [sideBets, banterPosts, duesLineItems, paymentRecords] = await Promise.all([
+    const [
+      sideBets,
+      banterPosts,
+      duesLineItems,
+      paymentRecords,
+      announcements,
+      attendanceRecords,
+      cartAssignments,
+    ] = await Promise.all([
       db.sideBets.where('tripId').equals(tripId).toArray(),
       db.banterPosts.where('tripId').equals(tripId).toArray(),
       db.duesLineItems.where('tripId').equals(tripId).toArray(),
       db.paymentRecords.where('tripId').equals(tripId).toArray(),
+      db.announcements.where('tripId').equals(tripId).toArray(),
+      db.attendanceRecords.where('tripId').equals(tripId).toArray(),
+      db.cartAssignments.where('tripId').equals(tripId).toArray(),
     ]);
 
     await syncTripToCloud(tripId, 'update', trip);
@@ -353,6 +403,18 @@ export async function syncTripToCloudFull(tripId: string): Promise<TripSyncResul
 
     for (const record of paymentRecords) {
       await syncPaymentRecordToCloud(record.id, 'update', record);
+    }
+
+    for (const announcement of announcements) {
+      await syncAnnouncementToCloud(announcement.id, 'update', announcement);
+    }
+
+    for (const record of attendanceRecords) {
+      await syncAttendanceRecordToCloud(record.id, 'update', record);
+    }
+
+    for (const assignment of cartAssignments) {
+      await syncCartAssignmentToCloud(assignment.id, 'update', assignment);
     }
 
     logger.log(`Full sync completed for trip ${tripId}`);
@@ -634,6 +696,42 @@ async function pullTripCore(lookup: {
       );
     const paymentRecords = (paymentsRaw as Array<Record<string, unknown>> | null) ?? [];
 
+    const { data: announcementsRaw } = await getTable('announcements')
+      .select('*')
+      .eq('trip_id', trip.id)
+      .then(
+        (response: { data: unknown; error: { code?: string } | null }) =>
+          response.error
+            ? { data: [] as Array<Record<string, unknown>> }
+            : (response as { data: Array<Record<string, unknown>> }),
+        () => ({ data: [] as Array<Record<string, unknown>> })
+      );
+    const announcements = (announcementsRaw as Array<Record<string, unknown>> | null) ?? [];
+
+    const { data: attendanceRaw } = await getTable('attendance_records')
+      .select('*')
+      .eq('trip_id', trip.id)
+      .then(
+        (response: { data: unknown; error: { code?: string } | null }) =>
+          response.error
+            ? { data: [] as Array<Record<string, unknown>> }
+            : (response as { data: Array<Record<string, unknown>> }),
+        () => ({ data: [] as Array<Record<string, unknown>> })
+      );
+    const attendanceRecords = (attendanceRaw as Array<Record<string, unknown>> | null) ?? [];
+
+    const { data: cartAssignmentsRaw } = await getTable('cart_assignments')
+      .select('*')
+      .eq('trip_id', trip.id)
+      .then(
+        (response: { data: unknown; error: { code?: string } | null }) =>
+          response.error
+            ? { data: [] as Array<Record<string, unknown>> }
+            : (response as { data: Array<Record<string, unknown>> }),
+        () => ({ data: [] as Array<Record<string, unknown>> })
+      );
+    const cartAssignments = (cartAssignmentsRaw as Array<Record<string, unknown>> | null) ?? [];
+
     await db.transaction(
       'rw',
       [
@@ -651,6 +749,9 @@ async function pullTripCore(lookup: {
         db.teeSets,
         db.duesLineItems,
         db.paymentRecords,
+        db.announcements,
+        db.attendanceRecords,
+        db.cartAssignments,
       ],
       async () => {
         await db.trips.put(tripFromCloud(trip as Record<string, unknown>));
@@ -713,6 +814,18 @@ async function pullTripCore(lookup: {
         for (const record of paymentRecords) {
           await db.paymentRecords.put(paymentRecordFromCloud(record));
         }
+
+        for (const announcement of announcements) {
+          await db.announcements.put(announcementFromCloud(announcement));
+        }
+
+        for (const record of attendanceRecords) {
+          await db.attendanceRecords.put(attendanceRecordFromCloud(record));
+        }
+
+        for (const assignment of cartAssignments) {
+          await db.cartAssignments.put(cartAssignmentFromCloud(assignment));
+        }
       }
     );
 
@@ -737,6 +850,9 @@ async function pullTripCore(lookup: {
       cloudBanterPostIds: banterPosts.map((p) => String(p.id)),
       cloudDuesLineItemIds: duesLineItems.map((item) => String(item.id)),
       cloudPaymentRecordIds: paymentRecords.map((record) => String(record.id)),
+      cloudAnnouncementIds: announcements.map((announcement) => String(announcement.id)),
+      cloudAttendanceRecordIds: attendanceRecords.map((record) => String(record.id)),
+      cloudCartAssignmentIds: cartAssignments.map((assignment) => String(assignment.id)),
     });
 
     const resolvedShareCode =

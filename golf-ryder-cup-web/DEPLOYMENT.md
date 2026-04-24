@@ -134,18 +134,37 @@ Deploy only after production Supabase migrations are applied. Verify:
 
 ## Feature Status
 
-| Feature | Status | Notes |
-| --------- | -------- | ------- |
-| Trip Management | ✅ Production | Full CRUD with share codes |
-| Team Builder | ✅ Production | USA vs Europe + custom |
-| Live Scoring | ✅ Production | Match play scoring engine |
-| Cloud Sync | ✅ Production | Supabase real-time |
-| Offline Mode | ✅ Production | IndexedDB with sync queue |
-| Push Notifications | ✅ Production | VAPID keys configured |
-| Voice Scoring | ✅ Production | Web Speech API |
-| Side Games | ✅ Production | Skins, Nassau, KP |
-| Handicap Calculations | ✅ Production | Course handicap engine |
-| Native iOS/Android | ✅ Ready | Capacitor configured |
+| Feature               | Status        | Notes                      |
+| --------------------- | ------------- | -------------------------- |
+| Trip Management       | ✅ Production | Full CRUD with share codes |
+| Team Builder          | ✅ Production | USA vs Europe + custom     |
+| Live Scoring          | ✅ Production | Match play scoring engine  |
+| Cloud Sync            | ✅ Production | Supabase real-time         |
+| Offline Mode          | ✅ Production | IndexedDB with sync queue  |
+| Push Notifications    | ✅ Production | VAPID keys configured      |
+| Voice Scoring         | ✅ Production | Web Speech API             |
+| Side Games            | ✅ Production | Skins, Nassau, KP          |
+| Handicap Calculations | ✅ Production | Course handicap engine     |
+| Native iOS/Android    | ✅ Ready      | Capacitor configured       |
+
+## Trip-Critical Sync Contract
+
+The offline Dexie sync contract mirrors Supabase for every trip-critical table.
+Before deploying a build that writes captain logistics, confirm the
+`20260424010000_trip_memberships_and_trip_scoped_rls` migration has been
+applied in the target Supabase project.
+
+Synced logistics tables:
+
+- `announcements`: captain messages with priority, category, status, author
+  metadata, read counts, and sent timestamps.
+- `attendance_records`: per-player attendance status, ETA, notes, location,
+  session scope, and updater metadata.
+- `cart_assignments`: trip/session/match cart groupings with player IDs,
+  capacity, notes, and creator metadata.
+
+The client queues local changes while offline and only removes local rows during
+cloud pull when there is no pending local create or update for that entity.
 
 ## Troubleshooting
 
@@ -175,5 +194,6 @@ For issues, check:
 3. Supabase logs for database errors
 
 ---
-*Last updated: January 2026*
-*Version: 1.0.0*
+
+_Last updated: April 2026_
+_Version: 1.0.0_

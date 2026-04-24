@@ -6,6 +6,11 @@
 
 import { useCallback, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import type {
+  Announcement,
+  AnnouncementCategory,
+  AnnouncementPriority,
+} from '@/lib/types/logistics';
 import {
   Calendar,
   CheckCircle2,
@@ -20,24 +25,7 @@ import {
   Zap,
 } from 'lucide-react';
 
-export type AnnouncementPriority = 'normal' | 'urgent';
-export type AnnouncementCategory = 'general' | 'schedule' | 'lineup' | 'weather' | 'results';
-
-export interface Announcement {
-  id: string;
-  title: string;
-  message: string;
-  priority: AnnouncementPriority;
-  category: AnnouncementCategory;
-  createdAt: string;
-  sentAt?: string;
-  readCount?: number;
-  totalRecipients?: number;
-  author: {
-    name: string;
-    role: 'captain';
-  };
-}
+export type { Announcement, AnnouncementCategory, AnnouncementPriority };
 
 export interface AnnouncementTemplate {
   id: string;
@@ -49,7 +37,7 @@ export interface AnnouncementTemplate {
 }
 
 interface AnnouncementComposerProps {
-  onSend: (announcement: Omit<Announcement, 'id' | 'createdAt' | 'sentAt' | 'author'>) => void;
+  onSend: (announcement: Pick<Announcement, 'title' | 'message' | 'priority' | 'category'>) => void;
   onCancel?: () => void;
   recipientCount?: number;
   captainName?: string;

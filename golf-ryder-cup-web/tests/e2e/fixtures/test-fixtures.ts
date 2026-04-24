@@ -78,6 +78,9 @@ const TEST_DB_SCHEMA = [
   { name: 'duesLineItems', keyPath: 'id', indexes: [['tripId', 'tripId'], ['playerId', 'playerId'], ['category', 'category'], ['status', 'status'], ['tripId+playerId', ['tripId', 'playerId']], ['tripId+status', ['tripId', 'status']], ['tripId+category', ['tripId', 'category']]] },
   { name: 'paymentRecords', keyPath: 'id', indexes: [['tripId', 'tripId'], ['fromPlayerId', 'fromPlayerId'], ['createdAt', 'createdAt'], ['tripId+fromPlayerId', ['tripId', 'fromPlayerId']]] },
   { name: 'tripTemplates', keyPath: 'id', indexes: [['name', 'name'], ['isBuiltin', 'isBuiltin'], ['useCount', 'useCount'], ['createdAt', 'createdAt']] },
+  { name: 'announcements', keyPath: 'id', indexes: [['tripId', 'tripId'], ['status', 'status'], ['createdAt', 'createdAt'], ['sentAt', 'sentAt'], ['tripId+createdAt', ['tripId', 'createdAt']], ['tripId+status', ['tripId', 'status']]] },
+  { name: 'attendanceRecords', keyPath: 'id', indexes: [['tripId', 'tripId'], ['playerId', 'playerId'], ['sessionId', 'sessionId'], ['status', 'status'], ['tripId+playerId', ['tripId', 'playerId']], ['tripId+sessionId', ['tripId', 'sessionId']], ['tripId+status', ['tripId', 'status']]] },
+  { name: 'cartAssignments', keyPath: 'id', indexes: [['tripId', 'tripId'], ['sessionId', 'sessionId'], ['matchId', 'matchId'], ['cartNumber', 'cartNumber'], ['tripId+sessionId', ['tripId', 'sessionId']], ['tripId+matchId', ['tripId', 'matchId']], ['tripId+cartNumber', ['tripId', 'cartNumber']]] },
 ] as const;
 
 async function seedDatabase(

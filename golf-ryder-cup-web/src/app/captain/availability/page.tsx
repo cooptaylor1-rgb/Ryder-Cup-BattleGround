@@ -2,7 +2,6 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   AttendanceCheckIn,
@@ -17,6 +16,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { db } from '@/lib/db';
 import { removePlayerFromMatch } from '@/lib/services/matchLineupService';
+import { upsertAttendanceRecord } from '@/lib/services/tripLogisticsService';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
@@ -31,18 +31,11 @@ import {
   Users,
 } from 'lucide-react';
 
-type AttendanceRecord = {
-  status: AttendanceStatus;
-  eta?: string;
-};
-
 export default function AvailabilityPage() {
-  const router = useRouter();
   const { currentTrip, players, sessions, teams, teamMembers } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, sessions: s.sessions, teams: s.teams, teamMembers: s.teamMembers })));
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
-  const [attendanceMap, setAttendanceMap] = useState<Map<string, AttendanceRecord>>(new Map());
   const [selectedSession, setSelectedSession] = useState<string | null>(null);
   const sessionInitialized = React.useRef(false);
 
@@ -70,6 +63,21 @@ export default function AvailabilityPage() {
       return team?.color === 'europe' ? 'B' : 'A';
     },
     [teamMembers, teams]
+  );
+
+  const attendanceRecords = useLiveQuery(
+    async () => {
+      if (!currentTrip) return [];
+      const records = await db.attendanceRecords.where('tripId').equals(currentTrip.id).toArray();
+      return records.filter((record) => (record.sessionId ?? '') === (selectedSession ?? ''));
+    },
+    [currentTrip?.id, selectedSession],
+    []
+  );
+
+  const attendanceMap = useMemo(
+    () => new Map(attendanceRecords.map((record) => [record.playerId, record])),
+    [attendanceRecords]
   );
 
   const attendeePlayers = useMemo<AttendeePlayer[]>(
@@ -129,27 +137,36 @@ export default function AvailabilityPage() {
   };
 
   const handleUpdateStatus = useCallback(
-    (playerId: string, status: AttendanceStatus, eta?: string) => {
-      setAttendanceMap((previous) => {
-        const next = new Map(previous);
-        next.set(playerId, { status, eta });
-        return next;
-      });
-
+    async (playerId: string, status: AttendanceStatus, eta?: string) => {
       const player = players.find((candidate) => candidate.id === playerId);
-      if (!player) {
+      if (!player || !currentTrip) {
         return;
       }
 
-      const statusLabels: Record<AttendanceStatus, string> = {
-        'checked-in': 'checked in',
-        'en-route': 'marked en route',
-        'not-arrived': 'marked as not arrived',
-        'no-show': 'marked as no-show',
-      };
-      showToast('info', `${player.firstName} ${statusLabels[status]}`);
+      try {
+        await upsertAttendanceRecord({
+          tripId: currentTrip.id,
+          playerId,
+          sessionId: selectedSession ?? undefined,
+          status,
+          eta,
+        });
+
+        const statusLabels: Record<AttendanceStatus, string> = {
+          'checked-in': 'checked in',
+          'en-route': 'marked en route',
+          'not-arrived': 'marked as not arrived',
+          'no-show': 'marked as no-show',
+        };
+        showToast('info', `${player.firstName} ${statusLabels[status]}`);
+      } catch (error) {
+        showToast(
+          'error',
+          error instanceof Error ? error.message : 'Could not update attendance.'
+        );
+      }
     },
-    [players, showToast]
+    [currentTrip, players, selectedSession, showToast]
   );
 
   const handleCall = useCallback(

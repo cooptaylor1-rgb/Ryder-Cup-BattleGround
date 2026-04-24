@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { type ReactNode } from 'react';
+import { useCallback, useMemo, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLiveQuery } from 'dexie-react-hooks';
 import {
   CartAssignmentManager,
+  type Cart,
   type CartPlayer,
 } from '@/components/captain';
 import {
@@ -13,6 +15,8 @@ import {
 } from '@/components/captain/CaptainAccessState';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
+import { db } from '@/lib/db';
+import { replaceCartAssignmentsForScope } from '@/lib/services/tripLogisticsService';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
@@ -28,29 +32,87 @@ export default function CartsPage() {
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
-  if (!currentTrip) {
-    return <CaptainNoTripState description="Start or select a trip to manage cart assignments." />;
-  }
+  const persistedCartAssignments = useLiveQuery(
+    async () => {
+      if (!currentTrip) return [];
+      const rows = await db.cartAssignments.where('tripId').equals(currentTrip.id).toArray();
+      return rows.sort((left, right) => left.cartNumber.localeCompare(right.cartNumber));
+    },
+    [currentTrip?.id],
+    []
+  );
 
-  if (!isCaptainMode) {
-    return <CaptainModeRequiredState description="Turn on Captain Mode to access cart assignments." />;
-  }
+  const cartPlayers: CartPlayer[] = useMemo(
+    () =>
+      players.map((player) => {
+        const membership = teamMembers.find((teamMember) => teamMember.playerId === player.id);
+        const team = membership ? teams.find((candidate) => candidate.id === membership.teamId) : undefined;
+        const teamId: 'A' | 'B' =
+          team?.name?.toLowerCase().includes('europe') || team?.name?.toLowerCase().includes('eur') || team?.name === 'B'
+            ? 'B'
+            : 'A';
 
-  const cartPlayers: CartPlayer[] = players.map((player) => {
-    const membership = teamMembers.find((teamMember) => teamMember.playerId === player.id);
-    const team = membership ? teams.find((candidate) => candidate.id === membership.teamId) : undefined;
-    const teamId: 'A' | 'B' =
-      team?.name?.toLowerCase().includes('europe') || team?.name?.toLowerCase().includes('eur') || team?.name === 'B'
-        ? 'B'
-        : 'A';
+        return {
+          id: player.id,
+          firstName: player.firstName,
+          lastName: player.lastName,
+          teamId,
+        };
+      }),
+    [players, teamMembers, teams]
+  );
 
-    return {
-      id: player.id,
-      firstName: player.firstName,
-      lastName: player.lastName,
-      teamId,
-    };
-  });
+  const cartPlayerById = useMemo(
+    () => new Map(cartPlayers.map((player) => [player.id, player])),
+    [cartPlayers]
+  );
+  const initialCarts = useMemo<Cart[] | undefined>(() => {
+    if (persistedCartAssignments.length === 0) return undefined;
+    return persistedCartAssignments.map((assignment) => ({
+      id: assignment.id,
+      number: assignment.cartNumber,
+      players: assignment.playerIds
+        .map((playerId) => cartPlayerById.get(playerId))
+        .filter((player): player is CartPlayer => Boolean(player)),
+      maxCapacity: assignment.maxCapacity,
+      notes: assignment.notes,
+    }));
+  }, [cartPlayerById, persistedCartAssignments]);
+  const cartAssignmentsKey = useMemo(
+    () =>
+      persistedCartAssignments.length === 0
+        ? `empty-${cartPlayers.length}`
+        : persistedCartAssignments
+            .map((assignment) => `${assignment.id}:${assignment.updatedAt}`)
+            .join('|'),
+    [cartPlayers.length, persistedCartAssignments]
+  );
+
+  const handleAssignmentsChange = useCallback(
+    async (carts: Cart[]) => {
+      if (!currentTrip) return;
+
+      try {
+        await replaceCartAssignmentsForScope({
+          tripId: currentTrip.id,
+          carts: carts.map((cart) => ({
+            id: cart.id,
+            cartNumber: cart.number,
+            playerIds: cart.players.map((player) => player.id),
+            maxCapacity: cart.maxCapacity,
+            notes: cart.notes,
+          })),
+        });
+        showToast('success', 'Cart assignments updated');
+      } catch (error) {
+        showToast(
+          'error',
+          error instanceof Error ? error.message : 'Could not save cart assignments.'
+        );
+      }
+    },
+    [currentTrip, showToast]
+  );
 
   const teamA = teams.find((team) => team.name?.toLowerCase().includes('usa') || team.name === 'A');
   const teamB = teams.find(
@@ -58,6 +120,14 @@ export default function CartsPage() {
       team.name?.toLowerCase().includes('europe') || team.name?.toLowerCase().includes('eur') || team.name === 'B'
   );
   const suggestedCartCount = Math.ceil(cartPlayers.length / 2);
+
+  if (!currentTrip) {
+    return <CaptainNoTripState description="Start or select a trip to manage cart assignments." />;
+  }
+
+  if (!isCaptainMode) {
+    return <CaptainModeRequiredState description="Turn on Captain Mode to access cart assignments." />;
+  }
 
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
@@ -138,12 +208,12 @@ export default function CartsPage() {
               </div>
             ) : (
               <CartAssignmentManager
+                key={cartAssignmentsKey}
                 players={cartPlayers}
+                initialCarts={initialCarts}
                 teamAName={teamA?.name || 'USA'}
                 teamBName={teamB?.name || 'Europe'}
-                onAssignmentsChange={() => {
-                  showToast('success', 'Cart assignments updated');
-                }}
+                onAssignmentsChange={handleAssignmentsChange}
               />
             )}
           </div>

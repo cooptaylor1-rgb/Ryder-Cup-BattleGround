@@ -23,6 +23,7 @@
  */
 
 import type { DuesLineItem, PaymentRecord } from '@/lib/types/finances';
+import type { Announcement, AttendanceRecord, CartAssignment } from '@/lib/types/logistics';
 import {
   coerceHandicapSettings,
   coerceScoringSettings,
@@ -65,6 +66,9 @@ function numberArrayOrUndefined(value: unknown): number[] | undefined {
 }
 
 function parseJsonObject(raw: unknown): Record<string, unknown> {
+  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+    return raw as Record<string, unknown>;
+  }
   if (typeof raw !== 'string' || raw.trim() === '') return {};
   try {
     const parsed = JSON.parse(raw);
@@ -74,6 +78,10 @@ function parseJsonObject(raw: unknown): Record<string, unknown> {
   } catch {
     return {};
   }
+}
+
+function optionalNumber(value: unknown): number | undefined {
+  return typeof value === 'number' ? value : undefined;
 }
 
 // ---------------------------------------------------------------
@@ -589,6 +597,131 @@ export function banterPostFromCloud(row: Record<string, unknown>): BanterPost {
         : undefined,
     relatedMatchId: optionalString(row.related_match_id),
     timestamp: String(row.timestamp ?? nowIso()),
+  };
+}
+
+// ---------------------------------------------------------------
+// Trip logistics
+// ---------------------------------------------------------------
+
+export function announcementToCloud(announcement: Announcement): Record<string, unknown> {
+  return {
+    id: announcement.id,
+    trip_id: announcement.tripId,
+    title: announcement.title,
+    message: announcement.message,
+    priority: announcement.priority,
+    category: announcement.category,
+    status: announcement.status,
+    author_auth_user_id: announcement.authorAuthUserId ?? null,
+    author_player_id: announcement.authorPlayerId ?? null,
+    read_count: announcement.readCount ?? 0,
+    total_recipients: announcement.totalRecipients ?? null,
+    metadata: {
+      ...(announcement.metadata ?? {}),
+      authorName: announcement.author.name,
+      authorRole: announcement.author.role,
+    },
+    sent_at: announcement.sentAt ?? null,
+    created_at: announcement.createdAt,
+    updated_at: announcement.updatedAt,
+  };
+}
+
+export function announcementFromCloud(row: Record<string, unknown>): Announcement {
+  const metadata = parseJsonObject(row.metadata);
+  const authorName = optionalString(metadata.authorName) ?? 'Captain';
+
+  return {
+    id: String(row.id),
+    tripId: String(row.trip_id),
+    title: String(row.title ?? ''),
+    message: String(row.message ?? ''),
+    priority: (row.priority as Announcement['priority']) || 'normal',
+    category: (row.category as Announcement['category']) || 'general',
+    status: (row.status as Announcement['status']) || 'sent',
+    authorAuthUserId: optionalString(row.author_auth_user_id),
+    authorPlayerId: optionalString(row.author_player_id),
+    readCount: optionalNumber(row.read_count) ?? 0,
+    totalRecipients: optionalNumber(row.total_recipients),
+    metadata,
+    sentAt: optionalString(row.sent_at),
+    createdAt: String(row.created_at ?? nowIso()),
+    updatedAt: String(row.updated_at ?? nowIso()),
+    author: {
+      name: authorName,
+      role: 'captain',
+    },
+  };
+}
+
+export function attendanceRecordToCloud(record: AttendanceRecord): Record<string, unknown> {
+  return {
+    id: record.id,
+    trip_id: record.tripId,
+    player_id: record.playerId,
+    session_id: record.sessionId ?? null,
+    match_id: record.matchId ?? null,
+    status: record.status,
+    eta: record.eta ?? null,
+    notes: record.notes ?? null,
+    last_location: record.lastLocation ?? null,
+    check_in_time: record.checkInTime ?? null,
+    updated_by_auth_user_id: record.updatedByAuthUserId ?? null,
+    updated_by_player_id: record.updatedByPlayerId ?? null,
+    created_at: record.createdAt,
+    updated_at: record.updatedAt,
+  };
+}
+
+export function attendanceRecordFromCloud(row: Record<string, unknown>): AttendanceRecord {
+  return {
+    id: String(row.id),
+    tripId: String(row.trip_id),
+    playerId: String(row.player_id),
+    sessionId: optionalString(row.session_id),
+    matchId: optionalString(row.match_id),
+    status: (row.status as AttendanceRecord['status']) || 'not-arrived',
+    eta: optionalString(row.eta),
+    notes: optionalString(row.notes),
+    lastLocation: optionalString(row.last_location),
+    checkInTime: optionalString(row.check_in_time),
+    updatedByAuthUserId: optionalString(row.updated_by_auth_user_id),
+    updatedByPlayerId: optionalString(row.updated_by_player_id),
+    createdAt: String(row.created_at ?? nowIso()),
+    updatedAt: String(row.updated_at ?? nowIso()),
+  };
+}
+
+export function cartAssignmentToCloud(assignment: CartAssignment): Record<string, unknown> {
+  return {
+    id: assignment.id,
+    trip_id: assignment.tripId,
+    session_id: assignment.sessionId ?? null,
+    match_id: assignment.matchId ?? null,
+    cart_number: assignment.cartNumber,
+    player_ids: assignment.playerIds,
+    max_capacity: assignment.maxCapacity,
+    notes: assignment.notes ?? null,
+    created_by_auth_user_id: assignment.createdByAuthUserId ?? null,
+    created_at: assignment.createdAt,
+    updated_at: assignment.updatedAt,
+  };
+}
+
+export function cartAssignmentFromCloud(row: Record<string, unknown>): CartAssignment {
+  return {
+    id: String(row.id),
+    tripId: String(row.trip_id),
+    sessionId: optionalString(row.session_id),
+    matchId: optionalString(row.match_id),
+    cartNumber: String(row.cart_number ?? ''),
+    playerIds: stringArray(row.player_ids),
+    maxCapacity: Number(row.max_capacity ?? 2),
+    notes: optionalString(row.notes),
+    createdByAuthUserId: optionalString(row.created_by_auth_user_id),
+    createdAt: String(row.created_at ?? nowIso()),
+    updatedAt: String(row.updated_at ?? nowIso()),
   };
 }
 

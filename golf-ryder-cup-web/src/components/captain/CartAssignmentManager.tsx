@@ -61,6 +61,10 @@ function generateCartNumber(index: number): string {
   return `Cart ${index + 1}`;
 }
 
+function createCartId(): string {
+  return crypto.randomUUID();
+}
+
 export function CartAssignmentManager({
   players,
   initialCarts,
@@ -74,7 +78,7 @@ export function CartAssignmentManager({
   const [carts, setCarts] = useState<Cart[]>(
     initialCarts ||
       Array.from({ length: defaultCartCount }, (_, index) => ({
-        id: `cart-${index}`,
+        id: createCartId(),
         number: generateCartNumber(index),
         players: [],
         maxCapacity: maxCartsPerCart,
@@ -147,7 +151,7 @@ export function CartAssignmentManager({
     commitCarts((current) => [
       ...current,
       {
-        id: `cart-${current.length}`,
+        id: createCartId(),
         number: generateCartNumber(current.length),
         players: [],
         maxCapacity: maxCartsPerCart,
@@ -175,7 +179,7 @@ export function CartAssignmentManager({
 
       for (let index = 0; index < maxPairs; index += 1) {
         nextCarts.push({
-          id: `cart-${cartIndex}`,
+          id: createCartId(),
           number: generateCartNumber(cartIndex),
           players: [teamAPlayers[index], teamBPlayers[index]],
           maxCapacity: maxCartsPerCart,
@@ -188,7 +192,7 @@ export function CartAssignmentManager({
         const cartPlayers = remaining.slice(index, index + maxCartsPerCart);
         if (cartPlayers.length > 0) {
           nextCarts.push({
-            id: `cart-${cartIndex}`,
+            id: createCartId(),
             number: generateCartNumber(cartIndex),
             players: cartPlayers,
             maxCapacity: maxCartsPerCart,
@@ -200,7 +204,7 @@ export function CartAssignmentManager({
 
     if (nextCarts.length === 0) {
       nextCarts.push({
-        id: 'cart-0',
+        id: createCartId(),
         number: generateCartNumber(0),
         players: [],
         maxCapacity: maxCartsPerCart,
