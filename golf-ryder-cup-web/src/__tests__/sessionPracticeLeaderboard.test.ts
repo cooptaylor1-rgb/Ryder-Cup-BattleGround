@@ -30,6 +30,8 @@ function makeMatch(order: number, playerIds: string[]): Match {
     result: 'notFinished',
     margin: 0,
     holesRemaining: 18,
+        createdAt: '2026-04-23T00:00:00Z',
+        updatedAt: '2026-04-23T00:00:00Z',
   };
 }
 
@@ -193,7 +195,7 @@ describe('computeSessionPracticeLeaderboard — 1-2-3 format', () => {
     const scores = scoresFromStrokeTable(match.id, { solo: Array(18).fill(5) });
 
     const result = computeSessionPracticeLeaderboard({
-      session: session({ sessionType: 'bestBall' }),
+      session: session({ sessionType: 'fourball' }),
       matches: [match],
       scores,
       players,
@@ -220,7 +222,7 @@ describe('computeSessionPracticeLeaderboard — 1-2-3 format', () => {
     ];
 
     const result = computeSessionPracticeLeaderboard({
-      session: session({ sessionType: 'bestBall' }),
+      session: session({ sessionType: 'fourball' }),
       matches: [matchA, matchB],
       scores,
       players,

@@ -242,8 +242,12 @@ describe('match sync round-trip', () => {
         createdAt: '2026-04-23T12:00:00Z',
         updatedAt: '2026-04-23T12:00:00Z',
       }),
-      mode: undefined as unknown as string,
-    };
+      // Cloud rows from pre-mode-column deployments return mode
+      // undefined — cast through unknown because the projection's
+      // type says `string` but we're intentionally simulating the
+      // pre-migration shape here.
+      mode: undefined,
+    } as unknown as ReturnType<typeof projectMatchToCloud>;
     const parsed = parseCloudToMatch(preMigration);
     expect(parsed.mode).toBe('ryderCup');
   });

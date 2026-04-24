@@ -5,6 +5,7 @@ import {
   BarChart3,
   Medal,
   MessageSquare,
+  Star,
   Swords,
   Trophy,
   Users,

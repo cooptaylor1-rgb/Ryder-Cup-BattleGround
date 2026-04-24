@@ -32,7 +32,8 @@ function parseBetNotes(raw: unknown): Record<string, unknown> {
   if (typeof raw !== 'string' || raw.trim() === '') return {};
   try {
     const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : {};
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+    return parsed as Record<string, unknown>;
   } catch {
     return {};
   }

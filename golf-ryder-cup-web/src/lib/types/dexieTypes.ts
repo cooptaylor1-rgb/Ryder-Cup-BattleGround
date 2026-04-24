@@ -118,7 +118,7 @@ export function getTeamStrokes(
     team: 'A' | 'B'
 ): number {
     if (team === 'A') {
-        return result.teamAStrokes ?? result.teamAScore ?? result.team1Score ?? 0;
+        return result.teamAStrokes ?? result.team1Score ?? 0;
     }
-    return result.teamBStrokes ?? result.teamBScore ?? result.team2Score ?? 0;
+    return result.teamBStrokes ?? result.team2Score ?? 0;
 }

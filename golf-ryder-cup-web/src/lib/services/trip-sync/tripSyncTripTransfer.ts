@@ -182,7 +182,13 @@ function parseBetNotes(raw: unknown): Record<string, unknown> {
   if (typeof raw !== 'string' || raw.trim() === '') return {};
   try {
     const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? (parsed as Record<string, unknown>) : {};
+    // Arrays are typeof === 'object' in JS, but a bet-notes blob
+    // must be a record. A legacy row that had notes='[1,2,3]'
+    // (or any JSON array) would otherwise destructure through
+    // parsed.perHole etc. as undefined-on-array and kick weird
+    // behavior later.
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+    return parsed as Record<string, unknown>;
   } catch {
     return {};
   }

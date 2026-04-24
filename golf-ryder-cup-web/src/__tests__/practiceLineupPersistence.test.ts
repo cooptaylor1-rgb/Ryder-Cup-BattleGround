@@ -41,7 +41,7 @@ async function seedTripAndSession(options?: {
     tripId: trip.id,
     name: 'Thursday Practice',
     sessionNumber: 1,
-    sessionType: 'fourBall',
+    sessionType: 'fourball',
     pointsPerMatch: 0,
     status: 'scheduled',
     isLocked: false,

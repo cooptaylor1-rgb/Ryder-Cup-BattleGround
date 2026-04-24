@@ -96,8 +96,8 @@ export async function recordHoleResult(
     if (
       existing &&
       existing.winner === winner &&
-      existing.teamAScore === teamAScore &&
-      existing.teamBScore === teamBScore
+      existing.teamAStrokes === teamAScore &&
+      existing.teamBStrokes === teamBScore
     ) {
       return existing;
     }
@@ -139,8 +139,8 @@ export async function recordHoleResult(
       matchId,
       holeNumber,
       winner,
-      teamAScore,
-      teamBScore,
+      teamAStrokes: teamAScore,
+      teamBStrokes: teamBScore,
       teamAPlayerScores: teamAPlayerScores ?? existing?.teamAPlayerScores,
       teamBPlayerScores: teamBPlayerScores ?? existing?.teamBPlayerScores,
       scoredBy: existing ? existing.scoredBy : scoredBy,
@@ -159,8 +159,8 @@ export async function recordHoleResult(
           holeNumber,
           previousWinner: existing.winner,
           newWinner: winner,
-          previousTeamAStrokes: existing.teamAScore,
-          previousTeamBStrokes: existing.teamBScore,
+          previousTeamAStrokes: existing.teamAStrokes,
+          previousTeamBStrokes: existing.teamBStrokes,
           newTeamAStrokes: teamAScore,
           newTeamBStrokes: teamBScore,
         }

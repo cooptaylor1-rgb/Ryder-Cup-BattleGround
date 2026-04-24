@@ -327,8 +327,8 @@ export function buildLiveLeaderboard(
       let teamBTotal = 0;
 
       for (const result of results) {
-        if (result.teamAScore !== undefined) teamATotal += result.teamAScore;
-        if (result.teamBScore !== undefined) teamBTotal += result.teamBScore;
+        if (result.teamAStrokes !== undefined) teamATotal += result.teamAStrokes;
+        if (result.teamBStrokes !== undefined) teamBTotal += result.teamBStrokes;
       }
 
       // Determine match status string from margin and holes remaining

@@ -340,9 +340,13 @@ describe('cascadeDelete', () => {
     expect(await db.scoringEvents.where('matchId').equals('m-1').count()).toBe(0);
 
     // Other session's match and its data survive — over-reach check.
+    // scoringEvents is keyed by ++localId (auto-increment), so
+    // look up by its string `id` index instead of the primary key.
     expect(await db.matches.get('m-other')).toBeDefined();
     expect(await db.holeResults.get('hr-other')).toBeDefined();
-    expect(await db.scoringEvents.get('se-other')).toBeDefined();
+    expect(
+      await db.scoringEvents.where('id').equals('se-other').first()
+    ).toBeDefined();
   });
 
   it('deleteMatchCascade with sync=true queues cloud deletes for match + children', async () => {

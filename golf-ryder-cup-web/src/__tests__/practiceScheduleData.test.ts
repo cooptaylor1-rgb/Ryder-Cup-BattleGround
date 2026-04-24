@@ -23,7 +23,12 @@ interface ScheduleSessionLike {
   scheduledDate?: string;
   timeSlot?: 'AM' | 'PM';
   firstTeeTime?: string;
-  status: string;
+  // Status literal union must match scheduleData.ts so structural
+  // assignability holds when the test feeds its sessions into
+  // groupMatchesForSchedule — "Two different types with this name
+  // exist" happens when the test's `status: string` is broader
+  // than the source's literal set.
+  status: 'scheduled' | 'inProgress' | 'paused' | 'completed' | 'cancelled';
   isPracticeSession?: boolean;
   defaultCourseId?: string;
   defaultTeeSetId?: string;
@@ -78,6 +83,8 @@ describe('buildScheduleByDay — practice rendering', () => {
         result: 'notFinished',
         margin: 0,
         holesRemaining: 18,
+        createdAt: '2026-04-23T00:00:00Z',
+        updatedAt: '2026-04-23T00:00:00Z',
         teeTime: '08:12',
       },
       {
@@ -94,6 +101,8 @@ describe('buildScheduleByDay — practice rendering', () => {
         result: 'notFinished',
         margin: 0,
         holesRemaining: 18,
+        createdAt: '2026-04-23T00:00:00Z',
+        updatedAt: '2026-04-23T00:00:00Z',
         teeTime: '08:24',
       },
     ];
@@ -128,13 +137,15 @@ describe('buildScheduleByDay — practice rendering', () => {
 
     const firstGroup = teeTimeEntries[0]!;
     expect(firstGroup.title).toBe('Group 1');
-    expect(firstGroup.subtitle).toBe('Alice Ace, Bob Birdie, Cole Chip, Dana Draw');
+    // Schedule-day view compresses names to `${first} ${lastInitial}`
+    // so a four-player group fits a tee-time row without wrapping.
+    expect(firstGroup.subtitle).toBe('Alice A, Bob B, Cole C, Dana D');
     // Group's own teeTime overrides the staggered default
     expect(firstGroup.time).toMatch(/8:12/);
 
     const secondGroup = teeTimeEntries[1]!;
     expect(secondGroup.title).toBe('Group 2');
-    expect(secondGroup.subtitle).toBe('Eli Eagle, Fay Fade');
+    expect(secondGroup.subtitle).toBe('Eli E, Fay F');
     expect(secondGroup.time).toMatch(/8:24/);
   });
 
@@ -168,6 +179,8 @@ describe('buildScheduleByDay — practice rendering', () => {
         result: 'notFinished',
         margin: 0,
         holesRemaining: 18,
+        createdAt: '2026-04-23T00:00:00Z',
+        updatedAt: '2026-04-23T00:00:00Z',
         // no teeTime
       },
     ];
@@ -216,6 +229,8 @@ describe('buildScheduleByDay — practice rendering', () => {
         result: 'notFinished',
         margin: 0,
         holesRemaining: 18,
+        createdAt: '2026-04-23T00:00:00Z',
+        updatedAt: '2026-04-23T00:00:00Z',
       },
     ];
     const players = [
@@ -236,6 +251,8 @@ describe('buildScheduleByDay — practice rendering', () => {
 
     const teeTimeEntry = days[0]!.entries.find((e) => e.type === 'teeTime')!;
     expect(teeTimeEntry.title).toBe('Match 1');
-    expect(teeTimeEntry.subtitle).toBe('USA One & USA Two vs EUR One & EUR Two');
+    // Same compact ${first} ${lastInitial} format as the practice
+    // grouping: schedule-day width is the binding constraint.
+    expect(teeTimeEntry.subtitle).toBe('USA O & USA T vs EUR O & EUR T');
   });
 });
