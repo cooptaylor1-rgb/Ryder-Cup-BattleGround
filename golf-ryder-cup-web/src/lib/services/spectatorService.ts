@@ -19,9 +19,28 @@ import type {
     HoleResult,
     Player,
 } from '@/lib/types/models';
+import type { MatchState } from '@/lib/types/computed';
 
 import { TEAM_COLORS } from '@/lib/constants/teamColors';
-import { calculateMatchStateSnapshot } from '@/lib/services/scoringEngine';
+import {
+    calculateMatchPoints,
+    calculateMatchState,
+} from '@/lib/services/scoringEngine';
+
+function isCompletedMatchState(state: MatchState): boolean {
+    return state.isClosedOut || state.holesRemaining === 0;
+}
+
+function getSpectatorStatus(match: Match, state: MatchState): Match['status'] {
+    if (match.status === 'cancelled') return 'cancelled';
+    if (isCompletedMatchState(state)) return 'completed';
+    if (state.holesPlayed > 0 || match.status === 'inProgress') return 'inProgress';
+    return 'scheduled';
+}
+
+function isTerminalSpectatorStatus(status: Match['status']): boolean {
+    return status === 'completed' || status === 'cancelled';
+}
 
 /**
  * Build spectator view for a trip
@@ -37,27 +56,37 @@ export function buildSpectatorView(
 ): SpectatorView {
     const teamA = teams.find(t => t.color === 'usa') || teams[0];
     const teamB = teams.find(t => t.color === 'europe') || teams[1];
+    const cupSessionIds = new Set(
+        sessions
+            .filter((session) => !session.isPracticeSession)
+            .map((session) => session.id)
+    );
+    const cupMatches = matches.filter(
+        (match) => cupSessionIds.has(match.sessionId) && match.mode !== 'practice'
+    );
+    const spectatorMatches = cupMatches.map((match) => {
+        const results = holeResults.filter((holeResult) => holeResult.matchId === match.id);
+        const state = calculateMatchState(match, results);
+        const status = getSpectatorStatus(match, state);
+        return { match, state, status };
+    });
 
     // Calculate current points
     let teamAPoints = 0;
     let teamBPoints = 0;
 
-    for (const match of matches.filter(m => m.status === 'completed')) {
-        const results = holeResults.filter(hr => hr.matchId === match.id);
-        const { winner } = calculateMatchWinner(results);
-
-        if (winner === 'teamA') teamAPoints += 1;
-        else if (winner === 'teamB') teamBPoints += 1;
-        else {
-            teamAPoints += 0.5;
-            teamBPoints += 0.5;
-        }
+    for (const { state } of spectatorMatches.filter((entry) => entry.status === 'completed')) {
+        const points = calculateMatchPoints(state);
+        teamAPoints += points.teamAPoints;
+        teamBPoints += points.teamBPoints;
     }
 
     // Determine overall status
-    const hasLive = matches.some(m => m.status === 'inProgress');
-    const hasCompleted = matches.some(m => m.status === 'completed');
-    const allCompleted = matches.every(m => m.status === 'completed' || m.status === 'cancelled');
+    const hasLive = spectatorMatches.some((entry) => entry.status === 'inProgress');
+    const hasCompleted = spectatorMatches.some((entry) => entry.status === 'completed');
+    const allCompleted =
+        spectatorMatches.length > 0 &&
+        spectatorMatches.every((entry) => isTerminalSpectatorStatus(entry.status));
 
     let currentStatus: 'upcoming' | 'live' | 'completed';
     if (allCompleted && hasCompleted) {
@@ -69,16 +98,19 @@ export function buildSpectatorView(
     }
 
     // Build live matches
-    const liveMatches = matches
-        .filter(m => m.status === 'inProgress')
-        .map(m => buildSpectatorMatch(m, sessions, holeResults, players));
+    const liveMatches = spectatorMatches
+        .filter((entry) => entry.status === 'inProgress')
+        .map((entry) => buildSpectatorMatch(entry.match, sessions, holeResults, players, entry.state));
 
     // Build recent results (last 5 completed)
-    const recentResults = matches
-        .filter(m => m.status === 'completed')
-        .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    const recentResults = spectatorMatches
+        .filter((entry) => entry.status === 'completed')
+        .sort(
+            (a, b) =>
+                new Date(b.match.updatedAt).getTime() - new Date(a.match.updatedAt).getTime()
+        )
         .slice(0, 5)
-        .map(m => buildSpectatorMatch(m, sessions, holeResults, players));
+        .map((entry) => buildSpectatorMatch(entry.match, sessions, holeResults, players, entry.state));
 
     // Calculate magic number
     const teamANeeds = Math.max(0, pointsToWin - teamAPoints);
@@ -119,7 +151,8 @@ function buildSpectatorMatch(
     match: Match,
     sessions: RyderCupSession[],
     holeResults: HoleResult[],
-    players: Player[]
+    players: Player[],
+    precomputedState?: MatchState
 ): SpectatorMatch {
     const session = sessions.find(s => s.id === match.sessionId);
     const results = holeResults.filter(hr => hr.matchId === match.id);
@@ -138,14 +171,15 @@ function buildSpectatorMatch(
         .join(' & ');
 
     // Calculate current score using shared scoring engine logic
-    const summary = calculateMatchStateSnapshot(results);
+    const summary = precomputedState ?? calculateMatchState(match, results);
+    const status = getSpectatorStatus(match, summary);
     const margin = Math.abs(summary.currentScore);
     const thruHole = summary.holesPlayed;
 
     let currentScore: string;
-    if (match.status === 'completed') {
+    if (status === 'completed') {
         currentScore = summary.winningTeam === 'halved' ? 'Halved' : summary.displayScore;
-    } else if (match.status === 'inProgress') {
+    } else if (status === 'inProgress') {
         if (margin === 0 || !summary.winningTeam || summary.winningTeam === 'halved') {
             currentScore = 'AS';
         } else {
@@ -161,31 +195,11 @@ function buildSpectatorMatch(
         sessionName: session?.name || 'Match',
         teamAPlayers,
         teamBPlayers,
-        status: match.status,
+        status,
         currentScore,
         thruHole,
-        result: match.status === 'completed' ? currentScore : undefined,
+        result: status === 'completed' ? currentScore : undefined,
     };
-}
-
-/**
- * Calculate match winner from hole results
- */
-function calculateMatchWinner(
-    results: HoleResult[]
-): { winner: 'teamA' | 'teamB' | 'halved'; margin: number } {
-    const snapshot = calculateMatchStateSnapshot(results);
-    const margin = Math.abs(snapshot.currentScore);
-
-    if (snapshot.winningTeam === 'teamA') {
-        return { winner: 'teamA', margin };
-    }
-
-    if (snapshot.winningTeam === 'teamB') {
-        return { winner: 'teamB', margin };
-    }
-
-    return { winner: 'halved', margin: 0 };
 }
 
 /**

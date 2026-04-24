@@ -227,8 +227,230 @@ describe('Spectator Service', () => {
             );
 
             expect(view.teamA.points).toBe(0);
+            expect(view.teamB.points).toBe(0);
+            expect(view.recentResults).toHaveLength(0);
+            expect(view.liveMatches[0]).toMatchObject({
+                id: 'm1',
+                currentScore: 'B 1 UP',
+            });
+        });
+
+        it('excludes practice matches from spectator cup points and live feed', () => {
+            const trip = {
+                id: 'trip-practice',
+                name: 'Trip',
+                startDate: '2026-06-01',
+                endDate: '2026-06-03',
+                createdAt: '2026-01-01T00:00:00.000Z',
+                updatedAt: '2026-01-01T00:00:00.000Z',
+            } as const;
+
+            const teams = [
+                { id: 't1', tripId: 'trip-practice', name: 'USA', color: 'usa', createdAt: '', updatedAt: '' },
+                { id: 't2', tripId: 'trip-practice', name: 'EUR', color: 'europe', createdAt: '', updatedAt: '' },
+            ] as const;
+
+            const sessions = [
+                {
+                    id: 's-cup',
+                    tripId: 'trip-practice',
+                    name: 'Singles',
+                    sessionNumber: 1,
+                    sessionType: 'singles',
+                    isPracticeSession: false,
+                    status: 'inProgress',
+                    createdAt: '',
+                    updatedAt: '',
+                },
+                {
+                    id: 's-practice',
+                    tripId: 'trip-practice',
+                    name: 'Warm-up',
+                    sessionNumber: 0,
+                    sessionType: 'fourball',
+                    isPracticeSession: true,
+                    status: 'inProgress',
+                    createdAt: '',
+                    updatedAt: '',
+                },
+            ] as const;
+
+            const matches = [
+                {
+                    id: 'm-cup',
+                    sessionId: 's-cup',
+                    matchOrder: 1,
+                    status: 'completed',
+                    currentHole: 10,
+                    teamAPlayerIds: ['p1'],
+                    teamBPlayerIds: ['p2'],
+                    teamAHandicapAllowance: 0,
+                    teamBHandicapAllowance: 0,
+                    result: 'notFinished',
+                    margin: 10,
+                    holesRemaining: 8,
+                    createdAt: '2026-01-01T00:00:00.000Z',
+                    updatedAt: '2026-01-01T00:03:00.000Z',
+                },
+                {
+                    id: 'm-practice-session',
+                    sessionId: 's-practice',
+                    matchOrder: 2,
+                    status: 'completed',
+                    currentHole: 10,
+                    teamAPlayerIds: ['p1'],
+                    teamBPlayerIds: ['p2'],
+                    teamAHandicapAllowance: 0,
+                    teamBHandicapAllowance: 0,
+                    result: 'notFinished',
+                    margin: 10,
+                    holesRemaining: 8,
+                    createdAt: '2026-01-01T00:00:00.000Z',
+                    updatedAt: '2026-01-01T00:04:00.000Z',
+                },
+                {
+                    id: 'm-practice-mode',
+                    sessionId: 's-cup',
+                    matchOrder: 3,
+                    status: 'inProgress',
+                    mode: 'practice',
+                    currentHole: 2,
+                    teamAPlayerIds: ['p1'],
+                    teamBPlayerIds: [],
+                    teamAHandicapAllowance: 0,
+                    teamBHandicapAllowance: 0,
+                    result: 'notFinished',
+                    margin: 1,
+                    holesRemaining: 17,
+                    createdAt: '2026-01-01T00:00:00.000Z',
+                    updatedAt: '2026-01-01T00:05:00.000Z',
+                },
+            ] as const;
+
+            const holeResults = [
+                ...Array.from({ length: 10 }, (_, index) => ({
+                    id: `cup-${index + 1}`,
+                    matchId: 'm-cup',
+                    holeNumber: index + 1,
+                    winner: 'teamB' as const,
+                    timestamp: `2026-01-01T00:${String(index).padStart(2, '0')}:00.000Z`,
+                })),
+                ...Array.from({ length: 10 }, (_, index) => ({
+                    id: `practice-session-${index + 1}`,
+                    matchId: 'm-practice-session',
+                    holeNumber: index + 1,
+                    winner: 'teamA' as const,
+                    timestamp: `2026-01-01T01:${String(index).padStart(2, '0')}:00.000Z`,
+                })),
+                {
+                    id: 'practice-mode-1',
+                    matchId: 'm-practice-mode',
+                    holeNumber: 1,
+                    winner: 'teamA' as const,
+                    timestamp: '2026-01-01T02:00:00.000Z',
+                },
+            ];
+
+            const players = [
+                { id: 'p1', firstName: 'Ann', lastName: 'A', createdAt: '', updatedAt: '' },
+                { id: 'p2', firstName: 'Bob', lastName: 'B', createdAt: '', updatedAt: '' },
+            ] as const;
+
+            const view = buildSpectatorView(
+                trip as never,
+                teams as never,
+                sessions as never,
+                matches as never,
+                holeResults as never,
+                players as never
+            );
+
+            expect(view.teamA.points).toBe(0);
             expect(view.teamB.points).toBe(1);
-            expect(view.recentResults[0]?.result).toBe('1 DN');
+            expect(view.currentStatus).toBe('completed');
+            expect(view.liveMatches).toHaveLength(0);
+            expect(view.recentResults.map((match) => match.id)).toEqual(['m-cup']);
+        });
+
+        it('treats a score-complete match as completed before the stored status catches up', () => {
+            const trip = {
+                id: 'trip-stale-status',
+                name: 'Trip',
+                startDate: '2026-06-01',
+                endDate: '2026-06-03',
+                createdAt: '2026-01-01T00:00:00.000Z',
+                updatedAt: '2026-01-01T00:00:00.000Z',
+            } as const;
+
+            const teams = [
+                { id: 't1', tripId: 'trip-stale-status', name: 'USA', color: 'usa', createdAt: '', updatedAt: '' },
+                { id: 't2', tripId: 'trip-stale-status', name: 'EUR', color: 'europe', createdAt: '', updatedAt: '' },
+            ] as const;
+
+            const sessions = [
+                {
+                    id: 's1',
+                    tripId: 'trip-stale-status',
+                    name: 'Singles',
+                    sessionNumber: 1,
+                    sessionType: 'singles',
+                    isPracticeSession: false,
+                    status: 'inProgress',
+                    createdAt: '',
+                    updatedAt: '',
+                },
+            ] as const;
+
+            const matches = [
+                {
+                    id: 'm-stale',
+                    sessionId: 's1',
+                    matchOrder: 1,
+                    status: 'inProgress',
+                    currentHole: 18,
+                    teamAPlayerIds: ['p1'],
+                    teamBPlayerIds: ['p2'],
+                    teamAHandicapAllowance: 0,
+                    teamBHandicapAllowance: 0,
+                    result: 'notFinished',
+                    margin: 0,
+                    holesRemaining: 0,
+                    createdAt: '2026-01-01T00:00:00.000Z',
+                    updatedAt: '2026-01-01T00:03:00.000Z',
+                },
+            ] as const;
+
+            const holeResults = Array.from({ length: 18 }, (_, index) => ({
+                id: `stale-${index + 1}`,
+                matchId: 'm-stale',
+                holeNumber: index + 1,
+                winner: (index % 2 === 0 ? 'teamA' : 'teamB') as 'teamA' | 'teamB',
+                timestamp: `2026-01-01T00:${String(index).padStart(2, '0')}:00.000Z`,
+            }));
+
+            const players = [
+                { id: 'p1', firstName: 'Ann', lastName: 'A', createdAt: '', updatedAt: '' },
+                { id: 'p2', firstName: 'Bob', lastName: 'B', createdAt: '', updatedAt: '' },
+            ] as const;
+
+            const view = buildSpectatorView(
+                trip as never,
+                teams as never,
+                sessions as never,
+                matches as never,
+                holeResults as never,
+                players as never
+            );
+
+            expect(view.teamA.points).toBe(0.5);
+            expect(view.teamB.points).toBe(0.5);
+            expect(view.currentStatus).toBe('completed');
+            expect(view.liveMatches).toHaveLength(0);
+            expect(view.recentResults[0]).toMatchObject({
+                id: 'm-stale',
+                status: 'completed',
+                result: 'Halved',
+            });
         });
     });
 
