@@ -484,10 +484,6 @@ export interface HoleResult {
   winner: HoleWinner;
   teamAStrokes?: number;
   teamBStrokes?: number;
-  /** Alias for teamAStrokes for compatibility */
-  teamAScore?: number;
-  /** Alias for teamBStrokes for compatibility */
-  teamBScore?: number;
 
   /**
    * Individual player scores for fourball/best ball formats.

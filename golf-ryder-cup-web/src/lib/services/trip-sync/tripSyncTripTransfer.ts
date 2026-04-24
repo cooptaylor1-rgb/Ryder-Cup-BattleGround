@@ -1,5 +1,14 @@
 import { storeTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import { mergeTripPlayers } from '@/lib/utils/tripPlayers';
+import {
+  coerceHandicapSettings,
+  coerceScoringSettings,
+} from '@/lib/utils/tripSettingsGuards';
+import {
+  holeResultFromCloud,
+  matchFromCloud,
+  sessionFromCloud,
+} from './tripSyncMappers';
 
 import { db } from '../../db';
 import type { BanterPost, SideBet, Trip } from '../../types/models';
@@ -413,8 +422,12 @@ async function pullTripCore(lookup: {
           isCaptainModeEnabled: trip.is_captain_mode_enabled,
           captainName: trip.captain_name,
           isPracticeRound: trip.is_practice_round || undefined,
-          scoringSettings: trip.scoring_settings ?? undefined,
-          handicapSettings: trip.handicap_settings ?? undefined,
+          // Validate JSONB blobs before writing into typed Dexie row.
+          // A malformed blob from an old client would otherwise sit in
+          // memory as the typed shape and blow up deep in a reducer
+          // the first time a component destructures it.
+          scoringSettings: coerceScoringSettings(trip.scoring_settings),
+          handicapSettings: coerceHandicapSettings(trip.handicap_settings),
           createdAt: trip.created_at,
           updatedAt: trip.updated_at,
         };
@@ -467,66 +480,17 @@ async function pullTripCore(lookup: {
         }
 
         for (const session of sessions || []) {
-          await db.sessions.put({
-            id: session.id,
-            tripId: session.trip_id,
-            name: session.name,
-            sessionNumber: session.session_number,
-            sessionType: session.session_type,
-            scheduledDate: session.scheduled_date,
-            timeSlot: session.time_slot,
-            firstTeeTime: session.first_tee_time || undefined,
-            pointsPerMatch: session.points_per_match,
-            notes: session.notes,
-            status: session.status,
-            isLocked: session.is_locked,
-            isPracticeSession: session.is_practice_session || undefined,
-            createdAt: session.created_at,
-            updatedAt: session.updated_at,
-          });
+          await db.sessions.put(sessionFromCloud(session as Record<string, unknown>));
         }
 
         for (const match of matches || []) {
-          await db.matches.put({
-            id: match.id,
-            sessionId: match.session_id,
-            courseId: match.course_id,
-            teeSetId: match.tee_set_id,
-            matchOrder: match.match_order,
-            status: match.status,
-            startTime: match.start_time,
-            currentHole: match.current_hole,
-            // Missing mode column on older deployments should degrade
-            // to the default so pre-migration pulls still parse.
-            mode:
-              match.mode === 'practice' || match.mode === 'ryderCup'
-                ? match.mode
-                : 'ryderCup',
-            teamAPlayerIds: match.team_a_player_ids,
-            teamBPlayerIds: match.team_b_player_ids,
-            teamAHandicapAllowance: match.team_a_handicap_allowance,
-            teamBHandicapAllowance: match.team_b_handicap_allowance,
-            result: match.result,
-            margin: match.margin,
-            holesRemaining: match.holes_remaining,
-            notes: match.notes,
-            createdAt: match.created_at,
-            updatedAt: match.updated_at,
-          });
+          await db.matches.put(matchFromCloud(match as Record<string, unknown>));
         }
 
         for (const holeResult of holeResults || []) {
-          await db.holeResults.put({
-            id: holeResult.id,
-            matchId: holeResult.match_id,
-            holeNumber: holeResult.hole_number,
-            winner: holeResult.winner,
-            teamAStrokes: holeResult.team_a_strokes,
-            teamBStrokes: holeResult.team_b_strokes,
-            scoredBy: holeResult.scored_by,
-            notes: holeResult.notes,
-            timestamp: holeResult.timestamp,
-          });
+          await db.holeResults.put(
+            holeResultFromCloud(holeResult as Record<string, unknown>)
+          );
         }
 
         for (const score of practiceScores || []) {

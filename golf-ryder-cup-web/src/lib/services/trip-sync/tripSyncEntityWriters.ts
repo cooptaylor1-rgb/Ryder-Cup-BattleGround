@@ -16,76 +16,61 @@ import type {
   Trip,
 } from '../../types/models';
 import type { SyncOperation, SyncQueueItem } from '../../types/sync';
+import { assertExhaustive } from '../../utils/exhaustive';
+import { isServerNewer } from './tripSyncLww';
+import { holeResultToCloud, matchToCloud, sessionToCloud } from './tripSyncMappers';
 import { getTable } from './tripSyncShared';
-
-/**
- * Returns true if the row already in Supabase has a newer (or equal)
- * updated_at than the incoming write. Used to implement last-write-wins
- * for mutable tables — without this, two offline devices editing the
- * same entity silently overwrite each other based on sync arrival
- * order, not actual edit time. There is still a narrow race between
- * the select and the upsert, but it closes the worst of the
- * offline-replay data-loss window.
- */
-async function isCloudNewer(
-  table: 'matches' | 'sessions',
-  id: string,
-  incomingUpdatedAt: string
-): Promise<boolean> {
-  const { data: existing } = await getTable(table)
-    .select('updated_at')
-    .eq('id', id)
-    .maybeSingle();
-
-  const existingUpdatedAt =
-    existing && typeof (existing as { updated_at?: string }).updated_at === 'string'
-      ? (existing as { updated_at: string }).updated_at
-      : null;
-
-  if (!existingUpdatedAt) return false;
-  return new Date(existingUpdatedAt).getTime() >= new Date(incomingUpdatedAt).getTime();
-}
+import {
+  deleteEntityByKey,
+  loadEntityForSync,
+  throwIfSupabaseError,
+} from './tripSyncWriterHelpers';
 
 export async function syncEntityToCloud(item: SyncQueueItem): Promise<void> {
-  const { entity, entityId, operation, data } = item;
-
-  switch (entity) {
+  // The `item` variable is a discriminated union over item.entity,
+  // so each case below narrows `item.data` to the matching model
+  // type automatically. No more `as Trip` / `as HoleResult` casts —
+  // if a future writer argument goes stale (e.g. a model gets a
+  // new required field), the compiler errors at the call site.
+  switch (item.entity) {
     case 'trip':
-      await syncTripToCloud(entityId, operation, data as Trip);
+      await syncTripToCloud(item.entityId, item.operation, item.data);
       break;
     case 'player':
-      await syncPlayerToCloud(entityId, operation, data as Player, item.tripId);
+      await syncPlayerToCloud(item.entityId, item.operation, item.data, item.tripId);
       break;
     case 'team':
-      await syncTeamToCloud(entityId, operation, data as Team);
+      await syncTeamToCloud(item.entityId, item.operation, item.data);
       break;
     case 'teamMember':
-      await syncTeamMemberToCloud(entityId, operation, data as TeamMember);
+      await syncTeamMemberToCloud(item.entityId, item.operation, item.data);
       break;
     case 'session':
-      await syncSessionToCloud(entityId, operation, data as RyderCupSession);
+      await syncSessionToCloud(item.entityId, item.operation, item.data);
       break;
     case 'match':
-      await syncMatchToCloud(entityId, operation, data as Match);
+      await syncMatchToCloud(item.entityId, item.operation, item.data);
       break;
     case 'holeResult':
-      await syncHoleResultToCloud(entityId, operation, data as HoleResult);
+      await syncHoleResultToCloud(item.entityId, item.operation, item.data);
       break;
     case 'course':
-      await syncCourseToCloud(entityId, operation, data as Course);
+      await syncCourseToCloud(item.entityId, item.operation, item.data);
       break;
     case 'teeSet':
-      await syncTeeSetToCloud(entityId, operation, data as TeeSet);
+      await syncTeeSetToCloud(item.entityId, item.operation, item.data);
       break;
     case 'sideBet':
-      await syncSideBetToCloud(entityId, operation, data as SideBet);
+      await syncSideBetToCloud(item.entityId, item.operation, item.data);
       break;
     case 'practiceScore':
-      await syncPracticeScoreToCloud(entityId, operation, data as PracticeScore);
+      await syncPracticeScoreToCloud(item.entityId, item.operation, item.data);
       break;
     case 'banterPost':
-      await syncBanterPostToCloud(entityId, operation, data as BanterPost);
+      await syncBanterPostToCloud(item.entityId, item.operation, item.data);
       break;
+    default:
+      assertExhaustive(item, 'Unhandled sync entity');
   }
 }
 
@@ -95,13 +80,15 @@ export async function syncTripToCloud(
   data?: Trip
 ): Promise<void> {
   if (operation === 'delete') {
-    const { error } = await getTable('trips').delete().eq('id', tripId);
-    if (error) throw new Error(error.message);
+    await deleteEntityByKey({ table: 'trips', column: 'id', value: tripId });
     return;
   }
 
-  const trip = data || (await db.trips.get(tripId));
-  if (!trip) throw new Error('Trip not found locally');
+  const trip = await loadEntityForSync({
+    data,
+    entityName: 'Trip',
+    fallback: () => db.trips.get(tripId),
+  });
 
   const cloudData = {
     id: trip.id,
@@ -119,22 +106,24 @@ export async function syncTripToCloud(
   };
 
   if (operation === 'create') {
-    const { data: insertedTrip, error } = await getTable('trips')
+    const insertResponse = await getTable('trips')
       .insert({ ...cloudData, created_at: trip.createdAt })
       .select('share_code')
       .single();
-    if (error) throw new Error(error.message);
+    throwIfSupabaseError(insertResponse);
+    const insertedTrip = insertResponse.data as { share_code?: string } | null;
     if (insertedTrip?.share_code) {
       storeTripShareCode(trip.id, insertedTrip.share_code);
     }
     return;
   }
 
-  const { data: upsertedTrip, error } = await getTable('trips')
+  const upsertResponse = await getTable('trips')
     .upsert(cloudData, { onConflict: 'id' })
     .select('share_code')
     .single();
-  if (error) throw new Error(error.message);
+  throwIfSupabaseError(upsertResponse);
+  const upsertedTrip = upsertResponse.data as { share_code?: string } | null;
   if (upsertedTrip?.share_code) {
     storeTripShareCode(trip.id, upsertedTrip.share_code);
   }
@@ -147,13 +136,15 @@ export async function syncPlayerToCloud(
   tripId?: string
 ): Promise<void> {
   if (operation === 'delete') {
-    const { error } = await getTable('players').delete().eq('id', playerId);
-    if (error) throw new Error(error.message);
+    await deleteEntityByKey({ table: 'players', column: 'id', value: playerId });
     return;
   }
 
-  const player = data || (await db.players.get(playerId));
-  if (!player) throw new Error('Player not found locally');
+  const player = await loadEntityForSync({
+    data,
+    entityName: 'Player',
+    fallback: () => db.players.get(playerId),
+  });
 
   const cloudData = {
     id: player.id,
@@ -168,8 +159,7 @@ export async function syncPlayerToCloud(
     updated_at: new Date().toISOString(),
   };
 
-  const { error } = await getTable('players').upsert(cloudData, { onConflict: 'id' });
-  if (error) throw new Error(error.message);
+  throwIfSupabaseError(await getTable('players').upsert(cloudData, { onConflict: 'id' }));
 }
 
 export async function syncTeamToCloud(
@@ -178,13 +168,15 @@ export async function syncTeamToCloud(
   data?: Team
 ): Promise<void> {
   if (operation === 'delete') {
-    const { error } = await getTable('teams').delete().eq('id', teamId);
-    if (error) throw new Error(error.message);
+    await deleteEntityByKey({ table: 'teams', column: 'id', value: teamId });
     return;
   }
 
-  const team = data || (await db.teams.get(teamId));
-  if (!team) throw new Error('Team not found locally');
+  const team = await loadEntityForSync({
+    data,
+    entityName: 'Team',
+    fallback: () => db.teams.get(teamId),
+  });
 
   const cloudData = {
     id: team.id,
@@ -198,8 +190,7 @@ export async function syncTeamToCloud(
     updated_at: new Date().toISOString(),
   };
 
-  const { error } = await getTable('teams').upsert(cloudData, { onConflict: 'id' });
-  if (error) throw new Error(error.message);
+  throwIfSupabaseError(await getTable('teams').upsert(cloudData, { onConflict: 'id' }));
 }
 
 export async function syncTeamMemberToCloud(
@@ -208,13 +199,15 @@ export async function syncTeamMemberToCloud(
   data?: TeamMember
 ): Promise<void> {
   if (operation === 'delete') {
-    const { error } = await getTable('team_members').delete().eq('id', teamMemberId);
-    if (error) throw new Error(error.message);
+    await deleteEntityByKey({ table: 'team_members', column: 'id', value: teamMemberId });
     return;
   }
 
-  const teamMember = data || (await db.teamMembers.get(teamMemberId));
-  if (!teamMember) throw new Error('TeamMember not found locally');
+  const teamMember = await loadEntityForSync({
+    data,
+    entityName: 'TeamMember',
+    fallback: () => db.teamMembers.get(teamMemberId),
+  });
 
   const cloudData = {
     id: teamMember.id,
@@ -224,8 +217,7 @@ export async function syncTeamMemberToCloud(
     is_captain: teamMember.isCaptain || false,
   };
 
-  const { error } = await getTable('team_members').upsert(cloudData, { onConflict: 'id' });
-  if (error) throw new Error(error.message);
+  throwIfSupabaseError(await getTable('team_members').upsert(cloudData, { onConflict: 'id' }));
 }
 
 export async function syncSessionToCloud(
@@ -234,38 +226,32 @@ export async function syncSessionToCloud(
   data?: RyderCupSession
 ): Promise<void> {
   if (operation === 'delete') {
-    const { error } = await getTable('sessions').delete().eq('id', sessionId);
-    if (error) throw new Error(error.message);
+    await deleteEntityByKey({ table: 'sessions', column: 'id', value: sessionId });
     return;
   }
 
-  const session = data || (await db.sessions.get(sessionId));
-  if (!session) throw new Error('Session not found locally');
+  const session = await loadEntityForSync({
+    data,
+    entityName: 'Session',
+    fallback: () => db.sessions.get(sessionId),
+  });
 
-  const incomingUpdatedAt = session.updatedAt || new Date().toISOString();
-  const cloudData = {
-    id: session.id,
-    trip_id: session.tripId,
-    name: session.name,
-    session_number: session.sessionNumber,
-    session_type: session.sessionType,
-    scheduled_date: session.scheduledDate?.split('T')[0] || null,
-    time_slot: session.timeSlot || null,
-    first_tee_time: session.firstTeeTime || null,
-    points_per_match: session.pointsPerMatch || 1.0,
-    notes: session.notes || null,
-    status: session.status || 'scheduled',
-    is_locked: session.isLocked || false,
-    is_practice_session: session.isPracticeSession || false,
-    default_course_id: session.defaultCourseId || null,
-    default_tee_set_id: session.defaultTeeSetId || null,
-    updated_at: incomingUpdatedAt,
-  };
+  const cloudData = sessionToCloud(session);
+  const incomingUpdatedAt = cloudData.updated_at as string;
 
   // Last-write-wins by updated_at. Two offline devices editing the same
   // session (e.g. captain locking while player edits notes) would otherwise
   // silently overwrite each other based on whichever sync ran last.
-  if (await isCloudNewer('sessions', session.id, incomingUpdatedAt)) return;
+  if (
+    await isServerNewer({
+      table: 'sessions',
+      timestampColumn: 'updated_at',
+      where: { id: session.id },
+      incoming: incomingUpdatedAt,
+    })
+  ) {
+    return;
+  }
 
   const { data: returned, error } = await getTable('sessions')
     .upsert(cloudData, { onConflict: 'id' })
@@ -301,12 +287,13 @@ export async function syncSessionToCloud(
   const rewrittenAt = new Date().toISOString();
   await db.sessions.update(session.id, { sessionNumber: candidate, updatedAt: rewrittenAt });
   const retryData = { ...cloudData, session_number: candidate, updated_at: rewrittenAt };
-  const { data: retryReturned, error: retryError } = await getTable('sessions')
+  const retryResponse = await getTable('sessions')
     .upsert(retryData, { onConflict: 'id' })
     .select('updated_at')
     .single();
-  if (retryError) throw new Error(retryError.message);
-  const retryServerUpdatedAt = (retryReturned as { updated_at?: string } | null)?.updated_at;
+  throwIfSupabaseError(retryResponse);
+  const retryServerUpdatedAt = (retryResponse.data as { updated_at?: string } | null)
+    ?.updated_at;
   if (retryServerUpdatedAt && retryServerUpdatedAt !== rewrittenAt) {
     await db.sessions.update(session.id, { updatedAt: retryServerUpdatedAt });
   }
@@ -318,49 +305,42 @@ export async function syncMatchToCloud(
   data?: Match
 ): Promise<void> {
   if (operation === 'delete') {
-    const { error } = await getTable('matches').delete().eq('id', matchId);
-    if (error) throw new Error(error.message);
+    await deleteEntityByKey({ table: 'matches', column: 'id', value: matchId });
     return;
   }
 
-  const match = data || (await db.matches.get(matchId));
-  if (!match) throw new Error('Match not found locally');
+  const match = await loadEntityForSync({
+    data,
+    entityName: 'Match',
+    fallback: () => db.matches.get(matchId),
+  });
 
-  const incomingUpdatedAt = match.updatedAt || new Date().toISOString();
-  const cloudData = {
-    id: match.id,
-    session_id: match.sessionId,
-    course_id: match.courseId || null,
-    tee_set_id: match.teeSetId || null,
-    match_order: match.matchOrder || 0,
-    status: match.status,
-    start_time: match.startTime || null,
-    current_hole: match.currentHole || 1,
-    mode: match.mode || 'ryderCup',
-    team_a_player_ids: match.teamAPlayerIds,
-    team_b_player_ids: match.teamBPlayerIds,
-    team_a_handicap_allowance: match.teamAHandicapAllowance || 0,
-    team_b_handicap_allowance: match.teamBHandicapAllowance || 0,
-    result: match.result || 'notFinished',
-    margin: match.margin || 0,
-    holes_remaining: match.holesRemaining || 0,
-    notes: match.notes || null,
-    updated_at: incomingUpdatedAt,
-  };
+  const cloudData = matchToCloud(match);
+  const incomingUpdatedAt = cloudData.updated_at as string;
 
   // Last-write-wins by updated_at. Two offline phones editing the same
   // match (captain advancing the hole while player submits a score) would
   // otherwise silently overwrite each other based on sync arrival order.
-  if (await isCloudNewer('matches', match.id, incomingUpdatedAt)) return;
+  if (
+    await isServerNewer({
+      table: 'matches',
+      timestampColumn: 'updated_at',
+      where: { id: match.id },
+      incoming: incomingUpdatedAt,
+    })
+  ) {
+    return;
+  }
 
-  const { data: returned, error } = await getTable('matches')
+  const matchResponse = await getTable('matches')
     .upsert(cloudData, { onConflict: 'id' })
     .select('updated_at')
     .single();
-  if (error) throw new Error(error.message);
+  throwIfSupabaseError(matchResponse);
   // Pull the trigger-set server updated_at back into Dexie so subsequent
   // LWW comparisons compare like-for-like; see sessions writer above.
-  const serverUpdatedAt = (returned as { updated_at?: string } | null)?.updated_at;
+  const serverUpdatedAt = (matchResponse.data as { updated_at?: string } | null)
+    ?.updated_at;
   if (serverUpdatedAt && serverUpdatedAt !== incomingUpdatedAt) {
     await db.matches.update(match.id, { updatedAt: serverUpdatedAt });
   }
@@ -372,13 +352,15 @@ export async function syncHoleResultToCloud(
   data?: HoleResult
 ): Promise<void> {
   if (operation === 'delete') {
-    const { error } = await getTable('hole_results').delete().eq('id', holeResultId);
-    if (error) throw new Error(error.message);
+    await deleteEntityByKey({ table: 'hole_results', column: 'id', value: holeResultId });
     return;
   }
 
-  const holeResult = data || (await db.holeResults.get(holeResultId));
-  if (!holeResult) throw new Error('HoleResult not found locally');
+  const holeResult = await loadEntityForSync({
+    data,
+    entityName: 'HoleResult',
+    fallback: () => db.holeResults.get(holeResultId),
+  });
 
   const validWinners = new Set(['teamA', 'teamB', 'halved', 'none']);
   if (
@@ -392,47 +374,30 @@ export async function syncHoleResultToCloud(
     throw new Error(`Invalid hole winner: ${holeResult.winner}`);
   }
 
-  const incomingTimestamp = holeResult.timestamp || new Date().toISOString();
-  const cloudData = {
-    id: holeResult.id,
-    match_id: holeResult.matchId,
-    hole_number: holeResult.holeNumber,
-    winner: holeResult.winner,
-    team_a_strokes: holeResult.teamAStrokes || null,
-    team_b_strokes: holeResult.teamBStrokes || null,
-    scored_by: holeResult.scoredBy || null,
-    notes: holeResult.notes || null,
-    timestamp: incomingTimestamp,
-  };
+  const cloudData = holeResultToCloud(holeResult);
+  const incomingTimestamp = cloudData.timestamp as string;
 
-  // Last-write-wins by timestamp, not by arrival order. Without this check
-  // an offline phone that reconnects hours later can silently overwrite a
-  // fresher score entered by another device during the offline window —
-  // the upsert did not consider timestamps, so whichever write hit Supabase
-  // last wrote. There is still a narrow race between the select and the
-  // upsert, but it closes the worst of the offline-replay data loss.
-  const { data: existing } = await getTable('hole_results')
-    .select('timestamp')
-    .eq('match_id', holeResult.matchId)
-    .eq('hole_number', holeResult.holeNumber)
-    .maybeSingle();
-
-  const existingTimestamp =
-    existing && typeof (existing as { timestamp?: string }).timestamp === 'string'
-      ? (existing as { timestamp: string }).timestamp
-      : null;
+  // Last-write-wins by timestamp — an offline phone reconnecting
+  // hours later must not overwrite a fresher score entered by
+  // another device during the offline window. hole_results keys
+  // on (match_id, hole_number) rather than id, so the shared
+  // helper takes the composite where clause.
   if (
-    existingTimestamp &&
-    new Date(existingTimestamp).getTime() >= new Date(incomingTimestamp).getTime()
+    await isServerNewer({
+      table: 'hole_results',
+      timestampColumn: 'timestamp',
+      where: { match_id: holeResult.matchId, hole_number: holeResult.holeNumber },
+      incoming: incomingTimestamp,
+    })
   ) {
-    // Cloud already has a newer (or equal) version; keep it.
     return;
   }
 
-  const { error } = await getTable('hole_results').upsert(cloudData, {
-    onConflict: 'match_id,hole_number',
-  });
-  if (error) throw new Error(error.message);
+  throwIfSupabaseError(
+    await getTable('hole_results').upsert(cloudData, {
+      onConflict: 'match_id,hole_number',
+    })
+  );
 }
 
 export async function syncCourseToCloud(
@@ -441,13 +406,15 @@ export async function syncCourseToCloud(
   data?: Course
 ): Promise<void> {
   if (operation === 'delete') {
-    const { error } = await getTable('courses').delete().eq('id', courseId);
-    if (error) throw new Error(error.message);
+    await deleteEntityByKey({ table: 'courses', column: 'id', value: courseId });
     return;
   }
 
-  const course = data || (await db.courses.get(courseId));
-  if (!course) throw new Error('Course not found locally');
+  const course = await loadEntityForSync({
+    data,
+    entityName: 'Course',
+    fallback: () => db.courses.get(courseId),
+  });
 
   const cloudData = {
     id: course.id,
@@ -456,8 +423,7 @@ export async function syncCourseToCloud(
     updated_at: new Date().toISOString(),
   };
 
-  const { error } = await getTable('courses').upsert(cloudData, { onConflict: 'id' });
-  if (error) throw new Error(error.message);
+  throwIfSupabaseError(await getTable('courses').upsert(cloudData, { onConflict: 'id' }));
 }
 
 export async function syncTeeSetToCloud(
@@ -466,13 +432,15 @@ export async function syncTeeSetToCloud(
   data?: TeeSet
 ): Promise<void> {
   if (operation === 'delete') {
-    const { error } = await getTable('tee_sets').delete().eq('id', teeSetId);
-    if (error) throw new Error(error.message);
+    await deleteEntityByKey({ table: 'tee_sets', column: 'id', value: teeSetId });
     return;
   }
 
-  const teeSet = data || (await db.teeSets.get(teeSetId));
-  if (!teeSet) throw new Error('TeeSet not found locally');
+  const teeSet = await loadEntityForSync({
+    data,
+    entityName: 'TeeSet',
+    fallback: () => db.teeSets.get(teeSetId),
+  });
 
   const cloudData = {
     id: teeSet.id,
@@ -489,8 +457,7 @@ export async function syncTeeSetToCloud(
     updated_at: new Date().toISOString(),
   };
 
-  const { error } = await getTable('tee_sets').upsert(cloudData, { onConflict: 'id' });
-  if (error) throw new Error(error.message);
+  throwIfSupabaseError(await getTable('tee_sets').upsert(cloudData, { onConflict: 'id' }));
 }
 
 /**
@@ -514,13 +481,15 @@ export async function syncSideBetToCloud(
   data?: SideBet
 ): Promise<void> {
   if (operation === 'delete') {
-    const { error } = await getTable('side_bets').delete().eq('id', sideBetId);
-    if (error) throw new Error(error.message);
+    await deleteEntityByKey({ table: 'side_bets', column: 'id', value: sideBetId });
     return;
   }
 
-  const bet = data || (await db.sideBets.get(sideBetId));
-  if (!bet) throw new Error('SideBet not found locally');
+  const bet = await loadEntityForSync({
+    data,
+    entityName: 'SideBet',
+    fallback: () => db.sideBets.get(sideBetId),
+  });
 
   const cloudData = {
     id: bet.id,
@@ -551,8 +520,7 @@ export async function syncSideBetToCloud(
     updated_at: new Date().toISOString(),
   };
 
-  const { error } = await getTable('side_bets').upsert(cloudData, { onConflict: 'id' });
-  if (error) throw new Error(error.message);
+  throwIfSupabaseError(await getTable('side_bets').upsert(cloudData, { onConflict: 'id' }));
 }
 
 
@@ -568,13 +536,19 @@ export async function syncPracticeScoreToCloud(
   data?: PracticeScore
 ): Promise<void> {
   if (operation === 'delete') {
-    const { error } = await getTable('practice_scores').delete().eq('id', practiceScoreId);
-    if (error) throw new Error(error.message);
+    await deleteEntityByKey({
+      table: 'practice_scores',
+      column: 'id',
+      value: practiceScoreId,
+    });
     return;
   }
 
-  const score = data || (await db.practiceScores.get(practiceScoreId));
-  if (!score) throw new Error('PracticeScore not found locally');
+  const score = await loadEntityForSync({
+    data,
+    entityName: 'PracticeScore',
+    fallback: () => db.practiceScores.get(practiceScoreId),
+  });
 
   const cloudData = {
     id: score.id,
@@ -585,8 +559,9 @@ export async function syncPracticeScoreToCloud(
     updated_at: score.updatedAt || new Date().toISOString(),
   };
 
-  const { error } = await getTable('practice_scores').upsert(cloudData, { onConflict: 'id' });
-  if (error) throw new Error(error.message);
+  throwIfSupabaseError(
+    await getTable('practice_scores').upsert(cloudData, { onConflict: 'id' })
+  );
 }
 
 
@@ -601,13 +576,19 @@ export async function syncBanterPostToCloud(
   data?: BanterPost
 ): Promise<void> {
   if (operation === 'delete') {
-    const { error } = await getTable('banter_posts').delete().eq('id', banterPostId);
-    if (error) throw new Error(error.message);
+    await deleteEntityByKey({
+      table: 'banter_posts',
+      column: 'id',
+      value: banterPostId,
+    });
     return;
   }
 
-  const post = data || (await db.banterPosts.get(banterPostId));
-  if (!post) throw new Error('BanterPost not found locally');
+  const post = await loadEntityForSync({
+    data,
+    entityName: 'BanterPost',
+    fallback: () => db.banterPosts.get(banterPostId),
+  });
 
   const cloudData = {
     id: post.id,
@@ -623,6 +604,7 @@ export async function syncBanterPostToCloud(
     updated_at: new Date().toISOString(),
   };
 
-  const { error } = await getTable('banter_posts').upsert(cloudData, { onConflict: 'id' });
-  if (error) throw new Error(error.message);
+  throwIfSupabaseError(
+    await getTable('banter_posts').upsert(cloudData, { onConflict: 'id' })
+  );
 }

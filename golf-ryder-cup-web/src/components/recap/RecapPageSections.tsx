@@ -1,13 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 import {
   Award,
   BarChart3,
-  Camera,
   Medal,
   MessageSquare,
-  Star,
   Swords,
   Trophy,
   Users,
@@ -17,7 +14,11 @@ import { EmptyStatePremium } from '@/components/ui';
 import { stripHtml } from '@/lib/utils/sanitize';
 import type { FunStatHighlight, TripHighlight, TripRecapData } from '@/lib/services/recapService';
 
-export type RecapSection = 'overview' | 'leaderboard' | 'matches' | 'stats' | 'banter' | 'photos';
+// The "photos" tab was on this list before the photo-share feature
+// was cut. The Dexie tables it backed never had a writer in
+// production so the tab was always an empty state. Removed along
+// with the feature's client-side remnants in the same commit.
+export type RecapSection = 'overview' | 'leaderboard' | 'matches' | 'stats' | 'banter';
 
 export const RECAP_SECTIONS: { id: RecapSection; label: string; icon: typeof Trophy }[] = [
   { id: 'overview', label: 'Overview', icon: Trophy },
@@ -25,7 +26,6 @@ export const RECAP_SECTIONS: { id: RecapSection; label: string; icon: typeof Tro
   { id: 'matches', label: 'Matches', icon: Swords },
   { id: 'stats', label: 'Stats', icon: BarChart3 },
   { id: 'banter', label: 'Banter', icon: MessageSquare },
-  { id: 'photos', label: 'Photos', icon: Camera },
 ];
 
 export function HeroBanner({ recap }: { recap: TripRecapData }) {
@@ -329,48 +329,4 @@ export function BanterSection({ recap }: { recap: TripRecapData }) {
   );
 }
 
-export function PhotosSection({ recap }: { recap: TripRecapData }) {
-  if (recap.topPhotos.length === 0) {
-    return (
-      <EmptyStatePremium
-        illustration="scorecard"
-        title="No photos"
-        description="Share photos during your trip and they'll appear in the recap."
-        variant="compact"
-      />
-    );
-  }
-
-  return (
-    <div className="grid grid-cols-2 gap-2">
-      {recap.topPhotos.map((photo, index) => (
-        <div
-          key={`${photo.url}-${index}`}
-          className={`relative rounded-xl overflow-hidden border border-[var(--rule)] ${
-            index === 0 ? 'col-span-2 aspect-video' : 'aspect-square'
-          }`}
-        >
-          <Image
-            src={photo.url}
-            alt={photo.caption || 'Trip photo'}
-            fill
-            className="object-cover"
-            sizes={index === 0 ? '100vw' : '50vw'}
-          />
-          {photo.isMomentOfTrip ? (
-            <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-[color:var(--ink)]/70 text-[var(--canvas)] text-xs flex items-center gap-1">
-              <Star size={10} className="text-[color:var(--gold)]" />
-              Moment of the Trip
-            </div>
-          ) : null}
-          {photo.caption ? (
-            <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-[color:var(--ink)]/70 to-transparent">
-              <p className="text-[var(--canvas)] text-xs">{photo.caption}</p>
-            </div>
-          ) : null}
-        </div>
-      ))}
-    </div>
-  );
-}
 

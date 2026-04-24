@@ -2,7 +2,12 @@
 import * as Sentry from '@sentry/nextjs';
 
 import { db } from '../../db';
-import type { SyncEntity, SyncOperation, SyncQueueItem } from '../../types/sync';
+import type {
+  SyncEntity,
+  SyncEntityPayloadMap,
+  SyncOperation,
+  SyncQueueItem,
+} from '../../types/sync';
 import { syncEntityToCloud } from './tripSyncEntityWriters';
 import {
   MAX_RETRY_COUNT,
@@ -255,12 +260,12 @@ export function resolveSyncOperationTransition(
   return incomingOperation;
 }
 
-export function queueSyncOperation(
-  entity: SyncEntity,
+export function queueSyncOperation<E extends SyncEntity>(
+  entity: E,
   entityId: string,
   operation: SyncOperation,
   tripId: string,
-  data?: unknown
+  data?: SyncEntityPayloadMap[E]
 ): void {
   void ensureQueueHydrated();
 
@@ -285,30 +290,35 @@ export function queueSyncOperation(
       return;
     }
 
-    existing.data = data;
-    existing.operation = resolvedOperation;
+    // Assigning through the union's `data` field needs a cast only
+    // because TypeScript can't prove the existing item's entity
+    // tag matches the function's E; the runtime guard above
+    // already enforces that (same entity + entityId + tripId), so
+    // the shape is correct.
+    (existing as { data?: unknown }).data = data;
+    (existing as { operation: SyncOperation }).operation = resolvedOperation;
     existing.idempotencyKey = idempotencyKey;
 
     if (resolvedOperation === 'delete') {
-      existing.data = undefined;
+      (existing as { data?: unknown }).data = undefined;
     }
 
     void persistQueueItem(existing);
     return;
   }
 
-  const item: SyncQueueItem = {
+  const item = {
     id: crypto.randomUUID(),
     entity,
     entityId,
     operation,
     data,
     tripId,
-    status: 'pending',
+    status: 'pending' as const,
     retryCount: 0,
     createdAt: new Date().toISOString(),
     idempotencyKey,
-  };
+  } as SyncQueueItem;
 
   tripSyncRuntime.syncQueue.push(item);
   void persistQueueItem(item);

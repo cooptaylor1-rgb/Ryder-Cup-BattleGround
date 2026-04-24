@@ -34,8 +34,6 @@ import type {
   ChatMessage,
   ChatThread,
   TrashTalk,
-  Photo,
-  PhotoAlbum,
   Poll,
   HeadToHeadRecord,
   TripArchive,
@@ -121,8 +119,6 @@ export class GolfTripDB extends Dexie {
   chatMessages!: Table<ChatMessage>;
   chatThreads!: Table<ChatThread>;
   trashTalks!: Table<TrashTalk>;
-  photos!: Table<Photo>;
-  photoAlbums!: Table<PhotoAlbum>;
   polls!: Table<Poll>;
   headToHeadRecords!: Table<HeadToHeadRecord>;
   tripArchives!: Table<TripArchive>;
@@ -306,6 +302,17 @@ export class GolfTripDB extends Dexie {
     this.version(14).stores({
       practiceScores:
         'id, matchId, [matchId+playerId+holeNumber], [matchId+playerId], [matchId+holeNumber]',
+    });
+
+    // Schema version 15 - Drop photos / photoAlbums
+    // The photo-share feature never shipped a writer in production
+    // (no uploader, no sync writer, no Supabase cloud round-trip),
+    // so these tables were always empty on every device. The recap
+    // "Photos" tab that read them is gone too. Passing null drops
+    // the store and any indexes on Dexie next open.
+    this.version(15).stores({
+      photos: null,
+      photoAlbums: null,
     });
   }
 }

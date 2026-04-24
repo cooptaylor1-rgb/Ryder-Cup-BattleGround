@@ -12,7 +12,18 @@
  * - Historical archives
  */
 
-import type { UUID, ISODateString, Player, SessionType, MatchStatus } from './models';
+import type {
+    Course,
+    HoleResult,
+    ISODateString,
+    Match,
+    MatchStatus,
+    Player,
+    RyderCupSession,
+    SessionType,
+    Team,
+    UUID,
+} from './models';
 
 // ============================================
 // PRE-FLIGHT VALIDATION
@@ -511,11 +522,13 @@ export interface TripBackup {
         location?: string;
     };
     players: Player[];
-    teams: unknown[];
-    sessions: unknown[];
-    matches: unknown[];
-    holeResults: unknown[];
-    courses: unknown[];
+    teams: Team[];
+    sessions: RyderCupSession[];
+    matches: Match[];
+    holeResults: HoleResult[];
+    courses: Course[];
+    // Awards / trophies are defined per deployment; leave loosely
+    // typed until the feature ships a concrete shape.
     awards?: unknown[];
     sideGames?: SideGame[];
     checksum: string;

@@ -194,8 +194,6 @@ export async function deleteTripCascade(
       db.chatMessages,
       db.chatThreads,
       db.trashTalks,
-      db.photos,
-      db.photoAlbums,
       db.polls,
       db.headToHeadRecords,
       db.tripArchives,
@@ -257,8 +255,6 @@ export async function deleteTripCascade(
       recordsDeleted += await db.chatMessages.where('tripId').equals(tripId).delete();
       recordsDeleted += await db.chatThreads.where('tripId').equals(tripId).delete();
       recordsDeleted += await db.trashTalks.where('tripId').equals(tripId).delete();
-      recordsDeleted += await db.photos.where('tripId').equals(tripId).delete();
-      recordsDeleted += await db.photoAlbums.where('tripId').equals(tripId).delete();
       recordsDeleted += await db.polls.where('tripId').equals(tripId).delete();
       recordsDeleted += await db.headToHeadRecords.where('tripId').equals(tripId).delete();
       recordsDeleted += await db.tripArchives.where('tripId').equals(tripId).delete();
@@ -280,7 +276,7 @@ export async function deleteTripCascade(
     }
   );
 
-  const tablesCleared = 30; // Number of tables touched
+  const tablesCleared = 28; // Number of tables touched
   logger.log('deleteTripCascade: complete', { tripId, tablesCleared, recordsDeleted });
 
   return { tablesCleared, recordsDeleted };

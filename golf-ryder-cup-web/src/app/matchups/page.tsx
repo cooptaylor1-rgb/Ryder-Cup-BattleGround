@@ -11,25 +11,18 @@ import { Users, Plus, Shield, Calendar, ChevronRight } from 'lucide-react';
 import { EmptyStatePremium, NoSessionsEmpty } from '@/components/ui';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout';
+import { useTeamsWithPlayers } from '@/lib/hooks/useTeamsWithPlayers';
 
 export default function MatchupsPage() {
   const router = useRouter();
-  const { currentTrip, sessions, teams, players, teamMembers } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, teams: s.teams, players: s.players, teamMembers: s.teamMembers })));
+  const { currentTrip, sessions } = useTripStore(
+    useShallow((s) => ({ currentTrip: s.currentTrip, sessions: s.sessions }))
+  );
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
 
   // If no active trip selected, show an explicit empty state (no redirect).
 
-  const getTeamPlayers = (teamId: string) => {
-    const memberIds = teamMembers
-      .filter(tm => tm.teamId === teamId)
-      .map(tm => tm.playerId);
-    return players.filter(p => memberIds.includes(p.id));
-  };
-
-  const teamA = teams.find(t => t.color === 'usa');
-  const teamB = teams.find(t => t.color === 'europe');
-  const teamAPlayers = teamA ? getTeamPlayers(teamA.id) : [];
-  const teamBPlayers = teamB ? getTeamPlayers(teamB.id) : [];
+  const { teamA, teamB, teamAPlayers, teamBPlayers } = useTeamsWithPlayers();
   const liveSessions = sessions.filter((session) => session.status === 'inProgress').length;
 
   if (!currentTrip) {

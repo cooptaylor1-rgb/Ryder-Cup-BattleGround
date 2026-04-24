@@ -19,13 +19,13 @@ import type { Player } from '@/lib/types/models';
 import { createLogger } from '@/lib/utils/logger';
 import { useTripRosterRefresh } from '@/lib/hooks/useTripRosterRefresh';
 
-interface BulkPlayerRow {
-  id: string;
-  firstName: string;
-  lastName: string;
-  handicapIndex: string;
-  teamId: string;
-}
+import {
+  createEmptyRow,
+  getHandicapValue,
+  isValidEmail,
+  isValidHandicapIndex,
+  type BulkPlayerRow,
+} from './playersFormHelpers';
 
 type CommandCenterPanel = 'roster' | 'draft';
 
@@ -38,29 +38,6 @@ const INITIAL_FORM_DATA = {
   email: '',
   teamId: '',
 };
-
-function createEmptyRow(): BulkPlayerRow {
-  return {
-    id: crypto.randomUUID(),
-    firstName: '',
-    lastName: '',
-    handicapIndex: '',
-    teamId: '',
-  };
-}
-
-function isValidHandicapIndex(value: string) {
-  const handicap = parseFloat(value);
-  return !Number.isNaN(handicap) && handicap >= -10 && handicap <= 54;
-}
-
-function isValidEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-function getHandicapValue(player: Player, fallback: number) {
-  return player.handicapIndex ?? fallback;
-}
 
 export default function PlayersPageClient() {
   const router = useRouter();

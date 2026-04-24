@@ -110,6 +110,16 @@ export async function saveLineup(
       teamBPlayerIds,
       teamAHandicapAllowance: handicapContext.teamAHandicapAllowance,
       teamBHandicapAllowance: handicapContext.teamBHandicapAllowance,
+      // Inherit the session's practice flag into Match.mode so the
+      // three bifurcation flags (Trip.isPracticeRound,
+      // Session.isPracticeSession, Match.mode) stay in agreement.
+      // Before this a captain could create a "Practice session",
+      // publish pairings through this path, and get matches with
+      // mode=undefined — which the leaderboard then treated as
+      // ryderCup and accumulated points from. The belt-and-
+      // suspenders filter in calculateTeamStandings catches this
+      // too, but fixing the inheritance here is the real fix.
+      mode: session.isPracticeSession ? 'practice' : 'ryderCup',
       // Inherit the session's default course + tee so a captain who
       // set them in Session Settings before publishing pairings
       // doesn't have to touch every match afterward. Per-match

@@ -129,7 +129,6 @@ interface TripState {
   updateSession: (sessionId: string, updates: Partial<RyderCupSession>) => Promise<void>;
 
   // Selectors (computed)
-  getTeamPlayers: (teamId: string) => Player[];
   getTeamByColor: (color: 'usa' | 'europe') => Team | null;
   getActiveSession: () => RyderCupSession | null;
   getSessionMatches: (sessionId: string) => Promise<Match[]>;
@@ -618,19 +617,54 @@ export const useTripStore = create<TripState>()(
 
       updateSession: async (sessionId, updates) => {
         const now = new Date().toISOString();
+        const { currentTrip, sessions } = get();
+        const previousSession = sessions.find((s) => s.id === sessionId);
         await db.sessions.update(sessionId, {
           ...updates,
           updatedAt: now,
         });
 
-        const { currentTrip, sessions } = get();
-        const updatedSession = sessions.find((s) => s.id === sessionId);
+        const updatedSession = previousSession;
         if (currentTrip && updatedSession) {
           queueSyncOperation('session', sessionId, 'update', currentTrip.id, {
             ...updatedSession,
             ...updates,
             updatedAt: now,
           });
+        }
+
+        // Cascade the practice flag into Match.mode for every match
+        // in this session. Without the cascade, flipping the session
+        // checkbox from "cup" to "practice" left existing matches
+        // with mode='ryderCup', so calculateTeamStandings' belt-and-
+        // suspenders match.mode filter did the right thing while
+        // the session flag and match.mode silently diverged. Fix the
+        // underlying drift so every read path sees one truth.
+        if (
+          previousSession &&
+          typeof updates.isPracticeSession === 'boolean' &&
+          previousSession.isPracticeSession !== updates.isPracticeSession
+        ) {
+          const targetMode = updates.isPracticeSession ? 'practice' : 'ryderCup';
+          const sessionMatches = await db.matches
+            .where('sessionId')
+            .equals(sessionId)
+            .toArray();
+          for (const match of sessionMatches) {
+            if (match.mode === targetMode) continue;
+            const matchUpdates = {
+              mode: targetMode,
+              version: (match.version ?? 0) + 1,
+              updatedAt: now,
+            } as const;
+            await db.matches.update(match.id, matchUpdates);
+            if (currentTrip) {
+              queueSyncOperation('match', match.id, 'update', currentTrip.id, {
+                ...match,
+                ...matchUpdates,
+              });
+            }
+          }
         }
 
         set((state) => ({
@@ -642,14 +676,6 @@ export const useTripStore = create<TripState>()(
       },
 
       // Selectors
-      getTeamPlayers: (teamId) => {
-        const { teamMembers, players } = get();
-        const memberPlayerIds = teamMembers
-          .filter((tm) => tm.teamId === teamId)
-          .map((tm) => tm.playerId);
-        return players.filter((p) => memberPlayerIds.includes(p.id));
-      },
-
       getTeamByColor: (color) => {
         const { teams } = get();
         return teams.find((t) => t.color === color) || null;

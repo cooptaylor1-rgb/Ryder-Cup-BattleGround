@@ -12,6 +12,7 @@ import { CaptainToggle } from '@/components/ui/CaptainToggle';
 import { EmptyStatePremium } from '@/components/ui/EmptyStatePremium';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
+import { useTeamsWithPlayers } from '@/lib/hooks/useTeamsWithPlayers';
 import {
   AlertTriangle,
   Car,
@@ -146,7 +147,13 @@ const setupActions: CaptainCommandAction[] = [
 export default function CaptainPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentTrip, sessions, teams, players, teamMembers } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, teams: s.teams, players: s.players, teamMembers: s.teamMembers })));
+  const { currentTrip, sessions, players } = useTripStore(
+    useShallow((s) => ({
+      currentTrip: s.currentTrip,
+      sessions: s.sessions,
+      players: s.players,
+    }))
+  );
   const { isCaptainMode, enableCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, enableCaptainMode: s.enableCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
   const [captainPin, setCaptainPin] = useState('');
@@ -275,21 +282,7 @@ export default function CaptainPageClient() {
     );
   }
 
-  const getTeamPlayers = (teamId: string) => {
-    const memberIds = teamMembers
-      .filter((membership) => membership.teamId === teamId)
-      .map((membership) => membership.playerId);
-
-    return players.filter((player) => memberIds.includes(player.id));
-  };
-
-  const teamA = teams.find((team) => team.color === 'usa');
-  const teamB = teams.find((team) => team.color === 'europe');
-  const teamAPlayers = teamA ? getTeamPlayers(teamA.id) : [];
-  const teamBPlayers = teamB ? getTeamPlayers(teamB.id) : [];
-  const unassignedPlayers = players.filter(
-    (player) => !teamMembers.some((membership) => membership.playerId === player.id)
-  );
+  const { teamA, teamB, teamAPlayers, teamBPlayers, unassignedPlayers } = useTeamsWithPlayers();
 
   const activeSessions = sessions.filter((session) => session.status === 'inProgress');
   const upcomingSessions = sessions.filter((session) => session.status === 'scheduled');

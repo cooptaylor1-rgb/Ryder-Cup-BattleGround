@@ -393,17 +393,17 @@ export function MatchScoringActiveState({
                   teamAHandicapStrokes={teamAHandicapAllowance}
                   teamBHandicapStrokes={teamBHandicapAllowance}
                   holeHandicaps={holeHandicaps}
-                  initialTeamAScore={currentHoleResult?.teamAScore || null}
-                  initialTeamBScore={currentHoleResult?.teamBScore || null}
+                  initialTeamAScore={currentHoleResult?.teamAStrokes || null}
+                  initialTeamBScore={currentHoleResult?.teamBStrokes || null}
                   onSubmit={onScoreWithStrokes}
                   isSubmitting={isSaving}
                 />
                 {currentHoleResult &&
-                  (currentHoleResult.teamAScore || currentHoleResult.teamBScore) && (
+                  (currentHoleResult.teamAStrokes || currentHoleResult.teamBStrokes) && (
                     <div className="mt-4 rounded-[20px] border border-[color:var(--rule)] bg-[color:var(--canvas-sunken)] px-4 py-3">
                       <p className="text-center text-xs text-[var(--ink-tertiary)]">
-                        Previous score: {teamAName} {currentHoleResult.teamAScore} -{' '}
-                        {currentHoleResult.teamBScore} {teamBName}
+                        Previous score: {teamAName} {currentHoleResult.teamAStrokes} -{' '}
+                        {currentHoleResult.teamBStrokes} {teamBName}
                       </p>
                     </div>
                   )}

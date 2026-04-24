@@ -56,14 +56,6 @@ export interface TripRecapData {
     emoji?: string;
   }>;
 
-  /** Top photos (moment of the trip + most liked) */
-  topPhotos: Array<{
-    url: string;
-    caption?: string;
-    likeCount: number;
-    isMomentOfTrip: boolean;
-  }>;
-
   /** Key dramatic moments */
   highlights: TripHighlight[];
 
@@ -132,10 +124,7 @@ export async function generateTripRecap(tripId: UUID): Promise<TripRecapData | n
   // 6. Load top banter posts (most reactions)
   const topTrashTalk = await loadTopBanterPosts(tripId);
 
-  // 7. Load top photos
-  const topPhotos = await loadTopPhotos(tripId);
-
-  // 8. Generate highlights from match results
+  // 7. Generate highlights from match results
   const highlights = generateHighlights(completedMatches, records, playerMap);
 
   // 9. Build match results summary
@@ -171,7 +160,6 @@ export async function generateTripRecap(tripId: UUID): Promise<TripRecapData | n
     playerLeaderboard: [...records.playerStats].sort((a, b) => b.points - a.points),
     funStats,
     topTrashTalk,
-    topPhotos,
     highlights,
     matchResults,
   };
@@ -275,34 +263,6 @@ async function loadTopBanterPosts(tripId: UUID): Promise<TripRecapData['topTrash
   }
 }
 
-async function loadTopPhotos(tripId: UUID): Promise<TripRecapData['topPhotos']> {
-  try {
-    const photos = await db.photos
-      .where('tripId')
-      .equals(tripId)
-      .toArray();
-
-    // Sort by: moment of trip first, then by likes count
-    const sorted = photos
-      .map(p => ({
-        url: p.url,
-        caption: p.caption,
-        likeCount: p.likes?.length ?? 0,
-        isMomentOfTrip: p.isMomentOfTrip ?? false,
-        momentVotes: p.momentVotes?.length ?? 0,
-      }))
-      .sort((a, b) => {
-        if (a.isMomentOfTrip !== b.isMomentOfTrip) return a.isMomentOfTrip ? -1 : 1;
-        if (a.momentVotes !== b.momentVotes) return b.momentVotes - a.momentVotes;
-        return b.likeCount - a.likeCount;
-      })
-      .slice(0, 8);
-
-    return sorted;
-  } catch {
-    return [];
-  }
-}
 
 // ============================================
 // HIGHLIGHTS GENERATOR
