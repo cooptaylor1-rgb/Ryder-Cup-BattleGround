@@ -1,13 +1,11 @@
 /**
  * Round-trip for the side-bet notes JSON blob.
  *
- * syncSideBetToCloud packs perHole, participantIds, results,
- * sessionId, nassauTeamA/B/Results, completedAt, description, status
- * into the `notes` text column because the Supabase side_bets table
- * has only a single `amount` slot. The pull path in
- * tripSyncTripTransfer re-inflates the blob. These tests guard the
- * packing format + the parsing tolerance so a captain's free-text
- * notes field from a legacy bet never crashes the roster poll.
+ * Legacy clients packed perHole, participantIds, results, sessionId,
+ * nassauTeamA/B/Results, completedAt, description, and status into
+ * the `notes` text column. Current sync has structured columns, but
+ * the pull path still reads the blob so old rows and malformed
+ * captain-entered notes never crash the roster poll.
  */
 
 import { describe, expect, it } from 'vitest';

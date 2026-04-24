@@ -249,12 +249,10 @@ async function reconcileLocalOrphans({
 }
 
 /**
- * syncSideBetToCloud folds richer fields (perHole, participantIds,
- * results, sessionId, nassauResults, etc.) into the `notes` column
- * as JSON because the table only has a single `amount` column. The
- * pull path reverses that: parse the blob back, tolerating any
- * malformed / empty string so a captain who typed free-text notes
- * on an old bet doesn't break the roster pull.
+ * Legacy side-bet rows packed richer fields into the `notes` JSON.
+ * Current sync writes first-class columns, but the pull path still
+ * needs this parser so older cloud rows stay readable and malformed
+ * captain-entered notes never break the roster pull.
  */
 export function parseBetNotes(raw: unknown): Record<string, unknown> {
   return parseSideBetNotes(raw);

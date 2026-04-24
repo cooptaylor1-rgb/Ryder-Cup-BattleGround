@@ -372,11 +372,21 @@ CREATE TABLE IF NOT EXISTS side_bets (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     trip_id UUID NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
     match_id UUID REFERENCES matches(id) ON DELETE SET NULL,
-    bet_type TEXT NOT NULL CHECK (bet_type IN ('skins', 'nassau', 'closest_to_pin', 'longest_drive', 'custom')),
+    session_id UUID REFERENCES sessions(id) ON DELETE SET NULL,
+    bet_type TEXT NOT NULL CHECK (bet_type IN ('skins', 'nassau', 'ctp', 'closest_to_pin', 'longdrive', 'longest_drive', 'custom')),
     name TEXT NOT NULL,
+    description TEXT,
+    status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'completed', 'pending')),
     amount DECIMAL(10, 2),
+    per_hole DECIMAL(10, 2),
     winner_player_id UUID REFERENCES players(id),
     hole_number INTEGER CHECK (hole_number >= 1 AND hole_number <= 18),
+    participant_ids UUID[] NOT NULL DEFAULT '{}'::UUID[],
+    results JSONB NOT NULL DEFAULT '[]'::JSONB CHECK (jsonb_typeof(results) = 'array'),
+    nassau_team_a UUID[] NOT NULL DEFAULT '{}'::UUID[],
+    nassau_team_b UUID[] NOT NULL DEFAULT '{}'::UUID[],
+    nassau_results JSONB NOT NULL DEFAULT '{}'::JSONB CHECK (jsonb_typeof(nassau_results) = 'object'),
+    completed_at TIMESTAMPTZ,
     notes TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -384,6 +394,9 @@ CREATE TABLE IF NOT EXISTS side_bets (
 
 CREATE INDEX idx_side_bets_trip_id ON side_bets(trip_id);
 CREATE INDEX idx_side_bets_match_id ON side_bets(match_id);
+CREATE INDEX idx_side_bets_trip_session ON side_bets(trip_id, session_id) WHERE session_id IS NOT NULL;
+CREATE INDEX idx_side_bets_trip_status ON side_bets(trip_id, status);
+CREATE INDEX idx_side_bets_participant_ids ON side_bets USING gin(participant_ids);
 
 -- ============================================
 -- ACHIEVEMENTS (Step 4: Gamification)

@@ -533,13 +533,10 @@ export async function syncTeeSetToCloud(
  * device opening the trip saw no bets at all, and the settlement
  * flow had nothing to settle.
  *
- * Column names match the public.side_bets schema: the `name` / `amount`
- * / `winner_player_id` / `hole_number` / `notes` columns in Supabase
- * don't perfectly mirror the local SideBet model, so the payload
- * flattens the model's pot + perHole + hole + winnerId into those
- * existing columns. The richer fields (description, participantIds,
- * results, nassau team arrays) are stored as JSON in `notes` until the
- * schema grows real columns for them.
+ * Column names match the public.side_bets schema. The payload writes
+ * the structured columns used by current clients and still fills the
+ * legacy `notes` JSON so old rows and pre-migration clients keep
+ * round-tripping without data loss.
  */
 export async function syncSideBetToCloud(
   sideBetId: string,

@@ -10,7 +10,12 @@
 import { describe, expect, it } from 'vitest';
 
 import type { DuesLineItem, PaymentRecord } from '@/lib/types/finances';
-import type { Announcement, AttendanceRecord, CartAssignment, TripInvitation } from '@/lib/types/logistics';
+import type {
+  Announcement,
+  AttendanceRecord,
+  CartAssignment,
+  TripInvitation,
+} from '@/lib/types/logistics';
 import type {
   BanterPost,
   Course,
@@ -184,7 +189,18 @@ describe('canonical non-scoring sync mappers', () => {
       createdAt: '2026-04-23T12:00:00Z',
       completedAt: '2026-04-23T18:00:00Z',
     };
-    const parsedBet = sideBetFromCloud(sideBetToCloud(sideBet));
+    const cloudBet = sideBetToCloud(sideBet);
+    expect(cloudBet).toMatchObject({
+      session_id: 'session-1',
+      description: 'Team nassau',
+      status: 'completed',
+      per_hole: 500,
+      participant_ids: ['p1', 'p2', 'p3', 'p4'],
+      nassau_team_a: ['p1', 'p2'],
+      nassau_team_b: ['p3', 'p4'],
+      completed_at: '2026-04-23T18:00:00Z',
+    });
+    const parsedBet = sideBetFromCloud({ ...cloudBet, notes: null });
     expect(parsedBet.sessionId).toBe('session-1');
     expect(parsedBet.participantIds).toEqual(sideBet.participantIds);
     expect(parsedBet.nassauResults?.overallWinner).toBe('teamB');
@@ -246,6 +262,41 @@ describe('canonical non-scoring sync mappers', () => {
       createdAt: '2026-04-23T13:00:00Z',
     };
     expect(paymentRecordFromCloud(paymentRecordToCloud(payment))).toEqual(payment);
+  });
+
+  it('reads legacy side bet notes when structured columns are absent', () => {
+    const legacyBet = sideBetFromCloud({
+      id: 'bet-legacy',
+      trip_id: 'trip-1',
+      match_id: null,
+      bet_type: 'skins',
+      name: 'Legacy Skins',
+      amount: '25',
+      winner_player_id: null,
+      hole_number: null,
+      notes: JSON.stringify({
+        description: 'Old notes payload',
+        status: 'completed',
+        perHole: 5,
+        sessionId: 'session-legacy',
+        participantIds: ['p1', 'p2'],
+        results: [{ holeNumber: 1, winnerId: 'p1', amount: 5 }],
+        completedAt: '2026-04-23T19:00:00Z',
+      }),
+      created_at: '2026-04-23T12:00:00Z',
+      updated_at: '2026-04-23T13:00:00Z',
+    });
+
+    expect(legacyBet).toMatchObject({
+      sessionId: 'session-legacy',
+      description: 'Old notes payload',
+      status: 'completed',
+      pot: 25,
+      perHole: 5,
+      participantIds: ['p1', 'p2'],
+      completedAt: '2026-04-23T19:00:00Z',
+    });
+    expect(legacyBet.results?.[0]).toMatchObject({ holeNumber: 1, winnerId: 'p1' });
   });
 
   it('round-trips invitations, announcements, attendance records, and cart assignments', () => {
@@ -491,9 +542,7 @@ describe('holeResultToCloud / holeResultFromCloud', () => {
         { playerId: 'pA1', grossScore: 4, netScore: 4, isBestBall: true },
         { playerId: 'pA2', grossScore: 5, netScore: 4 },
       ],
-      teamBPlayerScores: [
-        { playerId: 'pB1', grossScore: 5, netScore: 5, isBestBall: true },
-      ],
+      teamBPlayerScores: [{ playerId: 'pB1', grossScore: 5, netScore: 5, isBestBall: true }],
       scoredBy: 'pA1',
       timestamp: '2026-04-23T18:00:00Z',
     };

@@ -52,7 +52,12 @@ function optionalString(value: unknown): string | undefined {
 }
 
 function numberOrUndefined(value: unknown): number | undefined {
-  return typeof value === 'number' ? value : undefined;
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+  return undefined;
 }
 
 function stringArray(value: unknown): string[] {
@@ -81,7 +86,19 @@ function parseJsonObject(raw: unknown): Record<string, unknown> {
 }
 
 function optionalNumber(value: unknown): number | undefined {
-  return typeof value === 'number' ? value : undefined;
+  return numberOrUndefined(value);
+}
+
+function jsonArrayOrUndefined<T = unknown>(value: unknown): T[] | undefined {
+  return Array.isArray(value) ? (value as T[]) : undefined;
+}
+
+function jsonObjectOrUndefined<T = Record<string, unknown>>(value: unknown): T | undefined {
+  return value && typeof value === 'object' && !Array.isArray(value) ? (value as T) : undefined;
+}
+
+function hasObjectKeys(value: object | undefined): boolean {
+  return Boolean(value && Object.keys(value).length > 0);
 }
 
 // ---------------------------------------------------------------
@@ -521,11 +538,21 @@ export function sideBetToCloud(bet: SideBet): Record<string, unknown> {
     id: bet.id,
     trip_id: bet.tripId,
     match_id: bet.matchId ?? null,
+    session_id: bet.sessionId ?? null,
     bet_type: bet.type,
     name: bet.name,
+    description: bet.description || null,
+    status: bet.status,
     amount: bet.pot ?? bet.perHole ?? null,
+    per_hole: bet.perHole ?? null,
     winner_player_id: bet.winnerId ?? null,
     hole_number: bet.hole ?? null,
+    participant_ids: bet.participantIds,
+    results: bet.results ?? [],
+    nassau_team_a: bet.nassauTeamA ?? [],
+    nassau_team_b: bet.nassauTeamB ?? [],
+    nassau_results: bet.nassauResults ?? {},
+    completed_at: bet.completedAt ?? null,
     notes: packSideBetNotes(bet),
     created_at: bet.createdAt,
     updated_at: nowIso(),
@@ -534,35 +561,59 @@ export function sideBetToCloud(bet: SideBet): Record<string, unknown> {
 
 export function sideBetFromCloud(row: Record<string, unknown>): SideBet {
   const parsedNotes = parseSideBetNotes(row.notes);
+  const participantIds = stringArray(row.participant_ids);
+  const parsedParticipantIds = stringArray(parsedNotes.participantIds);
+  const results = jsonArrayOrUndefined<NonNullable<SideBet['results']>[number]>(row.results);
+  const parsedResults = jsonArrayOrUndefined<NonNullable<SideBet['results']>[number]>(
+    parsedNotes.results
+  );
+  const nassauTeamA = stringArray(row.nassau_team_a);
+  const parsedNassauTeamA = stringArray(parsedNotes.nassauTeamA);
+  const nassauTeamB = stringArray(row.nassau_team_b);
+  const parsedNassauTeamB = stringArray(parsedNotes.nassauTeamB);
+  const nassauResults = jsonObjectOrUndefined<NonNullable<SideBet['nassauResults']>>(
+    row.nassau_results
+  );
+  const parsedNassauResults = jsonObjectOrUndefined<NonNullable<SideBet['nassauResults']>>(
+    parsedNotes.nassauResults
+  );
+
   return {
     id: String(row.id),
     tripId: String(row.trip_id),
     matchId: optionalString(row.match_id),
-    sessionId: optionalString(parsedNotes.sessionId),
+    sessionId: optionalString(row.session_id) ?? optionalString(parsedNotes.sessionId),
     type: (row.bet_type as SideBet['type']) || 'custom',
     name: String(row.name ?? ''),
-    description: typeof parsedNotes.description === 'string' ? parsedNotes.description : '',
-    status: (parsedNotes.status as SideBet['status']) || 'active',
+    description:
+      optionalString(row.description) ??
+      (typeof parsedNotes.description === 'string' ? parsedNotes.description : ''),
+    status:
+      (row.status as SideBet['status']) || (parsedNotes.status as SideBet['status']) || 'active',
     pot: numberOrUndefined(row.amount),
-    perHole: numberOrUndefined(parsedNotes.perHole),
+    perHole: numberOrUndefined(row.per_hole) ?? numberOrUndefined(parsedNotes.perHole),
     winnerId: optionalString(row.winner_player_id),
     hole: numberOrUndefined(row.hole_number),
-    participantIds: stringArray(parsedNotes.participantIds),
-    results: Array.isArray(parsedNotes.results)
-      ? (parsedNotes.results as SideBet['results'])
-      : undefined,
-    nassauTeamA: Array.isArray(parsedNotes.nassauTeamA)
-      ? stringArray(parsedNotes.nassauTeamA)
-      : undefined,
-    nassauTeamB: Array.isArray(parsedNotes.nassauTeamB)
-      ? stringArray(parsedNotes.nassauTeamB)
-      : undefined,
-    nassauResults:
-      parsedNotes.nassauResults && typeof parsedNotes.nassauResults === 'object'
-        ? (parsedNotes.nassauResults as SideBet['nassauResults'])
-        : undefined,
+    participantIds: participantIds.length > 0 ? participantIds : parsedParticipantIds,
+    results: results && results.length > 0 ? results : parsedResults,
+    nassauTeamA:
+      nassauTeamA.length > 0
+        ? nassauTeamA
+        : parsedNassauTeamA.length > 0
+          ? parsedNassauTeamA
+          : undefined,
+    nassauTeamB:
+      nassauTeamB.length > 0
+        ? nassauTeamB
+        : parsedNassauTeamB.length > 0
+          ? parsedNassauTeamB
+          : undefined,
+    nassauResults: hasObjectKeys(nassauResults) ? nassauResults : parsedNassauResults,
     createdAt: String(row.created_at ?? nowIso()),
-    completedAt: optionalString(parsedNotes.completedAt),
+    completedAt:
+      optionalString(row.completed_at) ??
+      optionalString(row.settled_at) ??
+      optionalString(parsedNotes.completedAt),
   };
 }
 
