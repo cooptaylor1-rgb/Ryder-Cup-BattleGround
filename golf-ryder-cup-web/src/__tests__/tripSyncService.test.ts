@@ -174,6 +174,11 @@ describe('Trip Sync Service', () => {
         'holeResult',
         'course',
         'teeSet',
+        'sideBet',
+        'practiceScore',
+        'banterPost',
+        'duesLineItem',
+        'paymentRecord',
       ];
 
       entities.forEach((entity) => {

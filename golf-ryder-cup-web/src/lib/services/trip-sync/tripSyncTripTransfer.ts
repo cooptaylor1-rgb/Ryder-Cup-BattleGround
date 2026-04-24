@@ -1,17 +1,24 @@
 import { storeTripShareCode } from '@/lib/utils/tripShareCodeStore';
 import { mergeTripPlayers } from '@/lib/utils/tripPlayers';
 import {
-  coerceHandicapSettings,
-  coerceScoringSettings,
-} from '@/lib/utils/tripSettingsGuards';
-import {
+  banterPostFromCloud,
+  courseFromCloud,
+  duesLineItemFromCloud,
   holeResultFromCloud,
   matchFromCloud,
+  parseSideBetNotes,
+  paymentRecordFromCloud,
+  playerFromCloud,
+  practiceScoreFromCloud,
   sessionFromCloud,
+  sideBetFromCloud,
+  teamFromCloud,
+  teamMemberFromCloud,
+  teeSetFromCloud,
+  tripFromCloud,
 } from './tripSyncMappers';
 
 import { db } from '../../db';
-import type { BanterPost, SideBet, Trip } from '../../types/models';
 import { getPendingSyncIdsForTrip } from './tripSyncQueue';
 import { supabase } from '../../supabase/client';
 
@@ -35,6 +42,8 @@ async function reconcileLocalOrphans({
   cloudPracticeScoreIds,
   cloudSideBetIds,
   cloudBanterPostIds,
+  cloudDuesLineItemIds,
+  cloudPaymentRecordIds,
 }: {
   tripId: string;
   cloudPlayerIds: string[];
@@ -46,6 +55,8 @@ async function reconcileLocalOrphans({
   cloudPracticeScoreIds: string[];
   cloudSideBetIds: string[];
   cloudBanterPostIds: string[];
+  cloudDuesLineItemIds: string[];
+  cloudPaymentRecordIds: string[];
 }): Promise<void> {
   // Snapshot the pending sync-queue ids once so we don't repeatedly
   // walk the queue inside the per-entity filters.
@@ -59,6 +70,8 @@ async function reconcileLocalOrphans({
     practiceScore: getPendingSyncIdsForTrip(tripId, 'practiceScore'),
     sideBet: getPendingSyncIdsForTrip(tripId, 'sideBet'),
     banterPost: getPendingSyncIdsForTrip(tripId, 'banterPost'),
+    duesLineItem: getPendingSyncIdsForTrip(tripId, 'duesLineItem'),
+    paymentRecord: getPendingSyncIdsForTrip(tripId, 'paymentRecord'),
   };
 
   const cloud = {
@@ -71,6 +84,8 @@ async function reconcileLocalOrphans({
     practiceScore: new Set(cloudPracticeScoreIds),
     sideBet: new Set(cloudSideBetIds),
     banterPost: new Set(cloudBanterPostIds),
+    duesLineItem: new Set(cloudDuesLineItemIds),
+    paymentRecord: new Set(cloudPaymentRecordIds),
   };
 
   // Players scoped to this trip.
@@ -169,6 +184,20 @@ async function reconcileLocalOrphans({
     if (pendingByEntity.banterPost.has(post.id)) continue;
     await db.banterPosts.delete(post.id);
   }
+
+  const localDuesLineItems = await db.duesLineItems.where('tripId').equals(tripId).toArray();
+  for (const item of localDuesLineItems) {
+    if (cloud.duesLineItem.has(item.id)) continue;
+    if (pendingByEntity.duesLineItem.has(item.id)) continue;
+    await db.duesLineItems.delete(item.id);
+  }
+
+  const localPaymentRecords = await db.paymentRecords.where('tripId').equals(tripId).toArray();
+  for (const record of localPaymentRecords) {
+    if (cloud.paymentRecord.has(record.id)) continue;
+    if (pendingByEntity.paymentRecord.has(record.id)) continue;
+    await db.paymentRecords.delete(record.id);
+  }
 }
 
 /**
@@ -180,24 +209,23 @@ async function reconcileLocalOrphans({
  * on an old bet doesn't break the roster pull.
  */
 export function parseBetNotes(raw: unknown): Record<string, unknown> {
-  if (typeof raw !== 'string' || raw.trim() === '') return {};
-  try {
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
-      ? (parsed as Record<string, unknown>)
-      : {};
-  } catch {
-    return {};
-  }
+  return parseSideBetNotes(raw);
 }
 import { canSync, getTable, logger } from './tripSyncShared';
 import {
+  syncBanterPostToCloud,
+  syncCourseToCloud,
+  syncDuesLineItemToCloud,
   syncHoleResultToCloud,
   syncMatchToCloud,
+  syncPaymentRecordToCloud,
   syncPlayerToCloud,
+  syncPracticeScoreToCloud,
   syncSessionToCloud,
+  syncSideBetToCloud,
   syncTeamMemberToCloud,
   syncTeamToCloud,
+  syncTeeSetToCloud,
   syncTripToCloud,
 } from './tripSyncEntityWriters';
 import type { TripSyncResult } from './tripSyncTypes';
@@ -237,6 +265,41 @@ export async function syncTripToCloudFull(tripId: string): Promise<TripSyncResul
     const matchIds = matches.map((match) => match.id);
     const holeResults =
       matchIds.length === 0 ? [] : await db.holeResults.where('matchId').anyOf(matchIds).toArray();
+    const courseIds = [
+      ...new Set(
+        [
+          ...sessions.flatMap((session) => [session.defaultCourseId]),
+          ...matches.flatMap((match) => [match.courseId]),
+        ].filter((id): id is string => Boolean(id))
+      ),
+    ];
+    const courses =
+      courseIds.length === 0 ? [] : await db.courses.where('id').anyOf(courseIds).toArray();
+    const teeSetIds = [
+      ...new Set(
+        [
+          ...sessions.flatMap((session) => [session.defaultTeeSetId]),
+          ...matches.flatMap((match) => [match.teeSetId]),
+        ].filter((id): id is string => Boolean(id))
+      ),
+    ];
+    const courseTeeSets =
+      courseIds.length === 0 ? [] : await db.teeSets.where('courseId').anyOf(courseIds).toArray();
+    const explicitTeeSets =
+      teeSetIds.length === 0 ? [] : await db.teeSets.where('id').anyOf(teeSetIds).toArray();
+    const teeSets = Array.from(
+      new Map([...courseTeeSets, ...explicitTeeSets].map((teeSet) => [teeSet.id, teeSet])).values()
+    );
+    const practiceScores =
+      matchIds.length === 0
+        ? []
+        : await db.practiceScores.where('matchId').anyOf(matchIds).toArray();
+    const [sideBets, banterPosts, duesLineItems, paymentRecords] = await Promise.all([
+      db.sideBets.where('tripId').equals(tripId).toArray(),
+      db.banterPosts.where('tripId').equals(tripId).toArray(),
+      db.duesLineItems.where('tripId').equals(tripId).toArray(),
+      db.paymentRecords.where('tripId').equals(tripId).toArray(),
+    ]);
 
     await syncTripToCloud(tripId, 'update', trip);
 
@@ -252,6 +315,14 @@ export async function syncTripToCloudFull(tripId: string): Promise<TripSyncResul
       await syncTeamMemberToCloud(teamMember.id, 'update', teamMember);
     }
 
+    for (const course of courses) {
+      await syncCourseToCloud(course.id, 'update', course, tripId);
+    }
+
+    for (const teeSet of teeSets) {
+      await syncTeeSetToCloud(teeSet.id, 'update', teeSet, tripId);
+    }
+
     for (const session of sessions) {
       await syncSessionToCloud(session.id, 'update', session);
     }
@@ -262,6 +333,26 @@ export async function syncTripToCloudFull(tripId: string): Promise<TripSyncResul
 
     for (const holeResult of holeResults) {
       await syncHoleResultToCloud(holeResult.id, 'update', holeResult);
+    }
+
+    for (const score of practiceScores) {
+      await syncPracticeScoreToCloud(score.id, 'update', score);
+    }
+
+    for (const bet of sideBets) {
+      await syncSideBetToCloud(bet.id, 'update', bet);
+    }
+
+    for (const post of banterPosts) {
+      await syncBanterPostToCloud(post.id, 'update', post);
+    }
+
+    for (const item of duesLineItems) {
+      await syncDuesLineItemToCloud(item.id, 'update', item);
+    }
+
+    for (const record of paymentRecords) {
+      await syncPaymentRecordToCloud(record.id, 'update', record);
     }
 
     logger.log(`Full sync completed for trip ${tripId}`);
@@ -402,6 +493,76 @@ async function pullTripCore(lookup: {
         ? { data: [] }
         : await getTable('hole_results').select('*').in('match_id', matchIds);
 
+    const sessionRows = (sessions as Array<Record<string, unknown>> | null) ?? [];
+    const matchRows = (matches as Array<Record<string, unknown>> | null) ?? [];
+    const referencedCourseIds = [
+      ...new Set(
+        [
+          ...sessionRows.map((session) => session.default_course_id),
+          ...matchRows.map((match) => match.course_id),
+        ].filter((id): id is string => typeof id === 'string')
+      ),
+    ];
+    const { data: tripCoursesRaw } = await getTable('courses')
+      .select('*')
+      .eq('trip_id', trip.id)
+      .then(
+        (response: { data: unknown; error: { code?: string } | null }) =>
+          response.error
+            ? { data: [] as Array<Record<string, unknown>> }
+            : (response as { data: Array<Record<string, unknown>> }),
+        () => ({ data: [] as Array<Record<string, unknown>> })
+      );
+    const { data: referencedCoursesRaw } =
+      referencedCourseIds.length === 0
+        ? { data: [] as Array<Record<string, unknown>> }
+        : await getTable('courses').select('*').in('id', referencedCourseIds);
+    const courses = Array.from(
+      new Map(
+        [
+          ...((tripCoursesRaw as Array<Record<string, unknown>> | null) ?? []),
+          ...((referencedCoursesRaw as Array<Record<string, unknown>> | null) ?? []),
+        ].map((course) => [String(course.id), course])
+      ).values()
+    );
+
+    const courseIds = courses.map((course) => String(course.id));
+    const referencedTeeSetIds = [
+      ...new Set(
+        [
+          ...sessionRows.map((session) => session.default_tee_set_id),
+          ...matchRows.map((match) => match.tee_set_id),
+        ].filter((id): id is string => typeof id === 'string')
+      ),
+    ];
+    const { data: tripTeeSetsRaw } = await getTable('tee_sets')
+      .select('*')
+      .eq('trip_id', trip.id)
+      .then(
+        (response: { data: unknown; error: { code?: string } | null }) =>
+          response.error
+            ? { data: [] as Array<Record<string, unknown>> }
+            : (response as { data: Array<Record<string, unknown>> }),
+        () => ({ data: [] as Array<Record<string, unknown>> })
+      );
+    const { data: courseTeeSetsRaw } =
+      courseIds.length === 0
+        ? { data: [] as Array<Record<string, unknown>> }
+        : await getTable('tee_sets').select('*').in('course_id', courseIds);
+    const { data: referencedTeeSetsRaw } =
+      referencedTeeSetIds.length === 0
+        ? { data: [] as Array<Record<string, unknown>> }
+        : await getTable('tee_sets').select('*').in('id', referencedTeeSetIds);
+    const teeSets = Array.from(
+      new Map(
+        [
+          ...((tripTeeSetsRaw as Array<Record<string, unknown>> | null) ?? []),
+          ...((courseTeeSetsRaw as Array<Record<string, unknown>> | null) ?? []),
+          ...((referencedTeeSetsRaw as Array<Record<string, unknown>> | null) ?? []),
+        ].map((teeSet) => [String(teeSet.id), teeSet])
+      ).values()
+    );
+
     // Practice-round per-player strokes. Keyed by match_id just like
     // hole_results so we fetch the full set in one round-trip. If the
     // practice_scores table doesn't exist yet (e.g. captain hasn't
@@ -449,6 +610,30 @@ async function pullTripCore(lookup: {
       );
     const banterPosts = (banterRaw as Array<Record<string, unknown>> | null) ?? [];
 
+    const { data: duesRaw } = await getTable('dues_line_items')
+      .select('*')
+      .eq('trip_id', trip.id)
+      .then(
+        (response: { data: unknown; error: { code?: string } | null }) =>
+          response.error
+            ? { data: [] as Array<Record<string, unknown>> }
+            : (response as { data: Array<Record<string, unknown>> }),
+        () => ({ data: [] as Array<Record<string, unknown>> })
+      );
+    const duesLineItems = (duesRaw as Array<Record<string, unknown>> | null) ?? [];
+
+    const { data: paymentsRaw } = await getTable('payment_records')
+      .select('*')
+      .eq('trip_id', trip.id)
+      .then(
+        (response: { data: unknown; error: { code?: string } | null }) =>
+          response.error
+            ? { data: [] as Array<Record<string, unknown>> }
+            : (response as { data: Array<Record<string, unknown>> }),
+        () => ({ data: [] as Array<Record<string, unknown>> })
+      );
+    const paymentRecords = (paymentsRaw as Array<Record<string, unknown>> | null) ?? [];
+
     await db.transaction(
       'rw',
       [
@@ -462,53 +647,17 @@ async function pullTripCore(lookup: {
         db.practiceScores,
         db.sideBets,
         db.banterPosts,
+        db.courses,
+        db.teeSets,
+        db.duesLineItems,
+        db.paymentRecords,
       ],
       async () => {
-        const localTrip: Trip = {
-          id: trip.id,
-          name: trip.name,
-          startDate: trip.start_date,
-          endDate: trip.end_date,
-          location: trip.location,
-          notes: trip.notes,
-          isCaptainModeEnabled: trip.is_captain_mode_enabled,
-          captainName: trip.captain_name,
-          isPracticeRound: trip.is_practice_round || undefined,
-          // Validate JSONB blobs before writing into typed Dexie row.
-          // A malformed blob from an old client would otherwise sit in
-          // memory as the typed shape and blow up deep in a reducer
-          // the first time a component destructures it.
-          scoringSettings: coerceScoringSettings(trip.scoring_settings),
-          handicapSettings: coerceHandicapSettings(trip.handicap_settings),
-          createdAt: trip.created_at,
-          updatedAt: trip.updated_at,
-        };
-        await db.trips.put(localTrip);
+        await db.trips.put(tripFromCloud(trip as Record<string, unknown>));
 
         const { players: normalizedPlayers } = mergeTripPlayers(
           trip.id,
-          Array.from(playerRows.values()).map((player) => ({
-            id: String(player.id),
-            tripId: typeof player.trip_id === 'string' ? player.trip_id : undefined,
-            linkedAuthUserId:
-              typeof player.linked_auth_user_id === 'string'
-                ? player.linked_auth_user_id
-                : undefined,
-            linkedProfileId:
-              typeof player.linked_profile_id === 'string' ? player.linked_profile_id : undefined,
-            firstName: String(player.first_name ?? ''),
-            lastName: String(player.last_name ?? ''),
-            email: typeof player.email === 'string' ? player.email : undefined,
-            handicapIndex:
-              typeof player.handicap_index === 'number' ? player.handicap_index : undefined,
-            ghin: typeof player.ghin === 'string' ? player.ghin : undefined,
-            teePreference:
-              typeof player.tee_preference === 'string' ? player.tee_preference : undefined,
-            avatarUrl: typeof player.avatar_url === 'string' ? player.avatar_url : undefined,
-            joinedAt: typeof player.joined_at === 'string' ? player.joined_at : undefined,
-            createdAt: typeof player.created_at === 'string' ? player.created_at : undefined,
-            updatedAt: typeof player.updated_at === 'string' ? player.updated_at : undefined,
-          }))
+          Array.from(playerRows.values()).map((player) => playerFromCloud(player, trip.id))
         );
 
         for (const player of normalizedPlayers) {
@@ -516,28 +665,19 @@ async function pullTripCore(lookup: {
         }
 
         for (const team of teams || []) {
-          await db.teams.put({
-            id: team.id,
-            tripId: team.trip_id,
-            name: team.name,
-            color: team.color,
-            colorHex: team.color_hex,
-            icon: team.icon,
-            notes: team.notes,
-            mode: team.mode,
-            createdAt: team.created_at,
-          });
+          await db.teams.put(teamFromCloud(team as Record<string, unknown>));
         }
 
         for (const teamMember of teamMembers || []) {
-          await db.teamMembers.put({
-            id: teamMember.id,
-            teamId: teamMember.team_id,
-            playerId: teamMember.player_id,
-            sortOrder: teamMember.sort_order,
-            isCaptain: teamMember.is_captain,
-            createdAt: teamMember.created_at,
-          });
+          await db.teamMembers.put(teamMemberFromCloud(teamMember as Record<string, unknown>));
+        }
+
+        for (const course of courses) {
+          await db.courses.put(courseFromCloud(course));
+        }
+
+        for (const teeSet of teeSets) {
+          await db.teeSets.put(teeSetFromCloud(teeSet));
         }
 
         for (const session of sessions || []) {
@@ -555,88 +695,23 @@ async function pullTripCore(lookup: {
         }
 
         for (const score of practiceScores || []) {
-          await db.practiceScores.put({
-            id: String(score.id),
-            matchId: String(score.match_id),
-            playerId: String(score.player_id),
-            holeNumber: Number(score.hole_number),
-            gross: typeof score.gross === 'number' ? score.gross : undefined,
-            createdAt:
-              typeof score.created_at === 'string' ? score.created_at : new Date().toISOString(),
-            updatedAt:
-              typeof score.updated_at === 'string' ? score.updated_at : new Date().toISOString(),
-          });
+          await db.practiceScores.put(practiceScoreFromCloud(score));
         }
 
-        // Side bets: reverse the syncSideBetToCloud projection. The
-        // cloud schema has a single `amount` column and a JSON `notes`
-        // blob — syncSideBetToCloud folds the rich shape (perHole,
-        // participantIds, results, nassauResults, sessionId, etc.)
-        // into the notes blob; here we parse it back out so clients
-        // that pulled the bet see the same data model the creator
-        // wrote.
         for (const bet of sideBets) {
-          const parsedNotes = parseBetNotes(bet.notes);
-          await db.sideBets.put({
-            id: String(bet.id),
-            tripId: String(bet.trip_id),
-            matchId: typeof bet.match_id === 'string' ? bet.match_id : undefined,
-            sessionId:
-              typeof parsedNotes.sessionId === 'string' ? parsedNotes.sessionId : undefined,
-            type: (bet.bet_type as SideBet['type']) || 'custom',
-            name: String(bet.name ?? ''),
-            description:
-              typeof parsedNotes.description === 'string' ? parsedNotes.description : '',
-            status: (parsedNotes.status as SideBet['status']) || 'active',
-            pot: typeof bet.amount === 'number' ? bet.amount : undefined,
-            perHole:
-              typeof parsedNotes.perHole === 'number' ? parsedNotes.perHole : undefined,
-            winnerId: typeof bet.winner_player_id === 'string' ? bet.winner_player_id : undefined,
-            hole: typeof bet.hole_number === 'number' ? bet.hole_number : undefined,
-            participantIds: Array.isArray(parsedNotes.participantIds)
-              ? (parsedNotes.participantIds as string[])
-              : [],
-            results: Array.isArray(parsedNotes.results)
-              ? (parsedNotes.results as SideBet['results'])
-              : undefined,
-            nassauTeamA: Array.isArray(parsedNotes.nassauTeamA)
-              ? (parsedNotes.nassauTeamA as string[])
-              : undefined,
-            nassauTeamB: Array.isArray(parsedNotes.nassauTeamB)
-              ? (parsedNotes.nassauTeamB as string[])
-              : undefined,
-            nassauResults:
-              parsedNotes.nassauResults && typeof parsedNotes.nassauResults === 'object'
-                ? (parsedNotes.nassauResults as SideBet['nassauResults'])
-                : undefined,
-            createdAt:
-              typeof bet.created_at === 'string' ? bet.created_at : new Date().toISOString(),
-            completedAt:
-              typeof parsedNotes.completedAt === 'string'
-                ? parsedNotes.completedAt
-                : undefined,
-          });
+          await db.sideBets.put(sideBetFromCloud(bet));
         }
 
         for (const post of banterPosts) {
-          await db.banterPosts.put({
-            id: String(post.id),
-            tripId: String(post.trip_id),
-            authorId:
-              typeof post.author_id === 'string' ? post.author_id : undefined,
-            authorName: String(post.author_name ?? ''),
-            content: String(post.content ?? ''),
-            postType: (post.post_type as BanterPost['postType']) || 'message',
-            emoji: typeof post.emoji === 'string' ? post.emoji : undefined,
-            reactions:
-              post.reactions && typeof post.reactions === 'object'
-                ? (post.reactions as BanterPost['reactions'])
-                : undefined,
-            relatedMatchId:
-              typeof post.related_match_id === 'string' ? post.related_match_id : undefined,
-            timestamp:
-              typeof post.timestamp === 'string' ? post.timestamp : new Date().toISOString(),
-          });
+          await db.banterPosts.put(banterPostFromCloud(post));
+        }
+
+        for (const item of duesLineItems) {
+          await db.duesLineItems.put(duesLineItemFromCloud(item));
+        }
+
+        for (const record of paymentRecords) {
+          await db.paymentRecords.put(paymentRecordFromCloud(record));
         }
       }
     );
@@ -660,6 +735,8 @@ async function pullTripCore(lookup: {
       cloudPracticeScoreIds: practiceScores.map((ps) => String(ps.id)),
       cloudSideBetIds: sideBets.map((b) => String(b.id)),
       cloudBanterPostIds: banterPosts.map((p) => String(p.id)),
+      cloudDuesLineItemIds: duesLineItems.map((item) => String(item.id)),
+      cloudPaymentRecordIds: paymentRecords.map((record) => String(record.id)),
     });
 
     const resolvedShareCode =

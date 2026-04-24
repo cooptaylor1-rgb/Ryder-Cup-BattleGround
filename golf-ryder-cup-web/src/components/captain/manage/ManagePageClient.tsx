@@ -259,7 +259,12 @@ export function ManagePageClient() {
       // queue the Supabase sync so the next roster pull doesn't
       // undo the local change.
       const now = new Date().toISOString();
-      const nextUpdates = { ...updates, updatedAt: now };
+      const existing = await db.matches.get(matchId);
+      const nextUpdates = {
+        ...updates,
+        version: (existing?.version ?? 0) + 1,
+        updatedAt: now,
+      };
       await db.matches.update(matchId, nextUpdates);
       if (currentTrip) {
         const latest = await db.matches.get(matchId);

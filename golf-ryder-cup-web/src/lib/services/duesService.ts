@@ -8,6 +8,7 @@
  */
 
 import { db } from '@/lib/db';
+import { queueSyncOperation } from '@/lib/services/tripSyncService';
 import { createLogger } from '@/lib/utils/logger';
 import type {
   DuesLineItem,
@@ -28,6 +29,14 @@ function formatPlayerName(player: FinancialSummaryPlayer): string {
   return `${player.firstName}${player.lastName ? ` ${player.lastName}` : ''}`;
 }
 
+function queueDuesItem(item: DuesLineItem, operation: 'create' | 'update'): void {
+  queueSyncOperation('duesLineItem', item.id, operation, item.tripId, item);
+}
+
+function queuePaymentRecord(record: PaymentRecord, operation: 'create' | 'update'): void {
+  queueSyncOperation('paymentRecord', record.id, operation, record.tripId, record);
+}
+
 // ============================================
 // DUES CRUD
 // ============================================
@@ -42,6 +51,7 @@ export async function createDuesItem(item: Omit<DuesLineItem, 'id' | 'createdAt'
     updatedAt: now,
   };
   await db.duesLineItems.add(dues);
+  queueDuesItem(dues, 'create');
   logger.info('Created dues item', { id: dues.id, category: dues.category, amount: dues.amount });
   return dues;
 }
@@ -72,6 +82,9 @@ export async function createBulkDues(
     updatedAt: now,
   }));
   await db.duesLineItems.bulkAdd(items);
+  for (const item of items) {
+    queueDuesItem(item, 'create');
+  }
   logger.info('Created bulk dues', { count: items.length, category, amount });
   return items;
 }
@@ -79,11 +92,15 @@ export async function createBulkDues(
 /** Update a dues item */
 export async function updateDuesItem(id: string, updates: Partial<DuesLineItem>): Promise<void> {
   await db.duesLineItems.update(id, { ...updates, updatedAt: new Date().toISOString() });
+  const updated = await db.duesLineItems.get(id);
+  if (updated) queueDuesItem(updated, 'update');
 }
 
 /** Delete a dues item */
 export async function deleteDuesItem(id: string): Promise<void> {
+  const existing = await db.duesLineItems.get(id);
   await db.duesLineItems.delete(id);
+  if (existing) queueSyncOperation('duesLineItem', id, 'delete', existing.tripId);
 }
 
 /** Get all dues for a trip */
@@ -108,6 +125,7 @@ export async function recordPayment(payment: Omit<PaymentRecord, 'id' | 'created
     createdAt: new Date().toISOString(),
   };
   await db.paymentRecords.add(record);
+  queuePaymentRecord(record, 'create');
 
   // Update corresponding dues line items
   for (const lineItemId of payment.lineItemIds) {
@@ -122,6 +140,8 @@ export async function recordPayment(payment: Omit<PaymentRecord, 'id' | 'created
         paidVia: payment.method,
         updatedAt: new Date().toISOString(),
       });
+      const updated = await db.duesLineItems.get(lineItemId);
+      if (updated) queueDuesItem(updated, 'update');
     }
   }
 
@@ -146,9 +166,11 @@ export async function markAsPaid(
     paidVia: method,
     updatedAt: now,
   });
+  const updated = await db.duesLineItems.get(lineItemId);
+  if (updated) queueDuesItem(updated, 'update');
 
   // Create payment record for audit trail
-  await db.paymentRecords.add({
+  const record: PaymentRecord = {
     id: crypto.randomUUID(),
     tripId: item.tripId,
     fromPlayerId: item.playerId,
@@ -158,7 +180,9 @@ export async function markAsPaid(
     confirmedBy,
     confirmedAt: now,
     createdAt: now,
-  });
+  };
+  await db.paymentRecords.add(record);
+  queuePaymentRecord(record, 'create');
 }
 
 /** Mark a dues item as waived */
@@ -167,6 +191,8 @@ export async function waiveDues(lineItemId: string): Promise<void> {
     status: 'waived',
     updatedAt: new Date().toISOString(),
   });
+  const updated = await db.duesLineItems.get(lineItemId);
+  if (updated) queueDuesItem(updated, 'update');
 }
 
 /** Get all payments for a trip */

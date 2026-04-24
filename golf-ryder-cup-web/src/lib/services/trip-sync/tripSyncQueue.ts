@@ -65,6 +65,8 @@ async function restoreOrphanedQueueEntities(): Promise<void> {
     sideBet: 'sideBets',
     practiceScore: 'practiceScores',
     banterPost: 'banterPosts',
+    duesLineItem: 'duesLineItems',
+    paymentRecord: 'paymentRecords',
   };
 
   for (const item of tripSyncRuntime.syncQueue) {
@@ -222,6 +224,10 @@ const ENTITY_DEPENDENCY_ORDER: Record<SyncEntity, number> = {
   // banter_posts.trip_id FKs to trips (rank 0), so rank 4 sits
   // alongside sideBet — tripping a post after its trip row is safe.
   banterPost: 4,
+  // Finance rows are trip + player scoped. Payments conceptually sit
+  // after dues because a payment can point at one or more line-item ids.
+  duesLineItem: 4,
+  paymentRecord: 5,
 };
 
 export function compareByDependency(a: SyncQueueItem, b: SyncQueueItem): number {

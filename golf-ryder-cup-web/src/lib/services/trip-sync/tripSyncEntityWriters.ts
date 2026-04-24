@@ -15,16 +15,95 @@ import type {
   TeeSet,
   Trip,
 } from '../../types/models';
+import type { DuesLineItem, PaymentRecord } from '../../types/finances';
 import type { SyncOperation, SyncQueueItem } from '../../types/sync';
 import { assertExhaustive } from '../../utils/exhaustive';
 import { isServerNewer } from './tripSyncLww';
-import { holeResultToCloud, matchToCloud, sessionToCloud } from './tripSyncMappers';
+import {
+  banterPostToCloud,
+  courseToCloud,
+  duesLineItemToCloud,
+  holeResultToCloud,
+  matchFromCloud,
+  matchToCloud,
+  paymentRecordToCloud,
+  playerToCloud,
+  practiceScoreToCloud,
+  sessionToCloud,
+  sideBetToCloud,
+  teamMemberToCloud,
+  teamToCloud,
+  teeSetToCloud,
+  tripToCloud,
+} from './tripSyncMappers';
 import { getTable } from './tripSyncShared';
 import {
   deleteEntityByKey,
   loadEntityForSync,
   throwIfSupabaseError,
 } from './tripSyncWriterHelpers';
+
+type MatchSyncConflictShape = Pick<
+  Match,
+  | 'sessionId'
+  | 'courseId'
+  | 'teeSetId'
+  | 'matchOrder'
+  | 'status'
+  | 'startTime'
+  | 'currentHole'
+  | 'mode'
+  | 'teamAPlayerIds'
+  | 'teamBPlayerIds'
+  | 'teamAHandicapAllowance'
+  | 'teamBHandicapAllowance'
+  | 'result'
+  | 'margin'
+  | 'holesRemaining'
+  | 'notes'
+>;
+
+function normalizeMatchForConflict(match: Match): MatchSyncConflictShape {
+  return {
+    sessionId: match.sessionId,
+    courseId: match.courseId,
+    teeSetId: match.teeSetId,
+    matchOrder: match.matchOrder,
+    status: match.status,
+    startTime: match.startTime,
+    currentHole: match.currentHole,
+    mode: match.mode || 'ryderCup',
+    teamAPlayerIds: [...match.teamAPlayerIds],
+    teamBPlayerIds: [...match.teamBPlayerIds],
+    teamAHandicapAllowance: match.teamAHandicapAllowance,
+    teamBHandicapAllowance: match.teamBHandicapAllowance,
+    result: match.result,
+    margin: match.margin,
+    holesRemaining: match.holesRemaining,
+    notes: match.notes,
+  };
+}
+
+function matchSyncPayloadsEqual(left: Match, right: Match): boolean {
+  return JSON.stringify(normalizeMatchForConflict(left)) === JSON.stringify(normalizeMatchForConflict(right));
+}
+
+export function getMatchVersionConflict(existing: Match, incoming: Match): string | null {
+  const existingVersion = existing.version ?? 0;
+  const incomingVersion = incoming.version ?? 0;
+
+  if (existingVersion === 0 && incomingVersion === 0) return null;
+  if (existingVersion < incomingVersion) return null;
+  if (matchSyncPayloadsEqual(existing, incoming)) return null;
+
+  return `Scoring conflict: cloud match version ${existingVersion} is already at or ahead of local version ${incomingVersion}. Refresh the trip before retrying.`;
+}
+
+async function getExistingCloudMatch(matchId: string): Promise<Match | null> {
+  const response = await getTable('matches').select('*').eq('id', matchId).maybeSingle();
+  throwIfSupabaseError(response);
+  return response.data ? matchFromCloud(response.data as Record<string, unknown>) : null;
+}
 
 export async function syncEntityToCloud(item: SyncQueueItem): Promise<void> {
   // The `item` variable is a discriminated union over item.entity,
@@ -55,10 +134,10 @@ export async function syncEntityToCloud(item: SyncQueueItem): Promise<void> {
       await syncHoleResultToCloud(item.entityId, item.operation, item.data);
       break;
     case 'course':
-      await syncCourseToCloud(item.entityId, item.operation, item.data);
+      await syncCourseToCloud(item.entityId, item.operation, item.data, item.tripId);
       break;
     case 'teeSet':
-      await syncTeeSetToCloud(item.entityId, item.operation, item.data);
+      await syncTeeSetToCloud(item.entityId, item.operation, item.data, item.tripId);
       break;
     case 'sideBet':
       await syncSideBetToCloud(item.entityId, item.operation, item.data);
@@ -68,6 +147,12 @@ export async function syncEntityToCloud(item: SyncQueueItem): Promise<void> {
       break;
     case 'banterPost':
       await syncBanterPostToCloud(item.entityId, item.operation, item.data);
+      break;
+    case 'duesLineItem':
+      await syncDuesLineItemToCloud(item.entityId, item.operation, item.data);
+      break;
+    case 'paymentRecord':
+      await syncPaymentRecordToCloud(item.entityId, item.operation, item.data);
       break;
     default:
       assertExhaustive(item, 'Unhandled sync entity');
@@ -90,24 +175,11 @@ export async function syncTripToCloud(
     fallback: () => db.trips.get(tripId),
   });
 
-  const cloudData = {
-    id: trip.id,
-    name: trip.name,
-    start_date: trip.startDate.split('T')[0],
-    end_date: trip.endDate.split('T')[0],
-    location: trip.location || null,
-    notes: trip.notes || null,
-    is_captain_mode_enabled: trip.isCaptainModeEnabled,
-    captain_name: trip.captainName || null,
-    is_practice_round: trip.isPracticeRound || false,
-    scoring_settings: trip.scoringSettings ?? null,
-    handicap_settings: trip.handicapSettings ?? null,
-    updated_at: new Date().toISOString(),
-  };
+  const cloudData = tripToCloud(trip);
 
   if (operation === 'create') {
     const insertResponse = await getTable('trips')
-      .insert({ ...cloudData, created_at: trip.createdAt })
+      .insert(cloudData)
       .select('share_code')
       .single();
     throwIfSupabaseError(insertResponse);
@@ -146,21 +218,7 @@ export async function syncPlayerToCloud(
     fallback: () => db.players.get(playerId),
   });
 
-  const cloudData = {
-    id: player.id,
-    trip_id: player.tripId ?? tripId ?? null,
-    linked_auth_user_id: player.linkedAuthUserId ?? null,
-    linked_profile_id: player.linkedProfileId ?? null,
-    first_name: player.firstName,
-    last_name: player.lastName,
-    email: player.email || null,
-    handicap_index: player.handicapIndex || null,
-    ghin: player.ghin || null,
-    tee_preference: player.teePreference || null,
-    avatar_url: player.avatarUrl || null,
-    joined_at: player.joinedAt || null,
-    updated_at: new Date().toISOString(),
-  };
+  const cloudData = playerToCloud(player, tripId);
 
   throwIfSupabaseError(await getTable('players').upsert(cloudData, { onConflict: 'id' }));
 }
@@ -181,17 +239,7 @@ export async function syncTeamToCloud(
     fallback: () => db.teams.get(teamId),
   });
 
-  const cloudData = {
-    id: team.id,
-    trip_id: team.tripId,
-    name: team.name,
-    color: team.color,
-    color_hex: team.colorHex || null,
-    icon: team.icon || null,
-    notes: team.notes || null,
-    mode: team.mode || 'ryderCup',
-    updated_at: new Date().toISOString(),
-  };
+  const cloudData = teamToCloud(team);
 
   throwIfSupabaseError(await getTable('teams').upsert(cloudData, { onConflict: 'id' }));
 }
@@ -212,13 +260,7 @@ export async function syncTeamMemberToCloud(
     fallback: () => db.teamMembers.get(teamMemberId),
   });
 
-  const cloudData = {
-    id: teamMember.id,
-    team_id: teamMember.teamId,
-    player_id: teamMember.playerId,
-    sort_order: teamMember.sortOrder || 0,
-    is_captain: teamMember.isCaptain || false,
-  };
+  const cloudData = teamMemberToCloud(teamMember);
 
   throwIfSupabaseError(await getTable('team_members').upsert(cloudData, { onConflict: 'id' }));
 }
@@ -320,19 +362,39 @@ export async function syncMatchToCloud(
 
   const cloudData = matchToCloud(match);
   const incomingUpdatedAt = cloudData.updated_at as string;
+  const existingMatch = await getExistingCloudMatch(match.id);
+  if (existingMatch) {
+    const conflict = getMatchVersionConflict(existingMatch, match);
+    if (conflict) {
+      throw new Error(conflict);
+    }
 
-  // Last-write-wins by updated_at. Two offline phones editing the same
-  // match (captain advancing the hole while player submits a score) would
-  // otherwise silently overwrite each other based on sync arrival order.
-  if (
-    await isServerNewer({
-      table: 'matches',
-      timestampColumn: 'updated_at',
-      where: { id: match.id },
-      incoming: incomingUpdatedAt,
-    })
-  ) {
-    return;
+    const existingVersion = existingMatch.version ?? 0;
+    const incomingVersion = match.version ?? 0;
+    if (
+      existingVersion >= incomingVersion &&
+      incomingVersion > 0 &&
+      matchSyncPayloadsEqual(existingMatch, match)
+    ) {
+      return;
+    }
+
+    // Legacy rows without a version column still use timestamp LWW.
+    // Versioned scoring writes take the branch above so concurrent
+    // edits fail visibly instead of silently accepting the later
+    // queue replay.
+    if (
+      existingVersion === 0 &&
+      incomingVersion === 0 &&
+      (await isServerNewer({
+        table: 'matches',
+        timestampColumn: 'updated_at',
+        where: { id: match.id },
+        incoming: incomingUpdatedAt,
+      }))
+    ) {
+      return;
+    }
   }
 
   const matchResponse = await getTable('matches')
@@ -406,7 +468,8 @@ export async function syncHoleResultToCloud(
 export async function syncCourseToCloud(
   courseId: string,
   operation: SyncOperation,
-  data?: Course
+  data?: Course,
+  tripId?: string
 ): Promise<void> {
   if (operation === 'delete') {
     await deleteEntityByKey({ table: 'courses', column: 'id', value: courseId });
@@ -419,12 +482,7 @@ export async function syncCourseToCloud(
     fallback: () => db.courses.get(courseId),
   });
 
-  const cloudData = {
-    id: course.id,
-    name: course.name,
-    location: course.location || null,
-    updated_at: new Date().toISOString(),
-  };
+  const cloudData = courseToCloud(course, tripId);
 
   throwIfSupabaseError(await getTable('courses').upsert(cloudData, { onConflict: 'id' }));
 }
@@ -432,7 +490,8 @@ export async function syncCourseToCloud(
 export async function syncTeeSetToCloud(
   teeSetId: string,
   operation: SyncOperation,
-  data?: TeeSet
+  data?: TeeSet,
+  tripId?: string
 ): Promise<void> {
   if (operation === 'delete') {
     await deleteEntityByKey({ table: 'tee_sets', column: 'id', value: teeSetId });
@@ -445,20 +504,7 @@ export async function syncTeeSetToCloud(
     fallback: () => db.teeSets.get(teeSetId),
   });
 
-  const cloudData = {
-    id: teeSet.id,
-    course_id: teeSet.courseId,
-    name: teeSet.name,
-    color: teeSet.color || null,
-    rating: teeSet.rating,
-    slope: teeSet.slope,
-    par: teeSet.par,
-    hole_handicaps: teeSet.holeHandicaps,
-    hole_pars: teeSet.holePars || null,
-    yardages: teeSet.yardages || null,
-    total_yardage: teeSet.totalYardage || null,
-    updated_at: new Date().toISOString(),
-  };
+  const cloudData = teeSetToCloud(teeSet, tripId);
 
   throwIfSupabaseError(await getTable('tee_sets').upsert(cloudData, { onConflict: 'id' }));
 }
@@ -494,34 +540,7 @@ export async function syncSideBetToCloud(
     fallback: () => db.sideBets.get(sideBetId),
   });
 
-  const cloudData = {
-    id: bet.id,
-    trip_id: bet.tripId,
-    match_id: bet.matchId ?? null,
-    bet_type: bet.type,
-    name: bet.name,
-    // The schema has a single `amount` column; prefer pot, fall back to
-    // perHole for skins-style bets where the pot is per-hole rather
-    // than total.
-    amount: bet.pot ?? bet.perHole ?? null,
-    winner_player_id: bet.winnerId ?? null,
-    hole_number: bet.hole ?? null,
-    // Fold the app-specific richer shape into notes as JSON so we
-    // don't lose it on the round trip.
-    notes: JSON.stringify({
-      description: bet.description,
-      perHole: bet.perHole,
-      status: bet.status,
-      participantIds: bet.participantIds,
-      sessionId: bet.sessionId,
-      results: bet.results,
-      nassauTeamA: bet.nassauTeamA,
-      nassauTeamB: bet.nassauTeamB,
-      nassauResults: bet.nassauResults,
-      completedAt: bet.completedAt,
-    }),
-    updated_at: new Date().toISOString(),
-  };
+  const cloudData = sideBetToCloud(bet);
 
   throwIfSupabaseError(await getTable('side_bets').upsert(cloudData, { onConflict: 'id' }));
 }
@@ -553,14 +572,7 @@ export async function syncPracticeScoreToCloud(
     fallback: () => db.practiceScores.get(practiceScoreId),
   });
 
-  const cloudData = {
-    id: score.id,
-    match_id: score.matchId,
-    player_id: score.playerId,
-    hole_number: score.holeNumber,
-    gross: score.gross ?? null,
-    updated_at: score.updatedAt || new Date().toISOString(),
-  };
+  const cloudData = practiceScoreToCloud(score);
 
   throwIfSupabaseError(
     await getTable('practice_scores').upsert(cloudData, { onConflict: 'id' })
@@ -593,21 +605,51 @@ export async function syncBanterPostToCloud(
     fallback: () => db.banterPosts.get(banterPostId),
   });
 
-  const cloudData = {
-    id: post.id,
-    trip_id: post.tripId,
-    author_id: post.authorId ?? null,
-    author_name: post.authorName,
-    content: post.content,
-    post_type: post.postType,
-    emoji: post.emoji ?? null,
-    reactions: post.reactions ?? null,
-    related_match_id: post.relatedMatchId ?? null,
-    timestamp: post.timestamp,
-    updated_at: new Date().toISOString(),
-  };
+  const cloudData = banterPostToCloud(post);
 
   throwIfSupabaseError(
     await getTable('banter_posts').upsert(cloudData, { onConflict: 'id' })
+  );
+}
+
+export async function syncDuesLineItemToCloud(
+  duesLineItemId: string,
+  operation: SyncOperation,
+  data?: DuesLineItem
+): Promise<void> {
+  if (operation === 'delete') {
+    await deleteEntityByKey({ table: 'dues_line_items', column: 'id', value: duesLineItemId });
+    return;
+  }
+
+  const item = await loadEntityForSync({
+    data,
+    entityName: 'DuesLineItem',
+    fallback: () => db.duesLineItems.get(duesLineItemId),
+  });
+
+  throwIfSupabaseError(
+    await getTable('dues_line_items').upsert(duesLineItemToCloud(item), { onConflict: 'id' })
+  );
+}
+
+export async function syncPaymentRecordToCloud(
+  paymentRecordId: string,
+  operation: SyncOperation,
+  data?: PaymentRecord
+): Promise<void> {
+  if (operation === 'delete') {
+    await deleteEntityByKey({ table: 'payment_records', column: 'id', value: paymentRecordId });
+    return;
+  }
+
+  const record = await loadEntityForSync({
+    data,
+    entityName: 'PaymentRecord',
+    fallback: () => db.paymentRecords.get(paymentRecordId),
+  });
+
+  throwIfSupabaseError(
+    await getTable('payment_records').upsert(paymentRecordToCloud(record), { onConflict: 'id' })
   );
 }

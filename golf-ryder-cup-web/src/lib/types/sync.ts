@@ -18,6 +18,7 @@ import type {
   TeeSet,
   Trip,
 } from './models';
+import type { DuesLineItem, PaymentRecord } from './finances';
 
 export type SyncOperation = 'create' | 'update' | 'delete';
 
@@ -33,7 +34,9 @@ export type SyncEntity =
   | 'teeSet'
   | 'sideBet'
   | 'practiceScore'
-  | 'banterPost';
+  | 'banterPost'
+  | 'duesLineItem'
+  | 'paymentRecord';
 
 /**
  * Map of SyncEntity tag → the model type whose instance is carried
@@ -56,6 +59,8 @@ export interface SyncEntityPayloadMap {
   sideBet: SideBet;
   practiceScore: PracticeScore;
   banterPost: BanterPost;
+  duesLineItem: DuesLineItem;
+  paymentRecord: PaymentRecord;
 }
 
 export type SyncEntityPayload<E extends SyncEntity = SyncEntity> =
