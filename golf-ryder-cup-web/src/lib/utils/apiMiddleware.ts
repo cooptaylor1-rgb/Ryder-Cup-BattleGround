@@ -329,29 +329,84 @@ export async function requireAuth(req: NextRequest): Promise<{
   return { response: null, userId, userEmail };
 }
 
-async function hasTripMembershipForPlayerIds(
+async function findTripMembershipForAuthUser(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
   tripId: string,
-  playerIds: string[]
+  userId: string
 ): Promise<boolean> {
-  if (playerIds.length === 0) {
+  const { data, error } = await supabase
+    .from('trip_memberships')
+    .select('id')
+    .eq('trip_id', tripId)
+    .eq('auth_user_id', userId)
+    .in('status', ['active', 'pending'])
+    .limit(1);
+
+  return !error && !!data && data.length > 0;
+}
+
+async function findLinkedTripPlayerId(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  tripId: string,
+  userId: string,
+  userEmail?: string
+): Promise<string | null> {
+  const { data: authLinkedPlayers } = await supabase
+    .from('players')
+    .select('id')
+    .eq('trip_id', tripId)
+    .eq('linked_auth_user_id', userId)
+    .limit(1);
+
+  const authLinkedPlayerId = (authLinkedPlayers as Array<{ id: string }> | null)?.[0]?.id;
+  if (authLinkedPlayerId) return authLinkedPlayerId;
+
+  if (!userEmail) return null;
+
+  const { data: emailLinkedPlayers } = await supabase
+    .from('players')
+    .select('id')
+    .eq('trip_id', tripId)
+    .ilike('email', userEmail)
+    .limit(1);
+
+  return (emailLinkedPlayers as Array<{ id: string }> | null)?.[0]?.id ?? null;
+}
+
+async function redeemTripMembershipForShareCode(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: any,
+  tripId: string,
+  userId: string,
+  userEmail: string | undefined,
+  shareCode: string
+): Promise<boolean> {
+  const { data: trip, error: tripError } = await supabase
+    .from('trips')
+    .select('id, share_code')
+    .eq('id', tripId)
+    .single();
+
+  if (
+    tripError ||
+    !trip ||
+    String(trip.share_code ?? '').toUpperCase() !== shareCode.trim().toUpperCase()
+  ) {
     return false;
   }
 
-  const { data: membership, error } = await supabase
-    .from('team_members')
-    .select(
-      `
-        id,
-        teams!inner(trip_id)
-      `
-    )
-    .in('player_id', playerIds)
-    .eq('teams.trip_id', tripId)
-    .limit(1);
+  const playerId = await findLinkedTripPlayerId(supabase, tripId, userId, userEmail);
+  const { error } = await supabase.from('trip_memberships').insert({
+    trip_id: tripId,
+    auth_user_id: userId,
+    player_id: playerId,
+    role: 'player',
+    status: 'active',
+  });
 
-  return !error && !!membership && membership.length > 0;
+  return !error || (await findTripMembershipForAuthUser(supabase, tripId, userId));
 }
 
 // ============================================
@@ -416,50 +471,49 @@ export async function verifyTripAccess(
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // Check for share code in header
-  const shareCode = req.headers.get('X-Share-Code');
-  if (shareCode) {
-    const { data: trip, error } = await supabase
-      .from('trips')
-      .select('id, share_code')
-      .eq('id', tripId)
-      .single();
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader?.startsWith('Bearer ')) {
+    return { authorized: false, error: 'Authorization required for trip access' };
+  }
 
-    if (error || !trip) {
-      return { authorized: false, error: 'Trip not found' };
-    }
+  const { authenticated, userId, userEmail } = await verifyAuth(req);
+  if (!authenticated || !userId) {
+    return { authorized: false, error: 'Invalid authorization token' };
+  }
 
-    if (trip.share_code === shareCode) {
+  if (await findTripMembershipForAuthUser(supabase, tripId, userId)) {
+    return { authorized: true };
+  }
+
+  const linkedPlayerId = await findLinkedTripPlayerId(supabase, tripId, userId, userEmail);
+  if (linkedPlayerId) {
+    const { error } = await supabase.from('trip_memberships').insert({
+      trip_id: tripId,
+      auth_user_id: userId,
+      player_id: linkedPlayerId,
+      role: 'player',
+      status: 'active',
+    });
+
+    if (!error || (await findTripMembershipForAuthUser(supabase, tripId, userId))) {
       return { authorized: true };
     }
   }
 
-  // Check for authenticated user with trip membership
-  const authHeader = req.headers.get('Authorization');
-  if (authHeader?.startsWith('Bearer ')) {
-    const { authenticated, userId, userEmail } = await verifyAuth(req);
-    if (authenticated) {
-      const playerIds = new Set<string>();
-
-      if (userId) {
-        playerIds.add(userId);
-      }
-
-      if (userEmail) {
-        const { data: emailMatchedPlayers } = await supabase
-          .from('players')
-          .select('id')
-          .eq('email', userEmail)
-          .limit(10);
-
-        for (const player of emailMatchedPlayers ?? []) {
-          playerIds.add(player.id);
-        }
-      }
-
-      if (await hasTripMembershipForPlayerIds(supabase, tripId, [...playerIds])) {
-        return { authorized: true };
-      }
+  // Legacy clients may still include a share code with authenticated API
+  // calls. Redeem it into a membership instead of treating the code as
+  // reusable authorization.
+  const shareCode = req.headers.get('X-Share-Code');
+  if (shareCode) {
+    const redeemed = await redeemTripMembershipForShareCode(
+      supabase,
+      tripId,
+      userId,
+      userEmail,
+      shareCode
+    );
+    if (redeemed) {
+      return { authorized: true };
     }
   }
 

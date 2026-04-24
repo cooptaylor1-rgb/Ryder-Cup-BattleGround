@@ -17,6 +17,7 @@ const REQUIRED_MARKERS = [
   '20260423030000_add_scoring_sync_columns',
   '20260423040000_drop_unused_photos_and_comments',
   '20260424000000_add_deployment_health_markers',
+  '20260424010000_trip_memberships_and_trip_scoped_rls',
 ];
 
 function stubStrictEnv() {
@@ -120,7 +121,7 @@ describe('GET /api/health', () => {
     expect(response.status).toBe(503);
     expect(data.checks.supabase.status).toBe('unhealthy');
     expect(data.checks.supabase.migrations.missingMarkers).toEqual([
-      '20260424000000_add_deployment_health_markers',
+      '20260424010000_trip_memberships_and_trip_scoped_rls',
     ]);
   });
 

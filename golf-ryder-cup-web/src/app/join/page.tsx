@@ -6,15 +6,14 @@ import Link from 'next/link';
 import { MapPin, Calendar, Crown, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores';
 import { PageLoadingSkeleton, Button, EmptyStatePremium } from '@/components/ui';
-import { supabase } from '@/lib/supabase/client';
 
 interface TripPreview {
   id: string;
   name: string;
-  start_date: string | null;
-  end_date: string | null;
+  startDate: string | null;
+  endDate: string | null;
   location: string | null;
-  captain_name: string | null;
+  captainName: string | null;
 }
 
 function buildJoinPath(code: string | null): string {
@@ -61,36 +60,38 @@ function JoinPageInner() {
     };
   }, []);
 
-  // Look up the trip by share code *before* we redirect. This turns the
-  // invite landing from an unexplained loading screen into a proper
-  // confirmation page: invitees see the trip name, dates, and captain
-  // before they commit to signing up. A bad code or deleted trip now
-  // surfaces a clear empty state instead of quietly dropping them on
-  // the login screen with no context.
+  // Look up the trip by share code through the server. The API uses the
+  // service role for the narrow preview/redeem path; clients no longer
+  // query trips.share_code directly, so RLS can stay membership-scoped.
   useEffect(() => {
-    if (!code || !supabase) {
-      setLookupState(code ? 'error' : 'idle');
+    if (!code) {
       return;
     }
     let cancelled = false;
-    setLookupState('loading');
-    void supabase
-      .from('trips')
-      .select('id, name, start_date, end_date, location, captain_name')
-      .eq('share_code', code.toUpperCase())
-      .maybeSingle()
-      .then(({ data, error }) => {
+    queueMicrotask(() => {
+      if (!cancelled) setLookupState('loading');
+    });
+    void fetch(`/api/trips/join?code=${encodeURIComponent(code)}`, {
+      cache: 'no-store',
+    })
+      .then(async (response) => {
+        const payload = (await response.json().catch(() => null)) as
+          | { trip?: TripPreview }
+          | null;
         if (cancelled) return;
-        if (error) {
-          setLookupState('error');
-          return;
-        }
-        if (!data) {
+        if (response.status === 404) {
           setLookupState('missing');
           return;
         }
-        setTrip(data as TripPreview);
+        if (!response.ok || !payload?.trip) {
+          setLookupState('error');
+          return;
+        }
+        setTrip(payload.trip);
         setLookupState('found');
+      })
+      .catch(() => {
+        if (!cancelled) setLookupState('error');
       });
     return () => {
       cancelled = true;
@@ -165,7 +166,7 @@ function JoinPageInner() {
     );
   }
 
-  const dateRange = formatDateRange(trip.start_date, trip.end_date);
+  const dateRange = formatDateRange(trip.startDate, trip.endDate);
   const authed = isAuthenticated && currentUser && currentUser.hasCompletedOnboarding;
   const joinPath = buildJoinPath(code);
 
@@ -189,10 +190,10 @@ function JoinPageInner() {
               <span>{trip.location}</span>
             </div>
           )}
-          {trip.captain_name && (
+          {trip.captainName && (
             <div className="flex items-center gap-2">
               <Crown size={16} className="text-[var(--ink-tertiary)]" />
-              <span>Hosted by {trip.captain_name}</span>
+              <span>Hosted by {trip.captainName}</span>
             </div>
           )}
         </div>

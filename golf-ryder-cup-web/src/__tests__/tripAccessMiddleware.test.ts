@@ -18,17 +18,23 @@ function createRequest(headers?: Record<string, string>): NextRequest {
 
 function createDataClient(options: {
   tripShareCode?: string | null;
-  playerIdsByEmail?: string[];
+  linkedPlayerId?: string | null;
   membershipFound?: boolean;
 }) {
+  const insertedMemberships: Array<Record<string, unknown>> = [];
+
   return {
+    insertedMemberships,
     from: vi.fn((table: string) => {
       if (table === 'trips') {
         return {
           select: vi.fn(() => ({
             eq: vi.fn(() => ({
               single: vi.fn().mockResolvedValue({
-                data: options.tripShareCode === undefined ? null : { id: 'trip-1', share_code: options.tripShareCode },
+                data:
+                  options.tripShareCode === undefined
+                    ? null
+                    : { id: 'trip-1', share_code: options.tripShareCode },
                 error: options.tripShareCode === undefined ? { message: 'Not found' } : null,
               }),
             })),
@@ -36,26 +42,40 @@ function createDataClient(options: {
         };
       }
 
+      if (table === 'trip_memberships') {
+        return {
+          select: vi.fn(() => ({
+            eq: vi.fn(() => ({
+              eq: vi.fn(() => ({
+                in: vi.fn(() => ({
+                  limit: vi.fn().mockResolvedValue({
+                    data: options.membershipFound ? [{ id: 'membership-1' }] : [],
+                    error: null,
+                  }),
+                })),
+              })),
+            })),
+          })),
+          insert: vi.fn((row: Record<string, unknown>) => {
+            insertedMemberships.push(row);
+            return Promise.resolve({ data: null, error: null });
+          }),
+        };
+      }
+
       if (table === 'players') {
         return {
           select: vi.fn(() => ({
             eq: vi.fn(() => ({
-              limit: vi.fn().mockResolvedValue({
-                data: (options.playerIdsByEmail ?? []).map((id) => ({ id })),
-                error: null,
-              }),
-            })),
-          })),
-        };
-      }
-
-      if (table === 'team_members') {
-        return {
-          select: vi.fn(() => ({
-            in: vi.fn(() => ({
               eq: vi.fn(() => ({
                 limit: vi.fn().mockResolvedValue({
-                  data: options.membershipFound ? [{ id: 'membership-1' }] : [],
+                  data: options.linkedPlayerId ? [{ id: options.linkedPlayerId }] : [],
+                  error: null,
+                }),
+              })),
+              ilike: vi.fn(() => ({
+                limit: vi.fn().mockResolvedValue({
+                  data: options.linkedPlayerId ? [{ id: options.linkedPlayerId }] : [],
                   error: null,
                 }),
               })),
@@ -93,25 +113,10 @@ describe('Trip Access Middleware', () => {
     vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service-role-key');
   });
 
-  it('authorizes matching share code access', async () => {
-    createClientMock.mockReturnValueOnce(
-      createDataClient({ tripShareCode: 'ABCDEFGH', membershipFound: false })
-    );
-
-    const { verifyTripAccess } = await loadMiddleware();
-    const result = await verifyTripAccess(
-      createRequest({ 'X-Share-Code': 'ABCDEFGH' }),
-      'trip-1'
-    );
-
-    expect(result.authorized).toBe(true);
-  });
-
-  it('authorizes authenticated users via email-linked trip membership', async () => {
+  it('authorizes authenticated users via trip_memberships', async () => {
     createClientMock
       .mockReturnValueOnce(
         createDataClient({
-          playerIdsByEmail: ['player-123'],
           membershipFound: true,
         })
       )
@@ -131,18 +136,17 @@ describe('Trip Access Middleware', () => {
     expect(result.authorized).toBe(true);
   });
 
-  it('authorizes authenticated users when auth user id already matches a player id', async () => {
+  it('backfills a membership for authenticated users already linked to a trip player', async () => {
+    const dataClient = createDataClient({
+      linkedPlayerId: 'player-123',
+      membershipFound: false,
+    });
     createClientMock
-      .mockReturnValueOnce(
-        createDataClient({
-          playerIdsByEmail: [],
-          membershipFound: true,
-        })
-      )
+      .mockReturnValueOnce(dataClient)
       .mockReturnValueOnce(
         createAuthClient({
-          id: 'player-123',
-          email: 'nomatch@example.com',
+          id: 'auth-user-999',
+          email: 'player@example.com',
         })
       );
 
@@ -153,13 +157,66 @@ describe('Trip Access Middleware', () => {
     );
 
     expect(result.authorized).toBe(true);
+    expect(dataClient.insertedMemberships).toContainEqual({
+      trip_id: 'trip-1',
+      auth_user_id: 'auth-user-999',
+      player_id: 'player-123',
+      role: 'player',
+      status: 'active',
+    });
   });
 
-  it('denies authenticated users who are not linked to a trip player', async () => {
+  it('redeems a legacy share-code header into a membership instead of bypassing roles', async () => {
+    const dataClient = createDataClient({
+      tripShareCode: 'ABCDEFGH',
+      linkedPlayerId: null,
+      membershipFound: false,
+    });
+    createClientMock
+      .mockReturnValueOnce(dataClient)
+      .mockReturnValueOnce(
+        createAuthClient({
+          id: 'auth-user-999',
+          email: 'player@example.com',
+        })
+      );
+
+    const { verifyTripAccess } = await loadMiddleware();
+    const result = await verifyTripAccess(
+      createRequest({ Authorization: 'Bearer test-token', 'X-Share-Code': 'ABCDEFGH' }),
+      'trip-1'
+    );
+
+    expect(result.authorized).toBe(true);
+    expect(dataClient.insertedMemberships).toContainEqual({
+      trip_id: 'trip-1',
+      auth_user_id: 'auth-user-999',
+      player_id: null,
+      role: 'player',
+      status: 'active',
+    });
+  });
+
+  it('does not authorize unauthenticated share-code-only access', async () => {
+    createClientMock.mockReturnValueOnce(
+      createDataClient({
+        tripShareCode: 'ABCDEFGH',
+        membershipFound: false,
+      })
+    );
+
+    const { verifyTripAccess } = await loadMiddleware();
+    const result = await verifyTripAccess(createRequest({ 'X-Share-Code': 'ABCDEFGH' }), 'trip-1');
+
+    expect(result.authorized).toBe(false);
+    expect(result.error).toBe('Authorization required for trip access');
+  });
+
+  it('denies authenticated users who are not members and do not have a valid share code', async () => {
     createClientMock
       .mockReturnValueOnce(
         createDataClient({
-          playerIdsByEmail: [],
+          linkedPlayerId: null,
           membershipFound: false,
         })
       )

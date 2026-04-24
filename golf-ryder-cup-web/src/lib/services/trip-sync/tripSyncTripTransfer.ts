@@ -13,6 +13,7 @@ import {
 import { db } from '../../db';
 import type { BanterPost, SideBet, Trip } from '../../types/models';
 import { getPendingSyncIdsForTrip } from './tripSyncQueue';
+import { supabase } from '../../supabase/client';
 
 /**
  * Per-entity local orphan cleanup: for each entity we pulled, delete
@@ -272,8 +273,62 @@ export async function syncTripToCloudFull(tripId: string): Promise<TripSyncResul
   }
 }
 
+async function getSupabaseAccessToken(): Promise<string | null> {
+  if (!supabase) return null;
+
+  try {
+    const { data } = await supabase.auth.getSession();
+    return data.session?.access_token ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function redeemShareCodeForTripId(
+  shareCode: string
+): Promise<{ tripId: string; shareCode: string }> {
+  if (typeof fetch !== 'function') {
+    throw new Error('Trip join requires the app server');
+  }
+
+  const token = await getSupabaseAccessToken();
+  const response = await fetch('/api/trips/join', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ code: shareCode }),
+  });
+
+  const payload = (await response.json().catch(() => null)) as
+    | { tripId?: string; shareCode?: string; message?: string; error?: string }
+    | null;
+
+  if (!response.ok || !payload?.tripId) {
+    throw new Error(payload?.message ?? payload?.error ?? 'Trip not found with that share code');
+  }
+
+  return {
+    tripId: payload.tripId,
+    shareCode: payload.shareCode ?? shareCode,
+  };
+}
+
 export async function pullTripByShareCode(shareCode: string): Promise<TripSyncResult> {
-  return pullTripCore({ shareCode });
+  if (!canSync()) {
+    return { success: false, tripId: '', error: 'Offline' };
+  }
+
+  try {
+    const redeemed = await redeemShareCodeForTripId(shareCode.trim().toUpperCase());
+    storeTripShareCode(redeemed.tripId, redeemed.shareCode);
+    return pullTripCore({ tripId: redeemed.tripId });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Share-code redeem failed:', errorMessage);
+    return { success: false, tripId: '', error: errorMessage };
+  }
 }
 
 /**
@@ -291,7 +346,6 @@ export async function pullTripById(tripId: string): Promise<TripSyncResult> {
 }
 
 async function pullTripCore(lookup: {
-  shareCode?: string;
   tripId?: string;
 }): Promise<TripSyncResult> {
   if (!canSync()) {
@@ -299,17 +353,13 @@ async function pullTripCore(lookup: {
   }
 
   try {
-    const tripQuery = getTable('trips').select('*');
-    const { data: trip, error: tripError } = lookup.shareCode
-      ? await tripQuery.eq('share_code', lookup.shareCode.toUpperCase()).single()
-      : await tripQuery.eq('id', lookup.tripId).single();
+    const { data: trip, error: tripError } = await getTable('trips')
+      .select('*')
+      .eq('id', lookup.tripId)
+      .single();
 
     if (tripError || !trip) {
-      throw new Error(
-        lookup.shareCode
-          ? 'Trip not found with that share code'
-          : 'Trip not found with that id'
-      );
+      throw new Error('Trip not found with that id');
     }
 
     const [{ data: teams }, { data: sessions }] = await Promise.all([
@@ -440,6 +490,12 @@ async function pullTripCore(lookup: {
           Array.from(playerRows.values()).map((player) => ({
             id: String(player.id),
             tripId: typeof player.trip_id === 'string' ? player.trip_id : undefined,
+            linkedAuthUserId:
+              typeof player.linked_auth_user_id === 'string'
+                ? player.linked_auth_user_id
+                : undefined,
+            linkedProfileId:
+              typeof player.linked_profile_id === 'string' ? player.linked_profile_id : undefined,
             firstName: String(player.first_name ?? ''),
             lastName: String(player.last_name ?? ''),
             email: typeof player.email === 'string' ? player.email : undefined,
@@ -449,6 +505,9 @@ async function pullTripCore(lookup: {
             teePreference:
               typeof player.tee_preference === 'string' ? player.tee_preference : undefined,
             avatarUrl: typeof player.avatar_url === 'string' ? player.avatar_url : undefined,
+            joinedAt: typeof player.joined_at === 'string' ? player.joined_at : undefined,
+            createdAt: typeof player.created_at === 'string' ? player.created_at : undefined,
+            updatedAt: typeof player.updated_at === 'string' ? player.updated_at : undefined,
           }))
         );
 
@@ -604,7 +663,7 @@ async function pullTripCore(lookup: {
     });
 
     const resolvedShareCode =
-      lookup.shareCode ?? (typeof trip.share_code === 'string' ? trip.share_code : undefined);
+      typeof trip.share_code === 'string' ? trip.share_code : undefined;
     if (resolvedShareCode) {
       storeTripShareCode(trip.id, resolvedShareCode);
     }

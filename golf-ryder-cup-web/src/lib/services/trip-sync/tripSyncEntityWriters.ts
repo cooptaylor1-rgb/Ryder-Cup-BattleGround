@@ -149,6 +149,8 @@ export async function syncPlayerToCloud(
   const cloudData = {
     id: player.id,
     trip_id: player.tripId ?? tripId ?? null,
+    linked_auth_user_id: player.linkedAuthUserId ?? null,
+    linked_profile_id: player.linkedProfileId ?? null,
     first_name: player.firstName,
     last_name: player.lastName,
     email: player.email || null,
@@ -156,6 +158,7 @@ export async function syncPlayerToCloud(
     ghin: player.ghin || null,
     tee_preference: player.teePreference || null,
     avatar_url: player.avatarUrl || null,
+    joined_at: player.joinedAt || null,
     updated_at: new Date().toISOString(),
   };
 
