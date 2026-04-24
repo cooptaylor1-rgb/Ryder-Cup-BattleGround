@@ -119,26 +119,35 @@ export async function getPlayerDues(tripId: string, playerId: string): Promise<D
 
 /** Record a payment */
 export async function recordPayment(payment: Omit<PaymentRecord, 'id' | 'createdAt'>): Promise<PaymentRecord> {
+  const now = new Date().toISOString();
   const record: PaymentRecord = {
     ...payment,
     id: crypto.randomUUID(),
-    createdAt: new Date().toISOString(),
+    createdAt: now,
   };
   await db.paymentRecords.add(record);
   queuePaymentRecord(record, 'create');
 
-  // Update corresponding dues line items
-  for (const lineItemId of payment.lineItemIds) {
+  let remainingPayment = Math.max(0, payment.amount);
+
+  for (const lineItemId of [...new Set(payment.lineItemIds)]) {
+    if (remainingPayment <= 0) break;
+
     const item = await db.duesLineItems.get(lineItemId);
     if (item) {
-      const newPaid = item.amountPaid + payment.amount;
+      const outstanding = Math.max(0, item.amount - item.amountPaid);
+      const allocated = Math.min(remainingPayment, outstanding);
+      if (allocated <= 0) continue;
+
+      remainingPayment -= allocated;
+      const newPaid = item.amountPaid + allocated;
       const newStatus: DuesStatus = newPaid >= item.amount ? 'paid' : 'partial';
       await db.duesLineItems.update(lineItemId, {
         amountPaid: Math.min(newPaid, item.amount),
         status: newStatus,
-        paidAt: newStatus === 'paid' ? new Date().toISOString() : undefined,
+        paidAt: newStatus === 'paid' ? now : undefined,
         paidVia: payment.method,
-        updatedAt: new Date().toISOString(),
+        updatedAt: now,
       });
       const updated = await db.duesLineItems.get(lineItemId);
       if (updated) queueDuesItem(updated, 'update');

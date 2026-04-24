@@ -421,6 +421,55 @@ describe('DuesService', () => {
       expect(updated!.amountPaid).toBe(15000); // Capped at amount
       expect(updated!.status).toBe('paid');
     });
+
+    it('should allocate one payment across multiple line items without duplicating it', async () => {
+      const greenFee = await createDuesItem({
+        tripId: TRIP_ID,
+        playerId: PLAYER_1_ID,
+        category: 'green_fee',
+        description: 'Green Fee',
+        amount: 10000,
+        amountPaid: 0,
+        status: 'unpaid',
+        createdBy: CAPTAIN_ID,
+      });
+      const lodging = await createDuesItem({
+        tripId: TRIP_ID,
+        playerId: PLAYER_1_ID,
+        category: 'lodging',
+        description: 'Hotel',
+        amount: 15000,
+        amountPaid: 0,
+        status: 'unpaid',
+        createdBy: CAPTAIN_ID,
+      });
+
+      const payment = await recordPayment({
+        tripId: TRIP_ID,
+        fromPlayerId: PLAYER_1_ID,
+        amount: 22000,
+        method: 'zelle',
+        lineItemIds: [greenFee.id, lodging.id],
+      });
+
+      const [updatedGreenFee, updatedLodging] = await Promise.all([
+        db.duesLineItems.get(greenFee.id),
+        db.duesLineItems.get(lodging.id),
+      ]);
+
+      expect(payment.amount).toBe(22000);
+      expect(updatedGreenFee).toMatchObject({
+        amountPaid: 10000,
+        status: 'paid',
+        paidVia: 'zelle',
+      });
+      expect(updatedLodging).toMatchObject({
+        amountPaid: 12000,
+        status: 'partial',
+        paidVia: 'zelle',
+      });
+      expect(updatedGreenFee!.amountPaid + updatedLodging!.amountPaid).toBe(22000);
+    });
   });
 
   describe('markAsPaid', () => {
