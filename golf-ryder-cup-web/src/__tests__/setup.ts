@@ -22,16 +22,18 @@ vi.mock('next/navigation', () => ({
     useSearchParams: () => new URLSearchParams(),
 }));
 
-// Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: vi.fn().mockImplementation((query: string) => ({
-        media: query,
-        onchange: null,
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-    })),
-});
+// Mock window.matchMedia for jsdom-based tests.
+if (typeof window !== 'undefined') {
+    Object.defineProperty(window, 'matchMedia', {
+        writable: true,
+        value: vi.fn().mockImplementation((query: string) => ({
+            media: query,
+            onchange: null,
+            addListener: vi.fn(),
+            removeListener: vi.fn(),
+            addEventListener: vi.fn(),
+            removeEventListener: vi.fn(),
+            dispatchEvent: vi.fn(),
+        })),
+    });
+}

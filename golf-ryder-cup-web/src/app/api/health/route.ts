@@ -283,8 +283,9 @@ async function checkRateLimit(strict: boolean): Promise<RateLimitCheck> {
 }
 
 function checkDeployment(strict: boolean): DeploymentCheck {
-  const railwayCommitSha = process.env.RAILWAY_GIT_COMMIT_SHA ?? null;
-  const release = process.env.NEXT_PUBLIC_SENTRY_RELEASE ?? railwayCommitSha ?? '';
+  const railwayCommitSha = process.env.RAILWAY_GIT_COMMIT_SHA?.trim() || null;
+  const configuredRelease = process.env.NEXT_PUBLIC_SENTRY_RELEASE?.trim();
+  const release = configuredRelease?.startsWith('$') ? railwayCommitSha ?? '' : configuredRelease ?? railwayCommitSha ?? '';
   const environment =
     process.env.NEXT_PUBLIC_SENTRY_ENV ??
     process.env.RAILWAY_ENVIRONMENT_NAME ??

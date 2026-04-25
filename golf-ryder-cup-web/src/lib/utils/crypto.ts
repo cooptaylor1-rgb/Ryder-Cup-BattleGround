@@ -19,7 +19,7 @@ function bytesToB64(bytes: Uint8Array): string {
 
 function b64ToBytes(b64: string): Uint8Array {
   const bin = atob(b64);
-  const out = new Uint8Array(new ArrayBuffer(bin.length));
+  const out = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
   return out;
 }
@@ -32,7 +32,13 @@ async function sha256Hex(input: string): Promise<string> {
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-async function pbkdf2(pin: string, saltBuffer: ArrayBuffer, iterations: number): Promise<Uint8Array> {
+function normalizeSalt(salt: Uint8Array): ArrayBuffer {
+  const copy = new ArrayBuffer(salt.byteLength);
+  new Uint8Array(copy).set(salt);
+  return copy;
+}
+
+async function pbkdf2(pin: string, salt: Uint8Array, iterations: number): Promise<Uint8Array> {
   const encoder = new TextEncoder();
   const keyMaterial = await crypto.subtle.importKey('raw', encoder.encode(pin), 'PBKDF2', false, [
     'deriveBits',
@@ -41,7 +47,7 @@ async function pbkdf2(pin: string, saltBuffer: ArrayBuffer, iterations: number):
   const bits = await crypto.subtle.deriveBits(
     {
       name: 'PBKDF2',
-      salt: saltBuffer,
+      salt: normalizeSalt(salt),
       iterations,
       hash: 'SHA-256',
     },
@@ -63,9 +69,9 @@ export function isHashedPin(storedValue: string): boolean {
  * Hash a PIN for storage.
  */
 export async function hashPin(pin: string): Promise<string> {
-  const salt = new Uint8Array(new ArrayBuffer(PBKDF2_SALT_BYTES));
+  const salt = new Uint8Array(PBKDF2_SALT_BYTES);
   crypto.getRandomValues(salt);
-  const hash = await pbkdf2(pin, salt.buffer as ArrayBuffer, PBKDF2_ITERATIONS);
+  const hash = await pbkdf2(pin, salt, PBKDF2_ITERATIONS);
   return `pbkdf2$${PBKDF2_ITERATIONS}$${bytesToB64(salt)}$${bytesToB64(hash)}`;
 }
 
@@ -81,7 +87,7 @@ export async function verifyPin(pin: string, stored: string): Promise<boolean> {
     const iterations = Number(parts[1]);
     const salt = b64ToBytes(parts[2]);
     const expected = parts[3];
-    const actual = bytesToB64(await pbkdf2(pin, salt.buffer as ArrayBuffer, iterations));
+    const actual = bytesToB64(await pbkdf2(pin, salt, iterations));
     return actual === expected;
   }
 
