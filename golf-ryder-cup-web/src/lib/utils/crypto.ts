@@ -32,10 +32,15 @@ async function sha256Hex(input: string): Promise<string> {
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-function normalizeSalt(salt: Uint8Array): ArrayBuffer {
-  const copy = new ArrayBuffer(salt.byteLength);
-  new Uint8Array(copy).set(salt);
-  return copy;
+function normalizeSalt(salt: Uint8Array): BufferSource {
+  const copy = new Uint8Array(salt.byteLength);
+  copy.set(salt);
+
+  const maybeBuffer = (globalThis as typeof globalThis & {
+    Buffer?: { from(input: Uint8Array): Uint8Array };
+  }).Buffer;
+
+  return maybeBuffer ? maybeBuffer.from(copy) : copy;
 }
 
 async function pbkdf2(pin: string, salt: Uint8Array, iterations: number): Promise<Uint8Array> {
