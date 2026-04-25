@@ -139,8 +139,16 @@ const sentryWebpackPluginOptions = {
   automaticVercelMonitors: true,
 };
 
-// Only wrap with Sentry if DSN is configured
-let exportConfig: NextConfig = process.env.NEXT_PUBLIC_SENTRY_DSN
+const isSentrySourceMapUploadConfigured = !!(
+  process.env.NEXT_PUBLIC_SENTRY_DSN &&
+  process.env.SENTRY_AUTH_TOKEN &&
+  process.env.SENTRY_ORG &&
+  process.env.SENTRY_PROJECT
+);
+
+// Only enable the Sentry build plugin when source-map upload credentials
+// are complete. Runtime Sentry initialization still reads the DSN from env.
+let exportConfig: NextConfig = isSentrySourceMapUploadConfigured
   ? withSentryConfig(nextConfig, sentryWebpackPluginOptions)
   : nextConfig;
 

@@ -49,7 +49,9 @@ NEXT_PUBLIC_VAPID_PUBLIC_KEY=<your-vapid-public-key>
 VAPID_PRIVATE_KEY=<your-vapid-private-key>
 VAPID_SUBJECT=mailto:admin@example.com
 
-# Error Monitoring
+# Optional - Error Monitoring
+# DSN alone enables runtime reporting. Add the three server-side Sentry
+# variables only when source-map uploads should run during the production build.
 NEXT_PUBLIC_SENTRY_DSN=<your-sentry-dsn>
 SENTRY_AUTH_TOKEN=<your-sentry-auth-token>
 SENTRY_ORG=<your-sentry-org>
