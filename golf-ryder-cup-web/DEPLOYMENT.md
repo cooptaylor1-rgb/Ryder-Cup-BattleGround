@@ -23,8 +23,12 @@ a production database backup and a green staging deploy.
 - Start command: `cd golf-ryder-cup-web && pnpm start`
 - Health check path: `/api/health`
 
-`deploy:railway` runs install, typecheck, tests, production build, and a local
-`/api/health` smoke before Railway starts the deployed service.
+`deploy:railway` runs install, typecheck, the Railway release test suite,
+production build, and a local `/api/health` smoke before Railway starts the
+deployed service. The release suite intentionally excludes the long
+100/1000-user stress simulations so Railway builds do not time out; those
+stress simulations still run through `pnpm run test` and `pnpm run
+check:prepush`.
 
 ## Environment Variables
 
