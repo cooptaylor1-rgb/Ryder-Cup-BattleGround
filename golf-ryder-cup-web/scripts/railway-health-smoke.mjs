@@ -3,7 +3,9 @@ import { spawn } from 'node:child_process';
 const SKIP = process.env.RAILWAY_HEALTH_SMOKE_SKIP === '1';
 const PORT = process.env.RAILWAY_HEALTH_SMOKE_PORT || '4300';
 const TIMEOUT_MS = Number(process.env.RAILWAY_HEALTH_SMOKE_TIMEOUT_MS || 60_000);
+const MODE = process.env.RAILWAY_HEALTH_SMOKE_MODE || 'liveness';
 const HEALTH_URL = `http://127.0.0.1:${PORT}/api/health`;
+const IS_READINESS = MODE === 'readiness';
 
 if (SKIP) {
   console.log('[Railway Smoke] Skipping local health smoke.');
@@ -15,7 +17,7 @@ const server = spawn('pnpm', ['start'], {
   env: {
     ...process.env,
     PORT,
-    HEALTHCHECK_STRICT: process.env.HEALTHCHECK_STRICT ?? '1',
+    HEALTHCHECK_STRICT: process.env.HEALTHCHECK_STRICT ?? (IS_READINESS ? '1' : '0'),
   },
   stdio: ['ignore', 'pipe', 'pipe'],
 });
@@ -52,7 +54,15 @@ async function stopServer() {
 }
 
 async function readHealth() {
-  const response = await fetch(HEALTH_URL, { cache: 'no-store' });
+  const response = await fetch(HEALTH_URL, {
+    cache: 'no-store',
+    method: IS_READINESS ? 'GET' : 'HEAD',
+  });
+
+  if (!IS_READINESS) {
+    return { response, body: { status: response.ok ? 'healthy' : 'unhealthy' } };
+  }
+
   const text = await response.text();
   let body;
   try {
