@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/inject-sw-hash.js",
+    "build": "next build && node scripts/inject-sw-hash.js && node scripts/prepare-standalone.mjs",
     "build:analyze": "ANALYZE=true next build && node scripts/inject-sw-hash.js",
-    "start": "next start",
+    "start": "node .next/standalone/golf-ryder-cup-web/server.js",
     "cap:sync": "npx cap sync",
     "cap:copy": "npx cap copy",
     "cap:open:ios": "npx cap open ios",
