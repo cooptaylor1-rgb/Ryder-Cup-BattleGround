@@ -27,9 +27,7 @@ vi.mock('framer-motion', () => ({
       dragConstraints?: unknown;
       dragElastic?: unknown;
       onPanEnd?: unknown;
-    }>) => (
-      <div {...props}>{children}</div>
-    ),
+    }>) => <div {...props}>{children}</div>,
   },
   useMotionValue: () => ({ get: () => 0, set: vi.fn(), on: () => vi.fn() }),
   useTransform: () => 0,
@@ -180,6 +178,10 @@ describe('SwipeScorePanel Component', () => {
       // Check icon should be visible
       const checkContainer = document.querySelector('.w-8.h-8.rounded-full');
       expect(checkContainer).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Team USA wins hole' })).toHaveAttribute(
+        'aria-pressed',
+        'true'
+      );
     });
 
     it('shows checkmark when existingResult is teamB', () => {
@@ -192,6 +194,10 @@ describe('SwipeScorePanel Component', () => {
       render(<SwipeScorePanel {...defaultProps} existingResult="halved" />);
       const checkContainer = document.querySelector('.w-8.h-8.rounded-full');
       expect(checkContainer).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Hole halved' })).toHaveAttribute(
+        'aria-pressed',
+        'true'
+      );
     });
 
     it('does not show checkmark when existingResult is none', () => {

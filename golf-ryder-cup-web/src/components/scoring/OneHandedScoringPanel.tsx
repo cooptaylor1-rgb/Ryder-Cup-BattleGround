@@ -27,6 +27,14 @@ interface OneHandedScoringPanelProps {
 
 const SWIPE_THRESHOLD = 100;
 
+function colorWithAlpha(color: string, alphaPercent: number) {
+  return `color-mix(in srgb, ${color} ${alphaPercent}%, transparent)`;
+}
+
+function deepenColor(color: string, inkPercent = 12) {
+  return `color-mix(in srgb, ${color} ${100 - inkPercent}%, var(--ink))`;
+}
+
 function buildScoreSummary(currentScore: number, teamAName: string, teamBName: string) {
   if (currentScore === 0) {
     return {
@@ -47,11 +55,7 @@ function buildScoreSummary(currentScore: number, teamAName: string, teamBName: s
   };
 }
 
-function outcomeLabel(
-  result: HoleWinner | null | undefined,
-  teamAName: string,
-  teamBName: string
-) {
+function outcomeLabel(result: HoleWinner | null | undefined, teamAName: string, teamBName: string) {
   if (!result || result === 'none') return 'Ready to score';
   if (result === 'halved') return `Hole ${teamAName === teamBName ? '' : 'was '}halved`;
   return result === 'teamA' ? `${teamAName} won this hole` : `${teamBName} won this hole`;
@@ -236,7 +240,9 @@ export function OneHandedScoringPanel({
       <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
         <div className="rounded-[24px] border border-[color:var(--rule)]/80 bg-[color:var(--canvas)]/74 px-4 py-4">
           <p className="type-overline" style={{ color: teamAColor }}>
-            {teamAName}
+            <span className="block truncate" title={teamAName}>
+              {teamAName}
+            </span>
           </p>
           <p className="mt-2 text-sm text-[var(--ink-secondary)]">Swipe right or tap to award</p>
         </div>
@@ -257,7 +263,9 @@ export function OneHandedScoringPanel({
 
         <div className="rounded-[24px] border border-[color:var(--rule)]/80 bg-[color:var(--canvas)]/74 px-4 py-4 sm:text-right">
           <p className="type-overline" style={{ color: teamBColor }}>
-            {teamBName}
+            <span className="block truncate" title={teamBName}>
+              {teamBName}
+            </span>
           </p>
           <p className="mt-2 text-sm text-[var(--ink-secondary)]">Swipe left or tap to award</p>
         </div>
@@ -275,9 +283,11 @@ export function OneHandedScoringPanel({
         </div>
 
         <div className="mt-4 flex items-center justify-between gap-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             <ChevronRight size={14} style={{ color: teamAColor }} />
-            {teamAName}
+            <span className="truncate" title={teamAName}>
+              {teamAName}
+            </span>
           </div>
           <div className="h-1 flex-1 rounded-full bg-[color:var(--rule)]/70">
             <motion.div
@@ -296,8 +306,10 @@ export function OneHandedScoringPanel({
               transition={{ duration: 0.18 }}
             />
           </div>
-          <div className="flex items-center gap-2">
-            {teamBName}
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="truncate" title={teamBName}>
+              {teamBName}
+            </span>
             <ChevronLeft size={14} style={{ color: teamBColor }} />
           </div>
         </div>
@@ -315,19 +327,27 @@ export function OneHandedScoringPanel({
           type="button"
           onClick={() => handleTapScore('teamA')}
           disabled={disabled}
-          className="rounded-[26px] border px-4 py-5 text-left transition-transform active:scale-[0.98] disabled:opacity-50"
+          aria-pressed={existingResult === 'teamA'}
+          className="min-h-[96px] min-w-0 overflow-hidden rounded-[24px] border px-4 py-5 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           style={{
-            borderColor: activeSwipe === 'teamA' ? `${teamAColor}66` : `${teamAColor}2E`,
+            borderColor:
+              activeSwipe === 'teamA'
+                ? colorWithAlpha(teamAColor, 40)
+                : colorWithAlpha(teamAColor, 18),
             background:
               activeSwipe === 'teamA'
-                ? `linear-gradient(180deg, ${teamAColor} 0%, ${teamAColor}DD 100%)`
-                : `${teamAColor}14`,
+                ? `linear-gradient(180deg, ${teamAColor} 0%, ${deepenColor(teamAColor)} 100%)`
+                : colorWithAlpha(teamAColor, 8),
             color: activeSwipe === 'teamA' ? 'var(--canvas)' : teamAColor,
             boxShadow:
-              existingResult === 'teamA' ? `0 0 0 2px ${teamAColor}33 inset` : undefined,
+              existingResult === 'teamA'
+                ? `0 0 0 2px ${colorWithAlpha(teamAColor, 22)} inset`
+                : undefined,
           }}
         >
-          <p className="text-base font-semibold">{teamAName}</p>
+          <p className="truncate text-base font-semibold" title={teamAName}>
+            {teamAName}
+          </p>
           <p className="mt-1 text-sm opacity-80">Wins hole</p>
         </button>
 
@@ -335,15 +355,16 @@ export function OneHandedScoringPanel({
           type="button"
           onClick={() => handleTapScore('halved')}
           disabled={disabled}
-          className="rounded-[26px] border border-[color:var(--rule)] bg-[color:var(--canvas)] px-4 py-5 text-center transition-transform active:scale-[0.98] disabled:opacity-50"
+          aria-pressed={existingResult === 'halved'}
+          className="min-h-[96px] rounded-[24px] border border-[color:var(--rule)] bg-[color:var(--canvas)] px-4 py-5 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           style={{
             boxShadow:
-              existingResult === 'halved'
-                ? '0 0 0 2px rgba(86, 79, 68, 0.16) inset'
-                : undefined,
+              existingResult === 'halved' ? '0 0 0 2px rgba(86, 79, 68, 0.16) inset' : undefined,
           }}
         >
-          <p className="font-serif text-[length:var(--text-2xl)] leading-none text-[var(--ink)]">1/2</p>
+          <p className="font-serif text-[length:var(--text-2xl)] leading-none text-[var(--ink)]">
+            1/2
+          </p>
           <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink-tertiary)]">
             Halve
           </p>
@@ -353,19 +374,27 @@ export function OneHandedScoringPanel({
           type="button"
           onClick={() => handleTapScore('teamB')}
           disabled={disabled}
-          className="rounded-[26px] border px-4 py-5 text-right transition-transform active:scale-[0.98] disabled:opacity-50"
+          aria-pressed={existingResult === 'teamB'}
+          className="min-h-[96px] min-w-0 overflow-hidden rounded-[24px] border px-4 py-5 text-right transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           style={{
-            borderColor: activeSwipe === 'teamB' ? `${teamBColor}66` : `${teamBColor}2E`,
+            borderColor:
+              activeSwipe === 'teamB'
+                ? colorWithAlpha(teamBColor, 40)
+                : colorWithAlpha(teamBColor, 18),
             background:
               activeSwipe === 'teamB'
-                ? `linear-gradient(180deg, ${teamBColor} 0%, ${teamBColor}E1 100%)`
-                : `${teamBColor}14`,
+                ? `linear-gradient(180deg, ${teamBColor} 0%, ${deepenColor(teamBColor)} 100%)`
+                : colorWithAlpha(teamBColor, 8),
             color: activeSwipe === 'teamB' ? 'var(--canvas)' : teamBColor,
             boxShadow:
-              existingResult === 'teamB' ? `0 0 0 2px ${teamBColor}33 inset` : undefined,
+              existingResult === 'teamB'
+                ? `0 0 0 2px ${colorWithAlpha(teamBColor, 22)} inset`
+                : undefined,
           }}
         >
-          <p className="text-base font-semibold">{teamBName}</p>
+          <p className="truncate text-base font-semibold" title={teamBName}>
+            {teamBName}
+          </p>
           <p className="mt-1 text-sm opacity-80">Wins hole</p>
         </button>
       </motion.div>

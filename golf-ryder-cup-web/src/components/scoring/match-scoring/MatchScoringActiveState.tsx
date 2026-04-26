@@ -156,12 +156,7 @@ export function MatchScoringActiveState({
     prefersReducedMotion,
   } = preferences;
 
-  const {
-    activeSideBets,
-    activeMatchSideBets,
-    currentTripId,
-    currentPlayerIdForBets,
-  } = sideBets;
+  const { activeSideBets, activeMatchSideBets, currentTripId, currentPlayerIdForBets } = sideBets;
 
   const {
     onFinishEditing,
@@ -180,7 +175,7 @@ export function MatchScoringActiveState({
   } = handlers;
 
   return (
-    <section className="space-y-4 py-[var(--space-6)]">
+    <section className="space-y-4 py-[var(--space-6)] pb-[calc(112px+env(safe-area-inset-bottom,0px))] lg:pb-[var(--space-6)]">
       {isEditingScores && isMatchComplete && (
         <div className="flex items-center justify-between gap-3 rounded-[22px] border border-[var(--gold)] bg-[var(--gold-subtle)] px-4 py-3">
           <div className="flex items-center gap-2">
@@ -190,8 +185,9 @@ export function MatchScoringActiveState({
             </p>
           </div>
           <button
+            type="button"
             onClick={onFinishEditing}
-            className="rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink)]"
+            className="rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--gold-subtle)]"
           >
             Done
           </button>
@@ -202,9 +198,11 @@ export function MatchScoringActiveState({
         <div className="border-b border-[color:var(--rule)] px-4 py-4 sm:px-5">
           <div className="flex items-center justify-between gap-3">
             <button
+              type="button"
               onClick={onPrevHole}
               disabled={currentHole <= 1}
-              className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-transform active:scale-[0.96] disabled:opacity-30"
+              className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-30"
+              aria-label="Previous hole"
             >
               <ChevronLeft size={20} />
             </button>
@@ -226,9 +224,11 @@ export function MatchScoringActiveState({
             </div>
 
             <button
+              type="button"
               onClick={onNextHole}
               disabled={currentHole >= 18}
-              className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-transform active:scale-[0.96] disabled:opacity-30"
+              className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-30"
+              aria-label="Next hole"
             >
               <ChevronRight size={20} />
             </button>
@@ -286,7 +286,11 @@ export function MatchScoringActiveState({
             </div>
 
             <div className="overflow-x-auto">
-              <div className="inline-flex min-w-full gap-2 rounded-[22px] border border-[color:var(--rule)] bg-[color:var(--canvas-sunken)] px-2 py-2">
+              <div
+                className="inline-flex min-w-full gap-2 rounded-[22px] border border-[color:var(--rule)] bg-[color:var(--canvas-sunken)] px-2 py-2"
+                role="group"
+                aria-label="Scoring mode"
+              >
                 <ScoringModeChip
                   label="Swipe"
                   active={scoringMode === 'swipe'}
@@ -343,7 +347,11 @@ export function MatchScoringActiveState({
           )}
 
           {!isFourball && (teamAHandicapAllowance > 0 || teamBHandicapAllowance > 0) && (
-            <button onClick={onToggleShowHandicapDetails} className="w-full">
+            <button
+              type="button"
+              onClick={onToggleShowHandicapDetails}
+              className="w-full rounded-[22px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)]"
+            >
               <HandicapStrokeIndicator
                 currentHole={currentHole}
                 teamAStrokes={teamAHandicapAllowance}
@@ -462,37 +470,45 @@ export function MatchScoringActiveState({
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="grid grid-cols-3 gap-3"
+                className="grid grid-cols-[minmax(0,1fr)_4.75rem_minmax(0,1fr)] gap-2 sm:grid-cols-3 sm:gap-3"
               >
                 <button
+                  type="button"
                   onClick={() => onScore('teamA')}
                   disabled={isSaving}
                   className={cn(
-                    'rounded-[24px] border px-4 py-5 text-left font-sans transition-transform active:scale-[0.98]',
+                    'min-h-[92px] min-w-0 overflow-hidden rounded-[22px] border px-3 py-4 text-left font-sans shadow-card-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98] disabled:cursor-not-allowed sm:px-4 sm:py-5',
                     currentHoleResult?.winner === 'teamA'
-                      ? 'border-[color:var(--gold)]'
+                      ? 'border-[color:var(--gold)] ring-2 ring-[var(--gold)] ring-offset-2 ring-offset-[var(--canvas)]'
                       : 'border-transparent'
                   )}
                   style={{
-                    background:
-                      'linear-gradient(180deg, var(--team-usa) 0%, rgba(20,92,163,0.9) 100%)',
+                    background: `linear-gradient(180deg, ${teamAColor} 0%, color-mix(in srgb, ${teamAColor} 88%, var(--ink)) 100%)`,
                     color: 'var(--canvas)',
                     opacity: isSaving ? 0.5 : 1,
                   }}
                   aria-pressed={currentHoleResult?.winner === 'teamA'}
                   aria-label={`Score hole: ${teamAName} wins${currentHoleResult?.winner === 'teamA' ? ' (selected)' : ''}`}
                 >
-                  <span className="block text-[length:var(--text-lg)] font-semibold">{teamAName}</span>
-                  <span className="mt-1 block text-[length:var(--text-xs)] opacity-80">wins hole</span>
+                  <span
+                    className="block truncate text-[length:var(--text-lg)] font-semibold"
+                    title={teamAName}
+                  >
+                    {teamAName}
+                  </span>
+                  <span className="mt-1 block text-[length:var(--text-xs)] opacity-80">
+                    wins hole
+                  </span>
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => onScore('halved')}
                   disabled={isSaving}
                   className={cn(
-                    'rounded-[24px] border px-4 py-5 font-sans transition-transform active:scale-[0.98]',
+                    'min-h-[92px] min-w-0 rounded-[22px] border px-2 py-4 font-sans shadow-card-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98] disabled:cursor-not-allowed sm:px-4 sm:py-5',
                     currentHoleResult?.winner === 'halved'
-                      ? 'border-[color:var(--gold)]'
+                      ? 'border-[color:var(--gold)] ring-2 ring-[var(--gold)] ring-offset-2 ring-offset-[var(--canvas)]'
                       : 'border-[color:var(--rule)]'
                   )}
                   style={{
@@ -511,25 +527,32 @@ export function MatchScoringActiveState({
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => onScore('teamB')}
                   disabled={isSaving}
                   className={cn(
-                    'rounded-[24px] border px-4 py-5 text-right font-sans transition-transform active:scale-[0.98]',
+                    'min-h-[92px] min-w-0 overflow-hidden rounded-[22px] border px-3 py-4 text-right font-sans shadow-card-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98] disabled:cursor-not-allowed sm:px-4 sm:py-5',
                     currentHoleResult?.winner === 'teamB'
-                      ? 'border-[color:var(--gold)]'
+                      ? 'border-[color:var(--gold)] ring-2 ring-[var(--gold)] ring-offset-2 ring-offset-[var(--canvas)]'
                       : 'border-transparent'
                   )}
                   style={{
-                    background:
-                      'linear-gradient(180deg, var(--team-europe) 0%, rgba(132,41,61,0.92) 100%)',
+                    background: `linear-gradient(180deg, ${teamBColor} 0%, color-mix(in srgb, ${teamBColor} 88%, var(--ink)) 100%)`,
                     color: 'var(--canvas)',
                     opacity: isSaving ? 0.5 : 1,
                   }}
                   aria-pressed={currentHoleResult?.winner === 'teamB'}
                   aria-label={`Score hole: ${teamBName} wins${currentHoleResult?.winner === 'teamB' ? ' (selected)' : ''}`}
                 >
-                  <span className="block text-[length:var(--text-lg)] font-semibold">{teamBName}</span>
-                  <span className="mt-1 block text-[length:var(--text-xs)] opacity-80">wins hole</span>
+                  <span
+                    className="block truncate text-[length:var(--text-lg)] font-semibold"
+                    title={teamBName}
+                  >
+                    {teamBName}
+                  </span>
+                  <span className="mt-1 block text-[length:var(--text-xs)] opacity-80">
+                    wins hole
+                  </span>
                 </button>
               </motion.div>
             )}
@@ -539,8 +562,9 @@ export function MatchScoringActiveState({
 
       <div className="card-editorial overflow-hidden">
         <button
+          type="button"
           onClick={onToggleShowAdvancedTools}
-          className="flex w-full items-center justify-between px-4 py-4 sm:px-5"
+          className="flex w-full items-center justify-between px-4 py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus-ring)] sm:px-5"
           aria-expanded={showAdvancedTools}
           aria-controls="advanced-scoring-tools"
         >

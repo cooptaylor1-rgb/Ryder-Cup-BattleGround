@@ -27,6 +27,7 @@ import { Check, Minus, ChevronLeft, ChevronRight, Trophy } from 'lucide-react';
 import type { HoleWinner } from '@/lib/types/models';
 import { useHaptic } from '@/lib/hooks';
 import { useSwipeBackProtection } from '@/lib/hooks/useSwipeBackProtection';
+import { cn } from '@/lib/utils';
 
 interface SwipeScorePanelProps {
   /** Current hole number (1-18) */
@@ -55,6 +56,11 @@ interface SwipeScorePanelProps {
 const SWIPE_THRESHOLD = 80; // px to trigger score
 const VELOCITY_THRESHOLD = 300; // px/s for quick swipes
 const VERTICAL_THRESHOLD = 60; // px for halved gesture
+const SCORE_CONFIRMATION_DELAY_MS = 350;
+
+function colorWithAlpha(color: string, alphaPercent: number) {
+  return `color-mix(in srgb, ${color} ${alphaPercent}%, transparent)`;
+}
 
 export function SwipeScorePanel({
   holeNumber,
@@ -87,6 +93,10 @@ export function SwipeScorePanel({
   const [confirmedResult, setConfirmedResult] = useState<HoleWinner | null>(null);
   const [hasTriggeredHaptic, setHasTriggeredHaptic] = useState(false);
 
+  const teamASelected = existingResult === 'teamA';
+  const teamBSelected = existingResult === 'teamB';
+  const halvedSelected = existingResult === 'halved';
+
   // Transform motion values for visual feedback
   const teamAOpacity = useTransform(x, [-SWIPE_THRESHOLD, 0], [1, 0]);
   const teamBOpacity = useTransform(x, [0, SWIPE_THRESHOLD], [0, 1]);
@@ -96,9 +106,9 @@ export function SwipeScorePanel({
     x,
     [-SWIPE_THRESHOLD * 1.5, 0, SWIPE_THRESHOLD * 1.5],
     [
-      `linear-gradient(90deg, ${teamAColor}40 0%, transparent 50%)`,
+      `linear-gradient(90deg, ${colorWithAlpha(teamAColor, 28)} 0%, transparent 50%)`,
       'transparent',
-      `linear-gradient(90deg, transparent 50%, ${teamBColor}40 100%)`,
+      `linear-gradient(90deg, transparent 50%, ${colorWithAlpha(teamBColor, 28)} 100%)`,
     ]
   );
 
@@ -185,7 +195,7 @@ export function SwipeScorePanel({
           onScore(result!);
           setShowConfirmation(false);
           setConfirmedResult(null);
-        }, 600);
+        }, SCORE_CONFIRMATION_DELAY_MS);
       }
 
       // Reset gesture state
@@ -253,10 +263,22 @@ export function SwipeScorePanel({
     return `${leader} ${abs}UP`;
   };
 
+  const getExistingResultLabel = () => {
+    if (!existingResult || existingResult === 'none') return 'No score recorded for this hole';
+    if (existingResult === 'halved') return 'Hole recorded as halved';
+    return existingResult === 'teamA'
+      ? `${teamAName} is recorded as the hole winner`
+      : `${teamBName} is recorded as the hole winner`;
+  };
+
   return (
     <div
       ref={containerRef}
-      className={`relative w-full aspect-[4/3] max-h-[400px] rounded-3xl overflow-hidden focus:outline-none focus:ring-2 focus:ring-[var(--masters)] ${className}`}
+      className={cn(
+        'relative aspect-[4/3] min-h-[300px] w-full max-h-[420px] overflow-hidden rounded-[28px] border border-[color:var(--rule)]/70 shadow-card focus:outline-none focus:ring-2 focus:ring-[var(--masters)] focus:ring-offset-2 focus:ring-offset-[var(--canvas)]',
+        disabled && 'opacity-90',
+        className
+      )}
       style={{
         background: 'var(--surface)',
         touchAction: 'none',
@@ -266,9 +288,14 @@ export function SwipeScorePanel({
       }}
       tabIndex={0}
       onKeyDown={handleKeyDown}
-      role="application"
+      role="group"
+      aria-disabled={disabled}
       aria-label={`Score entry for hole ${holeNumber}. Press Left arrow or A for ${teamAName} wins, Right arrow or B for ${teamBName} wins, Up arrow or H for halved.`}
     >
+      <p className="sr-only" aria-live="polite">
+        {getExistingResultLabel()}
+      </p>
+
       {/* Background gradient based on gesture */}
       <motion.div
         className="absolute inset-0 pointer-events-none"
@@ -330,9 +357,9 @@ export function SwipeScorePanel({
             style={{
               background:
                 gestureState === 'teamA'
-                  ? `${teamAColor}30`
+                  ? colorWithAlpha(teamAColor, 18)
                   : gestureState === 'teamB'
-                    ? `${teamBColor}30`
+                    ? colorWithAlpha(teamBColor, 18)
                     : gestureState === 'halved'
                       ? 'rgba(100, 100, 100, 0.3)'
                       : 'transparent',
@@ -340,11 +367,11 @@ export function SwipeScorePanel({
                 gestureState !== 'idle'
                   ? `0 0 40px ${
                       gestureState === 'teamA'
-                        ? teamAColor
+                        ? colorWithAlpha(teamAColor, 40)
                         : gestureState === 'teamB'
-                          ? teamBColor
-                          : '#666'
-                    }40`
+                          ? colorWithAlpha(teamBColor, 40)
+                          : 'rgba(100, 100, 100, 0.25)'
+                    }`
                   : 'none',
             }}
           />
@@ -368,7 +395,9 @@ export function SwipeScorePanel({
             }}
           >
             <span className="text-2xl font-bold text-[var(--canvas)]">{holeNumber}</span>
-            <span className="text-xs text-[color:var(--canvas)]/80 uppercase tracking-wider">Hole</span>
+            <span className="text-xs text-[color:var(--canvas)]/80 uppercase tracking-wider">
+              Hole
+            </span>
           </div>
 
           {/* Gesture hints */}
@@ -413,52 +442,94 @@ export function SwipeScorePanel({
         )}
       </AnimatePresence>
 
-      {/* Tap buttons for accessibility (hidden but functional) */}
-      <div className="absolute bottom-4 left-4 right-4 flex justify-between">
+      {/* Tap buttons for accessibility and one-handed fallback */}
+      <div className="absolute bottom-3 left-3 right-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-2 sm:bottom-4 sm:left-4 sm:right-4">
         <button
+          type="button"
           onClick={handleTapTeamA}
           disabled={disabled}
-          className="px-4 py-2 rounded-xl text-sm font-medium opacity-60 hover:opacity-100 transition-opacity"
-          style={{ background: `${teamAColor}20`, color: teamAColor }}
+          aria-pressed={teamASelected}
+          className={cn(
+            'min-h-12 min-w-0 rounded-[18px] border px-3 py-2 text-left shadow-card-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50',
+            teamASelected && 'ring-2 ring-[var(--gold)] ring-offset-2 ring-offset-[var(--surface)]'
+          )}
+          style={{
+            background: colorWithAlpha(teamAColor, 14),
+            borderColor: colorWithAlpha(teamAColor, 34),
+            color: teamAColor,
+          }}
           aria-label={`${teamAName} wins hole`}
         >
-          {teamAName}
+          <span className="block truncate text-sm font-semibold" title={teamAName}>
+            {teamAName}
+          </span>
+          <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] opacity-75">
+            Wins
+          </span>
         </button>
 
         <button
+          type="button"
           onClick={handleTapHalved}
           disabled={disabled}
-          className="px-4 py-2 rounded-xl text-sm font-medium bg-[var(--surface-secondary)] text-[var(--ink-secondary)] opacity-60 hover:opacity-100 transition-opacity"
+          aria-pressed={halvedSelected}
+          className={cn(
+            'min-h-12 min-w-[4.75rem] rounded-[18px] border border-[color:var(--rule)] bg-[color:var(--surface-elevated)] px-3 py-2 text-sm font-semibold text-[var(--ink-secondary)] shadow-card-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50',
+            halvedSelected && 'ring-2 ring-[var(--gold)] ring-offset-2 ring-offset-[var(--surface)]'
+          )}
           aria-label="Hole halved"
         >
-          Halved
+          <span className="block leading-none">1/2</span>
+          <span className="mt-1 block text-[10px] uppercase tracking-[0.12em] text-[var(--ink-tertiary)]">
+            Halve
+          </span>
         </button>
 
         <button
+          type="button"
           onClick={handleTapTeamB}
           disabled={disabled}
-          className="px-4 py-2 rounded-xl text-sm font-medium opacity-60 hover:opacity-100 transition-opacity"
-          style={{ background: `${teamBColor}20`, color: teamBColor }}
+          aria-pressed={teamBSelected}
+          className={cn(
+            'min-h-12 min-w-0 rounded-[18px] border px-3 py-2 text-right shadow-card-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50',
+            teamBSelected && 'ring-2 ring-[var(--gold)] ring-offset-2 ring-offset-[var(--surface)]'
+          )}
+          style={{
+            background: colorWithAlpha(teamBColor, 14),
+            borderColor: colorWithAlpha(teamBColor, 34),
+            color: teamBColor,
+          }}
           aria-label={`${teamBName} wins hole`}
         >
-          {teamBName}
+          <span className="block truncate text-sm font-semibold" title={teamBName}>
+            {teamBName}
+          </span>
+          <span className="block text-[11px] font-semibold uppercase tracking-[0.12em] opacity-75">
+            Wins
+          </span>
         </button>
       </div>
 
       {/* Keyboard shortcut hint - visible on focus */}
       <div
-        className="absolute bottom-20 left-1/2 -translate-x-1/2 opacity-0 focus-within:opacity-100 transition-opacity pointer-events-none"
+        className="pointer-events-none absolute bottom-[5.75rem] left-1/2 -translate-x-1/2 opacity-0 transition-opacity focus-within:opacity-100"
         aria-hidden="true"
       >
         <div className="px-3 py-1.5 rounded-lg bg-[color:var(--ink)]/45 backdrop-blur-sm">
-          <span className="text-xs text-[color:var(--canvas)]/85">← A wins • ↑ Halved • B wins →</span>
+          <span className="text-xs text-[color:var(--canvas)]/85">
+            ← A wins • ↑ Halved • B wins →
+          </span>
         </div>
       </div>
 
       {/* Current score display */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2">
-        <div className="px-4 py-1.5 rounded-full bg-[color:var(--ink)]/12 backdrop-blur-sm">
-          <span className="text-sm font-semibold" style={{ color: 'var(--ink-primary)' }}>
+      <div className="absolute top-4 left-1/2 max-w-[68%] -translate-x-1/2">
+        <div className="rounded-full bg-[color:var(--ink)]/12 px-4 py-1.5 backdrop-blur-sm">
+          <span
+            className="block truncate text-sm font-semibold"
+            style={{ color: 'var(--ink-primary)' }}
+            title={getScoreDisplay()}
+          >
             {getScoreDisplay()}
           </span>
         </div>
@@ -466,7 +537,7 @@ export function SwipeScorePanel({
 
       {/* Existing result indicator */}
       {existingResult && existingResult !== 'none' && (
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 flex items-center gap-2 rounded-full bg-[color:var(--surface-elevated)]/84 p-1 shadow-card-sm backdrop-blur-sm">
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center"
             style={{
@@ -480,6 +551,13 @@ export function SwipeScorePanel({
           >
             <Check className="w-4 h-4 text-[var(--canvas)]" />
           </div>
+          <span className="hidden max-w-24 truncate pr-2 text-xs font-semibold text-[var(--ink-secondary)] sm:block">
+            {existingResult === 'halved'
+              ? 'Halved'
+              : existingResult === 'teamA'
+                ? teamAName
+                : teamBName}
+          </span>
         </div>
       )}
     </div>

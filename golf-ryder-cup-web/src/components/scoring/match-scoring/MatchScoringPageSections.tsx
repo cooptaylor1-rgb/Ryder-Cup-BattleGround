@@ -6,10 +6,7 @@ import type { MatchState } from '@/lib/types/computed';
 import type { Press } from '@/components/scoring';
 import { ScoreToast } from '@/components/scoring';
 import type { ScoringPreferences } from '@/lib/types/scoringPreferences';
-import {
-  StickyUndoBanner,
-  WeatherAlerts,
-} from '@/components/live-play';
+import { StickyUndoBanner, WeatherAlerts } from '@/components/live-play';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 
 import { MatchScoringActiveState } from './MatchScoringActiveState';
@@ -85,11 +82,7 @@ export function MatchScoringErrorState({
   );
 }
 
-export function MatchScoringUnavailableState({
-  onBackToScore,
-}: {
-  onBackToScore: () => void;
-}) {
+export function MatchScoringUnavailableState({ onBackToScore }: { onBackToScore: () => void }) {
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-canvas font-sans" role="alert">
       <main className="container-editorial py-12">
@@ -264,7 +257,7 @@ export function MatchScoringPageSections({
       <StickyUndoBanner
         action={ui.undoAction}
         duration={8000}
-        bottomOffset={80}
+        bottomOffset={104}
         onDismiss={() => ui.setUndoAction(null)}
       />
 
@@ -365,14 +358,12 @@ export function MatchScoringPageSections({
               onDismissScoringModeTip: ui.dismissScoringModeTip,
               onScoringModeChange,
               onQuickScoreTap: actions.handleQuickScoreTap,
-              onToggleShowHandicapDetails: () =>
-                ui.setShowHandicapDetails((previous) => !previous),
+              onToggleShowHandicapDetails: () => ui.setShowHandicapDetails((previous) => !previous),
               onScore: actions.handleScore,
               onScoreWithStrokes: actions.handleScoreWithStrokes,
               onFourballScore: actions.handleFourballScore,
               onUndo: actions.handleUndo,
-              onToggleShowAdvancedTools: () =>
-                ui.setShowAdvancedTools((previous) => !previous),
+              onToggleShowAdvancedTools: () => ui.setShowAdvancedTools((previous) => !previous),
               onPress,
             }}
           />

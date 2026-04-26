@@ -8,10 +8,11 @@ export interface ScoringModeMeta {
   description: string;
 }
 
-export function getScoringModeMeta(
-  scoringMode: ScoringMode,
-  isFourball: boolean
-): ScoringModeMeta {
+export function colorWithAlpha(color: string, alphaPercent: number) {
+  return `color-mix(in srgb, ${color} ${alphaPercent}%, transparent)`;
+}
+
+export function getScoringModeMeta(scoringMode: ScoringMode, isFourball: boolean): ScoringModeMeta {
   switch (scoringMode) {
     case 'swipe':
       return {
@@ -101,12 +102,13 @@ export function ScoringModeChip({
   return (
     <button
       type="button"
+      aria-pressed={active}
       onClick={onClick}
       className={cn(
-        'rounded-full px-4 py-2 text-sm font-medium transition-colors',
+        'min-h-11 shrink-0 whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas-sunken)] active:scale-[0.98]',
         active
           ? 'bg-[var(--masters)] text-[var(--canvas)] shadow-card-sm'
-          : 'bg-transparent text-[var(--ink-tertiary)]'
+          : 'bg-transparent text-[var(--ink-tertiary)] hover:bg-[color:var(--canvas)] hover:text-[var(--ink)]'
       )}
     >
       {label}
@@ -129,14 +131,22 @@ export function QuickScoreTile({
     <button
       type="button"
       onClick={onClick}
-      className="rounded-[24px] border border-dashed px-4 py-5 text-left transition-transform active:scale-[0.98]"
+      aria-pressed={pending}
+      aria-label={`${pending ? 'Confirm quick score for' : 'Arm quick score for'} ${teamName}`}
+      className={cn(
+        'min-h-[112px] min-w-0 rounded-[22px] border px-4 py-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98]',
+        pending &&
+          'shadow-card-sm ring-2 ring-[var(--gold)] ring-offset-2 ring-offset-[var(--canvas)]'
+      )}
       style={{
         borderColor: teamColor,
-        background: `${teamColor}12`,
+        background: pending ? colorWithAlpha(teamColor, 18) : colorWithAlpha(teamColor, 10),
         color: teamColor,
       }}
     >
-      <p className="text-xs font-semibold uppercase tracking-[0.14em]">{teamName}</p>
+      <p className="truncate text-xs font-semibold uppercase tracking-[0.14em]" title={teamName}>
+        {teamName}
+      </p>
       <p className="mt-2 text-sm font-semibold">
         {pending ? 'Tap again to confirm' : 'Quick score winner'}
       </p>

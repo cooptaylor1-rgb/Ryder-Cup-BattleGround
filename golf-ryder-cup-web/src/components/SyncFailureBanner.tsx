@@ -15,7 +15,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Clock3, RefreshCw } from 'lucide-react';
 import {
   getFailedSyncQueueItems,
   getSyncQueueStatus,
@@ -71,6 +71,13 @@ function describeFailedItem(item: FailedSyncItem): string {
   return `${entity} ${operation}`;
 }
 
+function formatAttemptTime(value?: string) {
+  if (!value) return null;
+  const timestamp = new Date(value);
+  if (Number.isNaN(timestamp.getTime())) return null;
+  return timestamp.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+}
+
 export function SyncFailureBanner({ className }: { className?: string }) {
   const [failedCount, setFailedCount] = useState(0);
   const [lastError, setLastError] = useState<string | undefined>(undefined);
@@ -86,6 +93,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
       setLastError(status.lastError);
       setFailedItems(getFailedSyncQueueItems(5));
       setBlockedReason(status.blockedReason);
+      if (status.failed <= 0) setShowDetail(false);
     };
     tick();
 
@@ -131,6 +139,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
       setLastError(status.lastError);
       setFailedItems(getFailedSyncQueueItems(5));
       setBlockedReason(status.blockedReason);
+      if (status.failed <= 0) setShowDetail(false);
     } finally {
       setIsRetrying(false);
     }
@@ -143,52 +152,80 @@ export function SyncFailureBanner({ className }: { className?: string }) {
   const message = blockedMessage
     ? blockedMessage
     : `${failedCount} change${failedCount === 1 ? '' : 's'} could not sync. Saved on this device.`;
+  const detailAvailable = failedItems.length > 0 || Boolean(lastError);
 
   return (
     <div
-      role="status"
-      aria-live="polite"
+      role="alert"
+      aria-live="assertive"
       style={{ zIndex: zIndex.nav + 1 }}
       className={cn(
-        'fixed top-0 inset-x-0 border-b border-[color:var(--error)]/30',
-        'bg-[color:var(--error)]/12 text-[var(--error)]',
-        'backdrop-blur supports-[backdrop-filter]:bg-[color:var(--error)]/10',
+        'fixed inset-x-0 top-0 border-b border-[color:var(--error)]/30',
+        'bg-[color:var(--surface-elevated)]/94 text-[var(--error)] shadow-card',
+        'backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-elevated)]/88',
         'pt-[env(safe-area-inset-top,0px)]',
-        className,
+        className
       )}
     >
-      <div className="mx-auto max-w-3xl px-4 py-2">
-        <div className="flex items-center gap-3">
-          <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
-          <div className="flex-1 min-w-0 text-sm font-medium">{message}</div>
-          {lastError && (
+      <div className="mx-auto max-w-4xl px-3 py-2 sm:px-4">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2 sm:flex sm:gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color:var(--error)]/14">
+            <AlertTriangle className="h-4 w-4" aria-hidden />
+          </div>
+          <div className="min-w-0 sm:flex-1">
+            <p className="text-sm font-semibold text-[var(--ink)]">Cloud sync needs attention</p>
+            <p className="text-xs font-medium text-[var(--error)] sm:text-sm">{message}</p>
+          </div>
+          <div className="col-span-2 flex items-center justify-end gap-2 sm:col-span-1">
+            {detailAvailable && (
+              <button
+                type="button"
+                onClick={() => setShowDetail((v) => !v)}
+                className="min-h-9 rounded-full border border-[color:var(--error)]/35 bg-[var(--canvas)]/88 px-3 py-1 text-xs font-semibold text-[var(--error)] transition-colors hover:bg-[color:var(--error)]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)]"
+                aria-expanded={showDetail}
+              >
+                {showDetail ? 'Hide details' : 'Details'}
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => setShowDetail((v) => !v)}
-              className="shrink-0 rounded-full border border-[color:var(--error)]/40 bg-[var(--canvas)]/80 px-3 py-1 text-xs font-semibold text-[var(--error)]"
+              onClick={handleRetry}
+              disabled={isRetrying || !canRetry}
+              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--error)]/35 bg-[var(--canvas)]/88 px-3 py-1 text-xs font-semibold text-[var(--error)] transition-colors hover:bg-[color:var(--error)]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {showDetail ? 'Hide details' : 'Details'}
+              <RefreshCw className={cn('h-3.5 w-3.5', isRetrying && 'animate-spin')} aria-hidden />
+              {isRetrying ? 'Retrying...' : 'Retry sync'}
             </button>
-          )}
-          <button
-            type="button"
-            onClick={handleRetry}
-            disabled={isRetrying || !canRetry}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--error)]/40 bg-[var(--canvas)]/80 px-3 py-1 text-xs font-semibold text-[var(--error)] disabled:opacity-60"
-          >
-            <RefreshCw className={cn('h-3.5 w-3.5', isRetrying && 'animate-spin')} aria-hidden />
-            {isRetrying ? 'Retrying...' : 'Retry sync'}
-          </button>
+          </div>
         </div>
-        {showDetail && lastError && (
-          <div className="mt-2 space-y-1 text-xs text-[var(--error)]/85">
+        {showDetail && detailAvailable && (
+          <div className="mt-2 space-y-1 rounded-[18px] border border-[color:var(--error)]/18 bg-[color:var(--canvas)]/82 p-3 text-xs text-[var(--ink-secondary)]">
             {failedItems.length > 0 ? (
-              failedItems.map((item) => (
-                <div key={`${item.entity}:${item.entityId}:${item.operation}`} className="break-words">
-                  <span className="font-semibold">{describeFailedItem(item)}:</span>{' '}
-                  {item.error ?? 'Sync failed'}
-                </div>
-              ))
+              failedItems.map((item) => {
+                const attemptTime = formatAttemptTime(item.lastAttemptAt ?? item.createdAt);
+                return (
+                  <div
+                    key={`${item.entity}:${item.entityId}:${item.operation}`}
+                    className="grid gap-1 rounded-[14px] px-2 py-1.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-semibold text-[var(--ink)]">{describeFailedItem(item)}</p>
+                      <p className="break-words text-[var(--ink-secondary)]">
+                        {item.error ?? 'Sync failed'}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2 text-[11px] font-medium text-[var(--ink-tertiary)]">
+                      {item.retryCount > 0 && <span>{item.retryCount} tries</span>}
+                      {attemptTime && (
+                        <span className="inline-flex items-center gap-1">
+                          <Clock3 className="h-3 w-3" aria-hidden />
+                          {attemptTime}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
             ) : (
               <p className="break-words">Last error: {lastError}</p>
             )}

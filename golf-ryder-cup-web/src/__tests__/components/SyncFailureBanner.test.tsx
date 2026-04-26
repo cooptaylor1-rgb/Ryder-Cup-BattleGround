@@ -20,7 +20,13 @@ describe('SyncFailureBanner', () => {
     vi.clearAllMocks();
     getFailedSyncQueueItemsMock.mockReturnValue([]);
     retryFailedQueueMock.mockResolvedValue(1);
-    processSyncQueueMock.mockResolvedValue({ success: true, synced: 1, failed: 0, queued: 0, errors: [] });
+    processSyncQueueMock.mockResolvedValue({
+      success: true,
+      synced: 1,
+      failed: 0,
+      queued: 0,
+      errors: [],
+    });
   });
 
   it('keeps retry disabled when sync is blocked by auth', async () => {
@@ -68,8 +74,10 @@ describe('SyncFailureBanner', () => {
     render(<SyncFailureBanner />);
 
     fireEvent.click(await screen.findByRole('button', { name: 'Details' }));
-    expect(screen.getByText('Match update:')).toBeInTheDocument();
+    expect(screen.getByText('Cloud sync needs attention')).toBeInTheDocument();
+    expect(screen.getByText('Match update')).toBeInTheDocument();
     expect(screen.getByText(/\[upsert matches\] row level security/)).toBeInTheDocument();
+    expect(screen.getByText('5 tries')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Retry sync' }));
 
