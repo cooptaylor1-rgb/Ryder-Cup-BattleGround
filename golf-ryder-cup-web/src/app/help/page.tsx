@@ -164,7 +164,7 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'How do I assign players to teams?',
-        a: 'Use the draft room or roster management screens to assign players before building sessions and lineups.',
+        a: 'Use the draft panel or roster management screens to assign players before building sessions and lineups.',
       },
       {
         q: 'Can I change a player handicap mid-trip?',
@@ -205,16 +205,16 @@ export default function HelpPage() {
       />
 
       <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
-        <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(247,240,241,0.99))] shadow-[0_26px_56px_rgba(46,34,18,0.08)]">
+        <section className="gradient-premium-surface overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] shadow-[0_26px_56px_rgba(46,34,18,0.08)]">
           <div className="grid gap-[var(--space-5)] px-[var(--space-5)] py-[var(--space-5)] lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.95fr)]">
             <div>
-              <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">Support Deck</p>
+              <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">Help</p>
               <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3.2rem)] italic leading-[1.02] text-[var(--ink)]">
                 The guidebook should read like a caddie book, not a shrug.
               </h1>
               <p className="mt-[var(--space-3)] max-w-[36rem] text-sm leading-7 text-[var(--ink-secondary)]">
-                Golf trips move too fast for scavenger-hunt support. This room is for the common questions,
-                the scoring edge cases, and the small bits of captain logic that players always need five
+                Golf trips move too fast to hunt for answers. Start here for the common questions,
+                scoring edge cases, and captain details that players always need five
                 minutes before the round.
               </p>
 
@@ -245,7 +245,7 @@ export default function HelpPage() {
             </div>
 
             <div className="grid gap-[var(--space-3)] sm:grid-cols-3 lg:grid-cols-1">
-              <HelpFactCard label="Topics" value={FAQ_SECTIONS.length} detail="The core rooms players actually need." />
+              <HelpFactCard label="Topics" value={FAQ_SECTIONS.length} detail="The topics players actually need." />
               <HelpFactCard label="Answers" value={FAQ_SECTIONS.reduce((sum, section) => sum + section.items.length, 0)} detail="Questions already settled before the first tee." />
               <HelpFactCard label="Best starting point" value="Search" detail="When the group is in a hurry, start there." valueClassName="font-sans text-[1rem] not-italic leading-[1.25]" />
             </div>
@@ -254,7 +254,7 @@ export default function HelpPage() {
 
         <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.1fr)_18rem]">
           <div className="space-y-[var(--space-4)]">
-            <section className="rounded-[1.8rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]">
+            <section className="gradient-premium-surface rounded-[1.8rem] border border-[color:var(--rule)]/75 p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]">
               <div className="flex flex-wrap gap-[var(--space-3)]">
                 {FAQ_SECTIONS.map((section) => (
                   <button
@@ -278,7 +278,7 @@ export default function HelpPage() {
                 <section
                   key={section.id}
                   id={section.id}
-                  className="rounded-[1.85rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]"
+                  className="gradient-premium-surface rounded-[1.85rem] border border-[color:var(--rule)]/75 p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]"
                 >
                   <div className="flex items-center gap-[var(--space-3)]">
                     <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[color:var(--maroon)]/10 text-[var(--maroon)]">
@@ -300,7 +300,7 @@ export default function HelpPage() {
                 </section>
               ))
             ) : (
-              <section className="rounded-[1.85rem] border border-dashed border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.98))] p-[var(--space-6)] text-center shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
+              <section className="rounded-[1.85rem] border border-dashed border-[color:var(--rule)]/75 bg-[color:var(--surface)]/86 p-[var(--space-6)] text-center shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[var(--surface-raised)] text-[var(--ink-tertiary)]">
                   <Search size={18} />
                 </div>
@@ -405,8 +405,8 @@ function HelpSidebarCard({
       className={cn(
         'rounded-[1.8rem] border p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]',
         tone === 'maroon'
-          ? 'border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(247,240,241,0.99))]'
-          : 'border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))]'
+          ? 'border-[var(--maroon-subtle)] bg-[color:var(--maroon)]/8'
+          : 'border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82'
       )}
     >
       <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[var(--surface-raised)] text-[var(--ink-tertiary)]">

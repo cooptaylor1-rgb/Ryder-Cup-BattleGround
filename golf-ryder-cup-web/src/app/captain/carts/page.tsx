@@ -226,7 +226,7 @@ export default function CartsPage() {
             />
             <CartSidebarCard
               title="Mix with intent"
-              body="Use the cart room to balance social chemistry, pace, and practical needs. A good cart pairing buys more peace than it gets credit for."
+              body="Use cart assignments to balance social chemistry, pace, and practical needs. A good pairing buys more peace than it gets credit for."
               icon={<Shield size={18} />}
               tone="maroon"
             />

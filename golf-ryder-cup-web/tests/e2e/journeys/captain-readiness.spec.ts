@@ -5,7 +5,7 @@ import {
 } from '../utils/test-helpers';
 
 async function logCaptainRouteError(page: import('@playwright/test').Page) {
-  const boundaryHeading = page.getByText(/The command room hit a rough patch\./i);
+  const boundaryHeading = page.getByText(/Captain tools hit a rough patch\./i);
   if (!(await boundaryHeading.isVisible().catch(() => false))) {
     return;
   }
@@ -45,7 +45,7 @@ test.describe('Captain readiness routes', () => {
       page.getByRole('heading', { name: /Run the trip before the trip runs you\./i })
     ).toBeVisible();
     await expect(page.getByTestId('preflight-rerun')).toBeVisible();
-    await expect(page.getByText(/The command room hit a rough patch\./i)).toHaveCount(0);
+    await expect(page.getByText(/Captain tools hit a rough patch\./i)).toHaveCount(0);
   });
 
   test('routes captains from manage trip into the course library @smoke', async ({ page }) => {
@@ -72,7 +72,7 @@ test.describe('Captain readiness routes', () => {
     await waitForStableDOM(page);
     await logCaptainRouteError(page);
 
-    await page.getByTestId('captain-new-session-link').click();
+    await page.getByRole('link', { name: /New Session/i }).click();
     await waitForStableDOM(page);
 
     await expect(page).toHaveURL(/\/lineup\/new\?mode=session/);

@@ -285,7 +285,7 @@ export default function SocialPageClient() {
             <div>
               <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">Clubhouse Feed</p>
               <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3.2rem)] italic leading-[1.02] text-[var(--ink)]">
-                Every good trip needs one room for noise, receipts, and bragging rights.
+                Every good trip needs a place for noise, receipts, and bragging rights.
               </h1>
               <p className="mt-[var(--space-3)] max-w-[36rem] text-sm leading-7 text-[var(--ink-secondary)]">
                 This feed is for the chatter between matches: the hot takes, the score jokes, the
@@ -299,7 +299,7 @@ export default function SocialPageClient() {
               <SocialFactCard
                 label="Feed tone"
                 value="Live"
-                detail="The room works best when it feels present-tense."
+                detail="The feed works best when it feels present-tense."
                 valueClassName="font-sans text-[1rem] not-italic leading-[1.25]"
               />
             </div>
@@ -322,7 +322,7 @@ export default function SocialPageClient() {
                   The clubhouse is quiet.
                 </h2>
                 <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">
-                  Start with a quick post, a joke, or a photo prompt and the room will stop feeling so polite.
+                  Start with a quick post, a joke, or a photo prompt and the feed will stop feeling so polite.
                 </p>
               </section>
             ) : (
@@ -348,7 +348,7 @@ export default function SocialPageClient() {
             />
             <SidebarPanel
               title="Photos deserve daylight"
-              body="Photos are better as a dedicated room than as a token tab inside a cluttered feed. Let each surface do one thing well."
+              body="Photos work better as their own view than as a small tab inside a crowded feed."
               tone="maroon"
             />
           </aside>
@@ -375,7 +375,7 @@ export default function SocialPageClient() {
         onClose={() => setPendingDeletePostId(null)}
         onConfirm={handleDeletePost}
         title="Delete post?"
-        description="This removes the post from the feed. It should feel deliberate, even in a casual room."
+        description="This removes the post from the feed."
         confirmLabel="Delete"
         variant="danger"
       />

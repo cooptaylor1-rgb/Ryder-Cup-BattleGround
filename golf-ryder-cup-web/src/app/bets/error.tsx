@@ -29,11 +29,11 @@ export default function BetsError({ error, reset }: ErrorPageProps) {
               Bets Board Interrupted
             </p>
             <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3rem)] italic leading-[1.02] text-[var(--ink)]">
-              The side games room lost the board for a moment.
+              Side games lost the board for a moment.
             </h1>
             <p className="mt-[var(--space-3)] max-w-[36rem] text-sm leading-7 text-[var(--ink-secondary)]">
               Something went wrong while loading the bets view. The wager data should still be intact.
-              This page just needs a cleaner route back into the room.
+              Try reloading or return to the bets board.
             </p>
 
             <div className="mt-[var(--space-5)] flex flex-wrap gap-[var(--space-3)]">
@@ -85,7 +85,7 @@ export default function BetsError({ error, reset }: ErrorPageProps) {
                 <span className="type-overline tracking-[0.15em]">Fallback</span>
               </div>
               <p className="mt-[var(--space-3)] text-sm leading-6 text-[var(--ink-secondary)]">
-                Home is still the safest reset point if the games room refuses to settle.
+                Home is still the safest reset point if side games keep failing.
               </p>
             </div>
           </aside>

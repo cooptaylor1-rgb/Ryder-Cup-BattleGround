@@ -73,8 +73,13 @@ export function FloatingMyMatch({
     const [isExpanded, setIsExpanded] = useState(defaultExpanded);
     const [hasNewUpdate, setHasNewUpdate] = useState(false);
 
-    // Hide on scoring pages to avoid redundancy
-    const shouldHide = pathname?.startsWith('/score/') || pathname?.startsWith('/captain');
+    // Hide on primary match operation screens where the same action is already in view.
+    const shouldHide =
+        pathname === '/score' ||
+        pathname?.startsWith('/score/') ||
+        pathname === '/schedule' ||
+        pathname?.startsWith('/schedule/') ||
+        pathname?.startsWith('/captain');
 
     // Find the active session
     const activeSession = useMemo(() => {
@@ -198,6 +203,7 @@ export function FloatingMyMatch({
         trigger('selection');
         setIsExpanded(!isExpanded);
     };
+    const bottomPosition = `calc(${bottomOffset}px + env(safe-area-inset-bottom, 0px))`;
 
     // Don't render if no trip, or on scoring page
     if (!currentTrip || shouldHide) {
@@ -209,7 +215,7 @@ export function FloatingMyMatch({
         return (
             <div
                 className="fixed right-4 z-50 flex items-center gap-2 rounded-full px-4 py-3 shadow-lg border border-[color:var(--ink-secondary)]/30 bg-[color:var(--ink)]/80 text-[color:var(--canvas-raised)] backdrop-blur-sm animate-pulse"
-                style={{ bottom: `${bottomOffset}px` }}
+                style={{ bottom: bottomPosition }}
             >
                 <Target className="w-5 h-5 text-[color:var(--canvas-raised)]/30" />
                 <div className="h-3.5 w-14 rounded bg-[color:var(--canvas-raised)]/15" />
@@ -234,7 +240,7 @@ export function FloatingMyMatch({
                     'flex items-center gap-2 rounded-full shadow-lg',
                     'px-4 py-3 bg-[var(--surface)] border border-[var(--rule)]'
                 )}
-                style={{ bottom: `${bottomOffset}px` }}
+                style={{ bottom: bottomPosition }}
                 aria-label="Find my match"
                 type="button"
             >
@@ -280,7 +286,7 @@ export function FloatingMyMatch({
                     'fixed right-4 z-50',
                     'lg:right-6',
                 )}
-                style={{ bottom: `${bottomOffset}px` }}
+                style={{ bottom: bottomPosition }}
             >
                 {/* Main FAB */}
                 <motion.button

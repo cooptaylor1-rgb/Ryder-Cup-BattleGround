@@ -9,9 +9,8 @@
  *
  * The existing SyncStatusBadge (per-page, in headers) handles the
  * "normal" pending state. This banner is the escalation: captains
- * scoring on the course need to know when their writes are not
- * reaching Supabase, because the whole room's leaderboard depends on
- * that queue draining. Previously a persistent sync failure was only
+ * scoring on the course need to know when their changes are not
+ * reaching the cloud. Previously a persistent sync failure was only
  * visible via the small header pill and easy to miss mid-round.
  */
 
@@ -97,8 +96,8 @@ export function SyncFailureBanner({ className }: { className?: string }) {
   // without Supabase would keep mashing Retry to no effect.
   const cloudUnreachable = !isSupabaseConfigured;
   const message = cloudUnreachable
-    ? 'Cloud sync isn’t set up — scores are saved on this device only. Ask the admin to configure Supabase to share live updates.'
-    : `${failedCount} change${failedCount === 1 ? '' : 's'} didn’t reach the cloud. Saved locally — retry to push.`;
+    ? 'Cloud sync is not configured. Your changes are saved on this device, but live sharing needs Supabase set up.'
+    : `${failedCount} change${failedCount === 1 ? '' : 's'} could not sync. Saved on this device.`;
 
   return (
     <div
@@ -123,7 +122,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
               onClick={() => setShowDetail((v) => !v)}
               className="shrink-0 rounded-full border border-[color:var(--error)]/40 bg-[var(--canvas)]/80 px-3 py-1 text-xs font-semibold text-[var(--error)]"
             >
-              {showDetail ? 'Hide detail' : 'Why?'}
+              {showDetail ? 'Hide details' : 'Details'}
             </button>
           )}
           {!cloudUnreachable && (
@@ -134,7 +133,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
               className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--error)]/40 bg-[var(--canvas)]/80 px-3 py-1 text-xs font-semibold text-[var(--error)] disabled:opacity-60"
             >
               <RefreshCw className={cn('h-3.5 w-3.5', isRetrying && 'animate-spin')} aria-hidden />
-              {isRetrying ? 'Retrying…' : 'Retry sync'}
+              {isRetrying ? 'Retrying...' : 'Retry sync'}
             </button>
           )}
         </div>

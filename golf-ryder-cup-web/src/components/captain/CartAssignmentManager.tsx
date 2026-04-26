@@ -462,7 +462,7 @@ function CartCard({
               {cart.players.length}/{cart.maxCapacity} seats filled
             </h3>
             <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
-              {isFull ? 'Ready to roll' : availablePlayers.length > 0 ? 'Still room to add a partner' : 'No one left to seat'}
+              {isFull ? 'Ready to roll' : availablePlayers.length > 0 ? 'One seat still open' : 'No one left to seat'}
             </p>
           </div>
         </div>

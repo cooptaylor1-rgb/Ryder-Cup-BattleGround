@@ -272,7 +272,7 @@ export default function NewTripPage() {
       />
 
       <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
-        <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(247,240,241,0.98))] shadow-[0_24px_52px_rgba(46,34,18,0.08)]">
+        <section className="gradient-premium-surface overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] shadow-[0_24px_52px_rgba(46,34,18,0.08)]">
           <div className="grid gap-[var(--space-5)] px-[var(--space-5)] py-[var(--space-5)] lg:grid-cols-[minmax(0,1.2fr)_18rem]">
             <div>
               <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">Captain Launch</p>
@@ -281,7 +281,7 @@ export default function NewTripPage() {
               </h1>
               <p className="mt-[var(--space-3)] max-w-[38rem] text-sm leading-7 text-[var(--ink-secondary)]">
                 Pick the trip shape, build the roster, set the competitive structure, and hand the
-                finished board straight to captain mode. No scattered setup chores. No utility-folder feel.
+                finished board straight to captain mode. No scattered setup chores.
               </p>
 
               <div className="mt-[var(--space-5)] flex flex-wrap gap-[var(--space-3)]">

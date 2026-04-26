@@ -29,11 +29,11 @@ export default function CaptainError({ error, reset }: ErrorPageProps) {
               Captain Tools Interrupted
             </p>
             <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3rem)] italic leading-[1.02] text-[var(--ink)]">
-              The command room hit a rough patch.
+              Captain tools hit a rough patch.
             </h1>
             <p className="mt-[var(--space-3)] max-w-[36rem] text-sm leading-7 text-[var(--ink-secondary)]">
               Something went wrong while loading the captain controls. The trip data should still be
-              intact. This screen just needs a cleaner entrance back into the room.
+              intact. Try reloading or return to the captain board.
             </p>
 
             <div className="mt-[var(--space-5)] flex flex-wrap gap-[var(--space-3)]">
@@ -75,8 +75,7 @@ export default function CaptainError({ error, reset }: ErrorPageProps) {
                 Captain note
               </h2>
               <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">
-                If this repeats, the problem is probably not the user. It is the surface. That is why it
-                is logged to Sentry automatically.
+                If this repeats, the app logs the error automatically so it can be investigated.
               </p>
             </div>
 
@@ -86,7 +85,7 @@ export default function CaptainError({ error, reset }: ErrorPageProps) {
                 <span className="type-overline tracking-[0.15em]">Fallback</span>
               </div>
               <p className="mt-[var(--space-3)] text-sm leading-6 text-[var(--ink-secondary)]">
-                Home is still the safest reset point if the captain room refuses to settle.
+                Home is still the safest reset point if captain tools keep failing.
               </p>
             </div>
           </aside>

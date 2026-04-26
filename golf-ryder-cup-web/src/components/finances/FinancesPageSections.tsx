@@ -59,12 +59,12 @@ export function FinanceHero({
     <section className="overflow-hidden rounded-[2rem] border border-[var(--masters)]/14 bg-[linear-gradient(135deg,rgba(10,80,48,0.97),rgba(4,52,30,0.98))] text-[var(--canvas)] shadow-[0_28px_64px_rgba(5,58,35,0.22)]">
       <div className="grid gap-[var(--space-5)] px-[var(--space-5)] py-[var(--space-5)] lg:grid-cols-[minmax(0,1.2fr)_18rem]">
         <div>
-          <p className="type-overline tracking-[0.18em] text-[color:var(--canvas)]/72">Ledger Room</p>
+          <p className="type-overline tracking-[0.18em] text-[color:var(--canvas)]/72">Ledger</p>
           <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3.2rem)] italic leading-[1.02] text-[var(--canvas)]">
             Money should feel organized long before the settlement text starts.
           </h1>
           <p className="mt-[var(--space-3)] max-w-[36rem] text-sm leading-7 text-[color:var(--canvas)]/80">
-            The point of this room is not complexity. It is calm. Green fees, carts, lodging, and side expenses
+            The goal is not complexity. It is calm. Green fees, carts, lodging, and side expenses
             should sit in one clean ledger instead of leaking into a dozen awkward conversations.
           </p>
         </div>

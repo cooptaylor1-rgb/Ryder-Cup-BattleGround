@@ -95,7 +95,7 @@ export default function ChecklistPage() {
   };
 
   if (!currentTrip) {
-    return <CaptainNoTripState description="Start or select a trip to run the pre-flight checklist." />;
+    return <CaptainNoTripState description="Start or select a trip to run the readiness check." />;
   }
 
   if (!isCaptainMode) {
@@ -105,7 +105,7 @@ export default function ChecklistPage() {
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]" data-testid="captain-checklist-page">
       <PageHeader
-        title="Pre-Flight"
+        title="Readiness Check"
         subtitle={currentTrip.name}
         onBack={() => navigateBackOr(router, '/captain')}
         icon={<Rocket size={16} className="text-[var(--canvas)]" />}
@@ -113,7 +113,7 @@ export default function ChecklistPage() {
       />
 
       <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
-        <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(247,240,241,0.98))] shadow-[0_24px_52px_rgba(46,34,18,0.08)]">
+        <section className="gradient-premium-surface overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] shadow-[0_24px_52px_rgba(46,34,18,0.08)]">
           <div className="grid gap-[var(--space-5)] px-[var(--space-5)] py-[var(--space-5)] lg:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.95fr)]">
             <div>
               <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">Captain Readiness</p>
@@ -171,7 +171,7 @@ export default function ChecklistPage() {
           fallback={<ChecklistRuntimeFallback />}
         >
           <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.15fr)_22rem]">
-            <div className="rounded-[2rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))] p-[var(--space-5)] shadow-[0_20px_46px_rgba(41,29,17,0.08)]">
+            <div className="gradient-premium-surface rounded-[2rem] border border-[color:var(--rule)]/75 p-[var(--space-5)] shadow-[0_20px_46px_rgba(41,29,17,0.08)]">
               <div className="mb-[var(--space-4)]">
                 <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Launch Checklist</p>
                 <h2 className="mt-[var(--space-2)] font-serif text-[1.95rem] italic text-[var(--ink)]">
@@ -183,7 +183,7 @@ export default function ChecklistPage() {
                 <div className="mb-[var(--space-4)] rounded-[1.25rem] border border-[color:var(--warning)]/18 bg-[color:var(--warning)]/8 px-[var(--space-4)] py-[var(--space-4)]">
                   <p className="type-meta font-semibold text-[var(--warning)]">Match board loaded with a fallback query</p>
                   <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
-                    The direct match lookup failed once on this device, so the checklist fell back to a safer load path instead of crashing the captain room.
+                    The direct match lookup failed once on this device, so the checklist used a safer load path instead of crashing.
                   </p>
                 </div>
               ) : null}
@@ -220,7 +220,7 @@ export default function ChecklistPage() {
                   <QuickFixLink href="/players" icon={<Users size={18} />} title="Manage Players" body="Add or edit the roster." />
                   <QuickFixLink href="/courses" icon={<Map size={18} />} title="Add or Import Courses" body="Build the course library and tee sets first." />
                   <QuickFixLink href="/captain/manage" icon={<Shield size={18} />} title="Assign Match Courses" body="Use each match card to set the course and tee used for handicaps." />
-                  <QuickFixLink href="/captain" icon={<Shield size={18} />} title="Captain Command" body="Return to the main board." />
+                  <QuickFixLink href="/captain" icon={<Shield size={18} />} title="Captain Tools" body="Return to the main board." />
                 </div>
               </div>
             </aside>
@@ -234,7 +234,7 @@ export default function ChecklistPage() {
 function ChecklistRuntimeFallback() {
   return (
     <section className="mt-[var(--space-6)] grid gap-[var(--space-4)] xl:grid-cols-[minmax(0,1.15fr)_22rem]">
-      <div className="rounded-[2rem] border border-[color:var(--warning)]/18 bg-[linear-gradient(180deg,rgba(184,134,11,0.08),rgba(255,255,255,0.98))] p-[var(--space-5)] shadow-[0_20px_46px_rgba(41,29,17,0.08)]">
+      <div className="rounded-[2rem] border border-[color:var(--warning)]/18 bg-[color:var(--warning)]/8 p-[var(--space-5)] shadow-[0_20px_46px_rgba(41,29,17,0.08)]">
         <p className="type-overline tracking-[0.16em] text-[var(--warning)]">Checklist fallback</p>
         <h2 className="mt-[var(--space-2)] font-serif text-[1.95rem] italic text-[var(--ink)]">
           The board hit a snag, but the trip did not.
@@ -292,7 +292,7 @@ function ChecklistFactCard({
       className={cn(
         'rounded-[1.5rem] border p-[var(--space-4)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]',
         tone === 'green'
-          ? 'border-[color:var(--success)]/16 bg-[linear-gradient(180deg,rgba(45,122,79,0.10),rgba(255,255,255,0.98))]'
+          ? 'border-[color:var(--success)]/16 bg-[color:var(--success)]/10'
           : 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78'
       )}
     >
@@ -324,7 +324,7 @@ function ChecklistSidebarCard({
       className={cn(
         'rounded-[1.6rem] border p-[var(--space-5)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]',
         tone === 'maroon'
-          ? 'border-[color:var(--maroon)]/16 bg-[linear-gradient(180deg,rgba(104,35,48,0.10),rgba(255,255,255,0.98))]'
+          ? 'border-[color:var(--maroon)]/16 bg-[color:var(--maroon)]/10'
           : 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82'
       )}
     >

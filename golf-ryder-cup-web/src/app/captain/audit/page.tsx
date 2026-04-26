@@ -54,7 +54,7 @@ const ACTION_META: Record<
     label: 'Session Created',
     icon: ShieldCheck,
     accentClassName: 'bg-[color:var(--masters)]/10 text-[var(--masters)]',
-    summary: 'A new room opened on the board.',
+    summary: 'A new session was added to the board.',
   },
   sessionLocked: {
     label: 'Session Locked',
@@ -66,7 +66,7 @@ const ACTION_META: Record<
     label: 'Session Unlocked',
     icon: Waves,
     accentClassName: 'bg-[color:var(--team-europe)]/10 text-[var(--team-europe)]',
-    summary: 'The room opened back up for edits.',
+    summary: 'The session opened back up for edits.',
   },
   pairingCreated: {
     label: 'Pairing Created',

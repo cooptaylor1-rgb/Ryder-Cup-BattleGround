@@ -108,6 +108,7 @@
 
   /* ---- SEMANTIC — Muted, not alarming ---- */
   --success: #2D7A4F;
+  --info: #3E728A;
   --warning: #B8860B;
   --error: #A63D40;
 
@@ -2172,6 +2173,7 @@ html.outdoor:root {
 
   /* ---- STATUS COLORS (Outdoor) ---- */
   --success: #166534 !important;
+  --info: #075985 !important;
   --warning: #a16207 !important;
   --error: #991b1b !important;
 
@@ -2316,6 +2318,7 @@ html.outdoor body {
 
     /* ---- STATUS COLORS (Dark Mode) ---- */
     --success: #22c55e;
+    --info: #38bdf8;
     --warning: #f59e0b;
     --error: #ef4444;
 
@@ -2476,6 +2479,7 @@ html.outdoor body {
 
   /* ---- STATUS COLORS (Dark Mode) ---- */
   --success: #22c55e;
+  --info: #38bdf8;
   --warning: #f59e0b;
   --error: #ef4444;
 
@@ -2703,6 +2707,7 @@ html.dark:root {
   --surface-secondary: #141414;
   --surface-tertiary: #1a1a1a;
   --surface-highlight: #1a1a1a;
+  --info: #38bdf8;
   --ink-primary: var(--ink);
   --rule: #2a2a2a;
   --rule-strong: #3a3a3a;
@@ -5939,5 +5944,4 @@ html.dark body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
-
 

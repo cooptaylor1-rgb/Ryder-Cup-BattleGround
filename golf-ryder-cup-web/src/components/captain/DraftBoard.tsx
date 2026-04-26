@@ -175,9 +175,9 @@ export function DraftBoard({ players, teams, onDraftComplete }: DraftBoardProps)
       <div className="space-y-[var(--space-5)]">
         <section className="overflow-hidden rounded-[2rem] border border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(248,244,237,0.97))] shadow-[0_18px_40px_rgba(46,34,18,0.07)]">
           <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
-            <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Draft Room</p>
+            <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Draft</p>
             <h2 className="mt-[var(--space-2)] font-serif text-[clamp(1.9rem,6vw,2.8rem)] italic leading-[1.04] text-[var(--ink)]">
-              Choose the room&apos;s tone.
+              Choose the draft style.
             </h2>
             <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
               Some drafts should feel ceremonial. Others should simply get the trip moving. Pick
@@ -214,7 +214,7 @@ export function DraftBoard({ players, teams, onDraftComplete }: DraftBoardProps)
             icon={<Shuffle size={22} />}
             eyebrow="Fastest"
             title="Random Draw"
-            description="Split the room quickly when the ceremony is less important than the start."
+            description="Split the group quickly when the ceremony is less important than the start."
             detail="One tap, two teams, and you are on to lineups."
             onClick={() => startDraft('random')}
           />
@@ -245,8 +245,8 @@ export function DraftBoard({ players, teams, onDraftComplete }: DraftBoardProps)
               </h2>
               <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
                 {currentTeam
-                  ? `${currentTeam.name} is on the clock. Keep the room moving and the board legible.`
-                  : 'The room is set. Make the next choice cleanly.'}
+                  ? `${currentTeam.name} is on the clock. Keep the draft moving and the board legible.`
+                  : 'The draft is set. Make the next choice cleanly.'}
               </p>
             </div>
 
@@ -324,7 +324,7 @@ export function DraftBoard({ players, teams, onDraftComplete }: DraftBoardProps)
               {formatPlayerName(selectedPlayerDetails.firstName, selectedPlayerDetails.lastName)}
             </h3>
             <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">
-              Set the number, then award the player when the room settles.
+              Set the number, then award the player when the bidding settles.
             </p>
           </div>
 

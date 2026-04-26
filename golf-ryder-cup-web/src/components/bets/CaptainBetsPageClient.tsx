@@ -440,7 +440,7 @@ export default function CaptainBetsPageClient() {
             />
             <CaptainNote
               title="Hand the players one clean board"
-              body="If the captain room is tidy, the public bets page can stay simple. That is the point: one desk to set the wagers, one board for everyone else to read."
+              body="If captain setup is tidy, the public bets page can stay simple: one place to set the wagers, one board for everyone else to read."
               icon={<Users size={18} />}
               tone="maroon"
             />

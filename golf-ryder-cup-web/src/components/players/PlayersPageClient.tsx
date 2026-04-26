@@ -663,13 +663,13 @@ export default function PlayersPageClient() {
               <div className="flex flex-col gap-[var(--space-4)] lg:flex-row lg:items-start lg:justify-between">
                 <div>
                   <p className="type-overline tracking-[0.18em] text-[var(--ink-tertiary)]">
-                    Captain Command Center
+                    Captain Roster
                   </p>
                   <h2 className="mt-[var(--space-2)] font-serif text-[clamp(1.9rem,6vw,2.7rem)] italic leading-[1.04] text-[var(--ink)]">
-                    Run roster moves and the draft from one room.
+                    Manage roster moves and the draft from one place.
                   </h2>
                   <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
-                    Keep the player list visible, move golfers manually when you need precision, or switch into the draft room without leaving the roster page.
+                    Keep the player list visible, move golfers manually when you need precision, or switch into the draft without leaving the roster page.
                   </p>
                 </div>
 
@@ -700,7 +700,7 @@ export default function PlayersPageClient() {
                   >
                     <div className="flex items-center justify-between gap-[var(--space-2)]">
                       <div>
-                        <p className="type-overline text-[var(--ink-tertiary)]">Draft room</p>
+                        <p className="type-overline text-[var(--ink-tertiary)]">Draft</p>
                         <p className="mt-[var(--space-1)] type-title-sm text-[var(--ink)]">Assign teams live</p>
                       </div>
                       <span className="inline-flex items-center rounded-full border border-[color:var(--gold)]/18 bg-[color:var(--gold)]/10 px-[var(--space-2)] py-[5px] text-[0.72rem] font-semibold text-[var(--gold-dark)]">
@@ -746,13 +746,13 @@ export default function PlayersPageClient() {
                   <EmptyStatePremium
                     illustration="golfers"
                     title="Captain Mode required"
-                    description="Turn on Captain Mode to run the draft room from the roster command center."
+                    description="Turn on Captain Mode to run the draft from the roster page."
                     variant="large"
                   />
                 ) : draftEligiblePlayers.length === 0 ? (
                   <EmptyStatePremium
                     illustration="golfers"
-                    title="The draft room is clear"
+                    title="The draft is clear"
                     description="Every player already has a side. Fine-tune the roster manually below or move straight into lineup work."
                     action={{
                       label: 'Build lineups',

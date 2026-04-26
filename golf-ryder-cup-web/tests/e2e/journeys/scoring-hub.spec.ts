@@ -32,6 +32,6 @@ test.describe('Score hub roundtrip', () => {
     await waitForStableDOM(page);
 
     await expect(page).toHaveURL(/\/score$/);
-    await expect(page.getByText(/Choose a card and start walking\./i)).toBeVisible();
+    await expect(page.getByText(/Select a match to score\./i)).toBeVisible();
   });
 });

@@ -327,21 +327,20 @@ export function ManagePageClient() {
       />
 
       <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
-        <section className="overflow-hidden rounded-[2rem] border border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(248,244,237,0.96))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
+        <section className="gradient-premium-surface overflow-hidden rounded-[2rem] border border-[var(--rule)] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
           <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
             <div className="flex flex-col gap-[var(--space-5)]">
               <div className="flex flex-col gap-[var(--space-4)] sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="type-overline tracking-[0.18em] text-[var(--ink-tertiary)]">
-                    Command Room
+                    Manage Trip
                   </p>
                   <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3rem)] italic leading-[1.02] text-[var(--ink)]">
                     Tune the board before the day gets loud.
                   </h1>
                   <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
-                    This is the captain&apos;s workbench: adjust session settings, tidy match
-                    allowances, and keep the roster calibrated without feeling like you stepped
-                    into a spreadsheet.
+                    Adjust session settings, tidy match allowances, and keep the roster calibrated
+                    before the group starts asking for answers.
                   </p>
                 </div>
 
@@ -356,7 +355,7 @@ export function ManagePageClient() {
               <div className="grid gap-[var(--space-3)] sm:grid-cols-3">
                 <LinkButton
                   href="/lineup/new?mode=session"
-                  aria-label="captain-new-session-link"
+                  aria-label="New session"
                   variant="primary"
                   leftIcon={<Plus size={16} />}
                   className="rounded-[1rem]"
@@ -376,7 +375,7 @@ export function ManagePageClient() {
                   className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] border border-[color:var(--gold)]/22 bg-[color:var(--gold)]/10 px-[var(--space-4)] py-[var(--space-3)] font-semibold text-[var(--ink)] transition-colors hover:bg-[color:var(--gold)]/14"
                 >
                   <Trophy size={16} />
-                  Open Draft Room
+                  Open Draft
                 </Link>
               </div>
 

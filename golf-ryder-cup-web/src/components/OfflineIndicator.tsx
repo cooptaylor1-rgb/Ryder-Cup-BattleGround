@@ -43,6 +43,44 @@ interface SyncQueueItemDisplay {
   error?: string;
 }
 
+const ENTITY_LABELS: Record<string, string> = {
+  trip: 'Trip',
+  player: 'Player',
+  team: 'Team',
+  session: 'Session',
+  match: 'Match',
+  holeResult: 'Score',
+  practiceScore: 'Practice score',
+  duesLineItem: 'Dues item',
+  paymentRecord: 'Payment',
+  tripInvitation: 'Invitation',
+  announcement: 'Message',
+  attendanceRecord: 'Attendance',
+  cartAssignment: 'Cart assignment',
+  sideBet: 'Side bet',
+  sideBetParticipant: 'Side bet player',
+  sideBetEntry: 'Side bet score',
+};
+
+const OPERATION_LABELS: Record<string, string> = {
+  create: 'added',
+  update: 'updated',
+  delete: 'removed',
+};
+
+const STATUS_LABELS: Record<SyncQueueItemDisplay['status'], string> = {
+  pending: 'Waiting',
+  syncing: 'Saving',
+  failed: 'Needs retry',
+  completed: 'Saved',
+};
+
+function readableQueueDescription(item: TripSyncQueueItem) {
+  const entity = ENTITY_LABELS[item.entity] ?? String(item.entity).replace(/([a-z])([A-Z])/g, '$1 $2');
+  const operation = OPERATION_LABELS[item.operation] ?? String(item.operation);
+  return `${entity} ${operation}`;
+}
+
 // Hook to track sync queue
 export function useSyncQueue() {
   const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
@@ -71,7 +109,7 @@ export function useSyncQueue() {
       const timestamp = item.lastAttemptAt || item.createdAt;
       return {
         id: item.id,
-        description: `${item.entity} ${item.operation}`,
+        description: readableQueueDescription(item),
         timestamp: new Date(timestamp).getTime(),
         retryCount: item.retryCount,
         status: item.status,
@@ -170,20 +208,20 @@ export function OfflineIndicator() {
                     <span className="text-sm font-medium text-[var(--canvas)]">You&apos;re offline</span>
                     {pendingCount > 0 && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-[color:var(--canvas-raised)]/20 text-[var(--canvas)]">
-                        {pendingCount} pending
+                        {pendingCount} saved locally
                       </span>
                     )}
                   </>
                 ) : isSyncing ? (
                   <>
                     <RefreshCw size={16} className="text-[var(--canvas)] animate-spin" />
-                    <span className="text-sm font-medium text-[var(--canvas)]">Syncing changes...</span>
+                    <span className="text-sm font-medium text-[var(--canvas)]">Saving changes...</span>
                   </>
                 ) : (
                   <>
                     <Check size={16} className="text-[var(--canvas)]" />
                     <span className="text-sm font-medium text-[var(--canvas)]">
-                      Back online - all synced!
+                      Back online. Changes saved.
                     </span>
                   </>
                 )}
@@ -195,7 +233,7 @@ export function OfflineIndicator() {
                   onClick={() => setShowDetails(!showDetails)}
                   className="w-full flex items-center justify-center gap-1 mt-1 text-[color:var(--canvas)]/80 hover:text-[var(--canvas)]"
                 >
-                  <span className="text-xs">{showDetails ? 'Hide' : 'View'} pending changes</span>
+                  <span className="text-xs">{showDetails ? 'Hide' : 'View'} saved changes</span>
                   {showDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                 </button>
               )}
@@ -217,7 +255,7 @@ export function OfflineIndicator() {
                             <span className="truncate flex-1">{item.description}</span>
                             {item.retryCount > 0 && (
                               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[color:var(--canvas-raised)]/10 text-[color:var(--canvas)]/80">
-                                Retry {item.retryCount}
+                                Tried {item.retryCount}x
                               </span>
                             )}
                             <span
@@ -229,7 +267,7 @@ export function OfflineIndicator() {
                                     : 'bg-[color:var(--canvas-raised)]/10 text-[color:var(--canvas)]/80'
                               }`}
                             >
-                              {item.status}
+                              {STATUS_LABELS[item.status]}
                             </span>
                             <span className="text-[color:var(--canvas)]/60">
                               {new Date(item.timestamp).toLocaleTimeString([], {
@@ -247,12 +285,12 @@ export function OfflineIndicator() {
                       ))}
                       {queueItems.length > 5 && (
                         <p className="text-xs text-[color:var(--canvas)]/60 text-center">
-                          +{queueItems.length - 5} more items
+                          +{queueItems.length - 5} more changes
                         </p>
                       )}
                     </div>
                     <p className="text-xs text-[color:var(--canvas)]/70 text-center mt-2">
-                      Changes will sync when you&apos;re back online
+                      Saved changes will sync when you&apos;re back online.
                     </p>
                   </motion.div>
                 )}
@@ -272,7 +310,7 @@ export function OfflineIndicator() {
             className="fixed top-4 right-4 z-50 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--surface)] border border-[var(--rule)] text-[var(--ink-primary)]"
           >
             <Wifi size={14} className="text-[var(--success)]" />
-            <span className="text-xs font-medium">Online</span>
+            <span className="text-xs font-medium">Back online</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -307,7 +345,7 @@ export function SyncStatusChip() {
       ) : (
         <>
           <Upload size={12} className="text-[var(--info)] animate-pulse" />
-          <span className="text-xs font-medium text-[var(--info)]">Syncing {pendingCount}</span>
+          <span className="text-xs font-medium text-[var(--info)]">Saving {pendingCount}</span>
         </>
       )}
     </div>

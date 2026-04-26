@@ -660,7 +660,7 @@ export async function enableCaptainMode(page: Page, pin?: string): Promise<boole
   if (!pin) {
     await page.evaluate(() => {
       localStorage.setItem(
-        'golf-ui-storage',
+        'golf-access-storage',
         JSON.stringify({
           state: {
             isCaptainMode: true,

@@ -541,9 +541,8 @@ export default function MorePageClient() {
                 Golf Ryder Cup
               </h2>
               <p className="mt-[var(--space-2)] max-w-[38rem] text-sm leading-7 text-[var(--ink-secondary)]">
-                Offline-first match play scoring for a serious buddies trip. The product is at its
-                best when even the support and utility rooms feel like they belong to the same
-                architect.
+                Offline-first match play scoring for a serious buddies trip, with support and
+                settings kept in the same visual system as the rest of the app.
               </p>
               <div className="mt-[var(--space-4)] flex items-center gap-2 text-xs text-[var(--ink-tertiary)]">
                 <Heart size={14} className="text-[var(--error)]" />

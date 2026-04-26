@@ -304,7 +304,7 @@ export default function FinancesPageClient() {
             <aside className="space-y-[var(--space-4)]">
               <SidebarNote
                 title="The best ledger feels dull"
-                body="If the money room is exciting, something already went wrong. Calmness is the design goal here."
+                body="If the ledger feels exciting, something already went wrong. Keep balances calm, obvious, and settled."
               />
               <SidebarNote
                 title="Captains need one charging desk"
@@ -342,7 +342,7 @@ export default function FinancesPageClient() {
               />
               <SidebarNote
                 title="Per-player amounts only"
-                body="This room works best when the unit is always obvious: per-player, then multiplied by the selected group."
+                body="Charges work best when the unit is obvious: per player, then multiplied by the selected group."
                 tone="green"
               />
             </aside>

@@ -58,7 +58,7 @@ export function SessionLineupHeroSection({
             <div className="card-editorial overflow-hidden p-[var(--space-5)] sm:p-[var(--space-6)]">
                 <div className="flex items-start justify-between gap-4">
                     <div>
-                        <p className="type-overline text-[var(--masters)]">Session room</p>
+                        <p className="type-overline text-[var(--masters)]">Session</p>
                         <h1 className="mt-[var(--space-2)] font-serif text-[length:var(--text-3xl)] font-normal tracking-[-0.03em] text-[var(--ink)]">
                             {session.name}
                         </h1>

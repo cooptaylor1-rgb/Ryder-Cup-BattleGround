@@ -54,14 +54,14 @@ const gameDayActions: CaptainCommandAction[] = [
   {
     id: 'lineup',
     label: 'Create Lineup',
-    description: 'Build or publish the next session without leaving the command room.',
+    description: 'Build or publish the next session from the captain board.',
     href: '/lineup/new',
     icon: Users,
     tone: 'maroon',
   },
   {
     id: 'manage',
-    label: 'Quick Swap',
+    label: 'Manage Sessions',
     description: 'Adjust sessions, player handicaps, and match allowances in one place.',
     href: '/captain/manage',
     icon: Sliders,
@@ -80,7 +80,7 @@ const gameDayActions: CaptainCommandAction[] = [
 const setupActions: CaptainCommandAction[] = [
   {
     id: 'checklist',
-    label: 'Pre-Flight',
+    label: 'Readiness Check',
     description: 'Run the readiness check before the first tee shot exposes a missing piece.',
     href: '/captain/checklist',
     icon: ClipboardCheck,
@@ -220,7 +220,7 @@ export default function CaptainPageClient() {
     return (
       <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
         <PageHeader
-          title="Captain Command"
+          title="Captain Tools"
           subtitle={currentTrip.name}
           icon={<Shield size={16} className="text-[var(--canvas)]" />}
           iconTone="captain"
@@ -228,13 +228,13 @@ export default function CaptainPageClient() {
         />
 
         <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
-          <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.88),rgba(247,240,241,0.96))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
+          <section className="gradient-premium-surface overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
             <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
               <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">
                 Captain Gate
               </p>
               <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3rem)] italic leading-[1.02] text-[var(--ink)]">
-                Open the command room.
+                Unlock captain tools.
               </h1>
               <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
                 The captain side controls the structure of the trip. Enter the PIN to unlock
@@ -328,7 +328,7 @@ export default function CaptainPageClient() {
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
-        title="Captain Command"
+        title="Captain Tools"
         subtitle={currentTrip.name}
         icon={<Shield size={16} className="text-[var(--canvas)]" />}
         iconTone="captain"
@@ -349,18 +349,18 @@ export default function CaptainPageClient() {
 
       <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
         {showSetupCreatedBanner ? (
-          <section className="mb-[var(--space-6)] overflow-hidden rounded-[1.8rem] border border-[var(--masters)]/16 bg-[linear-gradient(145deg,rgba(11,94,55,0.95),rgba(5,58,35,0.98))] text-[var(--canvas)] shadow-[0_24px_54px_rgba(5,58,35,0.24)]">
+          <section className="mb-[var(--space-6)] overflow-hidden rounded-[1.8rem] border border-[var(--masters)]/16 bg-[linear-gradient(145deg,var(--masters),var(--masters-deep))] text-[var(--canvas)] shadow-[0_24px_54px_rgba(5,58,35,0.24)]">
             <div className="flex flex-col gap-[var(--space-4)] px-[var(--space-5)] py-[var(--space-5)] lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <p className="type-overline tracking-[0.16em] text-[color:var(--canvas)]/72">
                   Setup complete
                 </p>
                 <h2 className="mt-[var(--space-2)] font-serif text-[2rem] italic leading-[1.02] text-[var(--canvas)]">
-                  The trip is built. Now run the room.
+                  The trip is built. Now run the day.
                 </h2>
                 <p className="mt-[var(--space-3)] max-w-[38rem] text-sm leading-7 text-[color:var(--canvas)]/80">
                   Your roster, teams, sessions, and tee-sheet defaults are already on the board.
-                  Publish the first lineup, share the invite, or run the pre-flight before the day starts moving.
+                  Publish the first lineup, share the invite, or run the readiness check before the day starts moving.
                 </p>
               </div>
 
@@ -375,7 +375,7 @@ export default function CaptainPageClient() {
                   href="/captain/checklist"
                   className="inline-flex min-h-12 items-center justify-center rounded-xl border border-[color:var(--canvas)]/22 bg-transparent px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--canvas)] transition-transform duration-150 hover:scale-[1.02] hover:bg-[color:var(--canvas)]/10"
                 >
-                  Run pre-flight
+                  Run readiness check
                 </Link>
               </div>
             </div>
@@ -414,21 +414,20 @@ export default function CaptainPageClient() {
         )}
 
 
-        <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(247,240,241,0.97))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
+        <section className="gradient-premium-surface overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
           <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
             <div className="flex flex-col gap-[var(--space-5)]">
               <div className="flex flex-col gap-[var(--space-4)] sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">
-                    Captain&apos;s Room
+                    Captain Tools
                   </p>
                   <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3rem)] italic leading-[1.02] text-[var(--ink)]">
                     Run the trip from one board.
                   </h1>
                   <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
-                    This should feel like a real command center, not a utilities folder. Keep the
-                    day moving, see what still needs work, and step into the right tool without
-                    losing the room.
+                    Keep the day moving, see what still needs work, and step into the right tool
+                    without losing context.
                   </p>
                 </div>
 
@@ -451,7 +450,7 @@ export default function CaptainPageClient() {
                   className="inline-flex items-center justify-center gap-[var(--space-2)] rounded-[1rem] border border-[color:var(--maroon)]/18 bg-[color:var(--maroon)]/10 px-[var(--space-4)] py-[var(--space-3)] font-semibold text-[var(--maroon-dark)] transition-colors hover:bg-[color:var(--maroon)]/14"
                 >
                   <Sliders size={16} />
-                  Open Manage Board
+                  Manage sessions
                 </Link>
               </div>
             </div>
@@ -487,8 +486,8 @@ export default function CaptainPageClient() {
         <section className="pt-[var(--space-8)]">
           <CaptainSectionHeading
             eyebrow="Setup"
-            title="Support tools"
-            description="Everything that shapes the trip around the edges: invites, logistics, messaging, and the quieter admin work."
+            title="Trip setup"
+            description="Invites, logistics, messaging, and the admin work that keeps the trip organized."
           />
           <div className="grid gap-[var(--space-4)] md:grid-cols-2">
             {setupActions.map((action) => (
@@ -516,7 +515,7 @@ export default function CaptainPageClient() {
           <CaptainSectionHeading
             eyebrow="Sessions"
             title="Session board"
-            description="Live rooms should stand apart, upcoming ones should feel staged, and completed sessions should read like settled business."
+            description="Live sessions stay separate from upcoming and completed work."
           />
           <div className="space-y-[var(--space-4)]">
             <SessionGroupCard
@@ -550,7 +549,7 @@ export default function CaptainPageClient() {
           <CaptainSectionHeading
             eyebrow="Roster"
             title="Team overview"
-            description="A quick read on the two sides and any players still floating outside the team structure."
+            description="A quick read on both teams and any players still waiting for an assignment."
           />
           <div className="grid gap-[var(--space-4)] md:grid-cols-2">
             <TeamOverviewCard

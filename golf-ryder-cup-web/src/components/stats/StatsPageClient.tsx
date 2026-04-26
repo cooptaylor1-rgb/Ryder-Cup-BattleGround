@@ -106,7 +106,7 @@ export default function StatsPageClient() {
           <EmptyStatePremium
             illustration="podium"
             title="No active trip"
-            description="Start or join a trip to open the stats rooms."
+            description="Start or join a trip to view stats."
             action={{
               label: 'Go home',
               onClick: () => router.push('/'),
@@ -278,4 +278,3 @@ function toneClass(tone: StatsRouteCard['tone']) {
       return 'bg-[color:var(--warning)]/12 text-[var(--warning)]';
   }
 }
-

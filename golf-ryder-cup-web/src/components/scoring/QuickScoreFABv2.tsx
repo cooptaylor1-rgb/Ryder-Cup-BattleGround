@@ -7,7 +7,6 @@
  * Features:
  * - Persistent FAB that follows you everywhere
  * - Expands to show quick score options
- * - Long-press for voice scoring
  * - Shows current match status
  * - Haptic feedback throughout
  * - Respects reduced motion
@@ -19,7 +18,7 @@
 import { useState, useEffect, useCallback, useRef, useId } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Target, Mic, ChevronRight, X, Trophy, Minus } from 'lucide-react';
+import { Target, ChevronRight, X, Trophy, Minus } from 'lucide-react';
 import { useTripStore, useScoringStore, useScoringPrefsStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -37,7 +36,7 @@ interface QuickScoreFABv2Props {
 
 export function QuickScoreFABv2({
   forceShow = false,
-  position = { bottom: 100, right: 16 },
+  position = { bottom: 152, right: 16 },
 }: QuickScoreFABv2Props) {
   const menuId = useId();
   const pathname = usePathname();
@@ -48,8 +47,6 @@ export function QuickScoreFABv2({
   const { scoringPreferences: _scoringPreferences } = useScoringPrefsStore(useShallow(s => ({ scoringPreferences: s.scoringPreferences })));
 
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isVoiceMode, setIsVoiceMode] = useState(false);
-  const [isListening, _setIsListening] = useState(false);
   const [activeMatchData, setActiveMatchData] = useState<{
     match: Match;
     displayScore: string;
@@ -58,7 +55,6 @@ export function QuickScoreFABv2({
     teamBName: string;
   } | null>(null);
 
-  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const fabRef = useRef<HTMLDivElement>(null);
 
   // Pages where FAB should be hidden
@@ -67,11 +63,25 @@ export function QuickScoreFABv2({
     (!currentTrip ||
       pathname === '/' ||
       pathname === '/schedule' ||
+      pathname.startsWith('/schedule/') ||
       pathname.startsWith('/captain') ||
       pathname === '/score' ||
       pathname.startsWith('/score/') ||
+      pathname === '/standings' ||
+      pathname.startsWith('/standings/') ||
+      pathname === '/more' ||
+      pathname.startsWith('/more/') ||
+      pathname === '/courses' ||
+      pathname.startsWith('/courses/') ||
+      pathname === '/players' ||
+      pathname.startsWith('/players/') ||
+      pathname === '/settings' ||
+      pathname.startsWith('/settings/') ||
+      pathname === '/profile' ||
+      pathname.startsWith('/profile/') ||
       pathname.startsWith('/profile/create') ||
       pathname.startsWith('/trip/new') ||
+      pathname.startsWith('/join') ||
       pathname.startsWith('/login'));
 
   // Find active matches
@@ -124,31 +134,9 @@ export function QuickScoreFABv2({
 
   // Handle FAB tap
   const handleTap = useCallback(() => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-
     haptic.tap();
     setIsExpanded((prev) => !prev);
   }, [haptic]);
-
-  // Handle long press start
-  const handlePressStart = useCallback(() => {
-    longPressTimer.current = setTimeout(() => {
-      haptic.impact();
-      setIsVoiceMode(true);
-      setIsExpanded(true);
-    }, 500);
-  }, [haptic]);
-
-  // Handle press end
-  const handlePressEnd = useCallback(() => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  }, []);
 
   // Handle quick score
   const handleQuickScore = useCallback(
@@ -181,7 +169,6 @@ export function QuickScoreFABv2({
     const handleClickOutside = (e: MouseEvent) => {
       if (fabRef.current && !fabRef.current.contains(e.target as Node)) {
         setIsExpanded(false);
-        setIsVoiceMode(false);
       }
     };
 
@@ -235,7 +222,6 @@ export function QuickScoreFABv2({
               <button
                 onClick={() => {
                   setIsExpanded(false);
-                  setIsVoiceMode(false);
                 }}
                 className="p-1 rounded-full hover:bg-[color:var(--canvas-raised)]/20 transition-colors"
                 aria-label="Close quick score menu"
@@ -244,41 +230,7 @@ export function QuickScoreFABv2({
               </button>
             </div>
 
-            {/* Voice Mode */}
-            {isVoiceMode ? (
-              <div className="p-4">
-                <div className="flex flex-col items-center py-4">
-                  <motion.div
-                    animate={isListening ? { scale: [1, 1.1, 1] } : {}}
-                    transition={{ duration: 1, repeat: Infinity }}
-                    className={`
-                      w-20 h-20 rounded-full flex items-center justify-center mb-3
-                      ${isListening ? 'bg-[var(--error)]' : 'bg-[var(--surface-secondary)]'}
-                    `}
-                  >
-                    <Mic
-                      className={`w-8 h-8 ${
-                        isListening ? 'text-[var(--canvas)]' : 'text-[var(--ink-secondary)]'
-                      }`}
-                    />
-                  </motion.div>
-                  <p className="text-sm text-center text-[var(--ink-secondary)]">
-                    {isListening
-                      ? 'Listening... Say "USA wins" or "Europe wins"'
-                      : 'Tap mic to start voice scoring'}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setIsVoiceMode(false)}
-                  className="w-full py-2 text-sm font-medium text-[var(--ink-secondary)] hover:text-[var(--ink-primary)]"
-                  aria-label="Switch to tap scoring"
-                >
-                  Switch to tap scoring
-                </button>
-              </div>
-            ) : (
-              /* Quick Score Buttons */
-              <div className="p-3 space-y-2">
+            <div className="p-3 space-y-2">
                 {/* Team A Button */}
                 <button
                   onClick={() => handleQuickScore('teamA')}
@@ -344,18 +296,7 @@ export function QuickScoreFABv2({
                   <ChevronRight className="w-4 h-4 text-[var(--ink-tertiary)]" />
                 </button>
 
-                {/* Voice Mode Toggle */}
-                <button
-                  onClick={() => setIsVoiceMode(true)}
-                  className="w-full flex items-center justify-center gap-2 p-2 text-xs font-medium rounded-lg hover:bg-[var(--surface-secondary)] transition-colors text-[var(--ink-secondary)]"
-                  aria-pressed={isVoiceMode}
-                  aria-label="Use voice scoring"
-                >
-                  <Mic className="w-3 h-3" />
-                  Use Voice Scoring
-                </button>
-              </div>
-            )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -363,8 +304,6 @@ export function QuickScoreFABv2({
       {/* Main FAB */}
       <motion.button
         onTap={handleTap}
-        onTapStart={handlePressStart}
-        onTapCancel={handlePressEnd}
         whileTap={{ scale: 0.95 }}
         className={`
           relative flex items-center gap-3 px-4 py-3 rounded-2xl

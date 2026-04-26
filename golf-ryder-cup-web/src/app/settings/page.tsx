@@ -108,7 +108,7 @@ export default function SettingsPage() {
 
             <div className="grid gap-[var(--space-3)] sm:grid-cols-3 lg:grid-cols-1">
               <SettingsFactCard label="Current theme" value={(theme || 'outdoor').replace(/^\w/, (char) => char.toUpperCase())} detail="The visual mode your device is using now." />
-              <SettingsFactCard label="Core controls" value={SETTING_ITEMS.length} detail="The four rooms that matter most on a golf trip." />
+              <SettingsFactCard label="Core controls" value={SETTING_ITEMS.length} detail="The settings that matter most on a golf trip." />
               <SettingsFactCard label="Support path" value="Help" detail="Open help for setup, scoring, and app questions." valueClassName="font-sans text-[1rem] not-italic leading-[1.25]" />
             </div>
           </div>

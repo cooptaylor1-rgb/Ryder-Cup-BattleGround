@@ -626,7 +626,7 @@ function BasicsStep({
                     type="text"
                     value={data.captainName}
                     onChange={(e) => updateData('captainName', e.target.value)}
-                    placeholder="Who is running the room?"
+                    placeholder="Who is running the trip?"
                     className="input w-full"
                 />
             </div>

@@ -209,7 +209,7 @@ export default function CaptainSettingsPage() {
       />
 
       <main className="container-editorial py-[var(--space-6)] pb-[var(--space-12)]">
-        <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(247,240,241,0.98))] shadow-[0_24px_52px_rgba(46,34,18,0.08)]">
+        <section className="gradient-premium-surface overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] shadow-[0_24px_52px_rgba(46,34,18,0.08)]">
           <div className="grid gap-[var(--space-5)] px-[var(--space-5)] py-[var(--space-5)] lg:grid-cols-[minmax(0,1.3fr)_minmax(18rem,0.95fr)]">
             <div>
               <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">Captain Control</p>
@@ -217,7 +217,7 @@ export default function CaptainSettingsPage() {
                 Set the trip once, let the rest of the board behave.
               </h1>
               <p className="mt-[var(--space-3)] max-w-[35rem] type-body-sm text-[var(--ink-secondary)]">
-                The settings room should be quiet: trip identity, dates, location, and team names. If this foundation is sound, the rest of the captain tools inherit order instead of chaos.
+                Keep trip identity, dates, location, and team names clear. If this foundation is sound, the rest of the captain tools inherit order instead of chaos.
               </p>
             </div>
 
@@ -363,14 +363,14 @@ export default function CaptainSettingsPage() {
                 />
               </div>
               <p className="mt-[var(--space-4)] text-sm leading-6 text-[var(--ink-secondary)]">
-                This page should settle the names and timing that the rest of the app repeats. Once those are clean, the other captain rooms inherit the order.
+                This page should settle the names and timing that the rest of the app repeats. Once those are clean, the other captain tools inherit the order.
               </p>
             </div>
 
             <div className="rounded-[1.6rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 p-[var(--space-5)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]">
               <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Captain Tools</p>
               <div className="mt-[var(--space-4)] space-y-3">
-                <CaptainToolLink href="/captain/checklist" icon={<Shield size={18} />} title="Pre-Flight Checklist" body="Review trip readiness." />
+                <CaptainToolLink href="/captain/checklist" icon={<Shield size={18} />} title="Readiness Check" body="Review trip readiness." />
                 <CaptainToolLink href="/captain/availability" icon={<Users size={18} />} title="Player Attendance" body="Track arrivals." />
                 <CaptainToolLink href="/captain/messages" icon={<Bell size={18} />} title="Announcements" body="Broadcast to the trip." />
                 <CaptainToolLink href="/captain/manage" icon={<Settings size={18} />} title="Session Management" body="Adjust rounds and scoring structure." />
@@ -413,7 +413,7 @@ function SettingsFactCard({
       className={cn(
         'rounded-[1.5rem] border p-[var(--space-4)] shadow-[0_16px_34px_rgba(41,29,17,0.05)]',
         tone === 'green'
-          ? 'border-[color:var(--success)]/16 bg-[linear-gradient(180deg,rgba(45,122,79,0.10),rgba(255,255,255,0.98))]'
+          ? 'border-[color:var(--success)]/16 bg-[color:var(--success)]/10'
           : 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78'
       )}
     >
@@ -441,7 +441,7 @@ function SettingsPanel({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-[1.8rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))] p-[var(--space-5)] shadow-[0_20px_46px_rgba(41,29,17,0.08)]">
+    <section className="gradient-premium-surface rounded-[1.8rem] border border-[color:var(--rule)]/75 p-[var(--space-5)] shadow-[0_20px_46px_rgba(41,29,17,0.08)]">
       <div className="flex items-center gap-[var(--space-3)]">
         <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[color:var(--maroon)]/10 text-[var(--maroon)]">
           {icon}

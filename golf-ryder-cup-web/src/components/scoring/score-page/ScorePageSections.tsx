@@ -80,7 +80,7 @@ export function ScorePageSections({
             <div className="flex items-start justify-between gap-[var(--space-4)]">
               <div>
                 <p className="type-overline tracking-[0.16em] text-[var(--masters)]">
-                  Scoring Room
+                  Current Session
                 </p>
                 <h1 className="type-display mt-[var(--space-2)] capitalize">
                   {activeSession.sessionType}
@@ -100,17 +100,18 @@ export function ScorePageSections({
 
             {quickContinueMatchId ? (
               <button
+                type="button"
                 onClick={() => onSelectMatch(quickContinueMatchId)}
-                className="mt-[var(--space-5)] flex w-full items-center justify-between gap-[var(--space-4)] rounded-[24px] border border-[color:rgba(0,102,68,0.2)] bg-[linear-gradient(135deg,rgba(0,102,68,0.14)_0%,rgba(255,255,255,0.8)_100%)] px-[var(--space-5)] py-[var(--space-4)] text-left shadow-[0_8px_20px_rgba(0,102,68,0.08)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--masters)]/40 active:scale-[0.99]"
+                className="mt-[var(--space-5)] flex w-full items-center justify-between gap-[var(--space-4)] rounded-[24px] border border-[color:var(--masters)]/20 bg-[color:var(--masters)]/10 px-[var(--space-5)] py-[var(--space-4)] text-left shadow-[0_8px_20px_rgba(0,102,68,0.08)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--masters)]/40 active:scale-[0.99]"
                 aria-label="Continue scoring active match"
               >
                 <div>
-                  <p className="type-overline text-[var(--masters)]">Quick Action</p>
+                  <p className="type-overline text-[var(--masters)]">Continue</p>
                   <p className="mt-[var(--space-1)] type-title-sm text-[var(--ink)]">
                     Continue live match
                   </p>
                   <p className="mt-1 text-sm text-[var(--ink-secondary)]">
-                    Jump straight back into the only match currently underway.
+                    Open the match already in progress.
                   </p>
                 </div>
                 <ChevronRight size={18} className="text-[var(--ink-tertiary)]" />
@@ -120,12 +121,38 @@ export function ScorePageSections({
         </section>
       ) : null}
 
+      {sessions.length > 1 ? (
+        <section className="pt-[var(--space-6)]">
+          <div className="card-editorial p-[var(--space-4)]">
+            <div className="mb-[var(--space-4)]">
+              <p className="type-overline text-[var(--ink-secondary)]">Sessions</p>
+              <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+                Switch sessions without losing your place.
+              </p>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-1">
+              {sessions.map((session) => (
+                <Button
+                  key={session.id}
+                  variant={session.id === selectedSessionId ? 'primary' : 'secondary'}
+                  size="sm"
+                  onClick={() => onSelectSession(session.id)}
+                  className="whitespace-nowrap font-sans"
+                >
+                  Session {session.sessionNumber}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       <section className="pb-[var(--space-8)] pt-[var(--space-6)]">
         <div className="mb-[var(--space-5)] flex items-end justify-between gap-4">
           <div>
             <p className="type-overline text-[var(--ink-secondary)]">Matches</p>
             <h2 className="mt-2 font-serif text-[length:var(--text-2xl)] font-normal tracking-[-0.02em] text-[var(--ink)]">
-              Choose a card and start walking.
+              Select a match to score.
             </h2>
           </div>
           <p className="hidden text-sm text-[var(--ink-tertiary)] sm:block">
@@ -189,32 +216,6 @@ export function ScorePageSections({
           )}
         </ErrorBoundary>
       </section>
-
-      {sessions.length > 1 ? (
-        <section className="pb-[var(--space-6)] pt-[var(--space-6)]">
-          <div className="card-editorial p-[var(--space-4)]">
-            <div className="mb-[var(--space-4)]">
-              <p className="type-overline text-[var(--ink-secondary)]">Sessions</p>
-              <p className="mt-2 text-sm text-[var(--ink-secondary)]">
-                Move between scheduled blocks without losing the scoring thread.
-              </p>
-            </div>
-            <div className="flex gap-3 overflow-x-auto pb-1">
-              {sessions.map((session) => (
-                <Button
-                  key={session.id}
-                  variant={session.id === selectedSessionId ? 'primary' : 'secondary'}
-                  size="sm"
-                  onClick={() => onSelectSession(session.id)}
-                  className="whitespace-nowrap font-sans"
-                >
-                  Session {session.sessionNumber}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : null}
     </main>
   );
 }
@@ -248,6 +249,7 @@ const MatchRow = React.memo(function MatchRow({
 
   return (
     <button
+      type="button"
       onClick={onClick}
       aria-label={`Open Match ${matchNumber}${isUserMatch ? ' (Your Match)' : ''}`}
       className={cn(
@@ -389,12 +391,12 @@ function SessionStatusPill({
       className={cn(
         'inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em]',
         status === 'inProgress'
-          ? 'bg-[color:rgba(0,102,68,0.12)] text-[var(--masters)]'
+          ? 'bg-[color:var(--masters)]/12 text-[var(--masters)]'
           : status === 'paused'
-            ? 'bg-[color:rgba(26,24,21,0.08)] text-[var(--ink-secondary)]'
+            ? 'bg-[color:var(--ink)]/8 text-[var(--ink-secondary)]'
             : status === 'completed'
-              ? 'bg-[color:rgba(26,24,21,0.08)] text-[var(--ink-secondary)]'
-              : 'bg-[color:rgba(201,162,39,0.15)] text-[var(--gold)]'
+              ? 'bg-[color:var(--ink)]/8 text-[var(--ink-secondary)]'
+              : 'bg-[color:var(--gold)]/15 text-[var(--gold)]'
       )}
     >
       {label}

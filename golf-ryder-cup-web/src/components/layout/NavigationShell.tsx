@@ -44,10 +44,15 @@ export function NavigationShell({ children }: { children: ReactNode }) {
   const hideNav = HIDE_NAV_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(route + '/')
   );
-  const hideLivePlayWidgets =
-    !currentTrip ||
-    pathname === '/captain' ||
-    pathname.startsWith('/captain/');
+  const isCaptainRoute = pathname === '/captain' || pathname.startsWith('/captain/');
+  const isScheduleRoute = pathname === '/schedule' || pathname.startsWith('/schedule/');
+  const isScoreRoute = pathname === '/score' || pathname.startsWith('/score/');
+  const isTripSetupRoute = pathname === '/trip/new' || pathname.startsWith('/trip/new/');
+  const showLiveChrome = Boolean(currentTrip && !hideNav && !isCaptainRoute && !isTripSetupRoute);
+  const showFloatingMyMatch = showLiveChrome && !isScoreRoute && !isScheduleRoute;
+  const showQuickStandingsOverlay = Boolean(
+    currentTrip && !hideNav && (isScoreRoute || isScheduleRoute)
+  );
 
   return (
     <>
@@ -80,14 +85,11 @@ export function NavigationShell({ children }: { children: ReactNode }) {
       {/* Mobile bottom nav */}
       {!hideNav && <BottomNav />}
 
-      {/* Live-play overlays — only when a trip is active */}
-      {!hideLivePlayWidgets && (
-        <>
-          <FloatingMyMatch bottomOffset={hideNav ? 20 : 80} />
-          <QuickStandingsOverlay />
-          <NotificationStack position="top-right" maxVisible={3} />
-        </>
-      )}
+      {/* Live-play overlays — kept route-aware so mobile scoring and schedule
+          screens do not stack multiple floating controls in the same corner. */}
+      {showFloatingMyMatch && <FloatingMyMatch bottomOffset={80} />}
+      {showQuickStandingsOverlay && <QuickStandingsOverlay />}
+      {showLiveChrome && <NotificationStack position="top-right" maxVisible={3} />}
 
       {/* Global loading overlay */}
       {isGlobalLoading && (

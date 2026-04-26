@@ -152,6 +152,7 @@ const ScheduleEntryCard = React.memo(function ScheduleEntryCard({
 
   return (
     <button
+      type="button"
       onClick={onPress}
       disabled={!onPress}
       className={cn(

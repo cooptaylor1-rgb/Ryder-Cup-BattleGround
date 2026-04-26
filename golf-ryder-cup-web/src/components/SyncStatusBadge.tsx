@@ -104,7 +104,7 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
             case 'synced':
                 return {
                     icon: <Check className="h-4 w-4" />,
-                    text: 'Synced',
+                    text: 'Cloud saved',
                     tone: 'text-[var(--success)]',
                     bg: 'bg-[color:var(--success)]/15',
                 };
@@ -112,28 +112,28 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
             case 'syncing':
                 return {
                     icon: <RefreshCw className={`h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />,
-                    text: `Syncing${queueInfo.pending > 0 ? ` (${queueInfo.pending})` : ''}`,
+                    text: `Saving${queueInfo.pending > 0 ? ` (${queueInfo.pending})` : ''}`,
                     tone: 'text-[var(--info)]',
                     bg: 'bg-[color:var(--info)]/15',
                 };
             case 'failed':
                 return {
                     icon: <AlertCircle className="h-4 w-4" />,
-                    text: `Failed (${queueInfo.failed})`,
+                    text: `Needs retry (${queueInfo.failed})`,
                     tone: 'text-[var(--error)]',
                     bg: 'bg-[color:var(--error)]/15',
                 };
             case 'offline':
                 return {
                     icon: <CloudOff className="h-4 w-4" />,
-                    text: 'Offline',
+                    text: 'Saved locally',
                     tone: 'text-[var(--ink-secondary)]',
                     bg: 'bg-[color:var(--ink-tertiary)]/10',
                 };
             default:
                 return {
                     icon: <Cloud className="h-4 w-4" />,
-                    text: 'Unknown',
+                    text: 'Checking sync',
                     tone: 'text-[var(--ink-tertiary)]',
                     bg: 'bg-[color:var(--ink-tertiary)]/10',
                 };
@@ -162,16 +162,18 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
     );
 
     if (status === 'failed' || status === 'pending') {
+        const failedChangeCount = queueInfo.failed || 1;
         const failedTooltip = queueInfo.lastError
-            ? `${queueInfo.failed} sync operations failed. Last error: ${queueInfo.lastError}. Click to retry.`
-            : `${queueInfo.failed} sync operations failed. Click to retry.`;
+            ? `${failedChangeCount} cloud sync ${failedChangeCount === 1 ? 'change needs' : 'changes need'} a retry. Last error: ${queueInfo.lastError}.`
+            : `${failedChangeCount} cloud sync ${failedChangeCount === 1 ? 'change needs' : 'changes need'} a retry.`;
+        const pendingChangeCount = queueInfo.pending || 1;
 
         return (
             <Tooltip
                 content={
                     status === 'failed'
                         ? failedTooltip
-                        : `${queueInfo.pending} changes pending sync. Click to sync now.`
+                        : `${pendingChangeCount} ${pendingChangeCount === 1 ? 'change is' : 'changes are'} waiting to sync. Click to save now.`
                 }
             >
                 <Button

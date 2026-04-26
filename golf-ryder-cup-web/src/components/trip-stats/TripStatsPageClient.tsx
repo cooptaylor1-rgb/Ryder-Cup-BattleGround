@@ -268,7 +268,7 @@ export default function TripStatsPageClient() {
                 Move back up a level.
               </h2>
               <p className="mt-[var(--space-2)] text-sm leading-7 text-[var(--ink-secondary)]">
-                The trip ledger is just one room in the wider stats wing. Jump back for awards, schedule, and broader context.
+                Jump back for awards, schedule, and broader trip context.
               </p>
             </Link>
           </aside>
@@ -277,4 +277,3 @@ export default function TripStatsPageClient() {
     </div>
   );
 }
-
