@@ -11,4 +11,4 @@ cmds = ["cd golf-ryder-cup-web && pnpm install --frozen-lockfile"]
 cmds = ["cd golf-ryder-cup-web && pnpm run build"]
 
 [start]
-cmd = "cd golf-ryder-cup-web && pnpm start"
+cmd = "cd golf-ryder-cup-web && HOSTNAME=0.0.0.0 pnpm start"

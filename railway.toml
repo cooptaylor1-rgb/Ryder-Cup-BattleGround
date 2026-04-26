@@ -8,7 +8,7 @@ healthcheckPath = "/api/health/live"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
-startCommand = "cd golf-ryder-cup-web && pnpm start"
+startCommand = "cd golf-ryder-cup-web && HOSTNAME=0.0.0.0 pnpm start"
 numReplicas = 1
 
 [service]
