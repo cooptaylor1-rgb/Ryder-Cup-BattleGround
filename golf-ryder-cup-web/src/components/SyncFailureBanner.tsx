@@ -17,19 +17,65 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import {
+  getFailedSyncQueueItems,
   getSyncQueueStatus,
   processSyncQueue,
   retryFailedQueue,
 } from '@/lib/services/tripSyncService';
-import { isSupabaseConfigured } from '@/lib/supabase/client';
 import { cn } from '@/lib/utils';
 import { zIndex } from '@/lib/constants/zIndex';
 
 const POLL_INTERVAL_MS = 8000;
 
+type FailedSyncItem = ReturnType<typeof getFailedSyncQueueItems>[number];
+type SyncBlockedReason = NonNullable<ReturnType<typeof getSyncQueueStatus>['blockedReason']>;
+
+const ENTITY_LABELS: Record<string, string> = {
+  trip: 'Trip',
+  player: 'Player',
+  team: 'Team',
+  teamMember: 'Team member',
+  session: 'Session',
+  match: 'Match',
+  holeResult: 'Score',
+  course: 'Course',
+  teeSet: 'Tee set',
+  sideBet: 'Side bet',
+  practiceScore: 'Practice score',
+  banterPost: 'Post',
+  duesLineItem: 'Dues item',
+  paymentRecord: 'Payment',
+  tripInvitation: 'Invitation',
+  announcement: 'Message',
+  attendanceRecord: 'Attendance',
+  cartAssignment: 'Cart assignment',
+};
+
+const OPERATION_LABELS: Record<string, string> = {
+  create: 'add',
+  update: 'update',
+  delete: 'remove',
+};
+
+const BLOCKED_MESSAGES: Record<SyncBlockedReason, string> = {
+  offline: 'Reconnect to retry cloud sync.',
+  'supabase-unconfigured':
+    'Cloud sync is not configured. Your changes are saved on this device, but live sharing needs Supabase set up.',
+  'auth-pending': 'Checking your cloud session before retrying sync.',
+  'auth-required': 'Sign in to retry cloud sync.',
+};
+
+function describeFailedItem(item: FailedSyncItem): string {
+  const entity = ENTITY_LABELS[item.entity] ?? item.entity;
+  const operation = OPERATION_LABELS[item.operation] ?? item.operation;
+  return `${entity} ${operation}`;
+}
+
 export function SyncFailureBanner({ className }: { className?: string }) {
   const [failedCount, setFailedCount] = useState(0);
   const [lastError, setLastError] = useState<string | undefined>(undefined);
+  const [failedItems, setFailedItems] = useState<FailedSyncItem[]>([]);
+  const [blockedReason, setBlockedReason] = useState<SyncBlockedReason | undefined>(undefined);
   const [showDetail, setShowDetail] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
 
@@ -38,6 +84,8 @@ export function SyncFailureBanner({ className }: { className?: string }) {
       const status = getSyncQueueStatus();
       setFailedCount(status.failed);
       setLastError(status.lastError);
+      setFailedItems(getFailedSyncQueueItems(5));
+      setBlockedReason(status.blockedReason);
     };
     tick();
 
@@ -81,6 +129,8 @@ export function SyncFailureBanner({ className }: { className?: string }) {
       const status = getSyncQueueStatus();
       setFailedCount(status.failed);
       setLastError(status.lastError);
+      setFailedItems(getFailedSyncQueueItems(5));
+      setBlockedReason(status.blockedReason);
     } finally {
       setIsRetrying(false);
     }
@@ -88,15 +138,10 @@ export function SyncFailureBanner({ className }: { className?: string }) {
 
   if (failedCount <= 0) return null;
 
-  // Distinguish "Supabase not configured at all" (the whole app is running
-  // local-only, nothing will ever reach the cloud) from "Supabase is
-  // configured but requests are failing" (retry can actually help).
-  // Previously both cases showed the same "N scores didn't reach the
-  // cloud — retry to push" message, so captains on a self-hosted deploy
-  // without Supabase would keep mashing Retry to no effect.
-  const cloudUnreachable = !isSupabaseConfigured;
-  const message = cloudUnreachable
-    ? 'Cloud sync is not configured. Your changes are saved on this device, but live sharing needs Supabase set up.'
+  const blockedMessage = blockedReason ? BLOCKED_MESSAGES[blockedReason] : undefined;
+  const canRetry = !blockedReason;
+  const message = blockedMessage
+    ? blockedMessage
     : `${failedCount} change${failedCount === 1 ? '' : 's'} could not sync. Saved on this device.`;
 
   return (
@@ -116,7 +161,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
         <div className="flex items-center gap-3">
           <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden />
           <div className="flex-1 min-w-0 text-sm font-medium">{message}</div>
-          {!cloudUnreachable && lastError && (
+          {lastError && (
             <button
               type="button"
               onClick={() => setShowDetail((v) => !v)}
@@ -125,22 +170,29 @@ export function SyncFailureBanner({ className }: { className?: string }) {
               {showDetail ? 'Hide details' : 'Details'}
             </button>
           )}
-          {!cloudUnreachable && (
-            <button
-              type="button"
-              onClick={handleRetry}
-              disabled={isRetrying}
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--error)]/40 bg-[var(--canvas)]/80 px-3 py-1 text-xs font-semibold text-[var(--error)] disabled:opacity-60"
-            >
-              <RefreshCw className={cn('h-3.5 w-3.5', isRetrying && 'animate-spin')} aria-hidden />
-              {isRetrying ? 'Retrying...' : 'Retry sync'}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={handleRetry}
+            disabled={isRetrying || !canRetry}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--error)]/40 bg-[var(--canvas)]/80 px-3 py-1 text-xs font-semibold text-[var(--error)] disabled:opacity-60"
+          >
+            <RefreshCw className={cn('h-3.5 w-3.5', isRetrying && 'animate-spin')} aria-hidden />
+            {isRetrying ? 'Retrying...' : 'Retry sync'}
+          </button>
         </div>
         {showDetail && lastError && (
-          <p className="mt-1 break-words text-xs text-[var(--error)]/85">
-            Last error: {lastError}
-          </p>
+          <div className="mt-2 space-y-1 text-xs text-[var(--error)]/85">
+            {failedItems.length > 0 ? (
+              failedItems.map((item) => (
+                <div key={`${item.entity}:${item.entityId}:${item.operation}`} className="break-words">
+                  <span className="font-semibold">{describeFailedItem(item)}:</span>{' '}
+                  {item.error ?? 'Sync failed'}
+                </div>
+              ))
+            ) : (
+              <p className="break-words">Last error: {lastError}</p>
+            )}
+          </div>
         )}
       </div>
     </div>

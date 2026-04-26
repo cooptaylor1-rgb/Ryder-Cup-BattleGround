@@ -21,6 +21,14 @@ import { Button } from '@/components/ui/Button';
 import { Tooltip } from '@/components/ui/Tooltip';
 
 type QueueInfo = ReturnType<typeof getSyncQueueStatus>;
+type SyncBlockedReason = NonNullable<QueueInfo['blockedReason']>;
+
+const BLOCKED_TOOLTIPS: Record<SyncBlockedReason, string> = {
+    offline: 'Reconnect to retry cloud sync.',
+    'supabase-unconfigured': 'Cloud sync is not configured for this build.',
+    'auth-pending': 'Checking your cloud session before retrying sync.',
+    'auth-required': 'Sign in to retry cloud sync.',
+};
 
 interface SyncStatusBadgeProps {
     /** Show full status text (not just icon) */
@@ -84,6 +92,12 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
     const handleManualSync = async () => {
         setIsSyncing(true);
         try {
+            const currentQueue = getSyncQueueStatus();
+            if (currentQueue.blockedReason) {
+                setQueueInfo(currentQueue);
+                return;
+            }
+
             // Reset ALL failed items — including the ones that
             // already burned through MAX_RETRY_COUNT — so clicking
             // the banner actually gives them another shot. Before
@@ -163,7 +177,10 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
 
     if (status === 'failed' || status === 'pending') {
         const failedChangeCount = queueInfo.failed || 1;
-        const failedTooltip = queueInfo.lastError
+        const blockedTooltip = queueInfo.blockedReason ? BLOCKED_TOOLTIPS[queueInfo.blockedReason] : undefined;
+        const failedTooltip = blockedTooltip
+            ? `${failedChangeCount} cloud sync ${failedChangeCount === 1 ? 'change is' : 'changes are'} blocked. ${blockedTooltip}`
+            : queueInfo.lastError
             ? `${failedChangeCount} cloud sync ${failedChangeCount === 1 ? 'change needs' : 'changes need'} a retry. Last error: ${queueInfo.lastError}.`
             : `${failedChangeCount} cloud sync ${failedChangeCount === 1 ? 'change needs' : 'changes need'} a retry.`;
         const pendingChangeCount = queueInfo.pending || 1;
@@ -181,7 +198,7 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
                     size="sm"
                     className="h-auto p-0"
                     onClick={handleManualSync}
-                    disabled={isSyncing}
+                    disabled={isSyncing || Boolean(queueInfo.blockedReason)}
                 >
                     {content}
                 </Button>

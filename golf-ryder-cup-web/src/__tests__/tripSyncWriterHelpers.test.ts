@@ -10,6 +10,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 import {
   deleteEntityByKey,
+  formatSupabaseSyncError,
   loadEntityForSync,
   throwIfSupabaseError,
 } from '@/lib/services/trip-sync/tripSyncWriterHelpers';
@@ -84,7 +85,7 @@ describe('deleteEntityByKey', () => {
 
     await expect(
       deleteEntityByKey({ table: 'sessions', column: 'id', value: 's1' })
-    ).rejects.toThrow('permission denied');
+    ).rejects.toThrow('[delete sessions] permission denied');
   });
 });
 
@@ -96,5 +97,29 @@ describe('throwIfSupabaseError', () => {
     expect(() =>
       throwIfSupabaseError({ error: { message: 'row level security' } })
     ).toThrow('row level security');
+  });
+
+  it('keeps Supabase code, details, and hint for sync diagnostics', () => {
+    expect(() =>
+      throwIfSupabaseError(
+        {
+          error: {
+            message: 'insert violates row level security policy',
+            code: '42501',
+            details: 'Failing row contains trip_id=trip-1',
+            hint: 'Check trip_membership policy',
+          },
+        },
+        { table: 'matches', operation: 'upsert' }
+      )
+    ).toThrow(
+      '[upsert matches] insert violates row level security policy | code: 42501 | details: Failing row contains trip_id=trip-1 | hint: Check trip_membership policy'
+    );
+  });
+});
+
+describe('formatSupabaseSyncError', () => {
+  it('formats a plain Supabase error without context', () => {
+    expect(formatSupabaseSyncError({ message: 'network error' })).toBe('network error');
   });
 });

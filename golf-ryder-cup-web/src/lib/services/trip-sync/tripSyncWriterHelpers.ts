@@ -1,5 +1,12 @@
 import { getTable } from './tripSyncShared';
 
+type SupabaseSyncError = {
+  message: string;
+  code?: string;
+  details?: string;
+  hint?: string;
+};
+
 /**
  * Loader shared by every sync writer. If the caller passed the
  * entity payload (happens when queueSyncOperation was called with
@@ -37,7 +44,31 @@ export async function deleteEntityByKey(options: {
   const { error } = await getTable(options.table)
     .delete()
     .eq(options.column, options.value);
-  if (error) throw new Error(error.message);
+  if (error) {
+    throw new Error(
+      formatSupabaseSyncError(error, {
+        table: options.table,
+        operation: 'delete',
+      })
+    );
+  }
+}
+
+export function formatSupabaseSyncError(
+  error: SupabaseSyncError,
+  context?: { table?: string; operation?: string }
+): string {
+  const prefix =
+    context?.table || context?.operation
+      ? `[${[context.operation, context.table].filter(Boolean).join(' ')}] `
+      : '';
+  const parts = [`${prefix}${error.message}`];
+
+  if (error.code) parts.push(`code: ${error.code}`);
+  if (error.details) parts.push(`details: ${error.details}`);
+  if (error.hint) parts.push(`hint: ${error.hint}`);
+
+  return parts.join(' | ');
 }
 
 /**
@@ -48,7 +79,8 @@ export async function deleteEntityByKey(options: {
  * boilerplate.
  */
 export function throwIfSupabaseError(
-  response: { error: { message: string } | null }
+  response: { error: SupabaseSyncError | null },
+  context?: { table?: string; operation?: string }
 ): void {
-  if (response.error) throw new Error(response.error.message);
+  if (response.error) throw new Error(formatSupabaseSyncError(response.error, context));
 }

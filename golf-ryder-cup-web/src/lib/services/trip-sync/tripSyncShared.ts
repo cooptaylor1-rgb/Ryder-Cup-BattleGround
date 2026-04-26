@@ -46,6 +46,8 @@ export function getSyncBlockReason():
   return null;
 }
 
+export type SyncBlockReason = Exclude<ReturnType<typeof getSyncBlockReason>, null>;
+
 export function canSync(): boolean {
   return getSyncBlockReason() === null;
 }

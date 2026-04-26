@@ -17,6 +17,7 @@ import {
   getRetryDelay,
   logger,
   sleep,
+  type SyncBlockReason,
   tripSyncRuntime,
 } from './tripSyncShared';
 import type { BulkSyncResult, SyncStatus } from './tripSyncTypes';
@@ -135,17 +136,15 @@ async function ensureQueueHydrated(): Promise<void> {
           //
           // Also reset terminally-failed items (status='failed' with
           // retryCount >= MAX_RETRY_COUNT) to pending with a fresh
-          // budget. A page reload is the captain's implicit "try
-          // again" — if the earlier failure was a server-side bug
-          // that's since been fixed (missing trigger, tight RLS, FK
-          // violation that got cleaned up), the retry succeeds and
-          // the banner clears. If the underlying issue is genuinely
-          // persistent, the items fail again and land in the same
-          // visible-failed state on the new session.
+          // budget, but only when sync is actually ready. A page
+          // reload while offline or signed out must not hide a real
+          // failed state behind a pending badge that cannot make
+          // progress. Once auth/network is available, the auth bridge
+          // calls retryFailedQueue() and the item gets a real retry.
           let resurrected: SyncQueueItem;
           if (item.status === 'syncing') {
             resurrected = { ...item, status: 'pending' };
-          } else if (item.status === 'failed') {
+          } else if (item.status === 'failed' && canSync()) {
             resurrected = { ...item, status: 'pending', retryCount: 0, error: undefined };
           } else {
             resurrected = item;
@@ -290,7 +289,7 @@ export function queueSyncOperation<E extends SyncEntity>(
     (item) =>
       (item.idempotencyKey === idempotencyKey ||
         (item.entityId === entityId && item.entity === entity && item.tripId === tripId)) &&
-      (item.status === 'pending' || item.status === 'syncing')
+      (item.status === 'pending' || item.status === 'syncing' || item.status === 'failed')
   );
 
   if (existing) {
@@ -310,9 +309,20 @@ export function queueSyncOperation<E extends SyncEntity>(
     // tag matches the function's E; the runtime guard above
     // already enforces that (same entity + entityId + tripId), so
     // the shape is correct.
+    const resolvedIdempotencyKey = buildSyncOperationKey(
+      entity,
+      entityId,
+      resolvedOperation,
+      tripId
+    );
+
     (existing as { data?: unknown }).data = data;
     (existing as { operation: SyncOperation }).operation = resolvedOperation;
-    existing.idempotencyKey = idempotencyKey;
+    existing.idempotencyKey = resolvedIdempotencyKey;
+    existing.status = 'pending';
+    existing.retryCount = 0;
+    existing.error = undefined;
+    existing.lastAttemptAt = undefined;
 
     if (resolvedOperation === 'delete') {
       (existing as { data?: unknown }).data = undefined;
@@ -386,10 +396,12 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
             ? 'Supabase not configured'
             : 'Offline';
 
+    const failedItems = tripSyncRuntime.syncQueue.filter((item) => item.status === 'failed');
+
     return {
       success: false,
       synced: 0,
-      failed: 0,
+      failed: failedItems.length,
       queued: tripSyncRuntime.syncQueue.length,
       errors: [message],
     };
@@ -532,6 +544,13 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
 export async function retryFailedQueue(): Promise<number> {
   await ensureQueueHydrated();
 
+  if (!canSync()) {
+    logger.warn('Retry requested while sync is blocked', {
+      reason: getSyncBlockReason(),
+    });
+    return 0;
+  }
+
   let retried = 0;
   for (const item of tripSyncRuntime.syncQueue) {
     if (item.status === 'failed') {
@@ -541,6 +560,10 @@ export async function retryFailedQueue(): Promise<number> {
       await persistQueueItem(item);
       retried++;
     }
+  }
+
+  if (retried > 0) {
+    scheduleSyncQueueProcessing();
   }
 
   return retried;
@@ -618,6 +641,34 @@ export function dumpSyncFailures(): Array<{
   return failures;
 }
 
+export type FailedSyncQueueItemSummary = {
+  entity: SyncEntity;
+  entityId: string;
+  operation: SyncOperation;
+  retryCount: number;
+  error?: string;
+  lastAttemptAt?: string;
+  createdAt: string;
+};
+
+export function getFailedSyncQueueItems(limit = 5): FailedSyncQueueItemSummary[] {
+  return tripSyncRuntime.syncQueue
+    .filter((item) => item.status === 'failed')
+    .sort((a, b) =>
+      (b.lastAttemptAt ?? b.createdAt).localeCompare(a.lastAttemptAt ?? a.createdAt)
+    )
+    .slice(0, limit)
+    .map((item) => ({
+      entity: item.entity,
+      entityId: item.entityId,
+      operation: item.operation,
+      retryCount: item.retryCount,
+      error: item.error,
+      lastAttemptAt: item.lastAttemptAt,
+      createdAt: item.createdAt,
+    }));
+}
+
 export function getSyncQueueStatus(): {
   pending: number;
   failed: number;
@@ -629,6 +680,7 @@ export function getSyncQueueStatus(): {
    * staring at a retry button that can't win.
    */
   lastError?: string;
+  blockedReason?: SyncBlockReason;
 } {
   const pending = tripSyncRuntime.syncQueue.filter(
     (item) => item.status === 'pending' || item.status === 'syncing'
@@ -642,6 +694,7 @@ export function getSyncQueueStatus(): {
     failed: failedItems.length,
     total: tripSyncRuntime.syncQueue.length,
     lastError,
+    blockedReason: getSyncBlockReason() ?? undefined,
   };
 }
 

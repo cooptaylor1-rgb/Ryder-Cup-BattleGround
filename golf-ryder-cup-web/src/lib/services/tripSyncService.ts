@@ -26,6 +26,7 @@ export {
   clearFailedQueue,
   clearQueue,
   dumpSyncFailures,
+  getFailedSyncQueueItems,
   getPendingSyncIdsForTrip,
   getSyncQueueStatus,
   getTripSyncStatus,

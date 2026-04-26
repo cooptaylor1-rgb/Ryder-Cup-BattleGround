@@ -57,6 +57,7 @@ vi.mock('../lib/db', () => ({
     tripSyncQueue: {
       put: vi.fn(),
       delete: vi.fn(),
+      clear: vi.fn(),
       toArray: vi.fn(() => Promise.resolve([])),
     },
   },
@@ -64,6 +65,7 @@ vi.mock('../lib/db', () => ({
 
 import {
   queueSyncOperation,
+  retryFailedQueue,
   getTripSyncStatus,
   getSyncQueueStatus,
   type SyncOperation,
@@ -72,10 +74,19 @@ import {
   buildSyncOperationKey,
   resolveSyncOperationTransition,
 } from '../lib/services/tripSyncService';
+import { setOnlineStatus, tripSyncRuntime } from '../lib/services/trip-sync/tripSyncShared';
+import type { Match } from '../lib/types/models';
 
 describe('Trip Sync Service', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    tripSyncRuntime.syncQueue.length = 0;
+    tripSyncRuntime.queueHydrated = true;
+    tripSyncRuntime.queueHydrationPromise = null;
+    tripSyncRuntime.syncInProgress = false;
+    tripSyncRuntime.authSessionResolved = true;
+    tripSyncRuntime.hasAuthSession = true;
+    setOnlineStatus(true);
   });
 
   afterEach(() => {
@@ -104,6 +115,79 @@ describe('Trip Sync Service', () => {
 
       const status = getSyncQueueStatus();
       expect(typeof status.failed).toBe('number');
+    });
+
+    it('merges a new local change into an existing failed operation for the same entity', () => {
+      tripSyncRuntime.syncQueue.push({
+        id: 'failed-op',
+        entity: 'match',
+        entityId: 'match-1',
+        operation: 'delete',
+        tripId: 'trip-1',
+        status: 'failed',
+        retryCount: 5,
+        error: 'old failure',
+        createdAt: '2026-04-26T10:00:00.000Z',
+        lastAttemptAt: '2026-04-26T10:05:00.000Z',
+        idempotencyKey: buildSyncOperationKey('match', 'match-1', 'delete', 'trip-1'),
+      });
+
+      queueSyncOperation('match', 'match-1', 'create', 'trip-1', {
+        id: 'match-1',
+        sessionId: 'session-1',
+        matchOrder: 1,
+        teamAPlayerIds: [],
+        teamBPlayerIds: [],
+        teamAHandicapAllowance: 0,
+        teamBHandicapAllowance: 0,
+        result: 'notFinished',
+        margin: 0,
+        holesRemaining: 18,
+        status: 'scheduled',
+        currentHole: 1,
+        createdAt: '2026-04-26T10:06:00.000Z',
+        updatedAt: '2026-04-26T10:06:00.000Z',
+      } satisfies Match);
+
+      expect(tripSyncRuntime.syncQueue).toHaveLength(1);
+      expect(tripSyncRuntime.syncQueue[0]).toMatchObject({
+        id: 'failed-op',
+        operation: 'update',
+        status: 'pending',
+        retryCount: 0,
+        error: undefined,
+        lastAttemptAt: undefined,
+        idempotencyKey: buildSyncOperationKey('match', 'match-1', 'update', 'trip-1'),
+      });
+    });
+  });
+
+  describe('retryFailedQueue', () => {
+    it('does not hide failed items when sync is blocked', async () => {
+      tripSyncRuntime.syncQueue.push({
+        id: 'failed-op',
+        entity: 'team',
+        entityId: 'team-1',
+        operation: 'update',
+        tripId: 'trip-1',
+        status: 'failed',
+        retryCount: 5,
+        error: 'row level security',
+        createdAt: '2026-04-26T10:00:00.000Z',
+      });
+
+      const retried = await retryFailedQueue();
+
+      expect(retried).toBe(0);
+      expect(tripSyncRuntime.syncQueue[0]).toMatchObject({
+        status: 'failed',
+        retryCount: 5,
+        error: 'row level security',
+      });
+      expect(getSyncQueueStatus()).toMatchObject({
+        failed: 1,
+        blockedReason: 'supabase-unconfigured',
+      });
     });
   });
 

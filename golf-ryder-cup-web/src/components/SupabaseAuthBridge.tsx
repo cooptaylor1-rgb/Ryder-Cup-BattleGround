@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase/client';
 import {
   getSyncQueueStatus,
   processSyncQueue,
+  retryFailedQueue,
   setTripSyncAuthSession,
 } from '@/lib/services/tripSyncService';
 import { useAuthStore } from '@/lib/stores';
@@ -37,7 +38,12 @@ function syncAuthDependentServices(session: Session | null): void {
   const queue = getSyncQueueStatus();
   if (queue.pending === 0 && queue.failed === 0) return;
 
-  void processSyncQueue().catch((error) => {
+  void (async () => {
+    if (queue.failed > 0) {
+      await retryFailedQueue();
+    }
+    await processSyncQueue();
+  })().catch((error) => {
     authLogger.warn('Failed to process sync queue after Supabase auth resolved:', error);
   });
 }
