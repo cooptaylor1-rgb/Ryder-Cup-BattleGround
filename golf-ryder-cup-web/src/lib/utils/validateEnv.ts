@@ -35,6 +35,18 @@ interface ValidationResult {
     warnings: string[];
 }
 
+function isLegacyJwtKey(value: string): boolean {
+    const parts = value.split('.');
+    return parts.length === 3 && parts.every((part) => part.length > 0);
+}
+
+function isSupabasePublicKey(value: string): boolean {
+    return (
+        isLegacyJwtKey(value) ||
+        /^sb_publishable_[A-Za-z0-9_-]+_[A-Za-z0-9_-]+$/.test(value)
+    );
+}
+
 // ============================================
 // ENVIRONMENT VARIABLE DEFINITIONS
 // ============================================
@@ -52,8 +64,9 @@ const ENV_CONFIGS: EnvConfig[] = [
         name: 'NEXT_PUBLIC_SUPABASE_ANON_KEY',
         required: false,
         description: 'Supabase anonymous key for client-side access',
-        validate: (v) => v.length > 100, // Supabase keys are long JWTs
-        validationError: 'Must be a valid Supabase anon key (JWT)',
+        validate: isSupabasePublicKey,
+        validationError:
+            'Must be a valid Supabase public key (legacy JWT anon key or sb_publishable_...)',
     },
 
     // Sentry (optional for error monitoring)
