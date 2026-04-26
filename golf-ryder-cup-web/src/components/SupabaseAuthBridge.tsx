@@ -4,6 +4,11 @@ import { useEffect } from 'react';
 import * as Sentry from '@sentry/nextjs';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/client';
+import {
+  getSyncQueueStatus,
+  processSyncQueue,
+  setTripSyncAuthSession,
+} from '@/lib/services/tripSyncService';
 import { useAuthStore } from '@/lib/stores';
 import { authLogger } from '@/lib/utils/logger';
 
@@ -25,12 +30,25 @@ function pushSentryUser(session: Session | null): void {
   });
 }
 
+function syncAuthDependentServices(session: Session | null): void {
+  setTripSyncAuthSession(session);
+  if (!session) return;
+
+  const queue = getSyncQueueStatus();
+  if (queue.pending === 0 && queue.failed === 0) return;
+
+  void processSyncQueue().catch((error) => {
+    authLogger.warn('Failed to process sync queue after Supabase auth resolved:', error);
+  });
+}
+
 export function SupabaseAuthBridge() {
   const syncSupabaseSession = useAuthStore((state) => state.syncSupabaseSession);
 
   useEffect(() => {
     if (!supabase) {
       syncSupabaseSession(null);
+      syncAuthDependentServices(null);
       pushSentryUser(null);
       return;
     }
@@ -49,6 +67,7 @@ export function SupabaseAuthBridge() {
         }
 
         syncSupabaseSession(data.session ?? null);
+        syncAuthDependentServices(data.session ?? null);
         pushSentryUser(data.session ?? null);
       })
       .catch((error) => {
@@ -58,6 +77,7 @@ export function SupabaseAuthBridge() {
 
         authLogger.warn('Unexpected Supabase auth bridge failure:', error);
         syncSupabaseSession(null);
+        syncAuthDependentServices(null);
         pushSentryUser(null);
       });
 
@@ -65,6 +85,7 @@ export function SupabaseAuthBridge() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       syncSupabaseSession(session);
+      syncAuthDependentServices(session);
       pushSentryUser(session);
     });
 

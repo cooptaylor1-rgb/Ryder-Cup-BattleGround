@@ -11,7 +11,11 @@ import {
   processSyncQueue,
   scheduleSyncQueueProcessing,
 } from './trip-sync/tripSyncQueue';
-import { canSync, logger, setOnlineStatus } from './trip-sync/tripSyncShared';
+import {
+  canSync,
+  logger,
+  setOnlineStatus,
+} from './trip-sync/tripSyncShared';
 import { registerSyncHandler } from './syncOrchestrator';
 
 export type { SyncEntity, SyncOperation, SyncQueueItem } from '../types/sync';
@@ -31,6 +35,7 @@ export {
   resolveSyncOperationTransition,
   retryFailedQueue,
 } from './trip-sync/tripSyncQueue';
+export { setSyncAuthSession as setTripSyncAuthSession } from './trip-sync/tripSyncShared';
 export {
   ensureTripShareCode,
   getTripShareCode,

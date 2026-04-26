@@ -98,7 +98,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
   const cloudUnreachable = !isSupabaseConfigured;
   const message = cloudUnreachable
     ? 'Cloud sync isn’t set up — scores are saved on this device only. Ask the admin to configure Supabase to share live updates.'
-    : `${failedCount} score${failedCount === 1 ? '' : 's'} didn’t reach the cloud. Saved locally — retry to push.`;
+    : `${failedCount} change${failedCount === 1 ? '' : 's'} didn’t reach the cloud. Saved locally — retry to push.`;
 
   return (
     <div

@@ -20,6 +20,8 @@ import { Cloud, CloudOff, RefreshCw, AlertCircle, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Tooltip } from '@/components/ui/Tooltip';
 
+type QueueInfo = ReturnType<typeof getSyncQueueStatus>;
+
 interface SyncStatusBadgeProps {
     /** Show full status text (not just icon) */
     showText?: boolean;
@@ -30,7 +32,7 @@ interface SyncStatusBadgeProps {
 export function SyncStatusBadge({ showText = false, className = '' }: SyncStatusBadgeProps) {
     const currentTrip = useTripStore((state) => state.currentTrip);
     const [status, setStatus] = useState<SyncStatus>('unknown');
-    const [queueInfo, setQueueInfo] = useState({ pending: 0, failed: 0 });
+    const [queueInfo, setQueueInfo] = useState<QueueInfo>({ pending: 0, failed: 0, total: 0 });
     const [isSyncing, setIsSyncing] = useState(false);
 
     useEffect(() => {
@@ -160,11 +162,15 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
     );
 
     if (status === 'failed' || status === 'pending') {
+        const failedTooltip = queueInfo.lastError
+            ? `${queueInfo.failed} sync operations failed. Last error: ${queueInfo.lastError}. Click to retry.`
+            : `${queueInfo.failed} sync operations failed. Click to retry.`;
+
         return (
             <Tooltip
                 content={
                     status === 'failed'
-                        ? `${queueInfo.failed} sync operations failed. Click to retry.`
+                        ? failedTooltip
                         : `${queueInfo.pending} changes pending sync. Click to sync now.`
                 }
             >

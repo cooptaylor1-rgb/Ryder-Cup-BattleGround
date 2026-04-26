@@ -13,6 +13,7 @@ import {
   MAX_RETRY_COUNT,
   SYNC_DEBOUNCE_MS,
   canSync,
+  getSyncBlockReason,
   getRetryDelay,
   logger,
   sleep,
@@ -375,12 +376,22 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
   await ensureQueueHydrated();
 
   if (!canSync()) {
+    const reason = getSyncBlockReason();
+    const message =
+      reason === 'auth-pending'
+        ? 'Waiting for Supabase sign-in state before syncing'
+        : reason === 'auth-required'
+          ? 'Sign in to sync queued changes to the cloud'
+          : reason === 'supabase-unconfigured'
+            ? 'Supabase not configured'
+            : 'Offline';
+
     return {
       success: false,
       synced: 0,
       failed: 0,
       queued: tripSyncRuntime.syncQueue.length,
-      errors: ['Offline'],
+      errors: [message],
     };
   }
 

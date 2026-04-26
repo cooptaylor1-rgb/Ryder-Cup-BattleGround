@@ -1,4 +1,5 @@
 import { createLogger } from '@/lib/utils/logger';
+import type { Session } from '@supabase/supabase-js';
 
 import { calcRetryDelay, syncSleep } from '../baseSyncService';
 import { supabase, isSupabaseConfigured } from '../../supabase/client';
@@ -19,14 +20,34 @@ export const tripSyncRuntime = {
   syncQueue: [] as SyncQueueItem[],
   queueHydrated: false,
   queueHydrationPromise: null as Promise<void> | null,
+  authSessionResolved: !isSupabaseConfigured,
+  hasAuthSession: !isSupabaseConfigured,
 };
 
 export function setOnlineStatus(isOnline: boolean): void {
   tripSyncRuntime.isOnline = isOnline;
 }
 
+export function setSyncAuthSession(session: Session | null): void {
+  tripSyncRuntime.authSessionResolved = true;
+  tripSyncRuntime.hasAuthSession = Boolean(session);
+}
+
+export function getSyncBlockReason():
+  | 'offline'
+  | 'supabase-unconfigured'
+  | 'auth-pending'
+  | 'auth-required'
+  | null {
+  if (!tripSyncRuntime.isOnline) return 'offline';
+  if (!isSupabaseConfigured || !supabase) return 'supabase-unconfigured';
+  if (!tripSyncRuntime.authSessionResolved) return 'auth-pending';
+  if (!tripSyncRuntime.hasAuthSession) return 'auth-required';
+  return null;
+}
+
 export function canSync(): boolean {
-  return tripSyncRuntime.isOnline && isSupabaseConfigured && !!supabase;
+  return getSyncBlockReason() === null;
 }
 
 /**
