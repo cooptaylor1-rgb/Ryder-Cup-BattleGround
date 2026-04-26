@@ -16,6 +16,7 @@ export const logger = createLogger('TripSync');
 export const tripSyncRuntime = {
   isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
   syncInProgress: false,
+  syncDrainRequested: false,
   syncDebounceTimer: null as ReturnType<typeof setTimeout> | null,
   syncQueue: [] as SyncQueueItem[],
   queueHydrated: false,

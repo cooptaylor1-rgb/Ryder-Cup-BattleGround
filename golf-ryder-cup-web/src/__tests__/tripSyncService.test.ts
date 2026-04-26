@@ -84,6 +84,7 @@ describe('Trip Sync Service', () => {
     tripSyncRuntime.queueHydrated = true;
     tripSyncRuntime.queueHydrationPromise = null;
     tripSyncRuntime.syncInProgress = false;
+    tripSyncRuntime.syncDrainRequested = false;
     tripSyncRuntime.authSessionResolved = true;
     tripSyncRuntime.hasAuthSession = true;
     setOnlineStatus(true);
@@ -211,8 +212,6 @@ describe('Trip Sync Service', () => {
       expect(typeof status.total).toBe('number');
     });
   });
-
-
 
   describe('buildSyncOperationKey', () => {
     it('generates deterministic key for identical operations', () => {

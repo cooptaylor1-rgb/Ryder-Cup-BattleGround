@@ -58,4 +58,22 @@ describe('SyncStatusBadge', () => {
       expect(processSyncQueueMock).toHaveBeenCalledTimes(1);
     });
   });
+
+  it('labels blocked pending work as saved locally instead of prompting a retry', async () => {
+    getTripSyncStatusMock.mockReturnValue('pending');
+    getSyncQueueStatusMock.mockReturnValue({
+      pending: 3,
+      failed: 0,
+      total: 3,
+      blockedReason: 'auth-required',
+    });
+
+    render(<SyncStatusBadge />);
+
+    expect(await screen.findByLabelText('Sync status: Saved locally (3)')).toBeInTheDocument();
+    expect(screen.getByRole('button')).toBeDisabled();
+    fireEvent.click(screen.getByRole('button'));
+    expect(retryFailedQueueMock).not.toHaveBeenCalled();
+    expect(processSyncQueueMock).not.toHaveBeenCalled();
+  });
 });

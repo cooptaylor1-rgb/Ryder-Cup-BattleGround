@@ -114,6 +114,10 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
   };
 
   const getStatusConfig = () => {
+    const blockedTooltip = queueInfo.blockedReason
+      ? BLOCKED_TOOLTIPS[queueInfo.blockedReason]
+      : undefined;
+
     switch (status) {
       case 'synced':
         return {
@@ -124,6 +128,14 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
         };
       case 'pending':
       case 'syncing':
+        if (blockedTooltip) {
+          return {
+            icon: <CloudOff className="h-4 w-4" />,
+            text: `Saved locally${queueInfo.pending > 0 ? ` (${queueInfo.pending})` : ''}`,
+            tone: 'text-[var(--ink-secondary)]',
+            bg: 'bg-[color:var(--ink-tertiary)]/10',
+          };
+        }
         return {
           icon: <RefreshCw className={`h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />,
           text: `Saving${queueInfo.pending > 0 ? ` (${queueInfo.pending})` : ''}`,
@@ -202,15 +214,12 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
         ? `${effectiveFailedCount} cloud sync ${effectiveFailedCount === 1 ? 'change needs' : 'changes need'} a retry. Last error: ${queueInfo.lastError}.`
         : `${effectiveFailedCount} cloud sync ${effectiveFailedCount === 1 ? 'change needs' : 'changes need'} a retry.`;
     const effectivePendingCount = pendingChangeCount || 1;
+    const pendingTooltip = blockedTooltip
+      ? `${effectivePendingCount} ${effectivePendingCount === 1 ? 'change is' : 'changes are'} saved on this device. ${blockedTooltip}`
+      : `${effectivePendingCount} ${effectivePendingCount === 1 ? 'change is' : 'changes are'} waiting to sync. Click to save now.`;
 
     return (
-      <Tooltip
-        content={
-          status === 'failed'
-            ? failedTooltip
-            : `${effectivePendingCount} ${effectivePendingCount === 1 ? 'change is' : 'changes are'} waiting to sync. Click to save now.`
-        }
-      >
+      <Tooltip content={status === 'failed' ? failedTooltip : pendingTooltip}>
         <Button
           variant="ghost"
           size="sm"

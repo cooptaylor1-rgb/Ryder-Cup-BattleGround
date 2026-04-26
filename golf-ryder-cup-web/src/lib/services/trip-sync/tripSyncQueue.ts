@@ -1,4 +1,3 @@
-
 import * as Sentry from '@sentry/nextjs';
 
 import { db } from '../../db';
@@ -84,7 +83,12 @@ async function restoreOrphanedQueueEntities(): Promise<void> {
     if (!tableKey) continue;
 
     try {
-      const table = (db as unknown as Record<string, { get: (id: string) => Promise<unknown>; put: (row: unknown) => Promise<unknown> }>)[tableKey];
+      const table = (
+        db as unknown as Record<
+          string,
+          { get: (id: string) => Promise<unknown>; put: (row: unknown) => Promise<unknown> }
+        >
+      )[tableKey];
       if (!table) continue;
       const existing = await table.get(item.entityId);
       if (existing) continue;
@@ -110,6 +114,27 @@ async function removeQueueItem(id: string): Promise<void> {
   } catch (error) {
     logger.warn('Failed to remove sync queue item:', error);
   }
+}
+
+function getQueueResultSnapshot(errors: string[] = []): BulkSyncResult {
+  const failedItems = tripSyncRuntime.syncQueue.filter((item) => item.status === 'failed');
+  const queued = tripSyncRuntime.syncQueue.filter((item) => item.status !== 'completed').length;
+  return {
+    success: errors.length === 0 && failedItems.length === 0,
+    synced: 0,
+    failed: failedItems.length,
+    queued,
+    errors,
+  };
+}
+
+function hasRetryableQueueWork(): boolean {
+  return tripSyncRuntime.syncQueue.some(
+    (item) =>
+      item.status === 'pending' ||
+      item.status === 'syncing' ||
+      (item.status === 'failed' && item.retryCount < MAX_RETRY_COUNT)
+  );
 }
 
 async function ensureQueueHydrated(): Promise<void> {
@@ -267,7 +292,10 @@ export function resolveSyncOperationTransition(
     return 'delete';
   }
 
-  if (existingOperation === 'delete' && (incomingOperation === 'create' || incomingOperation === 'update')) {
+  if (
+    existingOperation === 'delete' &&
+    (incomingOperation === 'create' || incomingOperation === 'update')
+  ) {
     return 'update';
   }
 
@@ -329,6 +357,9 @@ export function queueSyncOperation<E extends SyncEntity>(
     }
 
     void persistQueueItem(existing);
+    if (canSync()) {
+      scheduleSyncQueueProcessing();
+    }
     return;
   }
 
@@ -396,28 +427,16 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
             ? 'Supabase not configured'
             : 'Offline';
 
-    const failedItems = tripSyncRuntime.syncQueue.filter((item) => item.status === 'failed');
-
-    return {
-      success: false,
-      synced: 0,
-      failed: failedItems.length,
-      queued: tripSyncRuntime.syncQueue.length,
-      errors: [message],
-    };
+    return getQueueResultSnapshot([message]);
   }
 
   if (tripSyncRuntime.syncInProgress) {
-    return {
-      success: true,
-      synced: 0,
-      failed: 0,
-      queued: tripSyncRuntime.syncQueue.length,
-      errors: [],
-    };
+    tripSyncRuntime.syncDrainRequested = true;
+    return getQueueResultSnapshot();
   }
 
   tripSyncRuntime.syncInProgress = true;
+  tripSyncRuntime.syncDrainRequested = false;
   let synced = 0;
   let failed = 0;
   const errors: string[] = [];
@@ -534,10 +553,18 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
       }
     }
 
-    const remaining = tripSyncRuntime.syncQueue.filter((item) => item.status !== 'completed').length;
+    const remaining = tripSyncRuntime.syncQueue.filter(
+      (item) => item.status !== 'completed'
+    ).length;
     return { success: errors.length === 0, synced, failed, queued: remaining, errors };
   } finally {
+    const shouldDrainAgain = tripSyncRuntime.syncDrainRequested || hasRetryableQueueWork();
     tripSyncRuntime.syncInProgress = false;
+    tripSyncRuntime.syncDrainRequested = false;
+
+    if (shouldDrainAgain && canSync() && hasRetryableQueueWork()) {
+      scheduleSyncQueueProcessing();
+    }
   }
 }
 
@@ -654,9 +681,7 @@ export type FailedSyncQueueItemSummary = {
 export function getFailedSyncQueueItems(limit = 5): FailedSyncQueueItemSummary[] {
   return tripSyncRuntime.syncQueue
     .filter((item) => item.status === 'failed')
-    .sort((a, b) =>
-      (b.lastAttemptAt ?? b.createdAt).localeCompare(a.lastAttemptAt ?? a.createdAt)
-    )
+    .sort((a, b) => (b.lastAttemptAt ?? b.createdAt).localeCompare(a.lastAttemptAt ?? a.createdAt))
     .slice(0, limit)
     .map((item) => ({
       entity: item.entity,
@@ -717,19 +742,12 @@ export function getSyncQueueStatus(): {
  * sync pipeline either succeeds on a later retry or the user
  * explicitly discards it via clearFailedQueue.
  */
-export function getPendingSyncIdsForTrip(
-  tripId: string,
-  entity: SyncEntity
-): Set<string> {
+export function getPendingSyncIdsForTrip(tripId: string, entity: SyncEntity): Set<string> {
   const ids = new Set<string>();
   for (const item of tripSyncRuntime.syncQueue) {
     if (item.tripId !== tripId) continue;
     if (item.entity !== entity) continue;
-    if (
-      item.status !== 'pending' &&
-      item.status !== 'syncing' &&
-      item.status !== 'failed'
-    ) {
+    if (item.status !== 'pending' && item.status !== 'syncing' && item.status !== 'failed') {
       continue;
     }
     ids.add(item.entityId);

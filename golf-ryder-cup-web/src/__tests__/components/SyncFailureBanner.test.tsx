@@ -44,6 +44,20 @@ describe('SyncFailureBanner', () => {
     expect(screen.getByRole('button', { name: 'Retry sync' })).toBeDisabled();
   });
 
+  it('stays hidden while offline so the offline banner owns that state', () => {
+    getSyncQueueStatusMock.mockReturnValue({
+      pending: 0,
+      failed: 2,
+      total: 2,
+      lastError: 'offline',
+      blockedReason: 'offline',
+    });
+
+    render(<SyncFailureBanner />);
+
+    expect(screen.queryByText('Cloud sync needs attention')).not.toBeInTheDocument();
+  });
+
   it('shows failed item details and retries when sync is ready', async () => {
     getSyncQueueStatusMock
       .mockReturnValueOnce({
@@ -76,6 +90,7 @@ describe('SyncFailureBanner', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Details' }));
     expect(screen.getByText('Cloud sync needs attention')).toBeInTheDocument();
     expect(screen.getByText('Match update')).toBeInTheDocument();
+    expect(screen.getByText('Cloud permissions blocked this change.')).toBeInTheDocument();
     expect(screen.getByText(/\[upsert matches\] row level security/)).toBeInTheDocument();
     expect(screen.getByText('5 tries')).toBeInTheDocument();
 

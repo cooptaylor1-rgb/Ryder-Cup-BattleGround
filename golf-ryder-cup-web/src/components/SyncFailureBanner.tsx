@@ -65,6 +65,26 @@ const BLOCKED_MESSAGES: Record<SyncBlockedReason, string> = {
   'auth-required': 'Sign in to retry cloud sync.',
 };
 
+function summarizeSyncError(error?: string): string {
+  if (!error) return 'Sync failed';
+  if (/row level security|42501|permission/i.test(error)) {
+    return 'Cloud permissions blocked this change.';
+  }
+  if (/foreign key|23503|violates.*constraint/i.test(error)) {
+    return 'A related trip item needs to save first.';
+  }
+  if (/duplicate key|23505|unique/i.test(error)) {
+    return 'Cloud already has this change.';
+  }
+  if (/network|fetch|timeout|offline/i.test(error)) {
+    return 'Connection dropped while saving.';
+  }
+  if (/not found locally/i.test(error)) {
+    return 'This saved change is no longer on this device.';
+  }
+  return error;
+}
+
 function describeFailedItem(item: FailedSyncItem): string {
   const entity = ENTITY_LABELS[item.entity] ?? item.entity;
   const operation = OPERATION_LABELS[item.operation] ?? item.operation;
@@ -146,6 +166,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
   };
 
   if (failedCount <= 0) return null;
+  if (blockedReason === 'offline') return null;
 
   const blockedMessage = blockedReason ? BLOCKED_MESSAGES[blockedReason] : undefined;
   const canRetry = !blockedReason;
@@ -203,6 +224,8 @@ export function SyncFailureBanner({ className }: { className?: string }) {
             {failedItems.length > 0 ? (
               failedItems.map((item) => {
                 const attemptTime = formatAttemptTime(item.lastAttemptAt ?? item.createdAt);
+                const friendlyError = summarizeSyncError(item.error);
+                const showRawError = Boolean(item.error && friendlyError !== item.error);
                 return (
                   <div
                     key={`${item.entity}:${item.entityId}:${item.operation}`}
@@ -210,9 +233,12 @@ export function SyncFailureBanner({ className }: { className?: string }) {
                   >
                     <div className="min-w-0">
                       <p className="font-semibold text-[var(--ink)]">{describeFailedItem(item)}</p>
-                      <p className="break-words text-[var(--ink-secondary)]">
-                        {item.error ?? 'Sync failed'}
-                      </p>
+                      <p className="break-words text-[var(--ink-secondary)]">{friendlyError}</p>
+                      {showRawError && (
+                        <p className="mt-0.5 break-words text-[var(--ink-tertiary)]">
+                          Detail: {item.error}
+                        </p>
+                      )}
                     </div>
                     <div className="flex shrink-0 items-center gap-2 text-[11px] font-medium text-[var(--ink-tertiary)]">
                       {item.retryCount > 0 && <span>{item.retryCount} tries</span>}
@@ -227,7 +253,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
                 );
               })
             ) : (
-              <p className="break-words">Last error: {lastError}</p>
+              <p className="break-words">Last error: {summarizeSyncError(lastError)}</p>
             )}
           </div>
         )}
