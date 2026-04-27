@@ -53,7 +53,11 @@ const SUPPORTED_OTP_TYPES = new Set<EmailOtpType>([
 ]);
 
 const FALLBACK_PUBLIC_APP_ORIGIN = 'https://ryder-cup-battleground.app';
-const PLACEHOLDER_APP_HOSTS = new Set(['your-app-domain.com']);
+// `your-app-domain.com` is the literal placeholder shipped in .env.example.
+// If we see it in NEXT_PUBLIC_APP_URL we know the deploy forgot to set the
+// real value, so we fall back to the canonical origin instead of emailing
+// users links that point at a domain that doesn't exist.
+const PLACEHOLDER_APP_HOSTS = new Set(['your-app-domain.com', 'your-production-domain.com']);
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0']);
 
 function parseHttpOrigin(rawOrigin?: string | null): string | null {

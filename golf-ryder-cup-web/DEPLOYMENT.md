@@ -42,7 +42,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
 SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
 
 # Required - Application
-NEXT_PUBLIC_APP_URL=https://your-production-domain.com
+# Production: https://ryder-cup-battleground.app
+NEXT_PUBLIC_APP_URL=https://ryder-cup-battleground.app
 
 # Push Notifications
 NEXT_PUBLIC_VAPID_PUBLIC_KEY=<your-vapid-public-key>
@@ -68,11 +69,15 @@ RATE_LIMIT_REDIS_REST_TOKEN=<your-redis-rest-token>
 ```
 
 `NEXT_PUBLIC_APP_URL` is also the canonical return URL for Supabase magic-link
-and password-reset emails. In Supabase Auth settings, set Site URL to the same
-production domain and add these redirect URLs for each environment:
+and password-reset emails. In Supabase Auth settings (Dashboard →
+Authentication → URL Configuration), set:
 
-- `https://your-production-domain.com/auth/callback`
-- `https://your-production-domain.com/auth/reset-password`
+**Site URL:** `https://ryder-cup-battleground.app`
+
+**Redirect URLs (allow-list):**
+
+- `https://ryder-cup-battleground.app/auth/callback`
+- `https://ryder-cup-battleground.app/auth/reset-password`
 - `https://your-staging-domain.com/auth/callback`
 - `https://your-staging-domain.com/auth/reset-password`
 - `http://localhost:3000/auth/callback` for local development only
@@ -80,7 +85,10 @@ production domain and add these redirect URLs for each environment:
 
 If the Site URL or redirect allow-list points at localhost in production,
 password-reset emails can verify successfully and then dump the user at
-`localhost`, where no deployed app is listening.
+`localhost`, where no deployed app is listening. If a path isn't in the
+allow-list, Supabase silently strips the redirect and the user lands on
+a page with no auth tokens — `/auth/reset-password` will then show the
+"This link didn't carry a token" diagnostic instead of failing silently.
 
 ## Deployment Steps
 
