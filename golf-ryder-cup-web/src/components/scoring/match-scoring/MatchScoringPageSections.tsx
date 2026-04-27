@@ -1,5 +1,18 @@
-import { lazy, Suspense, type ReactNode } from 'react';
+/**
+ * MatchScoringPageSections — v2 cockpit composition.
+ *
+ * Phase 1 redesign: this file is now a thin shell that wires the new
+ * cockpit (header + cockpit body + drawer) to the existing model and
+ * action hooks. Empty / loading / error states are unchanged.
+ *
+ * What used to render here as a single 14-section dashboard now renders
+ * as three coherent zones:
+ *   - CockpitHeader (sticky, slim)
+ *   - MatchCockpit (hole hero + score input + hole pager)
+ *   - ScoringDrawer (Match | Standings | Bets — collapsible)
+ */
 
+import { lazy, Suspense, useState, type ReactNode } from 'react';
 import { AnimatePresence } from 'framer-motion';
 
 import type { MatchState } from '@/lib/types/computed';
@@ -9,15 +22,19 @@ import type { ScoringPreferences } from '@/lib/types/scoringPreferences';
 import { StickyUndoBanner, WeatherAlerts } from '@/components/live-play';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 
-import { MatchScoringActiveState } from './MatchScoringActiveState';
 import { MatchScoringCompleteState } from './MatchScoringCompleteState';
-import { MatchScoringHeroSection } from './MatchScoringHeroSection';
 import { MatchScoringSupportLayer } from './MatchScoringSupportLayer';
 import { countHalvedHoles } from './matchScoringReport';
 import type { MatchScoringPageModel } from './matchScoringPageModel';
 import type { ScoringMode } from './matchScoringShared';
 import type { MatchScoringPageActions } from './useMatchScoringPageActions';
 import type { MatchScoringPageUiState } from './useMatchScoringPageUiState';
+import {
+  CockpitHeader,
+  CockpitOverflowSheet,
+  MatchCockpit,
+  ScoringDrawer,
+} from './v2';
 
 const ScoreCelebration = lazy(() =>
   import('@/components/scoring').then((mod) => ({ default: mod.ScoreCelebration }))
@@ -98,12 +115,6 @@ export function MatchScoringUnavailableState({ onBackToScore }: { onBackToScore:
   );
 }
 
-/**
- * Shown in place of match-play scoring when the captain opens a
- * practice-round group. Head-to-head scoring doesn't apply (there's no
- * opposing team), but side bets attached to the group still score
- * hole-by-hole via the bet detail page, so we route the captain there.
- */
 export function PracticeMatchEmptyState({
   matchId,
   onBackToScore,
@@ -115,9 +126,6 @@ export function PracticeMatchEmptyState({
   onOpenBets: () => void;
   onNewBet?: () => void;
 }) {
-  // The primary CTA puts a new bet on *this group* directly; the
-  // "Open bets" secondary action takes the captain to the trip-wide
-  // bet board so they can see what already exists on the group first.
   const primary = onNewBet
     ? { label: 'New bet on this group', onClick: onNewBet }
     : { label: 'Open bets', onClick: onOpenBets };
@@ -156,10 +164,10 @@ interface MatchScoringPageSectionsProps {
   actions: MatchScoringPageActions;
   presses: Press[];
   isSaving: boolean;
+  isOnline: boolean;
   undoCount: number;
   isCaptainMode: boolean;
   prefersReducedMotion: boolean;
-  quickScoreMode: ScoringPreferences['quickScoreMode'];
   preferredHand: ScoringPreferences['preferredHand'];
   confirmDialog: ReactNode;
   onBackToScore: () => void;
@@ -175,6 +183,7 @@ interface MatchScoringPageSectionsProps {
   onScoreNextMatch: (matchId: string) => void;
   onBackToMatches: () => void;
   onEditScores: () => void;
+  onSelectMatch: (matchId: string) => void;
 }
 
 export function MatchScoringPageSections({
@@ -189,10 +198,10 @@ export function MatchScoringPageSections({
   actions,
   presses,
   isSaving,
+  isOnline,
   undoCount,
   isCaptainMode,
   prefersReducedMotion,
-  quickScoreMode,
   preferredHand,
   confirmDialog,
   onBackToScore,
@@ -208,9 +217,38 @@ export function MatchScoringPageSections({
   onScoreNextMatch,
   onBackToMatches,
   onEditScores,
+  onSelectMatch,
 }: MatchScoringPageSectionsProps) {
+  const [overflowOpen, setOverflowOpen] = useState(false);
+
+  // Derive a single live status line for the header. This is the only
+  // place the match score should appear above the cockpit body — v1
+  // rendered it three times.
+  const matchScoreLabel =
+    matchState.currentScore === 0
+      ? 'All square'
+      : matchState.currentScore > 0
+        ? `${model.teamAName} ${matchState.currentScore}UP`
+        : `${model.teamBName} ${Math.abs(matchState.currentScore)}UP`;
+  const matchProgressLabel =
+    matchState.holesPlayed === 0
+      ? 'Opening tee'
+      : matchState.holesRemaining === 0 || model.isMatchComplete
+        ? `${matchState.holesPlayed}/18`
+        : `Thru ${matchState.holesPlayed}`;
+
+  const saveState: 'idle' | 'saving' | 'saved' | 'offline' = ui.savingIndicator
+    ? ui.savingIndicator === 'Saving score...'
+      ? 'saving'
+      : ui.savingIndicator === 'Saved on this device'
+        ? 'offline'
+        : 'saved'
+    : isOnline
+      ? 'idle'
+      : 'offline';
+
   return (
-    <div className="min-h-screen page-premium-enter texture-grain bg-canvas font-sans">
+    <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)] font-sans">
       <AnimatePresence>
         {ui.celebration && (
           <Suspense
@@ -254,18 +292,21 @@ export function MatchScoringPageSections({
         )}
       </AnimatePresence>
 
+      {/* Undo banner sits above the drawer peek strip. */}
       <StickyUndoBanner
         action={ui.undoAction}
         duration={8000}
-        bottomOffset={104}
+        bottomOffset={72}
         onDismiss={() => ui.setUndoAction(null)}
       />
 
-      <MatchScoringSupportLayer
+      {/* Voice modal + stroke alerts. We deliberately strip the floating
+          camera FAB and floating Voice FAB here — voice is now an action
+          in the overflow sheet, photos move to the trip moments tab. */}
+      <MatchScoringSupportLayerSlim
         isMatchComplete={model.isMatchComplete}
         showVoiceModal={ui.showVoiceModal}
         currentHole={currentHole}
-        matchId={matchId}
         teamAName={model.teamAName}
         teamBName={model.teamBName}
         teamAHandicapAllowance={model.matchHandicapContext.teamAHandicapAllowance}
@@ -273,58 +314,47 @@ export function MatchScoringPageSections({
         holeHandicaps={model.holeHandicaps}
         showTeamStrokeAlerts={!model.isFourball}
         onCloseVoiceModal={onCloseVoiceModal}
-        onOpenVoiceModal={onOpenVoiceModal}
         onVoiceScoreConfirmed={actions.handleVoiceScore}
-        onPhotoCapture={actions.handlePhotoCapture}
         onStrokeAlertShown={onStrokeAlertShown}
       />
 
-      <MatchScoringHeroSection
+      <CockpitHeader
         matchOrder={matchOrder}
         sessionLabel={model.currentSession ? model.currentSession.sessionType : 'Match play'}
-        currentCourseName={model.currentCourse?.name}
-        currentTeeSetName={model.currentTeeSet?.name}
-        teamALineup={model.teamALineup}
-        teamBLineup={model.teamBLineup}
-        matchStatusLabel={model.matchStatusLabel}
-        isMatchComplete={model.isMatchComplete}
-        matchState={matchState}
-        prefersReducedMotion={prefersReducedMotion}
         teamAName={model.teamAName}
         teamBName={model.teamBName}
         teamAColor={model.teamAColor}
         teamBColor={model.teamBColor}
-        currentHole={currentHole}
-        currentPar={model.currentPar}
-        currentStrokeIndex={model.currentStrokeIndex}
-        currentYardage={model.currentYardage}
-        scoringModeMeta={model.scoringModeMeta}
-        savingIndicator={ui.savingIndicator}
+        teamALineup={model.teamALineup}
+        teamBLineup={model.teamBLineup}
+        matchScoreLabel={matchScoreLabel}
+        matchProgressLabel={matchProgressLabel}
+        isMatchComplete={model.isMatchComplete}
+        isSaving={isSaving}
+        saveState={saveState}
         undoCount={undoCount}
-        isCaptain={isCaptainMode}
         onBack={onBackToScore}
-        onOpenVoiceScoring={onOpenVoiceModal}
         onUndo={actions.handleUndo}
-        onHoleSelect={onHoleSelect}
+        onOpenOverflow={() => setOverflowOpen(true)}
       />
 
       <main className="container-editorial">
+        <WeatherAlertsBar />
+
         {!model.isMatchComplete || ui.isEditingScores ? (
-          <MatchScoringActiveState
+          <MatchCockpit
             scoring={{
-              isEditingScores: ui.isEditingScores,
-              isMatchComplete: model.isMatchComplete,
+              matchState,
               currentHole,
               currentHoleResult,
               currentPar: model.currentPar,
               currentStrokeIndex: model.currentStrokeIndex,
               currentYardage: model.currentYardage,
-              matchState,
               scoringMode: model.effectiveScoringMode,
               scoringModeMeta: model.scoringModeMeta,
               isFourball: model.isFourball,
-              quickScoreMode,
-              quickScorePendingTeam: ui.quickScorePending?.team,
+              isMatchComplete: model.isMatchComplete,
+              isEditingScores: ui.isEditingScores,
               isSaving,
               undoCount,
               presses,
@@ -335,6 +365,8 @@ export function MatchScoringPageSections({
               teamBName: model.teamBName,
               teamAColor: model.teamAColor,
               teamBColor: model.teamBColor,
+              teamALineup: model.teamALineup,
+              teamBLineup: model.teamBLineup,
               teamAHandicapAllowance: model.matchHandicapContext.teamAHandicapAllowance,
               teamBHandicapAllowance: model.matchHandicapContext.teamBHandicapAllowance,
               holeHandicaps: model.holeHandicaps,
@@ -345,32 +377,21 @@ export function MatchScoringPageSections({
             }}
             preferences={{
               preferredHand,
-              showHandicapDetails: ui.showHandicapDetails,
-              showScoringModeTip: ui.showScoringModeTip,
-              showAdvancedTools: ui.showAdvancedTools,
               prefersReducedMotion,
             }}
-            sideBets={{
-              activeSideBets: model.activeSideBets,
-              activeMatchSideBets: model.activeMatchSideBets,
-              currentTripId,
-              currentPlayerIdForBets: model.currentUserPlayerId,
-            }}
             handlers={{
-              onFinishEditing: () => ui.setIsEditingScores(false),
               onPrevHole,
               onNextHole,
-              onDismissScoringModeTip: ui.dismissScoringModeTip,
-              onScoringModeChange,
-              onQuickScoreTap: actions.handleQuickScoreTap,
-              onToggleShowHandicapDetails: () => ui.setShowHandicapDetails((previous) => !previous),
               onScore: actions.handleScore,
               onScoreWithStrokes: actions.handleScoreWithStrokes,
               onFourballScore: actions.handleFourballScore,
               onUndo: actions.handleUndo,
-              onToggleShowAdvancedTools: () => ui.setShowAdvancedTools((previous) => !previous),
               onPress,
+              onScoringModeChange,
+              onFinishEditing: () => ui.setIsEditingScores(false),
+              onJumpToHole: onHoleSelect,
             }}
+            isCaptainMode={isCaptainMode}
           />
         ) : (
           <MatchScoringCompleteState
@@ -396,13 +417,123 @@ export function MatchScoringPageSections({
             onBackToMatches={onBackToMatches}
           />
         )}
-
-        <section className="mt-4">
-          <WeatherAlerts showWeatherBar={true} />
-        </section>
       </main>
+
+      {/* Bottom drawer — the new home for standings, presses, side bets. */}
+      {!model.isMatchComplete && (
+        <ScoringDrawer
+          scoring={{
+            matchState,
+            currentHole,
+            currentHoleResult,
+            currentPar: model.currentPar,
+            currentStrokeIndex: model.currentStrokeIndex,
+            currentYardage: model.currentYardage,
+            scoringMode: model.effectiveScoringMode,
+            scoringModeMeta: model.scoringModeMeta,
+            isFourball: model.isFourball,
+            isMatchComplete: model.isMatchComplete,
+            isEditingScores: ui.isEditingScores,
+            isSaving,
+            undoCount,
+            presses,
+            sessionLeaderboard: model.sessionLeaderboard,
+          }}
+          teams={{
+            teamAName: model.teamAName,
+            teamBName: model.teamBName,
+            teamAColor: model.teamAColor,
+            teamBColor: model.teamBColor,
+            teamALineup: model.teamALineup,
+            teamBLineup: model.teamBLineup,
+            teamAHandicapAllowance: model.matchHandicapContext.teamAHandicapAllowance,
+            teamBHandicapAllowance: model.matchHandicapContext.teamBHandicapAllowance,
+            holeHandicaps: model.holeHandicaps,
+            teamAFourballPlayers: model.teamAFourballPlayers,
+            teamBFourballPlayers: model.teamBFourballPlayers,
+            teamAPlayers: model.teamAPlayers,
+            teamBPlayers: model.teamBPlayers,
+          }}
+          handlers={{
+            onJumpToHole: onHoleSelect,
+            onPress,
+          }}
+          presses={presses}
+          sideBets={model.activeMatchSideBets}
+          match={matchState.match}
+          currentTripId={currentTripId}
+          currentPlayerIdForBets={model.currentUserPlayerId}
+          onSelectMatch={onSelectMatch}
+        />
+      )}
+
+      <CockpitOverflowSheet
+        open={overflowOpen}
+        onClose={() => setOverflowOpen(false)}
+        matchId={matchId}
+        scoringMode={model.effectiveScoringMode}
+        scoringModeMeta={model.scoringModeMeta}
+        isFourball={model.isFourball}
+        isMatchComplete={model.isMatchComplete}
+        isCaptainMode={isCaptainMode}
+        preferredHand={preferredHand}
+        onScoringModeChange={onScoringModeChange}
+        onOpenVoiceScoring={onOpenVoiceModal}
+        onShareSummary={actions.handleShareSummary}
+        onExportSummary={actions.handleExportSummary}
+        onEditScores={onEditScores}
+      />
 
       {confirmDialog}
     </div>
+  );
+}
+
+/**
+ * Slim variant of MatchScoringSupportLayer that drops the floating photo
+ * and voice FABs — voice is in the overflow sheet now and photos move to
+ * the trip moments drawer tab. Keeping the voice modal + stroke alert
+ * banner since both are critical and contextual.
+ */
+function MatchScoringSupportLayerSlim(props: {
+  isMatchComplete: boolean;
+  showVoiceModal: boolean;
+  currentHole: number;
+  teamAName: string;
+  teamBName: string;
+  teamAHandicapAllowance: number;
+  teamBHandicapAllowance: number;
+  holeHandicaps: number[];
+  showTeamStrokeAlerts?: boolean;
+  onCloseVoiceModal: () => void;
+  onVoiceScoreConfirmed: (winner: 'teamA' | 'teamB' | 'halved' | 'none') => void;
+  onStrokeAlertShown: (hole: number, teamAStrokes: number, teamBStrokes: number) => void;
+}) {
+  return (
+    <MatchScoringSupportLayer
+      isMatchComplete={props.isMatchComplete}
+      showVoiceModal={props.showVoiceModal}
+      currentHole={props.currentHole}
+      matchId="" // FABs disabled below — matchId is unused for stroke alerts
+      teamAName={props.teamAName}
+      teamBName={props.teamBName}
+      teamAHandicapAllowance={props.teamAHandicapAllowance}
+      teamBHandicapAllowance={props.teamBHandicapAllowance}
+      holeHandicaps={props.holeHandicaps}
+      showTeamStrokeAlerts={props.showTeamStrokeAlerts}
+      onCloseVoiceModal={props.onCloseVoiceModal}
+      onOpenVoiceModal={() => {}}
+      onVoiceScoreConfirmed={props.onVoiceScoreConfirmed}
+      onPhotoCapture={() => {}}
+      onStrokeAlertShown={props.onStrokeAlertShown}
+    />
+  );
+}
+
+function WeatherAlertsBar() {
+  return (
+    <section className="-mx-4 mt-2 sm:-mx-5">
+      <WeatherAlerts showWeatherBar={true} />
+    </section>
   );
 }

@@ -229,10 +229,10 @@ export default function MatchScoringPageClient() {
         actions={actions}
         presses={presses}
         isSaving={isSaving}
+        isOnline={isOnline}
         undoCount={undoStack.length}
         isCaptainMode={isCaptainMode}
         prefersReducedMotion={prefersReducedMotion}
-        quickScoreMode={scoringPreferences.quickScoreMode}
         preferredHand={scoringPreferences.preferredHand}
         confirmDialog={ConfirmDialogComponent}
         onBackToScore={handleBackToScore}
@@ -250,6 +250,7 @@ export default function MatchScoringPageClient() {
         onViewStandings={() => router.push('/standings')}
         onScoreNextMatch={(nextMatchId) => router.push(`/score/${nextMatchId}`)}
         onBackToMatches={handleBackToScore}
+        onSelectMatch={(otherMatchId) => router.push(`/score/${otherMatchId}`)}
         onEditScores={async () => {
           // Flip the match out of completed state so the rest of the UI
           // treats it as live and subsequent scoring writes follow the
