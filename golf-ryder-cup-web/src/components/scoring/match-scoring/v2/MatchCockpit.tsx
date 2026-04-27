@@ -57,12 +57,20 @@ export function MatchCockpit({
   // Phase 2 collapse: the legacy 5-mode picker still flows in via
   // `scoring.scoringMode` from the model, but the cockpit only ever
   // renders the unified ScoreInputPanel. If the user (or store) picks
-  // "strokes" or "fourball", we open the corresponding sheet rather
-  // than replacing the panel.
+  // "strokes" or "fourball", we open the corresponding sheet. The
+  // setState is the *intended* side-effect — mode change ⇒ sheet open
+  // — which is exactly what useEffect is for; the React 19 rule's
+  // suggestion to derive sheet state at render time would just split
+  // the logic across two places.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    if (scoring.scoringMode === 'strokes' && !isFourball) setStrokeSheetOpen(true);
-    if (scoring.scoringMode === 'fourball' && isFourball) setFourballSheetOpen(true);
+    if (scoring.scoringMode === 'strokes' && !isFourball) {
+      setStrokeSheetOpen(true);
+    } else if (scoring.scoringMode === 'fourball' && isFourball) {
+      setFourballSheetOpen(true);
+    }
   }, [scoring.scoringMode, isFourball]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const factParts = [
     `Par ${currentPar}`,

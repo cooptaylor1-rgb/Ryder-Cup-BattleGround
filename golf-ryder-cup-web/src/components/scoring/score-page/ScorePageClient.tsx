@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Target } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
@@ -30,10 +30,18 @@ const logger = createLogger('score');
 
 export default function ScorePageClient() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { currentTrip, sessions, players } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, players: s.players })));
     const { selectMatch } = useScoringStore();
     const { currentUser, isAuthenticated, authUserId } = useAuthStore();
     const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+
+    // Phase 3 — smart routing. When the current user has exactly one
+    // in-progress match for *them*, fast-forward straight into scoring.
+    // Captains scoring proxy or anyone wanting the picker can append
+    // `?picker=1` to defeat the redirect.
+    const wantsPicker = searchParams?.get('picker') === '1';
+    const autoRoutedRef = useRef(false);
 
     const currentIdentity = useMemo(
         () => withTripPlayerIdentity(currentUser, authUserId),
@@ -154,6 +162,19 @@ export default function ScorePageClient() {
             logger.error('Failed to select match', { matchId, error });
         }
     };
+
+    // Smart auto-route: only fires once, only when there's an in-progress
+    // match the *current user is playing in*. Captains proxy-scoring see
+    // the picker (their match list typically has multiple in-progress).
+    useEffect(() => {
+        if (autoRoutedRef.current) return;
+        if (wantsPicker) return;
+        if (!isAuthenticated) return;
+        if (!userMatchRecord) return;
+
+        autoRoutedRef.current = true;
+        router.replace(`/score/${userMatchRecord.match.id}`);
+    }, [wantsPicker, isAuthenticated, userMatchRecord, router]);
 
     const isLoading = matches === undefined || holeResults === undefined;
 
