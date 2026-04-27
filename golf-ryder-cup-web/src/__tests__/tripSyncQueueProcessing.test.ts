@@ -36,6 +36,7 @@ import {
   processSyncQueue,
   queueSyncOperation,
 } from '../lib/services/trip-sync/tripSyncQueue';
+import { db } from '../lib/db';
 import {
   setOnlineStatus,
   setSyncAuthSession,
@@ -45,6 +46,7 @@ import { syncEntityToCloud } from '../lib/services/trip-sync/tripSyncEntityWrite
 import type { SyncQueueItem } from '../lib/types/sync';
 
 const syncEntityToCloudMock = vi.mocked(syncEntityToCloud);
+const tripSyncQueueTableMock = vi.mocked(db.tripSyncQueue);
 
 function makeQueueItem(overrides: Partial<SyncQueueItem> = {}): SyncQueueItem {
   return {
@@ -149,5 +151,25 @@ describe('trip sync queue processing', () => {
       error: 'permission denied',
     });
     expect(tripSyncRuntime.syncDebounceTimer).toBeNull();
+  });
+
+  it('hydrates persisted queue work before processing after a cold page load', async () => {
+    tripSyncRuntime.queueHydrated = false;
+    tripSyncQueueTableMock.toArray.mockResolvedValueOnce([makeQueueItem()]);
+
+    const result = await processSyncQueue();
+
+    expect(syncEntityToCloudMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        entity: 'match',
+        entityId: 'match-1',
+        operation: 'update',
+      })
+    );
+    expect(result).toMatchObject({
+      synced: 1,
+      failed: 0,
+      queued: 0,
+    });
   });
 });

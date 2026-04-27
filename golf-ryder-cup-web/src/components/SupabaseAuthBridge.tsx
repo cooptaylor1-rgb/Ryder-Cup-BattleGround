@@ -5,7 +5,6 @@ import * as Sentry from '@sentry/nextjs';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/client';
 import {
-  getSyncQueueStatus,
   processSyncQueue,
   retryFailedQueue,
   setTripSyncAuthSession,
@@ -35,13 +34,12 @@ function syncAuthDependentServices(session: Session | null): void {
   setTripSyncAuthSession(session);
   if (!session) return;
 
-  const queue = getSyncQueueStatus();
-  if (queue.pending === 0 && queue.failed === 0) return;
-
   void (async () => {
-    if (queue.failed > 0) {
-      await retryFailedQueue();
-    }
+    // retryFailedQueue hydrates the persisted IndexedDB queue before
+    // checking failed items. Do this even when the in-memory queue
+    // looks empty; after a cold page load the pending work may exist
+    // only in Dexie until hydration runs.
+    await retryFailedQueue();
     await processSyncQueue();
   })().catch((error) => {
     authLogger.warn('Failed to process sync queue after Supabase auth resolved:', error);

@@ -10,6 +10,7 @@ const MAX_RETRY_DELAY_MS = 30000;
 
 export const MAX_RETRY_COUNT = 5;
 export const SYNC_DEBOUNCE_MS = 1000;
+export const TRIP_SYNC_QUEUE_CHANGED_EVENT = 'trip-sync-queue-changed';
 
 export const logger = createLogger('TripSync');
 
@@ -25,13 +26,26 @@ export const tripSyncRuntime = {
   hasAuthSession: !isSupabaseConfigured,
 };
 
+export function notifyTripSyncQueueChanged(): void {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent(TRIP_SYNC_QUEUE_CHANGED_EVENT));
+}
+
 export function setOnlineStatus(isOnline: boolean): void {
+  if (tripSyncRuntime.isOnline === isOnline) return;
   tripSyncRuntime.isOnline = isOnline;
+  notifyTripSyncQueueChanged();
 }
 
 export function setSyncAuthSession(session: Session | null): void {
+  const nextHasSession = Boolean(session);
+  const changed =
+    !tripSyncRuntime.authSessionResolved || tripSyncRuntime.hasAuthSession !== nextHasSession;
   tripSyncRuntime.authSessionResolved = true;
-  tripSyncRuntime.hasAuthSession = Boolean(session);
+  tripSyncRuntime.hasAuthSession = nextHasSession;
+  if (changed) {
+    notifyTripSyncQueueChanged();
+  }
 }
 
 export function getSyncBlockReason():

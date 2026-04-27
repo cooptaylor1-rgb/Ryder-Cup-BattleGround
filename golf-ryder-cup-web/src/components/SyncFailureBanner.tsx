@@ -13,7 +13,7 @@
  * reaching the cloud.
  */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { AlertTriangle, Clock3, RefreshCw } from 'lucide-react';
 import {
@@ -22,6 +22,7 @@ import {
   getUnresolvedSyncQueueItems,
   processSyncQueue,
   retryFailedQueue,
+  TRIP_SYNC_QUEUE_CHANGED_EVENT,
 } from '@/lib/services/tripSyncService';
 import { cn } from '@/lib/utils';
 import { zIndex } from '@/lib/constants/zIndex';
@@ -102,7 +103,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
     router.push(`/login?returnTo=${encodeURIComponent(returnTo)}`);
   };
 
-  const refreshSnapshot = () => {
+  const refreshSnapshot = useCallback(() => {
     const status = getSyncQueueStatus();
     const shouldShowBlockedPending =
       status.pending > 0 && Boolean(status.blockedReason) && status.blockedReason !== 'offline';
@@ -118,7 +119,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
       setRetryFeedback(null);
     }
     return status;
-  };
+  }, []);
 
   useEffect(() => {
     const tick = () => {
@@ -148,11 +149,13 @@ export function SyncFailureBanner({ className }: { className?: string }) {
 
     if (document.visibilityState === 'visible') start();
     document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener(TRIP_SYNC_QUEUE_CHANGED_EVENT, tick);
     return () => {
       stop();
       document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener(TRIP_SYNC_QUEUE_CHANGED_EVENT, tick);
     };
-  }, []);
+  }, [refreshSnapshot]);
 
   const handleRetry = async () => {
     if (blockedReason === 'auth-required') {
@@ -207,12 +210,13 @@ export function SyncFailureBanner({ className }: { className?: string }) {
       role="alert"
       aria-live="assertive"
       aria-busy={isRetrying || undefined}
-      style={{ zIndex: zIndex.nav + 1 }}
+      style={{ zIndex: zIndex.toast }}
       className={cn(
-        'fixed inset-x-0 top-0 border-b border-[color:var(--error)]/30',
+        'fixed left-3 right-3 bottom-[calc(5rem+env(safe-area-inset-bottom,0px)+0.75rem)] rounded-[22px] border border-[color:var(--error)]/30',
         'bg-[color:var(--surface-elevated)]/94 text-[var(--error)] shadow-card',
         'backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-elevated)]/88',
-        'pt-[env(safe-area-inset-top,0px)]',
+        'sm:inset-x-0 sm:top-0 sm:bottom-auto sm:rounded-none sm:border-x-0 sm:border-t-0',
+        'sm:pt-[env(safe-area-inset-top,0px)]',
         className
       )}
     >

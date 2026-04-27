@@ -14,6 +14,7 @@ vi.mock('@/lib/services/tripSyncService', () => ({
   getUnresolvedSyncQueueItems: () => getUnresolvedSyncQueueItemsMock(),
   processSyncQueue: () => processSyncQueueMock(),
   retryFailedQueue: () => retryFailedQueueMock(),
+  TRIP_SYNC_QUEUE_CHANGED_EVENT: 'trip-sync-queue-changed',
 }));
 
 vi.mock('next/navigation', () => ({

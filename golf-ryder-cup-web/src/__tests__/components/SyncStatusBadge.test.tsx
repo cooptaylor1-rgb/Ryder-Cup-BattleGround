@@ -3,15 +3,20 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const getSyncQueueStatusMock = vi.hoisted(() => vi.fn());
 const getTripSyncStatusMock = vi.hoisted(() => vi.fn());
+const getFailedSyncQueueItemsMock = vi.hoisted(() => vi.fn());
+const getUnresolvedSyncQueueItemsMock = vi.hoisted(() => vi.fn());
 const processSyncQueueMock = vi.hoisted(() => vi.fn());
 const retryFailedQueueMock = vi.hoisted(() => vi.fn());
 const routerPushMock = vi.hoisted(() => vi.fn());
 
 vi.mock('@/lib/services/tripSyncService', () => ({
+  getFailedSyncQueueItems: () => getFailedSyncQueueItemsMock(),
   getSyncQueueStatus: () => getSyncQueueStatusMock(),
   getTripSyncStatus: (tripId: string) => getTripSyncStatusMock(tripId),
+  getUnresolvedSyncQueueItems: () => getUnresolvedSyncQueueItemsMock(),
   processSyncQueue: () => processSyncQueueMock(),
   retryFailedQueue: () => retryFailedQueueMock(),
+  TRIP_SYNC_QUEUE_CHANGED_EVENT: 'trip-sync-queue-changed',
 }));
 
 vi.mock('next/navigation', () => ({
@@ -47,6 +52,18 @@ describe('SyncStatusBadge', () => {
       blockedReason: undefined,
     });
     retryFailedQueueMock.mockResolvedValue(4);
+    getFailedSyncQueueItemsMock.mockReturnValue([
+      {
+        entity: 'match',
+        entityId: 'match-1',
+        operation: 'update',
+        retryCount: 5,
+        error: 'row level security',
+        createdAt: '2026-04-26T12:00:00.000Z',
+        lastAttemptAt: '2026-04-26T12:01:00.000Z',
+      },
+    ]);
+    getUnresolvedSyncQueueItemsMock.mockReturnValue([]);
     processSyncQueueMock.mockResolvedValue({
       success: true,
       synced: 4,
@@ -67,6 +84,7 @@ describe('SyncStatusBadge', () => {
     render(<SyncStatusBadge />);
 
     fireEvent.click(await screen.findByRole('button'));
+    fireEvent.click(await screen.findByRole('button', { name: 'Retry sync' }));
 
     await waitFor(() => {
       expect(retryFailedQueueMock).toHaveBeenCalledTimes(1);
@@ -82,12 +100,27 @@ describe('SyncStatusBadge', () => {
       total: 3,
       blockedReason: 'auth-required',
     });
+    getUnresolvedSyncQueueItemsMock.mockReturnValue([
+      {
+        entity: 'session',
+        entityId: 'session-1',
+        operation: 'create',
+        status: 'pending',
+        retryCount: 0,
+        createdAt: '2026-04-26T12:00:00.000Z',
+      },
+    ]);
 
     render(<SyncStatusBadge />);
 
     expect(await screen.findByLabelText('Sync status: Saved on device (3)')).toBeInTheDocument();
     expect(screen.getByRole('button')).toBeEnabled();
     fireEvent.click(screen.getByRole('button'));
+    expect(await screen.findByRole('dialog', { name: 'Cloud sync details' })).toBeInTheDocument();
+    expect(screen.getByText('Cloud saving is paused')).toBeInTheDocument();
+    expect(screen.getByText('Session add')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Sign in to sync' }));
     expect(routerPushMock).toHaveBeenCalledWith('/login?returnTo=%2Fschedule');
     expect(retryFailedQueueMock).not.toHaveBeenCalled();
     expect(processSyncQueueMock).not.toHaveBeenCalled();
@@ -101,5 +134,17 @@ describe('SyncStatusBadge', () => {
         name: /4 changes did not reach the cloud\. Cloud permissions blocked this change\. Latest: match update\./i,
       })
     ).toBeInTheDocument();
+  });
+
+  it('opens visible sync details with the latest failed item', async () => {
+    render(<SyncStatusBadge />);
+
+    fireEvent.click(await screen.findByRole('button'));
+
+    expect(await screen.findByRole('dialog', { name: 'Cloud sync details' })).toBeInTheDocument();
+    expect(screen.getByText('Cloud sync needs attention')).toBeInTheDocument();
+    expect(screen.getByText('Match update')).toBeInTheDocument();
+    expect(screen.getByText('Cloud permissions blocked this change.')).toBeInTheDocument();
+    expect(screen.getByText('5 attempts')).toBeInTheDocument();
   });
 });

@@ -15,6 +15,7 @@ import {
   getSyncBlockReason,
   getRetryDelay,
   logger,
+  notifyTripSyncQueueChanged,
   sleep,
   type SyncBlockReason,
   tripSyncRuntime,
@@ -40,6 +41,7 @@ function syncBreadcrumb(message: string, data?: Record<string, unknown>): void {
 async function persistQueueItem(item: SyncQueueItem): Promise<void> {
   try {
     await db.tripSyncQueue.put(item);
+    notifyTripSyncQueueChanged();
   } catch (error) {
     logger.warn('Failed to persist sync queue item:', error);
   }
@@ -111,6 +113,7 @@ async function restoreOrphanedQueueEntities(): Promise<void> {
 async function removeQueueItem(id: string): Promise<void> {
   try {
     await db.tripSyncQueue.delete(id);
+    notifyTripSyncQueueChanged();
   } catch (error) {
     logger.warn('Failed to remove sync queue item:', error);
   }
@@ -328,6 +331,7 @@ export function queueSyncOperation<E extends SyncEntity>(
       if (existingIndex >= 0) {
         tripSyncRuntime.syncQueue.splice(existingIndex, 1);
       }
+      notifyTripSyncQueueChanged();
       void removeQueueItem(existing.id);
       return;
     }
@@ -357,6 +361,7 @@ export function queueSyncOperation<E extends SyncEntity>(
     }
 
     void persistQueueItem(existing);
+    notifyTripSyncQueueChanged();
     if (canSync()) {
       scheduleSyncQueueProcessing();
     }
@@ -377,6 +382,7 @@ export function queueSyncOperation<E extends SyncEntity>(
   } as SyncQueueItem;
 
   tripSyncRuntime.syncQueue.push(item);
+  notifyTripSyncQueueChanged();
   void persistQueueItem(item);
   logger.log(`Queued ${operation} for ${entity}:${entityId}`);
 
@@ -427,11 +433,13 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
             ? 'Supabase not configured'
             : 'Offline';
 
+    notifyTripSyncQueueChanged();
     return getQueueResultSnapshot([message]);
   }
 
   if (tripSyncRuntime.syncInProgress) {
     tripSyncRuntime.syncDrainRequested = true;
+    notifyTripSyncQueueChanged();
     return getQueueResultSnapshot();
   }
 
@@ -556,6 +564,7 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
     const remaining = tripSyncRuntime.syncQueue.filter(
       (item) => item.status !== 'completed'
     ).length;
+    notifyTripSyncQueueChanged();
     return { success: errors.length === 0, synced, failed, queued: remaining, errors };
   } finally {
     const shouldDrainAgain = tripSyncRuntime.syncDrainRequested || hasRetryableQueueWork();
@@ -590,6 +599,10 @@ export async function retryFailedQueue(): Promise<number> {
   }
 
   if (retried > 0) {
+    notifyTripSyncQueueChanged();
+  }
+
+  if (retried > 0) {
     scheduleSyncQueueProcessing();
   }
 
@@ -602,6 +615,7 @@ export async function clearQueue(): Promise<number> {
   tripSyncRuntime.syncQueue.length = 0;
   try {
     await db.tripSyncQueue.clear();
+    notifyTripSyncQueueChanged();
   } catch (error) {
     logger.warn('Failed to clear sync queue:', error);
   }
@@ -621,6 +635,10 @@ export async function clearFailedQueue(): Promise<number> {
     }
   }
 
+  if (cleared > 0) {
+    notifyTripSyncQueueChanged();
+  }
+
   return cleared;
 }
 
@@ -635,6 +653,10 @@ export async function purgeQueueForTrip(tripId: string): Promise<number> {
       await removeQueueItem(item.id);
       removed++;
     }
+  }
+
+  if (removed > 0) {
+    notifyTripSyncQueueChanged();
   }
 
   return removed;
