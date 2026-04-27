@@ -145,7 +145,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
         setShowDetail(false);
         setRetryFeedback(null);
       } else {
-        setRetryFeedback('Still saved locally. Try again after the connection is stable.');
+        setRetryFeedback('Still saved on this device. Try again when the connection is stable.');
       }
     } catch (error) {
       const status = getSyncQueueStatus();
@@ -170,7 +170,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
     ? retryFeedback
     : blockedMessage
       ? blockedMessage
-      : `${failedCount} change${failedCount === 1 ? '' : 's'} could not sync. Saved on this device.`;
+      : `${failedCount} change${failedCount === 1 ? '' : 's'} did not reach the cloud. Saved on this device.`;
   const detailAvailable = failedItems.length > 0 || Boolean(lastError);
 
   return (

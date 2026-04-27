@@ -23,6 +23,55 @@ import { summarizeSyncError, SYNC_BLOCKED_MESSAGES } from '@/lib/utils/syncMessa
 
 type QueueInfo = ReturnType<typeof getSyncQueueStatus>;
 
+const ENTITY_LABELS: Record<string, string> = {
+  trip: 'trip',
+  player: 'player',
+  team: 'team',
+  teamMember: 'team member',
+  session: 'session',
+  match: 'match',
+  holeResult: 'score',
+  course: 'course',
+  teeSet: 'tee set',
+  sideBet: 'side bet',
+  practiceScore: 'practice score',
+  banterPost: 'post',
+  duesLineItem: 'dues item',
+  paymentRecord: 'payment',
+  tripInvitation: 'invitation',
+  announcement: 'message',
+  attendanceRecord: 'attendance',
+  cartAssignment: 'cart assignment',
+};
+
+const OPERATION_LABELS: Record<string, string> = {
+  create: 'add',
+  update: 'update',
+  delete: 'remove',
+};
+
+function changeLabel(count: number): string {
+  return `${count} change${count === 1 ? '' : 's'}`;
+}
+
+function describeLatestFailure(queueInfo: QueueInfo): string | null {
+  if (!queueInfo.lastFailedEntity || !queueInfo.lastFailedOperation) {
+    return null;
+  }
+
+  const entity = ENTITY_LABELS[queueInfo.lastFailedEntity] ?? queueInfo.lastFailedEntity;
+  const operation =
+    OPERATION_LABELS[queueInfo.lastFailedOperation] ?? queueInfo.lastFailedOperation;
+  return `Latest: ${entity} ${operation}.`;
+}
+
+function formatLastAttempt(value?: string): string | null {
+  if (!value) return null;
+  const timestamp = new Date(value);
+  if (Number.isNaN(timestamp.getTime())) return null;
+  return `Last tried at ${timestamp.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}.`;
+}
+
 interface SyncStatusBadgeProps {
   /** Show full status text (not just icon) */
   showText?: boolean;
@@ -115,7 +164,7 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
       case 'synced':
         return {
           icon: <Check className="h-4 w-4" />,
-          text: 'Cloud saved',
+          text: 'Saved to cloud',
           tone: 'text-[var(--success)]',
           bg: 'bg-[color:var(--success)]/15',
         };
@@ -124,35 +173,35 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
         if (blockedTooltip) {
           return {
             icon: <CloudOff className="h-4 w-4" />,
-            text: `Saved locally${queueInfo.pending > 0 ? ` (${queueInfo.pending})` : ''}`,
+            text: `Saved on device${queueInfo.pending > 0 ? ` (${queueInfo.pending})` : ''}`,
             tone: 'text-[var(--ink-secondary)]',
             bg: 'bg-[color:var(--ink-tertiary)]/10',
           };
         }
         return {
           icon: <RefreshCw className={`h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />,
-          text: `Saving${queueInfo.pending > 0 ? ` (${queueInfo.pending})` : ''}`,
+          text: `Saving to cloud${queueInfo.pending > 0 ? ` (${queueInfo.pending})` : ''}`,
           tone: 'text-[var(--info)]',
           bg: 'bg-[color:var(--info)]/15',
         };
       case 'failed':
         return {
           icon: <AlertCircle className="h-4 w-4" />,
-          text: `Needs retry${queueInfo.failed > 0 ? ` (${queueInfo.failed})` : ''}`,
+          text: `Retry sync${queueInfo.failed > 0 ? ` (${queueInfo.failed})` : ''}`,
           tone: 'text-[var(--error)]',
           bg: 'bg-[color:var(--error)]/15',
         };
       case 'offline':
         return {
           icon: <CloudOff className="h-4 w-4" />,
-          text: 'Saved locally',
+          text: 'Saved on device',
           tone: 'text-[var(--ink-secondary)]',
           bg: 'bg-[color:var(--ink-tertiary)]/10',
         };
       default:
         return {
           icon: <Cloud className="h-4 w-4" />,
-          text: 'Checking sync',
+          text: 'Checking save status',
           tone: 'text-[var(--ink-tertiary)]',
           bg: 'bg-[color:var(--ink-tertiary)]/10',
         };
@@ -202,15 +251,20 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
       ? SYNC_BLOCKED_MESSAGES[queueInfo.blockedReason]
       : undefined;
     const summarizedError = summarizeSyncError(queueInfo.lastError);
+    const latestFailure = describeLatestFailure(queueInfo);
+    const lastAttempt = formatLastAttempt(queueInfo.lastAttemptAt);
+    const failedDetails = [summarizedError, latestFailure, lastAttempt, 'Tap to retry.']
+      .filter(Boolean)
+      .join(' ');
     const failedTooltip = blockedTooltip
-      ? `${effectiveFailedCount} cloud sync ${effectiveFailedCount === 1 ? 'change is' : 'changes are'} blocked. ${blockedTooltip}`
+      ? `${changeLabel(effectiveFailedCount)} saved on this device. ${blockedTooltip}`
       : queueInfo.lastError
-        ? `${effectiveFailedCount} cloud sync ${effectiveFailedCount === 1 ? 'change needs' : 'changes need'} a retry. ${summarizedError}`
-        : `${effectiveFailedCount} cloud sync ${effectiveFailedCount === 1 ? 'change needs' : 'changes need'} a retry.`;
+        ? `${changeLabel(effectiveFailedCount)} did not reach the cloud. ${failedDetails}`
+        : `${changeLabel(effectiveFailedCount)} did not reach the cloud. Tap to retry.`;
     const effectivePendingCount = pendingChangeCount || 1;
     const pendingTooltip = blockedTooltip
-      ? `${effectivePendingCount} ${effectivePendingCount === 1 ? 'change is' : 'changes are'} saved on this device. ${blockedTooltip}`
-      : `${effectivePendingCount} ${effectivePendingCount === 1 ? 'change is' : 'changes are'} waiting to sync. Click to save now.`;
+      ? `${changeLabel(effectivePendingCount)} saved on this device. ${blockedTooltip}`
+      : `${changeLabel(effectivePendingCount)} saved on this device and waiting for the cloud. Tap to retry now.`;
 
     return (
       <Tooltip content={status === 'failed' ? failedTooltip : pendingTooltip}>

@@ -40,7 +40,7 @@ describe('SyncFailureBanner', () => {
 
     render(<SyncFailureBanner />);
 
-    expect(await screen.findByText('Sign in to resume cloud sync.')).toBeInTheDocument();
+    expect(await screen.findByText('Sign in to resume cloud saving.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Sign in to sync' })).toBeDisabled();
   });
 
@@ -116,7 +116,9 @@ describe('SyncFailureBanner', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Retry sync' }));
 
     expect(
-      await screen.findByText('Still saved locally. Try again after the connection is stable.')
+      await screen.findByText(
+        'Still saved on this device. Try again when the connection is stable.'
+      )
     ).toBeInTheDocument();
   });
 });

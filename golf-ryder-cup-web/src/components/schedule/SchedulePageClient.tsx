@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { PageHeader } from '@/components/layout';
 import {
   ScheduleDaySection,
@@ -13,25 +13,36 @@ import {
   buildScheduleByDay,
   resolveCurrentUserPlayer,
 } from '@/components/schedule/scheduleData';
-import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
-import { db } from '@/lib/db';
+import { EmptyStatePremium, PageLoadingSkeleton } from '@/components/ui';
+import { useTripScopedMatches } from '@/lib/hooks/useTripScopedMatches';
 import { useAccessStore, useAuthStore, useTripStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
-import { tripLogger } from '@/lib/utils/logger';
 import { navigateBackOr } from '@/lib/utils/navigation';
 import { assessTripPlayerLink, withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
 import { AlertCircle, CalendarDays, ChevronRight, User } from 'lucide-react';
-import type { Match } from '@/lib/types/models';
+import type { Match, RyderCupSession } from '@/lib/types/models';
+
+const EMPTY_SESSIONS: RyderCupSession[] = [];
+const EMPTY_MATCHES: Match[] = [];
 
 export default function SchedulePageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentTrip, sessions, players, courses, teeSets } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, sessions: s.sessions, players: s.players, courses: s.courses, teeSets: s.teeSets })));
+  const { currentTrip, players, courses, teeSets, isTripLoading } = useTripStore(
+    useShallow((s) => ({
+      currentTrip: s.currentTrip,
+      players: s.players,
+      courses: s.courses,
+      teeSets: s.teeSets,
+      isTripLoading: s.isLoading,
+    }))
+  );
   const { currentUser, isAuthenticated, authUserId } = useAuthStore();
-  const isCaptainMode = useAccessStore(s => s.isCaptainMode);
-  const [matches, setMatches] = useState<Match[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const isCaptainMode = useAccessStore((s) => s.isCaptainMode);
+  const tripData = useTripScopedMatches(isAuthenticated ? currentTrip?.id : undefined);
+  const sessions = tripData?.sessions ?? EMPTY_SESSIONS;
+  const matches = tripData?.matches ?? EMPTY_MATCHES;
+  const isScheduleLoading = isAuthenticated && Boolean(currentTrip) && tripData === undefined;
 
   // Default to "all" when there's no linked player profile. Otherwise
   // first-time users land on an empty "My Schedule" tab and think the
@@ -39,50 +50,9 @@ export default function SchedulePageClient() {
   // default so you see your own tee times first.
   const explicitView = searchParams?.get('view');
   const selectedTab =
-    explicitView === 'all' ? 'all'
-      : explicitView === 'my' ? 'my'
-        : currentUser ? 'my'
-          : 'all';
+    explicitView === 'all' ? 'all' : explicitView === 'my' ? 'my' : currentUser ? 'my' : 'all';
   const myScheduleHref = '/schedule';
   const fullScheduleHref = '/schedule?view=all';
-
-  const loadMatches = useCallback(async () => {
-    if (!isAuthenticated) {
-      setMatches([]);
-      setIsLoading(false);
-      setLoadError(null);
-      return;
-    }
-
-    if (!currentTrip) {
-      setIsLoading(false);
-      setLoadError(null);
-      return;
-    }
-
-    setIsLoading(true);
-    setLoadError(null);
-
-    try {
-      const sessionIds = sessions.map((session) => session.id);
-      if (sessionIds.length === 0) {
-        setMatches([]);
-        return;
-      }
-
-      const allMatches = await db.matches.where('sessionId').anyOf(sessionIds).toArray();
-      setMatches(allMatches);
-    } catch (error) {
-      tripLogger.error('Error loading matches:', error);
-      setLoadError("We couldn't load matches right now.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentTrip, isAuthenticated, sessions]);
-
-  useEffect(() => {
-    void loadMatches();
-  }, [loadMatches]);
 
   const currentIdentity = useMemo(
     () => withTripPlayerIdentity(currentUser, authUserId),
@@ -144,7 +114,7 @@ export default function SchedulePageClient() {
   }
 
   if (!currentTrip) {
-    if (isLoading) {
+    if (isTripLoading) {
       return <PageLoadingSkeleton title="Schedule" variant="list" />;
     }
 
@@ -173,7 +143,7 @@ export default function SchedulePageClient() {
     );
   }
 
-  if (isLoading) {
+  if (isScheduleLoading) {
     return <PageLoadingSkeleton title="Schedule" variant="list" />;
   }
 
@@ -206,13 +176,7 @@ export default function SchedulePageClient() {
       />
 
       <main className="container-editorial pb-8" id="schedule-content" role="tabpanel">
-        {loadError ? (
-          <div className="py-12">
-            <ErrorEmpty message={loadError} onRetry={loadMatches} />
-          </div>
-        ) : null}
-
-        {!loadError && selectedTab === 'my' && !currentUserPlayer ? (
+        {selectedTab === 'my' && !currentUserPlayer ? (
           <div className="mb-6 flex items-start gap-3 rounded-xl border border-[color:var(--warning)]/30 bg-[color:var(--warning)]/10 p-4">
             <AlertCircle size={20} className="mt-0.5 shrink-0 text-[var(--warning)]" />
             <div>
@@ -220,7 +184,7 @@ export default function SchedulePageClient() {
               <p className="type-caption mt-1">
                 {currentUserPlayerLink.status === 'ambiguous-email-match' ||
                 currentUserPlayerLink.status === 'ambiguous-name-match'
-                  ? "This trip has more than one possible roster match for your profile. Ask the captain to confirm which player entry is yours."
+                  ? 'This trip has more than one possible roster match for your profile. Ask the captain to confirm which player entry is yours.'
                   : currentUser
                     ? "You're signed in, but this trip doesn't have a linked player entry for your profile yet."
                     : 'Create a profile or sign in to see your personal tee times.'}
@@ -236,14 +200,14 @@ export default function SchedulePageClient() {
           </div>
         ) : null}
 
-        {!loadError && selectedTab === 'my' && currentUserPlayer && !hasUserSchedule ? (
+        {selectedTab === 'my' && currentUserPlayer && !hasUserSchedule ? (
           <div className="py-12">
             <EmptyStatePremium
               illustration="calendar"
-              title="No tee times yet"
-              description="You haven't been assigned to any matches. Check the Full Schedule tab or ask your captain."
+              title="No matches assigned yet"
+              description="Your roster profile is linked, but no tee time has been assigned to you yet. Open the full schedule to see every session."
               action={{
-                label: 'View Full Schedule',
+                label: 'Open Full Schedule',
                 onClick: () => router.push(fullScheduleHref),
               }}
               variant="default"
@@ -251,34 +215,32 @@ export default function SchedulePageClient() {
           </div>
         ) : null}
 
-        {!loadError
-          ? displaySchedule.map((day) => (
-              <ScheduleDaySection
-                key={day.date}
-                day={day}
-                onEntryPress={(entry) => {
-                  if (entry.matchId) {
-                    router.push(`/score/${entry.matchId}`);
-                  }
-                }}
-              />
-            ))
-          : null}
+        {displaySchedule.map((day) => (
+          <ScheduleDaySection
+            key={day.date}
+            day={day}
+            onEntryPress={(entry) => {
+              if (entry.matchId) {
+                router.push(`/score/${entry.matchId}`);
+              }
+            }}
+          />
+        ))}
 
-        {!loadError && selectedTab === 'all' && scheduleByDay.every((day) => day.entries.length === 0) ? (
+        {selectedTab === 'all' && scheduleByDay.every((day) => day.entries.length === 0) ? (
           <div className="py-16">
             <EmptyStatePremium
               illustration="calendar"
-              title="No sessions scheduled"
+              title="No sessions on the schedule"
               description={
                 isCaptainMode
-                  ? 'Build your first session to start the lineup and kick off scoring.'
-                  : 'Sessions will appear here once the captain sets up the schedule.'
+                  ? 'Create a session, then publish pairings when the lineup is ready.'
+                  : 'The full schedule will appear here after the captain adds sessions.'
               }
               action={
                 isCaptainMode
                   ? {
-                      label: 'Create session',
+                      label: 'Create Session',
                       onClick: () => router.push('/lineup/new?mode=session'),
                     }
                   : undefined

@@ -29,6 +29,9 @@ describe('SyncStatusBadge', () => {
       failed: 4,
       total: 4,
       lastError: 'row level security',
+      lastAttemptAt: '2026-04-26T12:01:00.000Z',
+      lastFailedEntity: 'match',
+      lastFailedOperation: 'update',
       blockedReason: undefined,
     });
     retryFailedQueueMock.mockResolvedValue(4);
@@ -44,7 +47,7 @@ describe('SyncStatusBadge', () => {
   it('shows failed sync count even when rendered as an icon badge', async () => {
     render(<SyncStatusBadge />);
 
-    expect(await screen.findByLabelText('Sync status: Needs retry (4)')).toBeInTheDocument();
+    expect(await screen.findByLabelText('Sync status: Retry sync (4)')).toBeInTheDocument();
     expect(screen.getByText('4')).toBeInTheDocument();
   });
 
@@ -70,10 +73,20 @@ describe('SyncStatusBadge', () => {
 
     render(<SyncStatusBadge />);
 
-    expect(await screen.findByLabelText('Sync status: Saved locally (3)')).toBeInTheDocument();
+    expect(await screen.findByLabelText('Sync status: Saved on device (3)')).toBeInTheDocument();
     expect(screen.getByRole('button')).toBeDisabled();
     fireEvent.click(screen.getByRole('button'));
     expect(retryFailedQueueMock).not.toHaveBeenCalled();
     expect(processSyncQueueMock).not.toHaveBeenCalled();
+  });
+
+  it('uses user-facing failure details for the retry label', async () => {
+    render(<SyncStatusBadge />);
+
+    expect(
+      await screen.findByRole('button', {
+        name: /4 changes did not reach the cloud\. Cloud permissions blocked this change\. Latest: match update\./i,
+      })
+    ).toBeInTheDocument();
   });
 });

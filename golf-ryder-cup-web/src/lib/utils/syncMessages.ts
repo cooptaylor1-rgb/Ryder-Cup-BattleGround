@@ -5,10 +5,10 @@ export type SyncBlockedReason =
   | 'auth-required';
 
 export const SYNC_BLOCKED_MESSAGES: Record<SyncBlockedReason, string> = {
-  offline: 'Reconnect to retry cloud sync.',
-  'supabase-unconfigured': 'Cloud sync needs Supabase set up. Changes stay saved on this device.',
-  'auth-pending': 'Checking your cloud session before retrying sync.',
-  'auth-required': 'Sign in to resume cloud sync.',
+  offline: 'Reconnect to retry cloud saving.',
+  'supabase-unconfigured': 'Cloud saving is not configured yet. Changes stay saved on this device.',
+  'auth-pending': 'Checking your sign-in before retrying cloud saving.',
+  'auth-required': 'Sign in to resume cloud saving.',
 };
 
 export function summarizeSyncError(error?: string): string {

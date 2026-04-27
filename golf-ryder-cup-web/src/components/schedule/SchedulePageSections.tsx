@@ -4,15 +4,7 @@ import React, { useMemo } from 'react';
 import Link from 'next/link';
 import { cn, getCountdown, getCountdownColor, isToday, parseDateInLocalZone } from '@/lib/utils';
 import type { DaySchedule, ScheduleEntry } from '@/components/schedule/scheduleData';
-import {
-  Calendar,
-  ChevronRight,
-  Clock,
-  Flag,
-  Sunrise,
-  Sunset,
-  User,
-} from 'lucide-react';
+import { Calendar, ChevronRight, Clock, Flag, Sunrise, Sunset, User } from 'lucide-react';
 
 export function ScheduleTabSelector({
   selectedTab,
@@ -48,13 +40,14 @@ export function ScheduleTabSelector({
           aria-selected={selectedTab === 'my'}
           aria-controls="schedule-content"
           className={cn(
-            'flex-1 rounded-xl px-4 py-3 font-medium transition-all flex items-center justify-center gap-2 no-underline',
+            'flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold no-underline transition-all active:scale-[0.99] sm:text-base',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)]',
             selectedTab === 'my'
-              ? 'bg-[var(--masters)] text-[var(--canvas)]'
-              : 'bg-[var(--surface)] border border-[var(--rule)] text-[var(--ink)]'
+              ? 'bg-[var(--masters)] text-[var(--canvas)] shadow-card-sm'
+              : 'border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink)] hover:border-[color:var(--masters)]/35 hover:bg-[color:var(--masters)]/5'
           )}
         >
-          <User size={18} />
+          <User size={18} className="shrink-0" />
           Your Matches
         </Link>
         <Link
@@ -65,13 +58,14 @@ export function ScheduleTabSelector({
           aria-selected={selectedTab === 'all'}
           aria-controls="schedule-content"
           className={cn(
-            'flex-1 rounded-xl px-4 py-3 font-medium transition-all flex items-center justify-center gap-2 no-underline',
+            'flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold no-underline transition-all active:scale-[0.99] sm:text-base',
+            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)]',
             selectedTab === 'all'
-              ? 'bg-[var(--masters)] text-[var(--canvas)]'
-              : 'bg-[var(--surface)] border border-[var(--rule)] text-[var(--ink)]'
+              ? 'bg-[var(--masters)] text-[var(--canvas)] shadow-card-sm'
+              : 'border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink)] hover:border-[color:var(--masters)]/35 hover:bg-[color:var(--masters)]/5'
           )}
         >
-          <Calendar size={18} />
+          <Calendar size={18} className="shrink-0" />
           Full Schedule
         </Link>
       </div>
@@ -113,9 +107,9 @@ export const ScheduleDaySection = React.memo(function ScheduleDaySection({
       {day.entries.length === 0 ? (
         <div className="py-[var(--space-4)]">
           <div className="rounded-[1.35rem] border border-dashed border-[var(--rule)] bg-[color:var(--surface)]/72 px-[var(--space-5)] py-[var(--space-5)] text-center">
-            <p className="type-title-sm text-[var(--ink)]">No scheduled events</p>
+            <p className="type-title-sm text-[var(--ink)]">No play scheduled</p>
             <p className="mt-[var(--space-2)] type-caption">
-              Nothing is on the books for this day yet.
+              There are no sessions or tee times for this day.
             </p>
           </div>
         </div>
@@ -183,7 +177,9 @@ const ScheduleEntryCard = React.memo(function ScheduleEntryCard({
     >
       <div className="flex items-start gap-3">
         <div className="w-16 shrink-0">
-          {entry.time ? <div className="text-sm font-semibold text-[var(--ink)]">{entry.time}</div> : null}
+          {entry.time ? (
+            <div className="text-sm font-semibold text-[var(--ink)]">{entry.time}</div>
+          ) : null}
 
           {countdown && !countdown.isPast && isUserMatch && entryIsToday ? (
             <div
@@ -271,7 +267,9 @@ const ScheduleEntryCard = React.memo(function ScheduleEntryCard({
           ) : null}
         </div>
 
-        {onPress ? <ChevronRight size={18} className="shrink-0 text-[var(--ink-tertiary)]" /> : null}
+        {onPress ? (
+          <ChevronRight size={18} className="shrink-0 text-[var(--ink-tertiary)]" />
+        ) : null}
       </div>
     </button>
   );

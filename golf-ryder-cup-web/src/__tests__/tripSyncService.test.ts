@@ -211,6 +211,43 @@ describe('Trip Sync Service', () => {
       expect(typeof status.failed).toBe('number');
       expect(typeof status.total).toBe('number');
     });
+
+    it('describes the newest failed queue item for the status badge', () => {
+      tripSyncRuntime.syncQueue.push(
+        {
+          id: 'older-failed-op',
+          entity: 'session',
+          entityId: 'session-1',
+          operation: 'create',
+          tripId: 'trip-1',
+          status: 'failed',
+          retryCount: 5,
+          error: 'older failure',
+          createdAt: '2026-04-26T10:00:00.000Z',
+          lastAttemptAt: '2026-04-26T10:05:00.000Z',
+        },
+        {
+          id: 'newer-failed-op',
+          entity: 'match',
+          entityId: 'match-1',
+          operation: 'update',
+          tripId: 'trip-1',
+          status: 'failed',
+          retryCount: 5,
+          error: 'newer row level security failure',
+          createdAt: '2026-04-26T10:00:00.000Z',
+          lastAttemptAt: '2026-04-26T10:15:00.000Z',
+        }
+      );
+
+      expect(getSyncQueueStatus()).toMatchObject({
+        failed: 2,
+        lastError: 'newer row level security failure',
+        lastAttemptAt: '2026-04-26T10:15:00.000Z',
+        lastFailedEntity: 'match',
+        lastFailedOperation: 'update',
+      });
+    });
   });
 
   describe('buildSyncOperationKey', () => {

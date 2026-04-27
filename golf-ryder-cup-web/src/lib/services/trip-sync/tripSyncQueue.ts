@@ -705,20 +705,28 @@ export function getSyncQueueStatus(): {
    * staring at a retry button that can't win.
    */
   lastError?: string;
+  lastAttemptAt?: string;
+  lastFailedEntity?: SyncEntity;
+  lastFailedOperation?: SyncOperation;
   blockedReason?: SyncBlockReason;
 } {
   const pending = tripSyncRuntime.syncQueue.filter(
     (item) => item.status === 'pending' || item.status === 'syncing'
   ).length;
   const failedItems = tripSyncRuntime.syncQueue.filter((item) => item.status === 'failed');
-  const lastError = failedItems
+  const lastFailedItem = failedItems
     .slice()
-    .sort((a, b) => (b.lastAttemptAt ?? '').localeCompare(a.lastAttemptAt ?? ''))[0]?.error;
+    .sort((a, b) =>
+      (b.lastAttemptAt ?? b.createdAt).localeCompare(a.lastAttemptAt ?? a.createdAt)
+    )[0];
   return {
     pending,
     failed: failedItems.length,
     total: tripSyncRuntime.syncQueue.length,
-    lastError,
+    lastError: lastFailedItem?.error,
+    lastAttemptAt: lastFailedItem?.lastAttemptAt ?? lastFailedItem?.createdAt,
+    lastFailedEntity: lastFailedItem?.entity,
+    lastFailedOperation: lastFailedItem?.operation,
     blockedReason: getSyncBlockReason() ?? undefined,
   };
 }
