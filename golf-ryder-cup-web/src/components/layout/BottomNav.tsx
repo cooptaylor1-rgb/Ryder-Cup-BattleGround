@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { useAccessStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { Target, Trophy, Home, Settings, Shield, CalendarDays } from 'lucide-react';
+import { useUserInProgressMatch } from '@/lib/hooks';
 
 interface NavItem {
   href: string;
@@ -57,6 +58,7 @@ export function BottomNav() {
   const router = useRouter();
   const pathname = usePathname();
   const { isCaptainMode } = useAccessStore(useShallow((s) => ({ isCaptainMode: s.isCaptainMode })));
+  const { hasInProgress: hasLiveScoring } = useUserInProgressMatch();
 
   const navItems = getNavItemsForMode(isCaptainMode);
 
@@ -123,6 +125,18 @@ export function BottomNav() {
                   className="absolute -top-0.5 -right-1.5 w-2.5 h-2.5 text-[var(--maroon)]"
                   aria-hidden="true"
                 />
+              )}
+              {/* Live-scoring dot on the Score tab when the user has an
+                  in-progress match. Pulses gently so it reads as "live"
+                  without becoming visual noise. */}
+              {item.href === '/score' && hasLiveScoring && (
+                <span
+                  className="absolute -top-0.5 -right-1.5 flex h-2.5 w-2.5 items-center justify-center"
+                  aria-hidden="true"
+                >
+                  <span className="absolute inset-0 animate-ping rounded-full bg-[var(--masters)] opacity-70" />
+                  <span className="relative h-2 w-2 rounded-full bg-[var(--masters)] ring-2 ring-[var(--canvas)]" />
+                </span>
               )}
             </div>
 

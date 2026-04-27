@@ -19,6 +19,16 @@ vi.mock('@/lib/stores', () => ({
   useAccessStore: () => mockAccessStore,
 }));
 
+// Mock useUserInProgressMatch — BottomNav uses this to render the live
+// scoring dot on the Score tab. The component should still render
+// cleanly without an active match. Tests don't need a Dexie environment.
+vi.mock('@/lib/hooks', () => ({
+  useUserInProgressMatch: () => ({
+    matchId: null,
+    hasInProgress: false,
+  }),
+}));
+
 // Mock next/navigation
 const mockPush = vi.fn();
 const mockPathname = vi.fn(() => '/');

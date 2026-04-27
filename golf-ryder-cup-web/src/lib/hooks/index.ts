@@ -116,6 +116,12 @@ export {
 // Visibility-based polling (battery optimization)
 export { useVisibilityPolling } from './useVisibilityPolling';
 
+// Resume-scoring driver — current user's in-progress match for the trip
+export { useUserInProgressMatch } from './useUserInProgressMatch';
+
+// Ambient-light driver for auto-flipping to sunlight (outdoor) theme
+export { useAmbientLight } from './useAmbientLight';
+
 // Session timeout management
 export {
   useSessionTimeout,
