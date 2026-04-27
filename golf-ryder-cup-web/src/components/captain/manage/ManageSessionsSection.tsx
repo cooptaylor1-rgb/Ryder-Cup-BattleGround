@@ -59,6 +59,7 @@ export function SessionManagementCard({
   isSubmitting: boolean;
 }) {
   const statusMeta = sessionStatusStyles[session.status];
+  const detailsId = `session-${session.id}-details`;
   const { showToast } = useToastStore(
     useShallow((s) => ({ showToast: s.showToast })),
   );
@@ -90,7 +91,10 @@ export function SessionManagementCard({
       )}
     >
       <button
+        type="button"
         onClick={onToggle}
+        aria-expanded={isExpanded}
+        aria-controls={detailsId}
         className="flex w-full items-start gap-[var(--space-4)] border-none bg-transparent px-[var(--space-5)] py-[var(--space-5)] text-left"
       >
         <div className="mt-[var(--space-1)] shrink-0">{statusMeta.icon}</div>
@@ -163,7 +167,10 @@ export function SessionManagementCard({
       </button>
 
       {isExpanded ? (
-        <div className="border-t border-[color:var(--rule)]/75 bg-[rgba(255,255,255,0.52)] px-[var(--space-5)] py-[var(--space-5)]">
+        <div
+          id={detailsId}
+          className="border-t border-[color:var(--rule)]/75 bg-[rgba(255,255,255,0.52)] px-[var(--space-5)] py-[var(--space-5)]"
+        >
           {canPauseOrResume && (
             <div className="mb-[var(--space-4)] flex flex-wrap items-center gap-[var(--space-3)] rounded-[1.25rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.7)] px-[var(--space-4)] py-[var(--space-3)]">
               <div className="flex-1 min-w-0">
@@ -257,7 +264,6 @@ export function SessionManagementCard({
     </section>
   );
 }
-
 
 
 

@@ -3,7 +3,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/Button';
 import { EmptyStatePremium, ErrorBoundary, NoScoresEmpty } from '@/components/ui';
-import { ChevronRight } from 'lucide-react';
+import { Activity, ChevronRight, Crown, Flag, Trophy, Users, type LucideIcon } from 'lucide-react';
 import { cn, formatPlayerName } from '@/lib/utils';
 import type { MatchState } from '@/lib/types/computed';
 import type { Player, RyderCupSession } from '@/lib/types/models';
@@ -72,51 +72,120 @@ export function ScorePageSections({
   onGoToMatchups,
   onOpenProfile,
 }: ScorePageSectionsProps) {
+  const featuredMatchState = React.useMemo(() => {
+    if (quickContinueMatchId) {
+      return matchStates.find((state) => state.match.id === quickContinueMatchId);
+    }
+
+    return (
+      matchStates.find((state) => state.status === 'inProgress') ??
+      matchStates.find((state) => state.status === 'scheduled') ??
+      matchStates[0]
+    );
+  }, [matchStates, quickContinueMatchId]);
+
+  const liveLeaderboard = React.useMemo(
+    () =>
+      [...matchStates]
+        .sort((left, right) => {
+          const statusRank = (state: MatchState) =>
+            state.status === 'inProgress' ? 0 : state.status === 'scheduled' ? 1 : 2;
+          const rankDelta = statusRank(left) - statusRank(right);
+          if (rankDelta !== 0) return rankDelta;
+          if (left.status === 'inProgress' && right.status === 'inProgress') {
+            return right.holesPlayed - left.holesPlayed;
+          }
+          return left.match.matchOrder - right.match.matchOrder;
+        })
+        .slice(0, 4),
+    [matchStates]
+  );
+
+  const userMatchStates = React.useMemo(
+    () =>
+      currentUserPlayerId
+        ? matchStates.filter(
+            (state) =>
+              state.match.teamAPlayerIds.includes(currentUserPlayerId) ||
+              state.match.teamBPlayerIds.includes(currentUserPlayerId)
+          )
+        : [],
+    [currentUserPlayerId, matchStates]
+  );
+
   return (
     <main className="container-editorial">
       {activeSession ? (
         <section className="pt-[var(--space-8)]">
           <div className="card-editorial overflow-hidden p-[var(--space-5)] sm:p-[var(--space-6)]">
-            <div className="flex items-start justify-between gap-[var(--space-4)]">
-              <div>
-                <p className="type-overline tracking-[0.16em] text-[var(--masters)]">
-                  Current Session
-                </p>
-                <h1 className="type-display mt-[var(--space-2)] capitalize">
-                  {activeSession.sessionType}
-                </h1>
-                <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
-                  Session {activeSession.sessionNumber} for {currentTripName}
-                </p>
-              </div>
-              <SessionStatusPill status={activeSession.status} />
-            </div>
-
-            <div className="mt-[var(--space-5)] grid grid-cols-3 gap-3">
-              <ScoreSessionStat label="Live" value={sessionStats.live} />
-              <ScoreSessionStat label="Complete" value={sessionStats.completed} />
-              <ScoreSessionStat label="Your Matches" value={sessionStats.userMatches} />
-            </div>
-
-            {quickContinueMatchId ? (
-              <button
-                type="button"
-                onClick={() => onSelectMatch(quickContinueMatchId)}
-                className="mt-[var(--space-5)] flex w-full items-center justify-between gap-[var(--space-4)] rounded-[24px] border border-[color:var(--masters)]/20 bg-[color:var(--masters)]/10 px-[var(--space-5)] py-[var(--space-4)] text-left shadow-[0_8px_20px_rgba(0,102,68,0.08)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--masters)]/40 active:scale-[0.99]"
-                aria-label="Continue scoring active match"
-              >
-                <div>
-                  <p className="type-overline text-[var(--masters)]">Continue</p>
-                  <p className="mt-[var(--space-1)] type-title-sm text-[var(--ink)]">
-                    Continue live match
-                  </p>
-                  <p className="mt-1 text-sm text-[var(--ink-secondary)]">
-                    Open the match already in progress.
-                  </p>
+            <div className="grid gap-[var(--space-6)] lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+              <div className="min-w-0">
+                <div className="flex items-start justify-between gap-[var(--space-4)]">
+                  <div className="min-w-0">
+                    <p className="type-overline tracking-[0.16em] text-[var(--masters)]">
+                      Current Session
+                    </p>
+                    <h1 className="type-display mt-[var(--space-2)] capitalize">
+                      {activeSession.sessionType}
+                    </h1>
+                    <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
+                      Session {activeSession.sessionNumber} for {currentTripName}
+                    </p>
+                  </div>
+                  <SessionStatusPill status={activeSession.status} />
                 </div>
-                <ChevronRight size={18} className="text-[var(--ink-tertiary)]" />
-              </button>
-            ) : null}
+
+                <div className="mt-[var(--space-5)] grid grid-cols-3 gap-3">
+                  <ScoreSessionStat icon={Activity} label="Live" value={sessionStats.live} />
+                  <ScoreSessionStat icon={Trophy} label="Complete" value={sessionStats.completed} />
+                  <ScoreSessionStat
+                    icon={Users}
+                    label="Your Matches"
+                    value={sessionStats.userMatches}
+                  />
+                </div>
+
+                {featuredMatchState ? (
+                  <FeaturedMatchPanel
+                    matchState={featuredMatchState}
+                    teamAPlayers={getMatchPlayers(featuredMatchState.match.teamAPlayerIds)}
+                    teamBPlayers={getMatchPlayers(featuredMatchState.match.teamBPlayerIds)}
+                    onClick={() => onSelectMatch(featuredMatchState.match.id)}
+                    isQuickContinue={featuredMatchState.match.id === quickContinueMatchId}
+                  />
+                ) : null}
+              </div>
+
+              <div className="rounded-[28px] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,var(--canvas)_0%,var(--surface-secondary)_100%)] p-4">
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div>
+                    <p className="type-overline text-[var(--ink-secondary)]">Live board</p>
+                    <p className="mt-1 text-sm text-[var(--ink-secondary)]">
+                      Every match at a glance.
+                    </p>
+                  </div>
+                  <Flag size={18} className="text-[var(--masters)]" />
+                </div>
+
+                {liveLeaderboard.length > 0 ? (
+                  <div className="space-y-2">
+                    {liveLeaderboard.map((state) => (
+                      <LeaderboardRow
+                        key={state.match.id}
+                        matchState={state}
+                        teamAPlayers={getMatchPlayers(state.match.teamAPlayerIds)}
+                        teamBPlayers={getMatchPlayers(state.match.teamBPlayerIds)}
+                        onClick={() => onSelectMatch(state.match.id)}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="rounded-[20px] border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/72 px-4 py-5 text-sm text-[var(--ink-secondary)]">
+                    Matches will appear here as soon as the session is published.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         </section>
       ) : null}
@@ -179,6 +248,32 @@ export function ScorePageSections({
           </div>
         ) : null}
 
+        {userMatchStates.length > 0 ? (
+          <div className="mb-[var(--space-5)] rounded-[28px] border border-[color:var(--masters)]/20 bg-[color:var(--masters)]/8 p-4">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div>
+                <p className="type-overline text-[var(--masters)]">Your card</p>
+                <p className="mt-1 text-sm text-[var(--ink-secondary)]">
+                  Jump directly into the match that matters to you.
+                </p>
+              </div>
+              <Crown size={18} className="text-[var(--masters)]" />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {userMatchStates.map((state) => (
+                <LeaderboardRow
+                  key={state.match.id}
+                  matchState={state}
+                  teamAPlayers={getMatchPlayers(state.match.teamAPlayerIds)}
+                  teamBPlayers={getMatchPlayers(state.match.teamBPlayerIds)}
+                  onClick={() => onSelectMatch(state.match.id)}
+                  emphasized
+                />
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         <ErrorBoundary variant="compact" showDetails={process.env.NODE_ENV === 'development'}>
           {isLoading ? (
             <div className="flex flex-col gap-[var(--space-4)] py-[var(--space-8)]">
@@ -229,6 +324,144 @@ interface MatchRowProps {
   isUserMatch?: boolean;
 }
 
+function formatPlayerList(playerList: Player[]) {
+  if (playerList.length === 0) return 'Lineup pending';
+  return playerList
+    .map((player) => formatPlayerName(player.firstName, player.lastName, 'short'))
+    .join(' / ');
+}
+
+function getMatchLeaderLabel(matchState: MatchState, teamAName: string, teamBName: string) {
+  if (matchState.status === 'completed') {
+    if (matchState.winningTeam === 'teamA') return `${teamAName} won ${matchState.displayScore}`;
+    if (matchState.winningTeam === 'teamB') return `${teamBName} won ${matchState.displayScore}`;
+    return `Halved ${matchState.displayScore}`;
+  }
+
+  if (matchState.holesPlayed === 0) return 'Opening tee';
+  if (matchState.currentScore > 0) return `${teamAName} leads ${matchState.displayScore}`;
+  if (matchState.currentScore < 0) return `${teamBName} leads ${matchState.displayScore}`;
+  return `All square thru ${matchState.holesPlayed}`;
+}
+
+function getMatchProgressLabel(matchState: MatchState) {
+  if (matchState.status === 'completed') return 'Final';
+  if (matchState.holesPlayed === 0) return 'Not started';
+  return `Thru ${matchState.holesPlayed} · ${matchState.holesRemaining} left`;
+}
+
+function scoreTone(matchState: MatchState) {
+  if (matchState.currentScore > 0) return 'text-[var(--team-usa)]';
+  if (matchState.currentScore < 0) return 'text-[var(--team-europe)]';
+  return 'text-[var(--ink-tertiary)]';
+}
+
+function FeaturedMatchPanel({
+  matchState,
+  teamAPlayers,
+  teamBPlayers,
+  onClick,
+  isQuickContinue,
+}: {
+  matchState: MatchState;
+  teamAPlayers: Player[];
+  teamBPlayers: Player[];
+  onClick: () => void;
+  isQuickContinue: boolean;
+}) {
+  const teamALabel = formatPlayerList(teamAPlayers);
+  const teamBLabel = formatPlayerList(teamBPlayers);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="mt-[var(--space-5)] w-full rounded-[28px] border border-[color:var(--masters)]/20 bg-[linear-gradient(135deg,rgba(0,102,68,0.12)_0%,rgba(255,255,255,0.78)_100%)] px-[var(--space-5)] py-[var(--space-4)] text-left shadow-[0_8px_20px_rgba(0,102,68,0.08)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--masters)]/40 active:scale-[0.99]"
+      aria-label={isQuickContinue ? 'Continue scoring active match' : 'Open featured match'}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="type-overline text-[var(--masters)]">
+            {isQuickContinue ? 'Continue scoring' : 'Featured match'}
+          </p>
+          <p className="mt-2 truncate type-title-sm text-[var(--ink)]">
+            {teamALabel} vs {teamBLabel}
+          </p>
+          <p className="mt-2 text-sm font-medium text-[var(--ink-secondary)]">
+            {getMatchLeaderLabel(matchState, 'USA', 'Europe')}
+          </p>
+        </div>
+        <div className="shrink-0 text-right">
+          <p
+            className={cn(
+              'font-serif text-[length:var(--text-3xl)] leading-none',
+              scoreTone(matchState)
+            )}
+          >
+            {matchState.displayScore}
+          </p>
+          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ink-tertiary)]">
+            {getMatchProgressLabel(matchState)}
+          </p>
+        </div>
+        <ChevronRight size={18} className="mt-2 shrink-0 text-[var(--ink-tertiary)]" />
+      </div>
+    </button>
+  );
+}
+
+function LeaderboardRow({
+  matchState,
+  teamAPlayers,
+  teamBPlayers,
+  onClick,
+  emphasized = false,
+}: {
+  matchState: MatchState;
+  teamAPlayers: Player[];
+  teamBPlayers: Player[];
+  onClick: () => void;
+  emphasized?: boolean;
+}) {
+  const teamALabel = formatPlayerList(teamAPlayers);
+  const teamBLabel = formatPlayerList(teamBPlayers);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'flex w-full items-center justify-between gap-3 rounded-[20px] border px-3 py-3 text-left transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--masters)]/35 active:scale-[0.99]',
+        emphasized
+          ? 'border-[color:var(--masters)]/25 bg-[color:var(--canvas)]/90'
+          : 'border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/72'
+      )}
+      aria-label={`Open Match ${matchState.match.matchOrder}`}
+    >
+      <div className="min-w-0">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+          Match {matchState.match.matchOrder}
+        </p>
+        <p className="mt-1 truncate text-sm font-semibold text-[var(--ink)]">{teamALabel}</p>
+        <p className="mt-0.5 truncate text-sm text-[var(--ink-secondary)]">{teamBLabel}</p>
+      </div>
+      <div className="shrink-0 text-right">
+        <p
+          className={cn(
+            'font-serif text-[length:var(--text-xl)] leading-none',
+            scoreTone(matchState)
+          )}
+        >
+          {matchState.displayScore}
+        </p>
+        <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink-tertiary)]">
+          {getMatchProgressLabel(matchState)}
+        </p>
+      </div>
+    </button>
+  );
+}
+
 const MatchRow = React.memo(function MatchRow({
   matchState,
   matchNumber,
@@ -239,13 +472,8 @@ const MatchRow = React.memo(function MatchRow({
 }: MatchRowProps) {
   const { currentScore, holesPlayed, status, displayScore } = matchState;
   const isActive = status === 'inProgress';
-
-  const formatPlayers = (playerList: Player[]) => {
-    if (playerList.length === 0) return '\u2014';
-    return playerList
-      .map((player) => formatPlayerName(player.firstName, player.lastName, 'short'))
-      .join(' / ');
-  };
+  const teamALabel = formatPlayerList(teamAPlayers);
+  const teamBLabel = formatPlayerList(teamBPlayers);
 
   return (
     <button
@@ -304,7 +532,7 @@ const MatchRow = React.memo(function MatchRow({
                 currentScore > 0 ? 'font-bold' : 'font-medium'
               )}
             >
-              {formatPlayers(teamAPlayers)}
+              {teamALabel}
             </span>
             {currentScore > 0 ? (
               <span className="text-[10px] font-bold uppercase tracking-[0.05em] text-[var(--team-usa)]">
@@ -321,7 +549,7 @@ const MatchRow = React.memo(function MatchRow({
                 currentScore < 0 ? 'font-bold' : 'font-medium'
               )}
             >
-              {formatPlayers(teamBPlayers)}
+              {teamBLabel}
             </span>
             {currentScore < 0 ? (
               <span className="text-[10px] font-bold uppercase tracking-[0.05em] text-[var(--team-europe)]">
@@ -361,9 +589,18 @@ const MatchRow = React.memo(function MatchRow({
   );
 });
 
-function ScoreSessionStat({ label, value }: { label: string; value: number }) {
+function ScoreSessionStat({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: number;
+}) {
   return (
     <div className="rounded-[20px] border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/72 px-3 py-3 text-center">
+      <Icon size={15} className="mx-auto text-[var(--masters)]" />
       <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
         {label}
       </p>

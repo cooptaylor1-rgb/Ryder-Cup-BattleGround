@@ -32,6 +32,12 @@ import { cn } from '@/lib/utils';
 interface SwipeScorePanelProps {
   /** Current hole number (1-18) */
   holeNumber: number;
+  /** Par for the current hole */
+  par?: number;
+  /** Stroke index / handicap rank for the current hole */
+  strokeIndex?: number;
+  /** Yardage for the current hole */
+  yardage?: number;
   /** Team A display name */
   teamAName: string;
   /** Team B display name */
@@ -64,6 +70,9 @@ function colorWithAlpha(color: string, alphaPercent: number) {
 
 export function SwipeScorePanel({
   holeNumber,
+  par,
+  strokeIndex,
+  yardage,
   teamAName,
   teamBName,
   teamAColor = '#1E3A5F',
@@ -271,6 +280,14 @@ export function SwipeScorePanel({
       : `${teamBName} is recorded as the hole winner`;
   };
 
+  const holeFacts = [
+    par ? `Par ${par}` : null,
+    strokeIndex ? `SI ${strokeIndex}` : null,
+    yardage ? `${yardage} yds` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
   return (
     <div
       ref={containerRef}
@@ -290,7 +307,7 @@ export function SwipeScorePanel({
       onKeyDown={handleKeyDown}
       role="group"
       aria-disabled={disabled}
-      aria-label={`Score entry for hole ${holeNumber}. Press Left arrow or A for ${teamAName} wins, Right arrow or B for ${teamBName} wins, Up arrow or H for halved.`}
+      aria-label={`Score entry for hole ${holeNumber}${holeFacts ? `, ${holeFacts}` : ''}. Press Left arrow or A for ${teamAName} wins, Right arrow or B for ${teamBName} wins, Up arrow or H for halved.`}
     >
       <p className="sr-only" aria-live="polite">
         {getExistingResultLabel()}
@@ -379,7 +396,7 @@ export function SwipeScorePanel({
           {/* Main orb */}
           <div
             className={`
-              relative w-32 h-32 rounded-full flex flex-col items-center justify-center
+              relative w-36 h-36 rounded-full flex flex-col items-center justify-center
               shadow-2xl transition-colors duration-200
               ${disabled ? 'opacity-50' : ''}
             `}
@@ -398,12 +415,17 @@ export function SwipeScorePanel({
             <span className="text-xs text-[color:var(--canvas)]/80 uppercase tracking-wider">
               Hole
             </span>
+            {holeFacts && (
+              <span className="mt-1 max-w-28 truncate text-center text-[11px] font-medium text-[color:var(--canvas)]/82">
+                {holeFacts}
+              </span>
+            )}
           </div>
 
           {/* Gesture hints */}
           {gestureState === 'idle' && !disabled && (
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-              <span className="text-xs text-[var(--ink-tertiary)]">Swipe to score</span>
+              <span className="text-xs text-[var(--ink-tertiary)]">Swipe or tap to score</span>
             </div>
           )}
         </motion.div>

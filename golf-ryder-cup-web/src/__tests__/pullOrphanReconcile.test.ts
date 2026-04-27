@@ -18,6 +18,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { db } from '../lib/db';
 import {
+  getPendingDeleteSyncIdsForTrip,
   getPendingSyncIdsForTrip,
   queueSyncOperation,
 } from '../lib/services/tripSyncService';
@@ -27,10 +28,17 @@ async function reconcileTripPlayers(
   tripId: string,
   cloudPlayerIds: string[]
 ): Promise<void> {
-  const pending = getPendingSyncIdsForTrip(tripId, 'player');
+  const pendingDeletes = getPendingDeleteSyncIdsForTrip(tripId, 'player');
+  const pending = new Set(
+    [...getPendingSyncIdsForTrip(tripId, 'player')].filter((id) => !pendingDeletes.has(id))
+  );
   const cloud = new Set(cloudPlayerIds);
   const local = await db.players.where('tripId').equals(tripId).toArray();
   for (const p of local) {
+    if (pendingDeletes.has(p.id)) {
+      await db.players.delete(p.id);
+      continue;
+    }
     if (cloud.has(p.id)) continue;
     if (pending.has(p.id)) continue;
     await db.players.delete(p.id);
@@ -115,6 +123,19 @@ describe('reconcileLocalOrphans — contract: gated-delete for local rows', () =
 
     const remaining = await db.players.toArray();
     expect(remaining.map((p) => p.id)).toContain('edited-local');
+  });
+
+  it('deletes a local player with a pending delete instead of resurrecting it', async () => {
+    const tripId = 'trip-1';
+    await db.trips.add(seedTrip(tripId));
+    const deleted = seedPlayer('deleted-local', tripId, 'deleted@example.com');
+    await db.players.add(deleted);
+
+    queueSyncOperation('player', 'deleted-local', 'delete', tripId);
+
+    await reconcileTripPlayers(tripId, []);
+
+    expect(await db.players.get('deleted-local')).toBeUndefined();
   });
 
   it('does not touch players on other trips', async () => {

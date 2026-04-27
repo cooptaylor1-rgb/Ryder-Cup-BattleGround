@@ -1,22 +1,12 @@
 import type { Match, RyderCupSession } from '@/lib/types/models';
+import { getFirstOpenSessionNumber } from '@/lib/utils/sessionNumbering';
 
 export function getTimeSlotForSessionNumber(sessionNumber: number): 'AM' | 'PM' {
   return sessionNumber % 2 === 0 ? 'PM' : 'AM';
 }
 
 export function getNextSessionNumber(sessions: Pick<RyderCupSession, 'sessionNumber'>[]): number {
-  const takenSessionNumbers = new Set(
-    sessions
-      .map((session) => session.sessionNumber)
-      .filter((sessionNumber) => Number.isInteger(sessionNumber) && sessionNumber > 0)
-  );
-
-  let candidate = 1;
-  while (takenSessionNumbers.has(candidate)) {
-    candidate += 1;
-  }
-
-  return candidate;
+  return getFirstOpenSessionNumber(sessions);
 }
 
 export function getDefaultTeeTimeForSessionNumber(sessionNumber: number): string {

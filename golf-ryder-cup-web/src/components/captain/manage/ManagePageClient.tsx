@@ -155,6 +155,10 @@ export function ManagePageClient() {
 
       try {
         await deleteMatchCascade(matchId);
+        setEditingMatch((current) => (current === matchId ? null : current));
+        if (requestedMatchId === matchId) {
+          router.replace('/captain/manage');
+        }
         showToast('success', 'Match deleted');
       } catch (error) {
         captainLogger.error('Failed to delete match:', error);
@@ -163,7 +167,7 @@ export function ManagePageClient() {
         setIsSubmitting(false);
       }
     },
-    [isSubmitting, showToast]
+    [isSubmitting, requestedMatchId, router, showToast]
   );
 
   const handleDeleteMatch = useCallback(
@@ -190,11 +194,25 @@ export function ManagePageClient() {
       setIsSubmitting(true);
 
       try {
+        const deletedSession = sessionsWithMatches.find((session) => session.id === sessionId);
         await deleteSessionCascade(sessionId);
+        setExpandedSessions((current) => {
+          if (!current.has(sessionId)) return current;
+          const next = new Set(current);
+          next.delete(sessionId);
+          return next;
+        });
+        if (
+          requestedSessionId === sessionId ||
+          (requestedMatchId &&
+            deletedSession?.matches.some((match) => match.id === requestedMatchId))
+        ) {
+          router.replace('/captain/manage');
+        }
         if (currentTrip?.id) {
           await loadTrip(currentTrip.id);
         }
-        showToast('success', 'Session deleted');
+        showToast('success', 'Session deleted. Schedule and pairings updated.');
       } catch (error) {
         captainLogger.error('Failed to delete session:', error);
         showToast('error', 'Failed to delete session. Some data may be partially deleted.');
@@ -202,7 +220,16 @@ export function ManagePageClient() {
         setIsSubmitting(false);
       }
     },
-    [currentTrip?.id, isSubmitting, loadTrip, showToast]
+    [
+      currentTrip?.id,
+      isSubmitting,
+      loadTrip,
+      requestedMatchId,
+      requestedSessionId,
+      router,
+      sessionsWithMatches,
+      showToast,
+    ]
   );
 
   const handleDeleteSession = useCallback(
@@ -342,11 +369,10 @@ export function ManagePageClient() {
                     Manage Trip
                   </p>
                   <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3rem)] italic leading-[1.02] text-[var(--ink)]">
-                    Tune the board before the day gets loud.
+                    Keep the trip ready for play.
                   </h1>
                   <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
-                    Adjust session settings, tidy match allowances, and keep the roster calibrated
-                    before the group starts asking for answers.
+                    Adjust session settings, update match details, and keep the roster accurate.
                   </p>
                 </div>
 
@@ -409,9 +435,9 @@ export function ManagePageClient() {
 
         <section className="pt-[var(--space-6)]">
           <ManageSectionHeading
-            eyebrow="Session Desk"
+            eyebrow="Sessions"
             title="Sessions and matches"
-            description="The rhythm of the trip lives here. Expand a session, adjust the settings, and make quick corrections without losing the thread."
+            description="Expand a session to adjust settings, update match details, or remove rounds that no longer belong on the trip."
           />
 
           {sessionsWithMatches.length === 0 ? (
@@ -450,9 +476,9 @@ export function ManagePageClient() {
 
         <section className="pt-[var(--space-8)]">
           <ManageSectionHeading
-            eyebrow="Roster Desk"
-            title="Player calibration"
-            description="Handicap upkeep should feel deliberate, not clerical. Keep the roster clean before the pairings start to move."
+            eyebrow="Roster"
+            title="Players and handicaps"
+            description="Update handicaps and team details before pairings move."
           />
 
           {players.length === 0 ? (

@@ -9,9 +9,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
-import { useAuthStore, useScoringStore, useTripStore, useToastStore, useScoringPrefsStore, useAccessStore } from '@/lib/stores';
+import {
+  useAuthStore,
+  useScoringStore,
+  useTripStore,
+  useToastStore,
+  useScoringPrefsStore,
+  useAccessStore,
+} from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
-import { zIndex } from '@/lib/constants/zIndex';
 import { useHaptic, useMatchState } from '@/lib/hooks';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
@@ -39,16 +45,32 @@ export default function MatchScoringPageClient() {
   const params = useParams();
   const matchId = params.matchId as string;
 
-  const { currentTrip, courses, players, teams, teeSets, sessions } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, courses: s.courses, players: s.players, teams: s.teams, teeSets: s.teeSets, sessions: s.sessions })));
+  const { currentTrip, courses, players, teams, teeSets, sessions } = useTripStore(
+    useShallow((s) => ({
+      currentTrip: s.currentTrip,
+      courses: s.courses,
+      players: s.players,
+      teams: s.teams,
+      teeSets: s.teeSets,
+      sessions: s.sessions,
+    }))
+  );
   const { currentUser, isAuthenticated, authUserId } = useAuthStore();
-  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
+  const { showToast } = useToastStore(useShallow((s) => ({ showToast: s.showToast })));
   const {
     scoringPreferences,
     scoringModeByFormat,
     getScoringModeForFormat,
     setScoringModeForFormat,
-  } = useScoringPrefsStore(useShallow(s => ({ scoringPreferences: s.scoringPreferences, scoringModeByFormat: s.scoringModeByFormat, getScoringModeForFormat: s.getScoringModeForFormat, setScoringModeForFormat: s.setScoringModeForFormat })));
-  const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
+  } = useScoringPrefsStore(
+    useShallow((s) => ({
+      scoringPreferences: s.scoringPreferences,
+      scoringModeByFormat: s.scoringModeByFormat,
+      getScoringModeForFormat: s.getScoringModeForFormat,
+      setScoringModeForFormat: s.setScoringModeForFormat,
+    }))
+  );
+  const { isCaptainMode } = useAccessStore(useShallow((s) => ({ isCaptainMode: s.isCaptainMode })));
   const haptic = useHaptic();
   const isOnline = useOnlineStatus();
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -77,9 +99,7 @@ export default function MatchScoringPageClient() {
   const liveMatchState = useMatchState(matchId);
   const matchState = liveMatchState || activeMatchState;
 
-  const [scoringModeOverrides, setScoringModeOverrides] = useState<Record<string, ScoringMode>>(
-    {}
-  );
+  const [scoringModeOverrides, setScoringModeOverrides] = useState<Record<string, ScoringMode>>({});
   const currentIdentity = useMemo(
     () => withTripPlayerIdentity(currentUser, authUserId),
     [authUserId, currentUser]
@@ -195,85 +215,65 @@ export default function MatchScoringPageClient() {
     return <PracticeScoringPage matchId={activeMatch.id} />;
   }
 
-  // Pre-flight: warn (but don't block) when no course is assigned. Handicap
-  // strokes can't be calculated without a tee set, so the match will be
-  // scored gross. If the captain fixes the course later, they can re-enter.
-  const missingCourse = !activeMatch.courseId;
-
   return (
     <>
-      {missingCourse && (
-        <div
-          style={{ zIndex: zIndex.nav + 1 }}
-          className="fixed top-0 inset-x-0 bg-[color:var(--warning)]/95 text-[var(--ink)] px-4 py-3 text-center text-sm font-medium backdrop-blur-sm safe-top"
-        >
-          <span className="mr-2">⚠</span>
-          No course assigned — scoring as gross (no handicap strokes).
-          {isCaptainMode && (
-            <button
-              type="button"
-              onClick={() => router.push('/captain/manage')}
-              className="ml-2 underline font-semibold"
-            >
-              Assign now
-            </button>
-          )}
-        </div>
-      )}
       <MatchScoringPageSections
-      matchId={matchId}
-      currentTripId={currentTrip?.id}
-      matchOrder={activeMatch.matchOrder}
-      matchState={matchState}
-      currentHole={currentHole}
-      currentHoleResult={model.currentHoleResult}
-      model={model}
-      ui={ui}
-      actions={actions}
-      presses={presses}
-      isSaving={isSaving}
-      undoCount={undoStack.length}
-      isCaptainMode={isCaptainMode}
-      prefersReducedMotion={prefersReducedMotion}
-      quickScoreMode={scoringPreferences.quickScoreMode}
-      preferredHand={scoringPreferences.preferredHand}
-      confirmDialog={ConfirmDialogComponent}
-      onBackToScore={handleBackToScore}
-      onHoleSelect={goToHole}
-      onPrevHole={prevHole}
-      onNextHole={nextHole}
-      onPress={handlePress}
-      onStrokeAlertShown={(_hole, teamAStrokes, teamBStrokes) => {
-        if (teamAStrokes > 0 || teamBStrokes > 0) {
-          haptic.tap();
-        }
-      }}
-      onOpenVoiceModal={() => ui.setShowVoiceModal(true)}
-      onCloseVoiceModal={() => ui.setShowVoiceModal(false)}
-      onViewStandings={() => router.push('/standings')}
-      onScoreNextMatch={(nextMatchId) => router.push(`/score/${nextMatchId}`)}
-      onBackToMatches={handleBackToScore}
-      onEditScores={async () => {
-        // Flip the match out of completed state so the rest of the UI
-        // treats it as live and subsequent scoring writes follow the
-        // normal inProgress path. Previously "Correct a Score" only
-        // switched the UI into edit mode, leaving match.status as
-        // 'completed' — peer devices, standings, and the audit log all
-        // still saw a finalized match while the captain was actively
-        // rewriting it.
-        if (activeMatch?.status === 'completed') {
-          try {
-            await reopenMatch(activeMatch.id);
-            scoringLogger.info('Match reopened for correction', { matchId: activeMatch.id });
-          } catch (error) {
-            scoringLogger.error('Failed to reopen match for correction', { matchId: activeMatch.id, error });
+        matchId={matchId}
+        currentTripId={currentTrip?.id}
+        matchOrder={activeMatch.matchOrder}
+        matchState={matchState}
+        currentHole={currentHole}
+        currentHoleResult={model.currentHoleResult}
+        model={model}
+        ui={ui}
+        actions={actions}
+        presses={presses}
+        isSaving={isSaving}
+        undoCount={undoStack.length}
+        isCaptainMode={isCaptainMode}
+        prefersReducedMotion={prefersReducedMotion}
+        quickScoreMode={scoringPreferences.quickScoreMode}
+        preferredHand={scoringPreferences.preferredHand}
+        confirmDialog={ConfirmDialogComponent}
+        onBackToScore={handleBackToScore}
+        onHoleSelect={goToHole}
+        onPrevHole={prevHole}
+        onNextHole={nextHole}
+        onPress={handlePress}
+        onStrokeAlertShown={(_hole, teamAStrokes, teamBStrokes) => {
+          if (teamAStrokes > 0 || teamBStrokes > 0) {
+            haptic.tap();
           }
-        }
-        ui.setIsEditingScores(true);
-        goToHole(1);
-      }}
-      onScoringModeChange={handleScoringModeChange}
-    />
+        }}
+        onOpenVoiceModal={() => ui.setShowVoiceModal(true)}
+        onCloseVoiceModal={() => ui.setShowVoiceModal(false)}
+        onViewStandings={() => router.push('/standings')}
+        onScoreNextMatch={(nextMatchId) => router.push(`/score/${nextMatchId}`)}
+        onBackToMatches={handleBackToScore}
+        onEditScores={async () => {
+          // Flip the match out of completed state so the rest of the UI
+          // treats it as live and subsequent scoring writes follow the
+          // normal inProgress path. Previously "Correct a Score" only
+          // switched the UI into edit mode, leaving match.status as
+          // 'completed' — peer devices, standings, and the audit log all
+          // still saw a finalized match while the captain was actively
+          // rewriting it.
+          if (activeMatch?.status === 'completed') {
+            try {
+              await reopenMatch(activeMatch.id);
+              scoringLogger.info('Match reopened for correction', { matchId: activeMatch.id });
+            } catch (error) {
+              scoringLogger.error('Failed to reopen match for correction', {
+                matchId: activeMatch.id,
+                error,
+              });
+            }
+          }
+          ui.setIsEditingScores(true);
+          goToHole(1);
+        }}
+        onScoringModeChange={handleScoringModeChange}
+      />
     </>
   );
 }

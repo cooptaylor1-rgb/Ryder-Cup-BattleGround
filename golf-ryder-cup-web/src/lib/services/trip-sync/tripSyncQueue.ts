@@ -678,20 +678,48 @@ export type FailedSyncQueueItemSummary = {
   createdAt: string;
 };
 
+export type UnresolvedSyncQueueItemSummary = FailedSyncQueueItemSummary & {
+  status: SyncQueueItem['status'];
+};
+
+function summarizeQueueItem(item: SyncQueueItem): UnresolvedSyncQueueItemSummary {
+  return {
+    entity: item.entity,
+    entityId: item.entityId,
+    operation: item.operation,
+    status: item.status,
+    retryCount: item.retryCount,
+    error: item.error,
+    lastAttemptAt: item.lastAttemptAt,
+    createdAt: item.createdAt,
+  };
+}
+
 export function getFailedSyncQueueItems(limit = 5): FailedSyncQueueItemSummary[] {
   return tripSyncRuntime.syncQueue
     .filter((item) => item.status === 'failed')
     .sort((a, b) => (b.lastAttemptAt ?? b.createdAt).localeCompare(a.lastAttemptAt ?? a.createdAt))
     .slice(0, limit)
-    .map((item) => ({
-      entity: item.entity,
-      entityId: item.entityId,
-      operation: item.operation,
-      retryCount: item.retryCount,
-      error: item.error,
-      lastAttemptAt: item.lastAttemptAt,
-      createdAt: item.createdAt,
-    }));
+    .map((item) => {
+      const summary = summarizeQueueItem(item);
+      return {
+        entity: summary.entity,
+        entityId: summary.entityId,
+        operation: summary.operation,
+        retryCount: summary.retryCount,
+        error: summary.error,
+        lastAttemptAt: summary.lastAttemptAt,
+        createdAt: summary.createdAt,
+      };
+    });
+}
+
+export function getUnresolvedSyncQueueItems(limit = 5): UnresolvedSyncQueueItemSummary[] {
+  return tripSyncRuntime.syncQueue
+    .filter((item) => item.status !== 'completed')
+    .sort((a, b) => (b.lastAttemptAt ?? b.createdAt).localeCompare(a.lastAttemptAt ?? a.createdAt))
+    .slice(0, limit)
+    .map(summarizeQueueItem);
 }
 
 export function getSyncQueueStatus(): {
@@ -755,6 +783,25 @@ export function getPendingSyncIdsForTrip(tripId: string, entity: SyncEntity): Se
   for (const item of tripSyncRuntime.syncQueue) {
     if (item.tripId !== tripId) continue;
     if (item.entity !== entity) continue;
+    if (item.status !== 'pending' && item.status !== 'syncing' && item.status !== 'failed') {
+      continue;
+    }
+    ids.add(item.entityId);
+  }
+  return ids;
+}
+
+/**
+ * Returns ids with a pending/syncing/failed delete operation. Pulls use
+ * this to avoid resurrecting rows the captain already deleted locally
+ * while the delete is still waiting to reach Supabase.
+ */
+export function getPendingDeleteSyncIdsForTrip(tripId: string, entity: SyncEntity): Set<string> {
+  const ids = new Set<string>();
+  for (const item of tripSyncRuntime.syncQueue) {
+    if (item.tripId !== tripId) continue;
+    if (item.entity !== entity) continue;
+    if (item.operation !== 'delete') continue;
     if (item.status !== 'pending' && item.status !== 'syncing' && item.status !== 'failed') {
       continue;
     }

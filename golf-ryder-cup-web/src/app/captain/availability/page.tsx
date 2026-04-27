@@ -337,9 +337,9 @@ export default function AvailabilityPage() {
             <div className="border-t border-[color:var(--rule)]/75 px-[var(--space-5)] py-[var(--space-4)]">
               <div className="flex flex-col gap-[var(--space-3)] sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Session Board</p>
+                  <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">Sessions</p>
                   <p className="mt-[var(--space-1)] type-caption text-[var(--ink-secondary)]">
-                    Shift the board to the round you’re actually trying to protect.
+                    Switch to the round you want to monitor.
                   </p>
                 </div>
                 <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">

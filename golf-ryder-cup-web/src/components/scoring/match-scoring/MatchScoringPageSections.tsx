@@ -296,6 +296,8 @@ export function MatchScoringPageSections({
         teamBColor={model.teamBColor}
         currentHole={currentHole}
         currentPar={model.currentPar}
+        currentStrokeIndex={model.currentStrokeIndex}
+        currentYardage={model.currentYardage}
         scoringModeMeta={model.scoringModeMeta}
         savingIndicator={ui.savingIndicator}
         undoCount={undoCount}
@@ -315,6 +317,8 @@ export function MatchScoringPageSections({
               currentHole,
               currentHoleResult,
               currentPar: model.currentPar,
+              currentStrokeIndex: model.currentStrokeIndex,
+              currentYardage: model.currentYardage,
               matchState,
               scoringMode: model.effectiveScoringMode,
               scoringModeMeta: model.scoringModeMeta,
@@ -324,6 +328,7 @@ export function MatchScoringPageSections({
               isSaving,
               undoCount,
               presses,
+              sessionLeaderboard: model.sessionLeaderboard,
             }}
             teams={{
               teamAName: model.teamAName,

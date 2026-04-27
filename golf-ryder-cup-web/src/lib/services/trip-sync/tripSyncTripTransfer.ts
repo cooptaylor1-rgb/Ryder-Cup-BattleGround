@@ -23,8 +23,19 @@ import {
 } from './tripSyncMappers';
 
 import { db } from '../../db';
-import { getPendingSyncIdsForTrip } from './tripSyncQueue';
+import {
+  getPendingDeleteSyncIdsForTrip,
+  getPendingSyncIdsForTrip,
+} from './tripSyncQueue';
 import { supabase } from '../../supabase/client';
+
+export function filterCloudRowsForPendingDeletes<T extends { id?: unknown }>(
+  rows: T[] | null | undefined,
+  pendingDeleteIds: Set<string>
+): T[] {
+  if (!rows?.length || pendingDeleteIds.size === 0) return rows ?? [];
+  return rows.filter((row) => !pendingDeleteIds.has(String(row.id)));
+}
 
 /**
  * Per-entity local orphan cleanup: for each entity we pulled, delete
@@ -72,22 +83,28 @@ async function reconcileLocalOrphans({
 }): Promise<void> {
   // Snapshot the pending sync-queue ids once so we don't repeatedly
   // walk the queue inside the per-entity filters.
+  const pendingIdsExcludingDeletes = (entity: Parameters<typeof getPendingSyncIdsForTrip>[1]) => {
+    const pending = getPendingSyncIdsForTrip(tripId, entity);
+    const pendingDeletes = getPendingDeleteSyncIdsForTrip(tripId, entity);
+    if (pendingDeletes.size === 0) return pending;
+    return new Set([...pending].filter((id) => !pendingDeletes.has(id)));
+  };
   const pendingByEntity = {
-    player: getPendingSyncIdsForTrip(tripId, 'player'),
-    team: getPendingSyncIdsForTrip(tripId, 'team'),
-    teamMember: getPendingSyncIdsForTrip(tripId, 'teamMember'),
-    session: getPendingSyncIdsForTrip(tripId, 'session'),
-    match: getPendingSyncIdsForTrip(tripId, 'match'),
-    holeResult: getPendingSyncIdsForTrip(tripId, 'holeResult'),
-    practiceScore: getPendingSyncIdsForTrip(tripId, 'practiceScore'),
-    sideBet: getPendingSyncIdsForTrip(tripId, 'sideBet'),
-    banterPost: getPendingSyncIdsForTrip(tripId, 'banterPost'),
-    duesLineItem: getPendingSyncIdsForTrip(tripId, 'duesLineItem'),
-    paymentRecord: getPendingSyncIdsForTrip(tripId, 'paymentRecord'),
-    tripInvitation: getPendingSyncIdsForTrip(tripId, 'tripInvitation'),
-    announcement: getPendingSyncIdsForTrip(tripId, 'announcement'),
-    attendanceRecord: getPendingSyncIdsForTrip(tripId, 'attendanceRecord'),
-    cartAssignment: getPendingSyncIdsForTrip(tripId, 'cartAssignment'),
+    player: pendingIdsExcludingDeletes('player'),
+    team: pendingIdsExcludingDeletes('team'),
+    teamMember: pendingIdsExcludingDeletes('teamMember'),
+    session: pendingIdsExcludingDeletes('session'),
+    match: pendingIdsExcludingDeletes('match'),
+    holeResult: pendingIdsExcludingDeletes('holeResult'),
+    practiceScore: pendingIdsExcludingDeletes('practiceScore'),
+    sideBet: pendingIdsExcludingDeletes('sideBet'),
+    banterPost: pendingIdsExcludingDeletes('banterPost'),
+    duesLineItem: pendingIdsExcludingDeletes('duesLineItem'),
+    paymentRecord: pendingIdsExcludingDeletes('paymentRecord'),
+    tripInvitation: pendingIdsExcludingDeletes('tripInvitation'),
+    announcement: pendingIdsExcludingDeletes('announcement'),
+    attendanceRecord: pendingIdsExcludingDeletes('attendanceRecord'),
+    cartAssignment: pendingIdsExcludingDeletes('cartAssignment'),
   };
 
   const cloud = {
@@ -533,48 +550,95 @@ async function pullTripCore(lookup: {
       throw new Error('Trip not found with that id');
     }
 
-    const [{ data: teams }, { data: sessions }] = await Promise.all([
+    const pendingDeletes = {
+      player: getPendingDeleteSyncIdsForTrip(trip.id, 'player'),
+      team: getPendingDeleteSyncIdsForTrip(trip.id, 'team'),
+      teamMember: getPendingDeleteSyncIdsForTrip(trip.id, 'teamMember'),
+      course: getPendingDeleteSyncIdsForTrip(trip.id, 'course'),
+      teeSet: getPendingDeleteSyncIdsForTrip(trip.id, 'teeSet'),
+      session: getPendingDeleteSyncIdsForTrip(trip.id, 'session'),
+      match: getPendingDeleteSyncIdsForTrip(trip.id, 'match'),
+      holeResult: getPendingDeleteSyncIdsForTrip(trip.id, 'holeResult'),
+      practiceScore: getPendingDeleteSyncIdsForTrip(trip.id, 'practiceScore'),
+      sideBet: getPendingDeleteSyncIdsForTrip(trip.id, 'sideBet'),
+      banterPost: getPendingDeleteSyncIdsForTrip(trip.id, 'banterPost'),
+      duesLineItem: getPendingDeleteSyncIdsForTrip(trip.id, 'duesLineItem'),
+      paymentRecord: getPendingDeleteSyncIdsForTrip(trip.id, 'paymentRecord'),
+      tripInvitation: getPendingDeleteSyncIdsForTrip(trip.id, 'tripInvitation'),
+      announcement: getPendingDeleteSyncIdsForTrip(trip.id, 'announcement'),
+      attendanceRecord: getPendingDeleteSyncIdsForTrip(trip.id, 'attendanceRecord'),
+      cartAssignment: getPendingDeleteSyncIdsForTrip(trip.id, 'cartAssignment'),
+    };
+
+    const [{ data: teamsRaw }, { data: sessionsRaw }] = await Promise.all([
       getTable('teams').select('*').eq('trip_id', trip.id),
       getTable('sessions').select('*').eq('trip_id', trip.id),
     ]);
 
-    const teamIds = (teams || []).map((team: { id: string }) => team.id);
-    const { data: teamMembers } =
+    const teams = filterCloudRowsForPendingDeletes(
+      teamsRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.team
+    );
+    const sessions = filterCloudRowsForPendingDeletes(
+      sessionsRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.session
+    );
+
+    const teamIds = teams.map((team) => String(team.id));
+    const { data: teamMembersRaw } =
       teamIds.length === 0
         ? { data: [] }
         : await getTable('team_members').select('*').in('team_id', teamIds);
+    const teamMembers = filterCloudRowsForPendingDeletes(
+      teamMembersRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.teamMember
+    );
 
-    const playerIds = [...new Set((teamMembers || []).map(
-      (teamMember: { player_id: string }) => teamMember.player_id
-    ))];
-    const [{ data: tripPlayers }, { data: linkedPlayers }] = await Promise.all([
+    const playerIds = [...new Set(teamMembers.map((teamMember) => String(teamMember.player_id)))];
+    const [{ data: tripPlayersRaw }, { data: linkedPlayersRaw }] = await Promise.all([
       getTable('players').select('*').eq('trip_id', trip.id),
       playerIds.length === 0
         ? Promise.resolve({ data: [] as Array<Record<string, unknown>> })
         : getTable('players').select('*').in('id', playerIds),
     ]);
     const playerRows = new Map<string, Record<string, unknown>>();
-    for (const player of (tripPlayers as Array<Record<string, unknown>> | null) ?? []) {
+    const tripPlayers = filterCloudRowsForPendingDeletes(
+      tripPlayersRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.player
+    );
+    const linkedPlayers = filterCloudRowsForPendingDeletes(
+      linkedPlayersRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.player
+    );
+    for (const player of tripPlayers) {
       playerRows.set(String(player.id), player);
     }
-    for (const player of (linkedPlayers as Array<Record<string, unknown>> | null) ?? []) {
+    for (const player of linkedPlayers) {
       playerRows.set(String(player.id), player);
     }
 
-    const sessionIds = (sessions || []).map((session: { id: string }) => session.id);
-    const { data: matches } =
+    const sessionIds = sessions.map((session) => String(session.id));
+    const { data: matchesRaw } =
       sessionIds.length === 0
         ? { data: [] }
         : await getTable('matches').select('*').in('session_id', sessionIds);
+    const matches = filterCloudRowsForPendingDeletes(
+      matchesRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.match
+    );
 
-    const matchIds = (matches || []).map((match: { id: string }) => match.id);
-    const { data: holeResults } =
+    const matchIds = matches.map((match) => String(match.id));
+    const { data: holeResultsRaw } =
       matchIds.length === 0
         ? { data: [] }
         : await getTable('hole_results').select('*').in('match_id', matchIds);
+    const holeResults = filterCloudRowsForPendingDeletes(
+      holeResultsRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.holeResult
+    );
 
-    const sessionRows = (sessions as Array<Record<string, unknown>> | null) ?? [];
-    const matchRows = (matches as Array<Record<string, unknown>> | null) ?? [];
+    const sessionRows = sessions;
+    const matchRows = matches;
     const referencedCourseIds = [
       ...new Set(
         [
@@ -600,8 +664,14 @@ async function pullTripCore(lookup: {
     const courses = Array.from(
       new Map(
         [
-          ...((tripCoursesRaw as Array<Record<string, unknown>> | null) ?? []),
-          ...((referencedCoursesRaw as Array<Record<string, unknown>> | null) ?? []),
+          ...filterCloudRowsForPendingDeletes(
+            tripCoursesRaw as Array<Record<string, unknown>> | null,
+            pendingDeletes.course
+          ),
+          ...filterCloudRowsForPendingDeletes(
+            referencedCoursesRaw as Array<Record<string, unknown>> | null,
+            pendingDeletes.course
+          ),
         ].map((course) => [String(course.id), course])
       ).values()
     );
@@ -636,9 +706,18 @@ async function pullTripCore(lookup: {
     const teeSets = Array.from(
       new Map(
         [
-          ...((tripTeeSetsRaw as Array<Record<string, unknown>> | null) ?? []),
-          ...((courseTeeSetsRaw as Array<Record<string, unknown>> | null) ?? []),
-          ...((referencedTeeSetsRaw as Array<Record<string, unknown>> | null) ?? []),
+          ...filterCloudRowsForPendingDeletes(
+            tripTeeSetsRaw as Array<Record<string, unknown>> | null,
+            pendingDeletes.teeSet
+          ),
+          ...filterCloudRowsForPendingDeletes(
+            courseTeeSetsRaw as Array<Record<string, unknown>> | null,
+            pendingDeletes.teeSet
+          ),
+          ...filterCloudRowsForPendingDeletes(
+            referencedTeeSetsRaw as Array<Record<string, unknown>> | null,
+            pendingDeletes.teeSet
+          ),
         ].map((teeSet) => [String(teeSet.id), teeSet])
       ).values()
     );
@@ -662,8 +741,10 @@ async function pullTripCore(lookup: {
                   : (response as { data: Array<Record<string, unknown>> }),
               () => ({ data: [] as Array<Record<string, unknown>> })
             );
-    const practiceScores =
-      (practiceScoresRaw as Array<Record<string, unknown>> | null) ?? [];
+    const practiceScores = filterCloudRowsForPendingDeletes(
+      practiceScoresRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.practiceScore
+    );
 
     // Side bets scoped to this trip. Writes already sync up via
     // queueSyncOperation at every UI mutation site; this is the
@@ -674,7 +755,10 @@ async function pullTripCore(lookup: {
     const { data: sideBetsRaw } = await getTable('side_bets')
       .select('*')
       .eq('trip_id', trip.id);
-    const sideBets = (sideBetsRaw as Array<Record<string, unknown>> | null) ?? [];
+    const sideBets = filterCloudRowsForPendingDeletes(
+      sideBetsRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.sideBet
+    );
 
     // Banter posts. Tolerate a missing banter_posts table (migration
     // not yet applied) the same way practice_scores does.
@@ -688,7 +772,10 @@ async function pullTripCore(lookup: {
             : (response as { data: Array<Record<string, unknown>> }),
         () => ({ data: [] as Array<Record<string, unknown>> })
       );
-    const banterPosts = (banterRaw as Array<Record<string, unknown>> | null) ?? [];
+    const banterPosts = filterCloudRowsForPendingDeletes(
+      banterRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.banterPost
+    );
 
     const { data: duesRaw } = await getTable('dues_line_items')
       .select('*')
@@ -700,7 +787,10 @@ async function pullTripCore(lookup: {
             : (response as { data: Array<Record<string, unknown>> }),
         () => ({ data: [] as Array<Record<string, unknown>> })
       );
-    const duesLineItems = (duesRaw as Array<Record<string, unknown>> | null) ?? [];
+    const duesLineItems = filterCloudRowsForPendingDeletes(
+      duesRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.duesLineItem
+    );
 
     const { data: paymentsRaw } = await getTable('payment_records')
       .select('*')
@@ -712,7 +802,10 @@ async function pullTripCore(lookup: {
             : (response as { data: Array<Record<string, unknown>> }),
         () => ({ data: [] as Array<Record<string, unknown>> })
       );
-    const paymentRecords = (paymentsRaw as Array<Record<string, unknown>> | null) ?? [];
+    const paymentRecords = filterCloudRowsForPendingDeletes(
+      paymentsRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.paymentRecord
+    );
 
     const { data: invitationsRaw } = await getTable('trip_invitations')
       .select('*')
@@ -724,7 +817,10 @@ async function pullTripCore(lookup: {
             : (response as { data: Array<Record<string, unknown>> }),
         () => ({ data: [] as Array<Record<string, unknown>> })
       );
-    const tripInvitations = (invitationsRaw as Array<Record<string, unknown>> | null) ?? [];
+    const tripInvitations = filterCloudRowsForPendingDeletes(
+      invitationsRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.tripInvitation
+    );
 
     const { data: announcementsRaw } = await getTable('announcements')
       .select('*')
@@ -736,7 +832,10 @@ async function pullTripCore(lookup: {
             : (response as { data: Array<Record<string, unknown>> }),
         () => ({ data: [] as Array<Record<string, unknown>> })
       );
-    const announcements = (announcementsRaw as Array<Record<string, unknown>> | null) ?? [];
+    const announcements = filterCloudRowsForPendingDeletes(
+      announcementsRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.announcement
+    );
 
     const { data: attendanceRaw } = await getTable('attendance_records')
       .select('*')
@@ -748,7 +847,10 @@ async function pullTripCore(lookup: {
             : (response as { data: Array<Record<string, unknown>> }),
         () => ({ data: [] as Array<Record<string, unknown>> })
       );
-    const attendanceRecords = (attendanceRaw as Array<Record<string, unknown>> | null) ?? [];
+    const attendanceRecords = filterCloudRowsForPendingDeletes(
+      attendanceRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.attendanceRecord
+    );
 
     const { data: cartAssignmentsRaw } = await getTable('cart_assignments')
       .select('*')
@@ -760,7 +862,10 @@ async function pullTripCore(lookup: {
             : (response as { data: Array<Record<string, unknown>> }),
         () => ({ data: [] as Array<Record<string, unknown>> })
       );
-    const cartAssignments = (cartAssignmentsRaw as Array<Record<string, unknown>> | null) ?? [];
+    const cartAssignments = filterCloudRowsForPendingDeletes(
+      cartAssignmentsRaw as Array<Record<string, unknown>> | null,
+      pendingDeletes.cartAssignment
+    );
 
     await db.transaction(
       'rw',
@@ -875,11 +980,11 @@ async function pullTripCore(lookup: {
     await reconcileLocalOrphans({
       tripId: trip.id,
       cloudPlayerIds: Array.from(playerRows.keys()),
-      cloudTeamIds: (teams ?? []).map((t: { id: string }) => String(t.id)),
-      cloudTeamMemberIds: (teamMembers ?? []).map((tm: { id: string }) => String(tm.id)),
-      cloudSessionIds: (sessions ?? []).map((s: { id: string }) => String(s.id)),
-      cloudMatchIds: (matches ?? []).map((m: { id: string }) => String(m.id)),
-      cloudHoleResultIds: (holeResults ?? []).map((hr: { id: string }) => String(hr.id)),
+      cloudTeamIds: teams.map((team) => String(team.id)),
+      cloudTeamMemberIds: teamMembers.map((teamMember) => String(teamMember.id)),
+      cloudSessionIds: sessions.map((session) => String(session.id)),
+      cloudMatchIds: matches.map((match) => String(match.id)),
+      cloudHoleResultIds: holeResults.map((holeResult) => String(holeResult.id)),
       cloudPracticeScoreIds: practiceScores.map((ps) => String(ps.id)),
       cloudSideBetIds: sideBets.map((b) => String(b.id)),
       cloudBanterPostIds: banterPosts.map((p) => String(p.id)),

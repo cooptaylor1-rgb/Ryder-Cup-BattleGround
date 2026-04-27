@@ -8,6 +8,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   getSyncQueueStatus,
   getTripSyncStatus,
@@ -80,10 +81,17 @@ interface SyncStatusBadgeProps {
 }
 
 export function SyncStatusBadge({ showText = false, className = '' }: SyncStatusBadgeProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const currentTrip = useTripStore((state) => state.currentTrip);
   const [status, setStatus] = useState<SyncStatus>('unknown');
   const [queueInfo, setQueueInfo] = useState<QueueInfo>({ pending: 0, failed: 0, total: 0 });
   const [isSyncing, setIsSyncing] = useState(false);
+
+  const goToSignIn = () => {
+    const returnTo = pathname || '/';
+    router.push(`/login?returnTo=${encodeURIComponent(returnTo)}`);
+  };
 
   useEffect(() => {
     const updateStatus = () => {
@@ -137,6 +145,9 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
       const currentQueue = getSyncQueueStatus();
       if (currentQueue.blockedReason) {
         setQueueInfo(currentQueue);
+        if (currentQueue.blockedReason === 'auth-required') {
+          goToSignIn();
+        }
         return;
       }
 
@@ -256,14 +267,16 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
     const failedDetails = [summarizedError, latestFailure, lastAttempt, 'Tap to retry.']
       .filter(Boolean)
       .join(' ');
+    const blockedAction =
+      queueInfo.blockedReason === 'auth-required' ? 'Tap to sign in and send them.' : '';
     const failedTooltip = blockedTooltip
-      ? `${changeLabel(effectiveFailedCount)} saved on this device. ${blockedTooltip}`
+      ? `${changeLabel(effectiveFailedCount)} saved on this device. ${blockedTooltip} ${blockedAction}`.trim()
       : queueInfo.lastError
         ? `${changeLabel(effectiveFailedCount)} did not reach the cloud. ${failedDetails}`
         : `${changeLabel(effectiveFailedCount)} did not reach the cloud. Tap to retry.`;
     const effectivePendingCount = pendingChangeCount || 1;
     const pendingTooltip = blockedTooltip
-      ? `${changeLabel(effectivePendingCount)} saved on this device. ${blockedTooltip}`
+      ? `${changeLabel(effectivePendingCount)} saved on this device. ${blockedTooltip} ${blockedAction}`.trim()
       : `${changeLabel(effectivePendingCount)} saved on this device and waiting for the cloud. Tap to retry now.`;
 
     return (
@@ -273,7 +286,10 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
           size="sm"
           className="min-h-11 min-w-11 rounded-full p-0"
           onClick={handleManualSync}
-          disabled={isSyncing || Boolean(queueInfo.blockedReason)}
+          disabled={
+            isSyncing ||
+            (Boolean(queueInfo.blockedReason) && queueInfo.blockedReason !== 'auth-required')
+          }
           aria-label={status === 'failed' ? failedTooltip : pendingTooltip}
         >
           {content}

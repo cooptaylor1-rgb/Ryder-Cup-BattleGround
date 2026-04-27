@@ -18,19 +18,16 @@ import type {
 import type { SessionType } from '@/lib/types';
 import type { ScoringPreferences } from '@/lib/types/scoringPreferences';
 import { formatPlayerName } from '@/lib/utils';
-import { resolveCurrentTripPlayer, type CurrentTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
+import {
+  resolveCurrentTripPlayer,
+  type CurrentTripPlayerIdentity,
+} from '@/lib/utils/tripPlayerIdentity';
 import { buildMatchHandicapContext } from '@/lib/services/matchHandicapService';
+import { calculateMatchState } from '@/lib/services/scoringEngine';
 import type { SideBet as ReminderSideBet } from '@/components/live-play/SideBetReminder';
 
-import {
-  buildMatchSummaryText,
-  findNextIncompleteMatch,
-} from './matchScoringReport';
-import {
-  getScoringModeMeta,
-  type ScoringMode,
-  type ScoringModeMeta,
-} from './matchScoringShared';
+import { buildMatchSummaryText, findNextIncompleteMatch } from './matchScoringReport';
+import { getScoringModeMeta, type ScoringMode, type ScoringModeMeta } from './matchScoringShared';
 import { toReminderBet } from './matchScoringUtils';
 
 export const DEFAULT_HOLE_HANDICAPS = [
@@ -47,6 +44,8 @@ export interface MatchScoringPageModel {
   currentTeeSet?: TeeSet;
   currentHoleResult?: MatchState['holeResults'][number];
   currentPar: number;
+  currentStrokeIndex: number;
+  currentYardage?: number;
   effectiveScoringMode: ScoringMode;
   holeHandicaps: number[];
   isFourball: boolean;
@@ -57,6 +56,17 @@ export interface MatchScoringPageModel {
   preferredScoringMode: ScoringMode;
   scoringModeMeta: ScoringModeMeta;
   scoringModeSessionKey: string;
+  sessionLeaderboard: Array<{
+    matchId: string;
+    matchOrder: number;
+    displayScore: string;
+    currentScore: number;
+    holesPlayed: number;
+    holesRemaining: number;
+    status: MatchState['status'];
+    teamALineup: string;
+    teamBLineup: string;
+  }>;
   summaryText: string;
   teamAColor: string;
   teamAFourballPlayers: Array<{
@@ -151,6 +161,22 @@ export function useMatchScoringPageModel(
       return db.sideBets.where('tripId').equals(currentTrip.id).toArray();
     },
     [currentTrip?.id],
+    []
+  );
+
+  const sessionMatchIds = useMemo(
+    () => sessionMatches.map((match) => match.id).join('|'),
+    [sessionMatches]
+  );
+  const sessionHoleResults = useLiveQuery(
+    async () => {
+      if (sessionMatches.length === 0) return [];
+      return db.holeResults
+        .where('matchId')
+        .anyOf(sessionMatches.map((match) => match.id))
+        .toArray();
+    },
+    [sessionMatchIds],
     []
   );
 
@@ -307,6 +333,8 @@ export function useMatchScoringPageModel(
   const teamALineup = useMemo(() => buildLineup(teamAPlayers), [teamAPlayers]);
   const teamBLineup = useMemo(() => buildLineup(teamBPlayers), [teamBPlayers]);
   const currentPar = currentTeeSet?.holePars?.[currentHole - 1] || 4;
+  const currentStrokeIndex = holeHandicaps[currentHole - 1] || currentHole;
+  const currentYardage = currentTeeSet?.yardages?.[currentHole - 1];
   const scoringModeMeta = getScoringModeMeta(effectiveScoringMode, isFourball);
   const isMatchComplete = Boolean(
     matchState && (matchState.isClosedOut || matchState.holesRemaining === 0)
@@ -329,6 +357,46 @@ export function useMatchScoringPageModel(
     });
   }, [matchState, teamAName, teamBName, teamAPlayers, teamBPlayers]);
 
+  const sessionLeaderboard = useMemo(() => {
+    const resultsByMatchId = new Map<string, MatchState['holeResults']>();
+
+    for (const result of sessionHoleResults ?? []) {
+      const existing = resultsByMatchId.get(result.matchId) ?? [];
+      existing.push(result);
+      resultsByMatchId.set(result.matchId, existing);
+    }
+
+    return sessionMatches
+      .map((match) => {
+        const state =
+          match.id === activeMatch?.id && matchState
+            ? matchState
+            : calculateMatchState(match, resultsByMatchId.get(match.id) ?? []);
+
+        return {
+          matchId: match.id,
+          matchOrder: match.matchOrder,
+          displayScore: state.displayScore,
+          currentScore: state.currentScore,
+          holesPlayed: state.holesPlayed,
+          holesRemaining: state.holesRemaining,
+          status: state.status,
+          teamALineup: buildLineup(resolveMatchPlayers(match.teamAPlayerIds, players)),
+          teamBLineup: buildLineup(resolveMatchPlayers(match.teamBPlayerIds, players)),
+        };
+      })
+      .sort((left, right) => {
+        const statusRank = (status: MatchState['status']) =>
+          status === 'inProgress' ? 0 : status === 'scheduled' ? 1 : 2;
+        const rankDelta = statusRank(left.status) - statusRank(right.status);
+        if (rankDelta !== 0) return rankDelta;
+        if (left.status === 'inProgress' && right.status === 'inProgress') {
+          return right.holesPlayed - left.holesPlayed;
+        }
+        return left.matchOrder - right.matchOrder;
+      });
+  }, [activeMatch?.id, matchState, players, sessionHoleResults, sessionMatches]);
+
   return {
     activeSideBets,
     activeMatchSideBets,
@@ -339,6 +407,8 @@ export function useMatchScoringPageModel(
     currentTeeSet,
     currentHoleResult,
     currentPar,
+    currentStrokeIndex,
+    currentYardage,
     effectiveScoringMode,
     holeHandicaps,
     isFourball,
@@ -349,6 +419,7 @@ export function useMatchScoringPageModel(
     preferredScoringMode,
     scoringModeMeta,
     scoringModeSessionKey,
+    sessionLeaderboard,
     summaryText,
     teamAColor,
     teamAFourballPlayers,

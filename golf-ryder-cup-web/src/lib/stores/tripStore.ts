@@ -31,6 +31,7 @@ import { deleteTripCascade } from '../services/cascadeDelete';
 import { buildMatchHandicapContext } from '../services/matchHandicapService';
 import { createLogger } from '../utils/logger';
 import { handleError } from '../utils/errorHandling';
+import { getFirstOpenSessionNumber } from '../utils/sessionNumbering';
 import { dedupePlayersByIdentity, mergeTripPlayers } from '../utils/tripPlayers';
 import { useAccessStore } from './accessStore';
 
@@ -594,9 +595,7 @@ export const useTripStore = create<TripState>()(
             .toArray();
           const taken = new Set(existing.map((s) => s.sessionNumber));
           if (taken.has(session.sessionNumber)) {
-            let candidate = session.sessionNumber + 1;
-            while (taken.has(candidate)) candidate += 1;
-            session.sessionNumber = candidate;
+            session.sessionNumber = getFirstOpenSessionNumber(existing);
           }
           await db.sessions.add(session);
         });

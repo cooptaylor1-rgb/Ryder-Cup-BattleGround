@@ -68,6 +68,8 @@ import {
   retryFailedQueue,
   getTripSyncStatus,
   getSyncQueueStatus,
+  getPendingDeleteSyncIdsForTrip,
+  getUnresolvedSyncQueueItems,
   type SyncOperation,
   type SyncEntity,
   type SyncQueueItem,
@@ -116,6 +118,26 @@ describe('Trip Sync Service', () => {
 
       const status = getSyncQueueStatus();
       expect(typeof status.failed).toBe('number');
+    });
+
+    it('reports only active delete operations for cloud-pull masking', () => {
+      queueSyncOperation('session', 'session-delete', 'delete', 'trip-1');
+      queueSyncOperation('session', 'session-update', 'update', 'trip-1');
+      queueSyncOperation('session', 'session-other-trip', 'delete', 'trip-2');
+
+      const ids = getPendingDeleteSyncIdsForTrip('trip-1', 'session');
+
+      expect(ids).toEqual(new Set(['session-delete']));
+    });
+
+    it('keeps failed deletes masked until the captain clears or retries them', () => {
+      queueSyncOperation('session', 'session-delete', 'delete', 'trip-1');
+      const queued = tripSyncRuntime.syncQueue.find((item) => item.entityId === 'session-delete');
+      if (queued) queued.status = 'failed';
+
+      expect(getPendingDeleteSyncIdsForTrip('trip-1', 'session')).toEqual(
+        new Set(['session-delete'])
+      );
     });
 
     it('merges a new local change into an existing failed operation for the same entity', () => {
@@ -247,6 +269,61 @@ describe('Trip Sync Service', () => {
         lastFailedEntity: 'match',
         lastFailedOperation: 'update',
       });
+    });
+  });
+
+  describe('getUnresolvedSyncQueueItems', () => {
+    it('summarizes pending and failed work without completed items', () => {
+      tripSyncRuntime.syncQueue.push(
+        {
+          id: 'pending-op',
+          entity: 'session',
+          entityId: 'session-1',
+          operation: 'create',
+          tripId: 'trip-1',
+          status: 'pending',
+          retryCount: 0,
+          createdAt: '2026-04-26T10:00:00.000Z',
+        },
+        {
+          id: 'failed-op',
+          entity: 'match',
+          entityId: 'match-1',
+          operation: 'update',
+          tripId: 'trip-1',
+          status: 'failed',
+          retryCount: 5,
+          error: 'row level security',
+          createdAt: '2026-04-26T10:05:00.000Z',
+          lastAttemptAt: '2026-04-26T10:15:00.000Z',
+        },
+        {
+          id: 'completed-op',
+          entity: 'player',
+          entityId: 'player-1',
+          operation: 'update',
+          tripId: 'trip-1',
+          status: 'completed',
+          retryCount: 0,
+          createdAt: '2026-04-26T10:20:00.000Z',
+        }
+      );
+
+      expect(getUnresolvedSyncQueueItems()).toEqual([
+        expect.objectContaining({
+          entity: 'match',
+          entityId: 'match-1',
+          operation: 'update',
+          status: 'failed',
+          error: 'row level security',
+        }),
+        expect.objectContaining({
+          entity: 'session',
+          entityId: 'session-1',
+          operation: 'create',
+          status: 'pending',
+        }),
+      ]);
     });
   });
 

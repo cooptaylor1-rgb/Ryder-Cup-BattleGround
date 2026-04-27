@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { useRouter } from 'next/navigation';
 import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
-import { db } from '@/lib/db';
+import { useTripScopedMatches } from '@/lib/hooks/useTripScopedMatches';
 import { saveLineup, type LineupPlayer as PersistedLineupPlayer, type LineupState } from '@/lib/services/lineupBuilderService';
 import {
   savePracticeLineup,
@@ -24,7 +23,7 @@ import {
 } from '@/components/captain';
 import { LinkButton } from '@/components/ui/LinkButton';
 import { Users, Info } from 'lucide-react';
-import type { Match, SessionType } from '@/lib/types';
+import type { SessionType } from '@/lib/types';
 import { EmptyStatePremium } from '@/components/ui';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -57,26 +56,23 @@ interface NewLineupPageClientProps {
 
 export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageClientProps) {
   const router = useRouter();
-  const { currentTrip, teams, players, teamMembers, addSession, sessions } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, teams: s.teams, players: s.players, teamMembers: s.teamMembers, addSession: s.addSession, sessions: s.sessions })));
+  const { currentTrip, teams, players, teamMembers, addSession, sessions: storeSessions } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, teams: s.teams, players: s.players, teamMembers: s.teamMembers, addSession: s.addSession, sessions: s.sessions })));
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
 
-  // Scope to the current trip's sessions rather than loading every
-  // match the device has ever seen.
-  const tripSessionIds = useMemo(
-    () => sessions.map((s) => s.id),
-    [sessions]
+  const tripData = useTripScopedMatches(currentTrip?.id);
+  const persistedTripSessions = useMemo(
+    () => (currentTrip ? storeSessions.filter((session) => session.tripId === currentTrip.id) : []),
+    [currentTrip, storeSessions]
   );
-  const tripMatches = useLiveQuery(
-    async () =>
-      tripSessionIds.length > 0
-        ? db.matches.where('sessionId').anyOf(tripSessionIds).toArray()
-        : currentTrip
-          ? ([] as Match[])
-          : undefined,
-    [tripSessionIds.join(','), currentTrip?.id],
-    undefined as Match[] | undefined
+  const sessions = useMemo(
+    () =>
+      [...(tripData?.sessions ?? persistedTripSessions)].sort(
+        (a, b) => a.sessionNumber - b.sessionNumber
+      ),
+    [persistedTripSessions, tripData?.sessions]
   );
+  const tripMatches = tripData?.matches;
 
   const nextSessionNumber = useMemo(() => getNextSessionNumber(sessions), [sessions]);
   const fallbackDate = useMemo(() => getTodayDate(), []);
@@ -613,7 +609,7 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
         />
         <main className="container-editorial py-12">
           <div className="card-editorial p-[var(--space-6)]">
-            <p className="type-overline text-[var(--masters)]">Lineup desk</p>
+            <p className="type-overline text-[var(--masters)]">Lineups</p>
             <p className="mt-3 text-sm text-[var(--ink-secondary)]">
               Finding the next session that still needs pairings.
             </p>
@@ -634,7 +630,7 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
         />
         <main className="container-editorial py-12">
           <div className="card-editorial p-[var(--space-6)]">
-            <p className="type-overline text-[var(--masters)]">Opening session</p>
+            <p className="type-overline text-[var(--masters)]">Opening lineup</p>
             <p className="mt-3 text-sm text-[var(--ink-secondary)]">
               Jumping into the next round that still needs lineups.
             </p>
@@ -669,14 +665,13 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="type-overline text-[var(--masters)]">
-                  {step === 'setup' ? 'Session setup' : 'Lineup studio'}
+                  {step === 'setup' ? 'Session setup' : 'Lineup'}
                 </p>
                 <h1 className="mt-[var(--space-2)] font-serif text-[length:var(--text-3xl)] font-normal tracking-[-0.03em] text-[var(--ink)]">
                   {sessionName || 'New session'}
                 </h1>
                 <p className="mt-[var(--space-2)] max-w-2xl text-sm text-[var(--ink-secondary)]">
-                  Build the session the way a captain would actually think about it: choose the
-                  format, confirm the roster depth, then shape the card.
+                  Choose the format, confirm roster depth, then build the card.
                 </p>
               </div>
               <span
@@ -717,8 +712,8 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
                   </div>
                   <p className="mt-[var(--space-3)] type-title-sm text-[var(--ink)]">
                     {rosterNeedsAttention
-                      ? 'Clean up the roster before you publish the card.'
-                      : 'Everything is in place for a confident lineup build.'}
+                      ? 'Update the roster before publishing the card.'
+                      : 'Everything is in place for the lineup build.'}
                   </p>
                   <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
                     {rosterNeedsAttention
@@ -762,10 +757,11 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
               <div className="mt-[var(--space-4)] rounded-2xl border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] p-[var(--space-4)]">
                 <div className="flex flex-wrap items-center justify-between gap-[var(--space-3)]">
                   <div>
-                    <p className="type-overline text-[var(--ink-tertiary)]">Session queue</p>
+                    <p className="type-overline text-[var(--ink-tertiary)]">Sessions</p>
                     <p className="mt-1 text-sm text-[var(--ink-secondary)]">
-                      Add sessions one-by-one here. You currently have {orderedSessions.length}{' '}
-                      session{orderedSessions.length === 1 ? '' : 's'} in this trip.
+                      {orderedSessions.length}{' '}
+                      session{orderedSessions.length === 1 ? '' : 's'} in this trip. Next open
+                      slot: {defaultSessionName}.
                     </p>
                   </div>
                   <LinkButton
@@ -778,16 +774,21 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
                   </LinkButton>
                 </div>
                 {orderedSessions.length > 0 && (
-                  <ul className="mt-[var(--space-3)] space-y-2">
-                    {orderedSessions.slice(-3).map((session) => (
+                  <ul className="mt-[var(--space-3)] max-h-[18rem] space-y-2 overflow-y-auto pr-1">
+                    {orderedSessions.map((session) => (
                       <li
                         key={session.id}
-                        className="rounded-xl border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-3)] py-[var(--space-2)] text-sm text-[var(--ink-secondary)]"
+                        className="flex flex-col gap-1 rounded-xl border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-3)] py-[var(--space-2)] text-sm text-[var(--ink-secondary)] sm:flex-row sm:items-center sm:justify-between"
                       >
-                        <span className="font-medium text-[var(--ink)]">
-                          Session {session.sessionNumber}:
-                        </span>{' '}
-                        {session.name}
+                        <span>
+                          <span className="font-medium text-[var(--ink)]">
+                            Session {session.sessionNumber}:
+                          </span>{' '}
+                          {session.name}
+                        </span>
+                        <span className="type-caption text-[var(--ink-tertiary)]">
+                          {session.timeSlot ?? 'Time TBD'}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -851,8 +852,8 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
             <div className="mb-[var(--space-5)]">
               <p className="type-overline text-[var(--ink-secondary)]">Build the groups</p>
               <p className="mt-2 text-sm text-[var(--ink-secondary)]">
-                Practice rounds ignore Ryder Cup sides — pick 2-4 players per group, set a
-                tee time, and publish.
+                Practice rounds use groups instead of team matchups. Pick 2-4 players per group,
+                set a tee time, and publish.
               </p>
             </div>
             <PracticeGroupsEditor
@@ -891,8 +892,8 @@ export default function NewLineupPageClient({ mode = 'lineup' }: NewLineupPageCl
             <div className="mb-[var(--space-5)]">
               <p className="type-overline text-[var(--ink-secondary)]">Build the card</p>
               <p className="mt-2 text-sm text-[var(--ink-secondary)]">
-                Drag players into place, keep an eye on fairness, and publish when the session
-                feels right.
+                Drag players into each match, review fairness, and publish when the lineup is
+                ready.
               </p>
             </div>
             <div className="mb-[var(--space-4)] rounded-[1.4rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.72)] p-[var(--space-4)]">

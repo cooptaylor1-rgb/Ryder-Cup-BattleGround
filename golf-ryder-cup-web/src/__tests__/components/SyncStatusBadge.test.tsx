@@ -5,12 +5,24 @@ const getSyncQueueStatusMock = vi.hoisted(() => vi.fn());
 const getTripSyncStatusMock = vi.hoisted(() => vi.fn());
 const processSyncQueueMock = vi.hoisted(() => vi.fn());
 const retryFailedQueueMock = vi.hoisted(() => vi.fn());
+const routerPushMock = vi.hoisted(() => vi.fn());
 
 vi.mock('@/lib/services/tripSyncService', () => ({
   getSyncQueueStatus: () => getSyncQueueStatusMock(),
   getTripSyncStatus: (tripId: string) => getTripSyncStatusMock(tripId),
   processSyncQueue: () => processSyncQueueMock(),
   retryFailedQueue: () => retryFailedQueueMock(),
+}));
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/schedule',
+  useRouter: () => ({
+    push: routerPushMock,
+    replace: vi.fn(),
+    back: vi.fn(),
+  }),
+  useParams: () => ({}),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 vi.mock('@/lib/stores/tripStore', () => ({
@@ -74,8 +86,9 @@ describe('SyncStatusBadge', () => {
     render(<SyncStatusBadge />);
 
     expect(await screen.findByLabelText('Sync status: Saved on device (3)')).toBeInTheDocument();
-    expect(screen.getByRole('button')).toBeDisabled();
+    expect(screen.getByRole('button')).toBeEnabled();
     fireEvent.click(screen.getByRole('button'));
+    expect(routerPushMock).toHaveBeenCalledWith('/login?returnTo=%2Fschedule');
     expect(retryFailedQueueMock).not.toHaveBeenCalled();
     expect(processSyncQueueMock).not.toHaveBeenCalled();
   });

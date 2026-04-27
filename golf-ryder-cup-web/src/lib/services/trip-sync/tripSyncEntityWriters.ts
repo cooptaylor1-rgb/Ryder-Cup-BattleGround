@@ -193,20 +193,6 @@ export async function syncTripToCloud(
   });
 
   const cloudData = tripToCloud(trip);
-
-  if (operation === 'create') {
-    const insertResponse = await getTable('trips')
-      .insert(cloudData)
-      .select('share_code')
-      .single();
-    throwIfSupabaseError(insertResponse);
-    const insertedTrip = insertResponse.data as { share_code?: string } | null;
-    if (insertedTrip?.share_code) {
-      storeTripShareCode(trip.id, insertedTrip.share_code);
-    }
-    return;
-  }
-
   const upsertResponse = await getTable('trips')
     .upsert(cloudData, { onConflict: 'id' })
     .select('share_code')

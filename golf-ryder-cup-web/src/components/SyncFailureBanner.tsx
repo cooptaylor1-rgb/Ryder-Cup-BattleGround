@@ -3,22 +3,23 @@
 /**
  * Sync Failure Banner
  *
- * Site-wide strip that appears ONLY when the trip sync queue has failed
- * operations. Keeps quiet when everything is working so captains aren't
- * desensitized to its presence.
+ * Site-wide strip that appears when trip sync needs user attention:
+ * failed operations, or local changes that cannot send because sign-in
+ * or cloud setup is blocking the queue.
  *
  * The existing SyncStatusBadge (per-page, in headers) handles the
  * "normal" pending state. This banner is the escalation: captains
  * scoring on the course need to know when their changes are not
- * reaching the cloud. Previously a persistent sync failure was only
- * visible via the small header pill and easy to miss mid-round.
+ * reaching the cloud.
  */
 
 import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { AlertTriangle, Clock3, RefreshCw } from 'lucide-react';
 import {
   getFailedSyncQueueItems,
   getSyncQueueStatus,
+  getUnresolvedSyncQueueItems,
   processSyncQueue,
   retryFailedQueue,
 } from '@/lib/services/tripSyncService';
@@ -34,6 +35,8 @@ import {
 const POLL_INTERVAL_MS = 8000;
 
 type FailedSyncItem = ReturnType<typeof getFailedSyncQueueItems>[number];
+type UnresolvedSyncItem = ReturnType<typeof getUnresolvedSyncQueueItems>[number];
+type VisibleSyncItem = FailedSyncItem | UnresolvedSyncItem;
 
 const ENTITY_LABELS: Record<string, string> = {
   trip: 'Trip',
@@ -62,10 +65,17 @@ const OPERATION_LABELS: Record<string, string> = {
   delete: 'remove',
 };
 
-function describeFailedItem(item: FailedSyncItem): string {
+function describeSyncItem(item: VisibleSyncItem): string {
   const entity = ENTITY_LABELS[item.entity] ?? item.entity;
   const operation = OPERATION_LABELS[item.operation] ?? item.operation;
   return `${entity} ${operation}`;
+}
+
+function describeItemStatus(item: VisibleSyncItem): string {
+  if (item.error) return summarizeSyncError(item.error);
+  if ('status' in item && item.status === 'syncing') return 'Sending to the cloud now.';
+  if ('status' in item && item.status === 'pending') return 'Waiting to send to the cloud.';
+  return 'Sync could not finish.';
 }
 
 function formatAttemptTime(value?: string) {
@@ -76,25 +86,43 @@ function formatAttemptTime(value?: string) {
 }
 
 export function SyncFailureBanner({ className }: { className?: string }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [pendingCount, setPendingCount] = useState(0);
   const [failedCount, setFailedCount] = useState(0);
   const [lastError, setLastError] = useState<string | undefined>(undefined);
-  const [failedItems, setFailedItems] = useState<FailedSyncItem[]>([]);
+  const [syncItems, setSyncItems] = useState<VisibleSyncItem[]>([]);
   const [blockedReason, setBlockedReason] = useState<SyncBlockedReason | undefined>(undefined);
   const [showDetail, setShowDetail] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
   const [retryFeedback, setRetryFeedback] = useState<string | null>(null);
 
+  const goToSignIn = () => {
+    const returnTo = pathname || '/';
+    router.push(`/login?returnTo=${encodeURIComponent(returnTo)}`);
+  };
+
+  const refreshSnapshot = () => {
+    const status = getSyncQueueStatus();
+    const shouldShowBlockedPending =
+      status.pending > 0 && Boolean(status.blockedReason) && status.blockedReason !== 'offline';
+    setPendingCount(status.pending);
+    setFailedCount(status.failed);
+    setLastError(status.lastError);
+    setSyncItems(
+      status.failed > 0 ? getFailedSyncQueueItems(5) : getUnresolvedSyncQueueItems(5)
+    );
+    setBlockedReason(status.blockedReason);
+    if (status.failed <= 0 && !shouldShowBlockedPending) {
+      setShowDetail(false);
+      setRetryFeedback(null);
+    }
+    return status;
+  };
+
   useEffect(() => {
     const tick = () => {
-      const status = getSyncQueueStatus();
-      setFailedCount(status.failed);
-      setLastError(status.lastError);
-      setFailedItems(getFailedSyncQueueItems(5));
-      setBlockedReason(status.blockedReason);
-      if (status.failed <= 0) {
-        setShowDetail(false);
-        setRetryFeedback(null);
-      }
+      refreshSnapshot();
     };
     tick();
 
@@ -127,6 +155,11 @@ export function SyncFailureBanner({ className }: { className?: string }) {
   }, []);
 
   const handleRetry = async () => {
+    if (blockedReason === 'auth-required') {
+      goToSignIn();
+      return;
+    }
+
     setIsRetrying(true);
     setRetryFeedback('Retrying saved changes...');
     try {
@@ -136,23 +169,15 @@ export function SyncFailureBanner({ className }: { className?: string }) {
       // whenever the captain had been tapping retry for a while.
       await retryFailedQueue();
       await processSyncQueue();
-      const status = getSyncQueueStatus();
-      setFailedCount(status.failed);
-      setLastError(status.lastError);
-      setFailedItems(getFailedSyncQueueItems(5));
-      setBlockedReason(status.blockedReason);
-      if (status.failed <= 0) {
+      const status = refreshSnapshot();
+      if (status.failed <= 0 && !(status.pending > 0 && status.blockedReason)) {
         setShowDetail(false);
         setRetryFeedback(null);
       } else {
         setRetryFeedback('Still saved on this device. Try again when the connection is stable.');
       }
     } catch (error) {
-      const status = getSyncQueueStatus();
-      setFailedCount(status.failed);
-      setLastError(status.lastError);
-      setFailedItems(getFailedSyncQueueItems(5));
-      setBlockedReason(status.blockedReason);
+      refreshSnapshot();
       setRetryFeedback(
         `${summarizeSyncError(error instanceof Error ? error.message : String(error))} Changes are still saved on this device.`
       );
@@ -161,17 +186,21 @@ export function SyncFailureBanner({ className }: { className?: string }) {
     }
   };
 
-  if (failedCount <= 0) return null;
+  const hasBlockedPending =
+    pendingCount > 0 && Boolean(blockedReason) && blockedReason !== 'offline';
+  if (failedCount <= 0 && !hasBlockedPending) return null;
   if (blockedReason === 'offline') return null;
 
   const blockedMessage = blockedReason ? SYNC_BLOCKED_MESSAGES[blockedReason] : undefined;
-  const canRetry = !blockedReason;
+  const canRetry = !blockedReason && failedCount > 0;
+  const canOpenSignIn = blockedReason === 'auth-required';
+  const visibleChangeCount = failedCount > 0 ? failedCount : pendingCount;
   const message = retryFeedback
     ? retryFeedback
     : blockedMessage
-      ? blockedMessage
+      ? `${visibleChangeCount} change${visibleChangeCount === 1 ? '' : 's'} saved on this device. ${blockedMessage}`
       : `${failedCount} change${failedCount === 1 ? '' : 's'} did not reach the cloud. Saved on this device.`;
-  const detailAvailable = failedItems.length > 0 || Boolean(lastError);
+  const detailAvailable = syncItems.length > 0 || Boolean(lastError);
 
   return (
     <div
@@ -194,7 +223,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
           </div>
           <div className="min-w-0 sm:flex-1">
             <p className="text-sm font-semibold text-[var(--ink)]">
-              Changes are saved on this device
+              {blockedReason ? 'Cloud saving is paused' : 'Changes are saved on this device'}
             </p>
             <p className="text-xs font-medium text-[var(--error)] sm:text-sm">{message}</p>
           </div>
@@ -212,7 +241,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
             <button
               type="button"
               onClick={handleRetry}
-              disabled={isRetrying || !canRetry}
+              disabled={isRetrying || (!canRetry && !canOpenSignIn)}
               className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--error)]/35 bg-[var(--canvas)]/88 px-3 py-1 text-xs font-semibold text-[var(--error)] transition-colors hover:bg-[color:var(--error)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <RefreshCw className={cn('h-3.5 w-3.5', isRetrying && 'animate-spin')} aria-hidden />
@@ -222,10 +251,10 @@ export function SyncFailureBanner({ className }: { className?: string }) {
         </div>
         {showDetail && detailAvailable && (
           <div className="mt-2 space-y-1 rounded-[18px] border border-[color:var(--error)]/18 bg-[color:var(--canvas)]/82 p-3 text-xs text-[var(--ink-secondary)]">
-            {failedItems.length > 0 ? (
-              failedItems.map((item) => {
+            {syncItems.length > 0 ? (
+              syncItems.map((item) => {
                 const attemptTime = formatAttemptTime(item.lastAttemptAt ?? item.createdAt);
-                const friendlyError = summarizeSyncError(item.error);
+                const friendlyError = describeItemStatus(item);
                 const showRawError = Boolean(item.error && friendlyError !== item.error);
                 return (
                   <div
@@ -233,7 +262,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
                     className="grid gap-1 rounded-[14px] px-2 py-1.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start"
                   >
                     <div className="min-w-0">
-                      <p className="font-semibold text-[var(--ink)]">{describeFailedItem(item)}</p>
+                      <p className="font-semibold text-[var(--ink)]">{describeSyncItem(item)}</p>
                       <p className="break-words text-[var(--ink-secondary)]">{friendlyError}</p>
                       {showRawError && (
                         <p className="mt-0.5 break-words text-[var(--ink-tertiary)]">

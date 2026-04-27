@@ -275,6 +275,13 @@ export async function seedUserProfile(
       'golf-app-auth',
       JSON.stringify({ state: { currentUser: userProfile, isAuthenticated: true }, version: 0 })
     );
+    localStorage.setItem(
+      'golf-ryder-cup-onboarding-complete',
+      JSON.stringify({
+        version: '1.0',
+        completedAt: new Date().toISOString(),
+      })
+    );
 
     // User registry used by login flow
     localStorage.setItem(
@@ -490,7 +497,12 @@ export async function dismissAllBlockingModals(page: Page): Promise<void> {
 
   for (const button of blockingOverlayButtons) {
     try {
-      if (await button.first().isVisible({ timeout: 750 }).catch(() => false)) {
+      if (
+        await button
+          .first()
+          .isVisible({ timeout: 750 })
+          .catch(() => false)
+      ) {
         await button.first().click();
         await page.waitForTimeout(TEST_CONFIG.delays.animation);
       }

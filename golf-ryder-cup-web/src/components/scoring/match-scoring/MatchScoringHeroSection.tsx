@@ -4,7 +4,12 @@ import { HoleMiniMap } from '@/components/scoring';
 import { SyncStatusBadge } from '@/components/SyncStatusBadge';
 import type { MatchState } from '@/lib/types/computed';
 import { cn } from '@/lib/utils';
-import { ScoringFactCard, ScoringStatusBadge, type ScoringModeMeta } from './matchScoringShared';
+import {
+  colorWithAlpha,
+  ScoringFactCard,
+  ScoringStatusBadge,
+  type ScoringModeMeta,
+} from './matchScoringShared';
 
 interface MatchScoringHeroSectionProps {
   matchOrder: number;
@@ -23,6 +28,8 @@ interface MatchScoringHeroSectionProps {
   teamBColor: string;
   currentHole: number;
   currentPar: number;
+  currentStrokeIndex: number;
+  currentYardage?: number;
   scoringModeMeta: ScoringModeMeta;
   savingIndicator: string | null;
   undoCount: number;
@@ -50,6 +57,8 @@ export function MatchScoringHeroSection({
   teamBColor,
   currentHole,
   currentPar,
+  currentStrokeIndex,
+  currentYardage,
   scoringModeMeta,
   savingIndicator,
   isCaptain,
@@ -59,6 +68,20 @@ export function MatchScoringHeroSection({
   onUndo,
   onHoleSelect,
 }: MatchScoringHeroSectionProps) {
+  const leaderName =
+    matchState.currentScore > 0 ? teamAName : matchState.currentScore < 0 ? teamBName : undefined;
+  const trailingName =
+    matchState.currentScore > 0 ? teamBName : matchState.currentScore < 0 ? teamAName : undefined;
+  const matchNarrative =
+    matchState.holesPlayed === 0
+      ? 'Opening tee'
+      : leaderName
+        ? `${leaderName} leads ${matchState.displayScore}`
+        : 'All square';
+  const currentHoleNote = [`Par ${currentPar}`, currentYardage ? `${currentYardage} yds` : null]
+    .filter(Boolean)
+    .join(' · ');
+
   return (
     <>
       <header
@@ -125,13 +148,14 @@ export function MatchScoringHeroSection({
       <section className="container-editorial space-y-4 pt-[var(--space-8)]">
         <div className="card-editorial overflow-hidden p-[var(--space-5)] sm:p-[var(--space-6)]">
           <div className="flex items-start justify-between gap-[var(--space-4)]">
-            <div>
+            <div className="min-w-0">
               <p className="type-overline text-[var(--masters)]">{sessionLabel}</p>
               <h1 className="mt-[var(--space-2)] font-serif text-[length:var(--text-3xl)] font-normal text-[var(--ink)]">
-                Live scoring
+                Live scoring cockpit
               </h1>
-              <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
-                {teamALineup} vs {teamBLineup}
+              <p className="mt-[var(--space-2)] text-sm font-medium text-[var(--ink-secondary)]">
+                {matchNarrative}
+                {trailingName && !isMatchComplete ? ` · ${trailingName} chasing` : ''}
               </p>
               {/*
                 Course / tee badges. Must stay legible in bright sunlight
@@ -164,24 +188,33 @@ export function MatchScoringHeroSection({
             />
           </div>
 
-          <div className="mt-[var(--space-6)] grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
-            <div className="rounded-[24px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/70 px-4 py-4 text-left">
-              <p className="type-overline text-[color:var(--team-usa)]">{teamAName}</p>
-              <p className="mt-2 text-sm text-[var(--ink-secondary)]">
-                {matchState.teamAHolesWon} holes won
-              </p>
-            </div>
-
+          <div className="mt-[var(--space-6)] grid gap-3 lg:grid-cols-[minmax(0,1fr)_16rem_minmax(0,1fr)] lg:items-stretch">
+            <TeamScoreCard
+              teamName={teamAName}
+              lineup={teamALineup}
+              holesWon={matchState.teamAHolesWon}
+              teamColor={teamAColor}
+              tone={
+                matchState.currentScore > 0
+                  ? 'leading'
+                  : matchState.currentScore < 0
+                    ? 'trailing'
+                    : 'even'
+              }
+            />
             <motion.div
               key={matchState.displayScore}
               initial={prefersReducedMotion ? false : { scale: 0.96, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="text-center"
+              className="flex min-h-[160px] flex-col items-center justify-center rounded-[28px] border border-[color:var(--rule)]/75 bg-[radial-gradient(circle_at_top,var(--canvas)_0%,var(--surface-secondary)_74%)] px-5 py-5 text-center shadow-card-sm"
             >
+              <p className="type-overline text-[var(--ink-tertiary)]">
+                {isMatchComplete ? 'Final' : 'Live match'}
+              </p>
               <p
                 className={cn(
-                  'score-monumental',
+                  'score-monumental mt-2',
                   matchState.currentScore > 0
                     ? 'text-[color:var(--team-usa)]'
                     : matchState.currentScore < 0
@@ -201,20 +234,32 @@ export function MatchScoringHeroSection({
                 </p>
               )}
             </motion.div>
-
-            <div className="rounded-[24px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/70 px-4 py-4 text-left sm:text-right">
-              <p className="type-overline text-[color:var(--team-europe)]">{teamBName}</p>
-              <p className="mt-2 text-sm text-[var(--ink-secondary)]">
-                {matchState.teamBHolesWon} holes won
-              </p>
-            </div>
+            <TeamScoreCard
+              teamName={teamBName}
+              lineup={teamBLineup}
+              holesWon={matchState.teamBHolesWon}
+              teamColor={teamBColor}
+              tone={
+                matchState.currentScore < 0
+                  ? 'leading'
+                  : matchState.currentScore > 0
+                    ? 'trailing'
+                    : 'even'
+              }
+              align="right"
+            />
           </div>
 
-          <div className="mt-[var(--space-5)] grid gap-3 min-[420px]:grid-cols-3">
+          <div className="mt-[var(--space-5)] grid gap-3 min-[420px]:grid-cols-2 sm:grid-cols-4">
             <ScoringFactCard
               eyebrow="Current hole"
               value={`Hole ${currentHole}`}
-              note={`Par ${currentPar}`}
+              note={currentHoleNote}
+            />
+            <ScoringFactCard
+              eyebrow="Stroke index"
+              value={currentStrokeIndex}
+              note={currentStrokeIndex === 1 ? 'Hardest hole' : 'Handicap rank'}
             />
             <ScoringFactCard
               eyebrow="Remaining"
@@ -268,5 +313,74 @@ export function MatchScoringHeroSection({
         </AnimatePresence>
       </section>
     </>
+  );
+}
+
+function TeamScoreCard({
+  teamName,
+  lineup,
+  holesWon,
+  teamColor,
+  tone,
+  align = 'left',
+}: {
+  teamName: string;
+  lineup: string;
+  holesWon: number;
+  teamColor: string;
+  tone: 'leading' | 'trailing' | 'even';
+  align?: 'left' | 'right';
+}) {
+  const label = tone === 'leading' ? 'Leading' : tone === 'trailing' ? 'Chasing' : 'All square';
+
+  return (
+    <div
+      className={cn(
+        'flex min-h-[160px] flex-col justify-between rounded-[28px] border px-4 py-4 shadow-card-sm',
+        align === 'right' ? 'text-left lg:text-right' : 'text-left'
+      )}
+      style={{
+        borderColor:
+          tone === 'leading' ? teamColor : 'color-mix(in srgb, var(--rule) 76%, transparent)',
+        background:
+          tone === 'leading'
+            ? `linear-gradient(180deg, ${colorWithAlpha(teamColor, 14)} 0%, var(--canvas) 84%)`
+            : 'color-mix(in srgb, var(--canvas) 76%, transparent)',
+      }}
+    >
+      <div className="min-w-0">
+        <p className="type-overline" style={{ color: teamColor }}>
+          {teamName}
+        </p>
+        <p className="mt-2 truncate text-base font-semibold text-[var(--ink)]" title={lineup}>
+          {lineup || 'Lineup pending'}
+        </p>
+      </div>
+      <div
+        className={cn(
+          'mt-5 flex items-end justify-between gap-3',
+          align === 'right' && 'lg:flex-row-reverse'
+        )}
+      >
+        <div>
+          <p className="font-serif text-[length:var(--text-3xl)] leading-none text-[var(--ink)]">
+            {holesWon}
+          </p>
+          <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+            holes won
+          </p>
+        </div>
+        <span
+          className="rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em]"
+          style={{
+            background:
+              tone === 'leading' ? colorWithAlpha(teamColor, 16) : 'var(--surface-secondary)',
+            color: tone === 'leading' ? teamColor : 'var(--ink-secondary)',
+          }}
+        >
+          {label}
+        </span>
+      </div>
+    </div>
   );
 }

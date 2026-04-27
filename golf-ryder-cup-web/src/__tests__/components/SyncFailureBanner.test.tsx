@@ -3,14 +3,28 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const getSyncQueueStatusMock = vi.fn();
 const getFailedSyncQueueItemsMock = vi.fn();
+const getUnresolvedSyncQueueItemsMock = vi.fn();
 const retryFailedQueueMock = vi.fn();
 const processSyncQueueMock = vi.fn();
+const routerPushMock = vi.fn();
 
 vi.mock('@/lib/services/tripSyncService', () => ({
   getFailedSyncQueueItems: () => getFailedSyncQueueItemsMock(),
   getSyncQueueStatus: () => getSyncQueueStatusMock(),
+  getUnresolvedSyncQueueItems: () => getUnresolvedSyncQueueItemsMock(),
   processSyncQueue: () => processSyncQueueMock(),
   retryFailedQueue: () => retryFailedQueueMock(),
+}));
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/schedule',
+  useRouter: () => ({
+    push: routerPushMock,
+    replace: vi.fn(),
+    back: vi.fn(),
+  }),
+  useParams: () => ({}),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 import { SyncFailureBanner } from '@/components/SyncFailureBanner';
@@ -19,6 +33,7 @@ describe('SyncFailureBanner', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     getFailedSyncQueueItemsMock.mockReturnValue([]);
+    getUnresolvedSyncQueueItemsMock.mockReturnValue([]);
     retryFailedQueueMock.mockResolvedValue(1);
     processSyncQueueMock.mockResolvedValue({
       success: true,
@@ -29,7 +44,7 @@ describe('SyncFailureBanner', () => {
     });
   });
 
-  it('keeps retry disabled when sync is blocked by auth', async () => {
+  it('routes to sign-in when failed sync is blocked by auth', async () => {
     getSyncQueueStatusMock.mockReturnValue({
       pending: 0,
       failed: 1,
@@ -40,8 +55,44 @@ describe('SyncFailureBanner', () => {
 
     render(<SyncFailureBanner />);
 
-    expect(await screen.findByText('Sign in to resume cloud saving.')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Sign in to sync' })).toBeDisabled();
+    expect(
+      await screen.findByText('1 change saved on this device. Sign in to resume cloud saving.')
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Sign in to sync' }));
+
+    expect(routerPushMock).toHaveBeenCalledWith('/login?returnTo=%2Fschedule');
+    expect(retryFailedQueueMock).not.toHaveBeenCalled();
+    expect(processSyncQueueMock).not.toHaveBeenCalled();
+  });
+
+  it('explains pending local work when cloud sync is waiting for sign-in', async () => {
+    getSyncQueueStatusMock.mockReturnValue({
+      pending: 16,
+      failed: 0,
+      total: 16,
+      blockedReason: 'auth-required',
+    });
+    getUnresolvedSyncQueueItemsMock.mockReturnValue([
+      {
+        entity: 'session',
+        entityId: 'session-1',
+        operation: 'create',
+        status: 'pending',
+        retryCount: 0,
+        createdAt: '2026-04-26T12:00:00.000Z',
+      },
+    ]);
+
+    render(<SyncFailureBanner />);
+
+    expect(await screen.findByText('Cloud saving is paused')).toBeInTheDocument();
+    expect(
+      screen.getByText('16 changes saved on this device. Sign in to resume cloud saving.')
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Details' }));
+    expect(screen.getByText('Session add')).toBeInTheDocument();
+    expect(screen.getByText('Waiting to send to the cloud.')).toBeInTheDocument();
   });
 
   it('stays hidden while offline so the offline banner owns that state', () => {
@@ -52,10 +103,20 @@ describe('SyncFailureBanner', () => {
       lastError: 'offline',
       blockedReason: 'offline',
     });
+    getUnresolvedSyncQueueItemsMock.mockReturnValue([
+      {
+        entity: 'match',
+        entityId: 'match-1',
+        operation: 'update',
+        status: 'pending',
+        retryCount: 0,
+        createdAt: '2026-04-26T12:00:00.000Z',
+      },
+    ]);
 
     render(<SyncFailureBanner />);
 
-    expect(screen.queryByText('Cloud sync needs attention')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cloud saving is paused')).not.toBeInTheDocument();
   });
 
   it('shows failed item details and retries when sync is ready', async () => {
