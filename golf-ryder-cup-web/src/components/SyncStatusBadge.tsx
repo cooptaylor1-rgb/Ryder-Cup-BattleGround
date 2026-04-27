@@ -122,8 +122,8 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
   const [isSyncing, setIsSyncing] = useState(false);
 
   const goToSignIn = () => {
-    const returnTo = pathname || '/';
-    router.push(`/login?returnTo=${encodeURIComponent(returnTo)}`);
+    const nextPath = pathname || '/';
+    router.push(`/login?cloud=1&next=${encodeURIComponent(nextPath)}`);
   };
 
   const refreshSnapshot = useCallback(() => {
@@ -411,7 +411,9 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="font-semibold text-[var(--ink)]">{describeSyncItem(item)}</p>
+                          <p className="font-semibold text-[var(--ink)]">
+                            {describeSyncItem(item)}
+                          </p>
                           <p className="mt-0.5 break-words text-[var(--ink-secondary)]">
                             {friendlyError}
                           </p>

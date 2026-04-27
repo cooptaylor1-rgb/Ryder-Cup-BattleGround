@@ -200,9 +200,17 @@ export function MatchScoringActiveState({
       : 'Awaiting score';
   const leaderName =
     matchState.currentScore > 0 ? teamAName : matchState.currentScore < 0 ? teamBName : undefined;
+  const trailingName =
+    matchState.currentScore > 0 ? teamBName : matchState.currentScore < 0 ? teamAName : undefined;
   const liveScoreLabel = leaderName
     ? `${leaderName} ${Math.abs(matchState.currentScore)} up`
     : 'All square';
+  const livePositionDetail =
+    leaderName && trailingName
+      ? `${trailingName} chasing with ${matchState.holesRemaining} to play`
+      : matchState.holesPlayed > 0
+        ? `${matchState.holesRemaining} holes still in play`
+        : 'No holes recorded yet';
   const currentHoleFacts = [
     { label: 'Par', value: currentPar, icon: Flag },
     { label: 'Stroke index', value: currentStrokeIndex, icon: Gauge },
@@ -264,6 +272,20 @@ export function MatchScoringActiveState({
             >
               <ChevronRight size={20} />
             </button>
+          </div>
+
+          <div className="mt-4 rounded-[22px] border border-[color:var(--masters)]/20 bg-[var(--masters-subtle)] px-4 py-3 text-left">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--masters)]">
+              Match position
+            </p>
+            <div className="mt-1 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+              <p className="text-[length:var(--text-lg)] font-semibold text-[var(--ink)]">
+                {liveScoreLabel}
+              </p>
+              <p className="text-sm font-medium text-[var(--ink-secondary)]">
+                {livePositionDetail}
+              </p>
+            </div>
           </div>
 
           <div className="mt-4 grid grid-cols-3 gap-2">
@@ -523,7 +545,7 @@ export function MatchScoringActiveState({
           <div className="rounded-[22px] border border-[color:var(--rule)]/75 bg-[color:var(--canvas-sunken)] px-3 py-3">
             <div className="flex items-start justify-between gap-3 px-1">
               <div className="min-w-0">
-                <p className="type-overline text-[var(--ink-secondary)]">Entry style</p>
+                <p className="type-overline text-[var(--ink-secondary)]">Scoring method</p>
                 <p className="mt-1 text-sm text-[var(--ink-secondary)]">
                   {scoringModeMeta.description}
                 </p>
@@ -582,11 +604,11 @@ export function MatchScoringActiveState({
                   <Sparkles size={16} className="mt-0.5 shrink-0 text-[var(--masters)]" />
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-[var(--ink)]">
-                      Tune the input, keep the score visible.
+                      Fast scoring stays front and center.
                     </p>
                     <p className="mt-1 text-xs text-[var(--ink-secondary)]">
-                      Winner taps stay front and center. Switch entry style only when the card needs
-                      strokes or one-handed controls.
+                      Use winner taps for match play speed, then switch methods only when the card
+                      needs strokes or one-handed controls.
                     </p>
                   </div>
                   <button

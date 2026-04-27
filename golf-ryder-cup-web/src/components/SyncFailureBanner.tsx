@@ -99,8 +99,8 @@ export function SyncFailureBanner({ className }: { className?: string }) {
   const [retryFeedback, setRetryFeedback] = useState<string | null>(null);
 
   const goToSignIn = () => {
-    const returnTo = pathname || '/';
-    router.push(`/login?returnTo=${encodeURIComponent(returnTo)}`);
+    const nextPath = pathname || '/';
+    router.push(`/login?cloud=1&next=${encodeURIComponent(nextPath)}`);
   };
 
   const refreshSnapshot = useCallback(() => {
@@ -110,9 +110,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
     setPendingCount(status.pending);
     setFailedCount(status.failed);
     setLastError(status.lastError);
-    setSyncItems(
-      status.failed > 0 ? getFailedSyncQueueItems(5) : getUnresolvedSyncQueueItems(5)
-    );
+    setSyncItems(status.failed > 0 ? getFailedSyncQueueItems(5) : getUnresolvedSyncQueueItems(5));
     setBlockedReason(status.blockedReason);
     if (status.failed <= 0 && !shouldShowBlockedPending) {
       setShowDetail(false);

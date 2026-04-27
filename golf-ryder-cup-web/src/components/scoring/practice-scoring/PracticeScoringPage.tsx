@@ -210,31 +210,34 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
       />
 
       <main className="container-editorial py-[var(--space-6)] space-y-[var(--space-5)]">
-        <section className="overflow-hidden rounded-[2rem] border border-[color:var(--masters)]/25 bg-[radial-gradient(circle_at_14%_18%,rgba(255,255,255,0.18),transparent_30%),linear-gradient(135deg,var(--masters-deep)_0%,var(--masters)_52%,#10150f_100%)] text-white shadow-[0_24px_70px_rgba(0,0,0,0.22)]">
-          <div className="grid gap-[var(--space-5)] p-[var(--space-5)] lg:grid-cols-[1.1fr_0.9fr] lg:p-[var(--space-6)]">
+        <section className="overflow-hidden rounded-[2rem] border border-[color:var(--rule)] bg-[var(--canvas-raised)] shadow-[0_24px_70px_rgba(26,24,21,0.10)]">
+          <div className="h-1.5 bg-[linear-gradient(90deg,var(--masters)_0%,var(--gold)_48%,var(--masters-deep)_100%)]" />
+          <div className="grid gap-[var(--space-5)] p-[var(--space-5)] lg:grid-cols-[1.05fr_0.95fr] lg:p-[var(--space-6)]">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-[var(--space-2)]">
-                <span className="inline-flex items-center gap-2 rounded-full bg-white/12 px-[var(--space-3)] py-1 type-micro font-semibold uppercase tracking-[0.16em] text-white/80 ring-1 ring-white/15">
+                <span className="inline-flex items-center gap-2 rounded-full bg-[var(--masters-subtle)] px-[var(--space-3)] py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--masters)] ring-1 ring-[color:var(--masters)]/18">
                   <CircleDot size={13} />
                   Live practice scoring
                 </span>
-                <span className="rounded-full bg-white/10 px-[var(--space-3)] py-1 type-micro font-semibold text-white/75 ring-1 ring-white/15">
+                <span className="rounded-full bg-[var(--surface)] px-[var(--space-3)] py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink-secondary)] ring-1 ring-[color:var(--rule)]">
                   Group {match.matchOrder}
                 </span>
               </div>
 
               <div className="mt-[var(--space-5)] flex flex-col gap-[var(--space-4)] sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <p className="type-overline tracking-[0.18em] text-white/65">Current hole</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-tertiary)]">
+                    Current hole
+                  </p>
                   <div className="mt-[var(--space-2)] flex items-end gap-[var(--space-3)]">
-                    <span className="font-serif text-[5rem] italic leading-[0.8] text-white sm:text-[6rem]">
+                    <span className="font-serif text-[5rem] italic leading-[0.8] text-[var(--masters)] sm:text-[6rem]">
                       {currentHole}
                     </span>
                     <div className="pb-1">
-                      <p className="text-[1.7rem] font-semibold leading-none text-white">
+                      <p className="text-[1.7rem] font-semibold leading-none text-[var(--ink)]">
                         Par {holePar}
                       </p>
-                      <p className="mt-2 type-meta text-white/70">
+                      <p className="mt-2 text-sm font-medium text-[var(--ink-secondary)]">
                         {[
                           holeYardage ? `${holeYardage} yards` : null,
                           holeStrokeIndex ? `Stroke index ${holeStrokeIndex}` : null,
@@ -246,20 +249,20 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
                   </div>
                 </div>
 
-                <div className="min-w-[13rem] rounded-[1.25rem] bg-white/10 p-[var(--space-3)] ring-1 ring-white/15 backdrop-blur">
-                  <div className="flex items-center justify-between type-meta text-white/75">
+                <div className="min-w-[13rem] rounded-[1.25rem] border border-[color:var(--masters)]/20 bg-[var(--masters-subtle)] p-[var(--space-3)]">
+                  <div className="flex items-center justify-between text-sm font-semibold text-[var(--masters-deep)]">
                     <span>Hole entered</span>
                     <span>
                       {enteredOnCurrentHole}/{groupPlayers.length || 0}
                     </span>
                   </div>
-                  <div className="mt-[var(--space-2)] h-2 overflow-hidden rounded-full bg-white/15">
+                  <div className="mt-[var(--space-2)] h-2 overflow-hidden rounded-full bg-[color:var(--masters)]/14">
                     <div
-                      className="h-full rounded-full bg-[var(--gold)] transition-[width] duration-300"
+                      className="h-full rounded-full bg-[var(--masters)] transition-[width] duration-300"
                       style={{ width: `${currentHoleProgress}%` }}
                     />
                   </div>
-                  <p className="mt-[var(--space-2)] type-micro text-white/65">
+                  <p className="mt-[var(--space-2)] text-[11px] font-medium text-[var(--ink-secondary)]">
                     {currentHoleComplete
                       ? 'Hole is complete. Advance when ready.'
                       : `${Math.max(groupPlayers.length - enteredOnCurrentHole, 0)} scores left on this hole.`}
@@ -286,17 +289,19 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
               </div>
             </div>
 
-            <div className="rounded-[1.5rem] bg-black/16 p-[var(--space-4)] ring-1 ring-white/15 backdrop-blur">
+            <div className="rounded-[1.5rem] border border-[color:var(--gold)]/45 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--gold)_16%,var(--canvas-raised))_0%,var(--canvas-raised)_62%,var(--masters-subtle)_100%)] p-[var(--space-4)] shadow-[0_18px_44px_rgba(26,24,21,0.08)]">
               <div className="flex items-center justify-between gap-[var(--space-3)]">
                 <div>
-                  <p className="type-overline tracking-[0.18em] text-white/60">Live leader</p>
-                  <h2 className="mt-[var(--space-1)] type-title text-white">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--gold-dark)]">
+                    Live leader
+                  </p>
+                  <h2 className="mt-[var(--space-1)] text-[length:var(--text-xl)] font-semibold leading-tight text-[var(--ink)]">
                     {leader
                       ? formatPlayerName(leader.player.firstName, leader.player.lastName)
                       : 'Awaiting scores'}
                   </h2>
                 </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--gold)] text-[var(--masters-deep)] shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--gold)] text-[var(--masters-deep)] shadow-[0_10px_30px_rgba(26,24,21,0.14)]">
                   <Trophy size={22} />
                 </div>
               </div>
@@ -319,19 +324,19 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
                     return (
                       <div
                         key={row.player.id}
-                        className="flex items-center justify-between gap-[var(--space-3)] rounded-[1rem] bg-white/9 px-[var(--space-3)] py-[var(--space-2)] ring-1 ring-white/10"
+                        className="flex items-center justify-between gap-[var(--space-3)] rounded-[1rem] border border-[color:var(--rule)] bg-[var(--canvas-raised)] px-[var(--space-3)] py-[var(--space-2)]"
                       >
-                        <span className="truncate type-meta text-white/78">
+                        <span className="truncate text-sm font-semibold text-[var(--ink)]">
                           {formatPlayerName(row.player.firstName, row.player.lastName)}
                         </span>
-                        <span className="font-serif text-[1.15rem] italic text-white">
+                        <span className="font-serif text-[1.15rem] italic text-[var(--masters)]">
                           {toPar !== null ? formatToPar(toPar) : row.grossTotal}
                         </span>
                       </div>
                     );
                   })
                 ) : (
-                  <p className="rounded-[1rem] bg-white/9 px-[var(--space-3)] py-[var(--space-3)] type-body-sm text-white/72 ring-1 ring-white/10">
+                  <p className="rounded-[1rem] border border-[color:var(--rule)] bg-[var(--canvas-raised)] px-[var(--space-3)] py-[var(--space-3)] text-sm leading-relaxed text-[var(--ink-secondary)]">
                     Enter the first hole and the chase board will build instantly.
                   </p>
                 )}
@@ -649,12 +654,12 @@ function HeroMetric({
   value: string;
 }) {
   return (
-    <div className="rounded-[1.1rem] bg-white/10 px-[var(--space-3)] py-[var(--space-3)] ring-1 ring-white/15">
-      <div className="flex items-center gap-2 text-white/62">
+    <div className="rounded-[1.1rem] border border-[color:var(--rule)] bg-[var(--canvas)] px-[var(--space-3)] py-[var(--space-3)] shadow-[0_8px_22px_rgba(26,24,21,0.05)]">
+      <div className="flex items-center gap-2 text-[var(--ink-tertiary)]">
         {icon}
-        <span className="type-micro font-semibold uppercase tracking-[0.12em]">{label}</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.12em]">{label}</span>
       </div>
-      <p className="mt-1 truncate font-serif text-[1.55rem] italic leading-none text-white">
+      <p className="mt-1 truncate font-serif text-[1.55rem] italic leading-none text-[var(--ink)]">
         {value}
       </p>
     </div>
@@ -663,9 +668,11 @@ function HeroMetric({
 
 function LiveLeaderMetric({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-[1rem] bg-white/10 px-[var(--space-3)] py-[var(--space-3)] ring-1 ring-white/10">
-      <p className="type-micro font-semibold uppercase tracking-[0.12em] text-white/55">{label}</p>
-      <p className="mt-1 font-serif text-[1.8rem] italic leading-none text-white">{value}</p>
+    <div className="rounded-[1rem] border border-[color:var(--rule)] bg-[var(--canvas-raised)] px-[var(--space-3)] py-[var(--space-3)]">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink-tertiary)]">
+        {label}
+      </p>
+      <p className="mt-1 font-serif text-[1.8rem] italic leading-none text-[var(--ink)]">{value}</p>
     </div>
   );
 }

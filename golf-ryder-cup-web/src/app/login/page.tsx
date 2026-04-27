@@ -31,9 +31,17 @@ function LoginPageContent() {
     isLoading,
     error,
     clearError,
+    authUserId,
     authEmail,
     hasResolvedSupabaseSession,
   } = useAuthStore();
+
+  const requestedNext = searchParams?.get('next') ?? searchParams?.get('returnTo');
+  const nextPath = safeNextPath(requestedNext);
+  const nextParam = nextPath !== '/' ? `?next=${encodeURIComponent(nextPath)}` : '';
+  const cloudSignInRequested = searchParams?.get('cloud') === '1' && isSupabaseConfigured;
+  const needsCloudSession =
+    cloudSignInRequested && isAuthenticated && Boolean(currentUser) && !authUserId;
 
   const [email, setEmail] = useState('');
   const [pin, setPin] = useState('');
@@ -50,10 +58,14 @@ function LoginPageContent() {
   const [isOffline, setIsOffline] = useState(false);
   const [isResetInFlight, setIsResetInFlight] = useState(false);
   const [resetSentTo, setResetSentTo] = useState<string | null>(null);
+  const [didPrefillCloudEmail, setDidPrefillCloudEmail] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && currentUser) {
-      const nextPath = safeNextPath(searchParams?.get('next'));
+      if (cloudSignInRequested && !authUserId) {
+        return;
+      }
+
       if (!currentUser.hasCompletedOnboarding) {
         const nextParam = nextPath !== '/' ? `?next=${encodeURIComponent(nextPath)}` : '';
         router.push(`/profile/complete${nextParam}`);
@@ -61,17 +73,28 @@ function LoginPageContent() {
         router.push(nextPath);
       }
     }
-  }, [isAuthenticated, currentUser, router, searchParams]);
+  }, [authUserId, cloudSignInRequested, currentUser, isAuthenticated, nextPath, router]);
 
   useEffect(() => {
     if (!hasResolvedSupabaseSession || !authEmail || currentUser) {
       return;
     }
 
-    const nextPath = safeNextPath(searchParams?.get('next'));
     const nextParam = nextPath !== '/' ? `?next=${encodeURIComponent(nextPath)}` : '';
     router.replace(`/profile/create${nextParam}`);
-  }, [authEmail, currentUser, hasResolvedSupabaseSession, router, searchParams]);
+  }, [authEmail, currentUser, hasResolvedSupabaseSession, nextPath, router]);
+
+  useEffect(() => {
+    if (!cloudSignInRequested || didPrefillCloudEmail || email) {
+      return;
+    }
+
+    const preferredEmail = currentUser?.email ?? authEmail ?? '';
+    if (preferredEmail) {
+      setEmail(preferredEmail);
+      setDidPrefillCloudEmail(true);
+    }
+  }, [authEmail, cloudSignInRequested, currentUser?.email, didPrefillCloudEmail, email]);
 
   useEffect(() => {
     if (!isSupabaseConfigured || typeof window === 'undefined') {
@@ -112,9 +135,6 @@ function LoginPageContent() {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, password, pin]);
-
-  const nextPath = safeNextPath(searchParams?.get('next'));
-  const nextParam = nextPath !== '/' ? `?next=${encodeURIComponent(nextPath)}` : '';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -219,11 +239,13 @@ function LoginPageContent() {
           </p>
 
           <h1 className="font-serif italic font-normal text-[clamp(2rem,8vw,3rem)] leading-[1.1] text-[var(--ink)] mb-[var(--space-3)]">
-            Welcome Back
+            {needsCloudSession ? 'Finish Cloud Sign-In' : 'Welcome Back'}
           </h1>
 
           <p className="font-sans text-[length:var(--text-base)] text-[var(--ink-secondary)]">
-            Sign in to your trip
+            {needsCloudSession
+              ? 'Enter your account password to send saved changes.'
+              : 'Sign in to your trip'}
           </p>
         </div>
       </header>
@@ -231,6 +253,18 @@ function LoginPageContent() {
       {/* Form */}
       <main className="container-editorial flex-1">
         <form onSubmit={handleLogin} className="max-w-sm mx-auto">
+          {/* Email */}
+          {needsCloudSession && (
+            <div className="mb-[var(--space-6)] rounded-[var(--radius-md)] border border-[color:var(--warning)]/25 bg-[color:var(--warning)]/10 px-[var(--space-4)] py-[var(--space-3)]">
+              <p className="font-sans text-[length:var(--text-sm)] font-semibold text-[var(--ink)]">
+                Local profile is signed in. Cloud saving still needs your account session.
+              </p>
+              <p className="mt-1 font-sans text-[length:var(--text-xs)] leading-relaxed text-[var(--ink-secondary)]">
+                After this sign-in, the saved changes on this device will retry automatically.
+              </p>
+            </div>
+          )}
+
           {/* Email */}
           <div className="mb-[var(--space-6)]">
             <label
@@ -399,8 +433,7 @@ function LoginPageContent() {
                 <div className="mt-[var(--space-3)] flex items-center gap-[var(--space-2)] rounded-[var(--radius-sm)] bg-[var(--surface)] px-[var(--space-3)] py-[var(--space-2)]">
                   <WifiOff className="h-4 w-4 text-[var(--ink-tertiary)]" />
                   <p className="font-sans text-[length:var(--text-xs)] text-[var(--ink-secondary)]">
-                    Offline detected. Magic-link sign-in will work again when your connection
-                    returns.
+                    Offline detected. Cloud sign-in will work again when your connection returns.
                   </p>
                 </div>
               )}
@@ -493,7 +526,7 @@ function LoginPageContent() {
 
         {/* Footer note */}
         <p className="text-center font-sans text-[length:var(--text-xs)] text-[var(--ink-tertiary)] mt-[var(--space-8)] leading-relaxed">
-          Secure sign-in works best with the email link.
+          Cloud sign-in keeps your saved changes moving across devices.
           <br />
           Offline PIN access is device-specific and optional.
         </p>

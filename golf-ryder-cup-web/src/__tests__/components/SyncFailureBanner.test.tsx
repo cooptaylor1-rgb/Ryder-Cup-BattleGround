@@ -57,11 +57,13 @@ describe('SyncFailureBanner', () => {
     render(<SyncFailureBanner />);
 
     expect(
-      await screen.findByText('1 change saved on this device. Sign in to resume cloud saving.')
+      await screen.findByText(
+        '1 change saved on this device. Cloud account sign-in is required to send changes.'
+      )
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Sign in to sync' }));
 
-    expect(routerPushMock).toHaveBeenCalledWith('/login?returnTo=%2Fschedule');
+    expect(routerPushMock).toHaveBeenCalledWith('/login?cloud=1&next=%2Fschedule');
     expect(retryFailedQueueMock).not.toHaveBeenCalled();
     expect(processSyncQueueMock).not.toHaveBeenCalled();
   });
@@ -88,7 +90,9 @@ describe('SyncFailureBanner', () => {
 
     expect(await screen.findByText('Cloud saving is paused')).toBeInTheDocument();
     expect(
-      screen.getByText('16 changes saved on this device. Sign in to resume cloud saving.')
+      screen.getByText(
+        '16 changes saved on this device. Cloud account sign-in is required to send changes.'
+      )
     ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Details' }));

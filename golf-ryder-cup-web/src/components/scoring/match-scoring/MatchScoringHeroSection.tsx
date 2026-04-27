@@ -146,131 +146,134 @@ export function MatchScoringHeroSection({
       </header>
 
       <section className="container-editorial space-y-4 pt-[var(--space-8)]">
-        <div className="card-editorial overflow-hidden p-[var(--space-5)] sm:p-[var(--space-6)]">
-          <div className="flex items-start justify-between gap-[var(--space-4)]">
-            <div className="min-w-0">
-              <p className="type-overline text-[var(--masters)]">{sessionLabel}</p>
-              <h1 className="mt-[var(--space-2)] font-serif text-[length:var(--text-3xl)] font-normal text-[var(--ink)]">
-                Live scoring cockpit
-              </h1>
-              <p className="mt-[var(--space-2)] text-sm font-medium text-[var(--ink-secondary)]">
-                {matchNarrative}
-                {trailingName && !isMatchComplete ? ` · ${trailingName} chasing` : ''}
-              </p>
-              {/*
+        <div className="overflow-hidden rounded-[28px] border border-[color:var(--rule)] bg-[var(--canvas-raised)] shadow-[0_24px_70px_rgba(26,24,21,0.10)]">
+          <div className="h-1.5 bg-[linear-gradient(90deg,var(--team-usa)_0%,var(--gold)_50%,var(--team-europe)_100%)]" />
+          <div className="p-[var(--space-5)] sm:p-[var(--space-6)]">
+            <div className="flex items-start justify-between gap-[var(--space-4)]">
+              <div className="min-w-0">
+                <p className="type-overline text-[var(--masters)]">{sessionLabel}</p>
+                <h1 className="mt-[var(--space-2)] font-serif text-[length:var(--text-3xl)] font-normal text-[var(--ink)]">
+                  Match scoreboard
+                </h1>
+                <p className="mt-[var(--space-2)] text-sm font-medium text-[var(--ink-secondary)]">
+                  {matchNarrative}
+                  {trailingName && !isMatchComplete ? ` · ${trailingName} chasing` : ''}
+                </p>
+                {/*
                 Course / tee badges. Must stay legible in bright sunlight
                 on the course — bumped to text-xs (12px → ~13px scaled)
                 with py-2 padding for a larger visual target. Previously
                 rendered at text-[11px] / py-1 which was borderline
                 unreadable at arm's length.
               */}
-              <div className="mt-[var(--space-3)] flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)]">
-                <div className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)]/72 px-3 py-2">
-                  <MapPin size={14} className="text-[var(--ink-tertiary)]" />
-                  <span>{currentCourseName ?? 'Course not assigned'}</span>
+                <div className="mt-[var(--space-3)] flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)]">
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)]/72 px-3 py-2">
+                    <MapPin size={14} className="text-[var(--ink-tertiary)]" />
+                    <span>{currentCourseName ?? 'Course not assigned'}</span>
+                  </div>
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)]/72 px-3 py-2">
+                    <Flag size={14} className="text-[var(--ink-tertiary)]" />
+                    <span>{currentTeeSetName ?? 'Tee set not assigned'}</span>
+                  </div>
                 </div>
-                <div className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)]/72 px-3 py-2">
-                  <Flag size={14} className="text-[var(--ink-tertiary)]" />
-                  <span>{currentTeeSetName ?? 'Tee set not assigned'}</span>
-                </div>
-              </div>
-              {(!currentCourseName || !currentTeeSetName) && (
-                <p className="mt-2 text-xs text-[var(--warning)]">
-                  {isCaptain
-                    ? 'Assign a course and tee set in Manage Trip session settings to turn on handicap-adjusted scoring. You can still score gross without it.'
-                    : 'Scores will still count, but handicap strokes won’t apply until the captain sets a course and tee.'}
-                </p>
-              )}
-            </div>
-            <ScoringStatusBadge
-              label={matchStatusLabel}
-              tone={isMatchComplete ? 'muted' : 'masters'}
-            />
-          </div>
-
-          <div className="mt-[var(--space-6)] grid gap-3 lg:grid-cols-[minmax(0,1fr)_16rem_minmax(0,1fr)] lg:items-stretch">
-            <TeamScoreCard
-              teamName={teamAName}
-              lineup={teamALineup}
-              holesWon={matchState.teamAHolesWon}
-              teamColor={teamAColor}
-              tone={
-                matchState.currentScore > 0
-                  ? 'leading'
-                  : matchState.currentScore < 0
-                    ? 'trailing'
-                    : 'even'
-              }
-            />
-            <motion.div
-              key={matchState.displayScore}
-              initial={prefersReducedMotion ? false : { scale: 0.96, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.2, ease: 'easeOut' }}
-              className="flex min-h-[160px] flex-col items-center justify-center rounded-[28px] border border-[color:var(--rule)]/75 bg-[radial-gradient(circle_at_top,var(--canvas)_0%,var(--surface-secondary)_74%)] px-5 py-5 text-center shadow-card-sm"
-            >
-              <p className="type-overline text-[var(--ink-tertiary)]">
-                {isMatchComplete ? 'Final' : 'Live match'}
-              </p>
-              <p
-                className={cn(
-                  'score-monumental mt-2',
-                  matchState.currentScore > 0
-                    ? 'text-[color:var(--team-usa)]'
-                    : matchState.currentScore < 0
-                      ? 'text-[color:var(--team-europe)]'
-                      : 'text-[var(--ink-tertiary)]'
+                {(!currentCourseName || !currentTeeSetName) && (
+                  <p className="mt-2 text-xs text-[var(--warning)]">
+                    {isCaptain
+                      ? 'Assign a course and tee set in Manage Trip session settings to turn on handicap-adjusted scoring. You can still score gross without it.'
+                      : 'Scores will still count, but handicap strokes won’t apply until the captain sets a course and tee.'}
+                  </p>
                 )}
-              >
-                {matchState.displayScore}
-              </p>
-              <p className="mt-2 text-sm text-[var(--ink-secondary)]">
-                {matchState.holesPlayed > 0 ? `Through ${matchState.holesPlayed}` : 'Opening tee'}
-              </p>
-              {matchState.isDormie && (
-                <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--gold)]">
-                  <AlertCircle size={12} />
-                  Dormie
-                </p>
-              )}
-            </motion.div>
-            <TeamScoreCard
-              teamName={teamBName}
-              lineup={teamBLineup}
-              holesWon={matchState.teamBHolesWon}
-              teamColor={teamBColor}
-              tone={
-                matchState.currentScore < 0
-                  ? 'leading'
-                  : matchState.currentScore > 0
-                    ? 'trailing'
-                    : 'even'
-              }
-              align="right"
-            />
-          </div>
+              </div>
+              <ScoringStatusBadge
+                label={matchStatusLabel}
+                tone={isMatchComplete ? 'muted' : 'masters'}
+              />
+            </div>
 
-          <div className="mt-[var(--space-5)] grid gap-3 min-[420px]:grid-cols-2 sm:grid-cols-4">
-            <ScoringFactCard
-              eyebrow="Current hole"
-              value={`Hole ${currentHole}`}
-              note={currentHoleNote}
-            />
-            <ScoringFactCard
-              eyebrow="Stroke index"
-              value={currentStrokeIndex}
-              note={currentStrokeIndex === 1 ? 'Hardest hole' : 'Handicap rank'}
-            />
-            <ScoringFactCard
-              eyebrow="Remaining"
-              value={matchState.holesRemaining}
-              note="Still in play"
-            />
-            <ScoringFactCard
-              eyebrow="Mode"
-              value={scoringModeMeta.label}
-              note={scoringModeMeta.note}
-            />
+            <div className="mt-[var(--space-6)] grid gap-3 lg:grid-cols-[minmax(0,1fr)_16rem_minmax(0,1fr)] lg:items-stretch">
+              <TeamScoreCard
+                teamName={teamAName}
+                lineup={teamALineup}
+                holesWon={matchState.teamAHolesWon}
+                teamColor={teamAColor}
+                tone={
+                  matchState.currentScore > 0
+                    ? 'leading'
+                    : matchState.currentScore < 0
+                      ? 'trailing'
+                      : 'even'
+                }
+              />
+              <motion.div
+                key={matchState.displayScore}
+                initial={prefersReducedMotion ? false : { scale: 0.96, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.2, ease: 'easeOut' }}
+                className="flex min-h-[170px] flex-col items-center justify-center rounded-[28px] border border-[color:var(--masters)]/20 bg-[linear-gradient(180deg,var(--masters-subtle)_0%,var(--canvas)_82%)] px-5 py-5 text-center shadow-[0_18px_42px_rgba(26,24,21,0.08)]"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--masters)]">
+                  {isMatchComplete ? 'Final' : 'Live match'}
+                </p>
+                <p
+                  className={cn(
+                    'score-monumental mt-2',
+                    matchState.currentScore > 0
+                      ? 'text-[color:var(--team-usa)]'
+                      : matchState.currentScore < 0
+                        ? 'text-[color:var(--team-europe)]'
+                        : 'text-[var(--ink-tertiary)]'
+                  )}
+                >
+                  {matchState.displayScore}
+                </p>
+                <p className="mt-2 text-sm font-semibold text-[var(--ink-secondary)]">
+                  {matchState.holesPlayed > 0 ? `Through ${matchState.holesPlayed}` : 'Opening tee'}
+                </p>
+                {matchState.isDormie && (
+                  <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--gold)]">
+                    <AlertCircle size={12} />
+                    Dormie
+                  </p>
+                )}
+              </motion.div>
+              <TeamScoreCard
+                teamName={teamBName}
+                lineup={teamBLineup}
+                holesWon={matchState.teamBHolesWon}
+                teamColor={teamBColor}
+                tone={
+                  matchState.currentScore < 0
+                    ? 'leading'
+                    : matchState.currentScore > 0
+                      ? 'trailing'
+                      : 'even'
+                }
+                align="right"
+              />
+            </div>
+
+            <div className="mt-[var(--space-5)] grid gap-3 min-[420px]:grid-cols-2 sm:grid-cols-4">
+              <ScoringFactCard
+                eyebrow="Current hole"
+                value={`Hole ${currentHole}`}
+                note={currentHoleNote}
+              />
+              <ScoringFactCard
+                eyebrow="Stroke index"
+                value={currentStrokeIndex}
+                note={currentStrokeIndex === 1 ? 'Hardest hole' : 'Handicap rank'}
+              />
+              <ScoringFactCard
+                eyebrow="Remaining"
+                value={matchState.holesRemaining}
+                note="Still in play"
+              />
+              <ScoringFactCard
+                eyebrow="Mode"
+                value={scoringModeMeta.label}
+                note={scoringModeMeta.note}
+              />
+            </div>
           </div>
         </div>
 
@@ -336,16 +339,16 @@ function TeamScoreCard({
   return (
     <div
       className={cn(
-        'flex min-h-[160px] flex-col justify-between rounded-[28px] border px-4 py-4 shadow-card-sm',
+        'flex min-h-[170px] flex-col justify-between rounded-[28px] border px-4 py-4 shadow-[0_14px_34px_rgba(26,24,21,0.06)]',
         align === 'right' ? 'text-left lg:text-right' : 'text-left'
       )}
       style={{
         borderColor:
-          tone === 'leading' ? teamColor : 'color-mix(in srgb, var(--rule) 76%, transparent)',
+          tone === 'leading' ? teamColor : 'color-mix(in srgb, var(--rule) 92%, transparent)',
         background:
           tone === 'leading'
-            ? `linear-gradient(180deg, ${colorWithAlpha(teamColor, 14)} 0%, var(--canvas) 84%)`
-            : 'color-mix(in srgb, var(--canvas) 76%, transparent)',
+            ? `linear-gradient(180deg, ${colorWithAlpha(teamColor, 16)} 0%, var(--canvas-raised) 86%)`
+            : 'linear-gradient(180deg, var(--canvas-raised) 0%, var(--canvas) 100%)',
       }}
     >
       <div className="min-w-0">
@@ -363,7 +366,7 @@ function TeamScoreCard({
         )}
       >
         <div>
-          <p className="font-serif text-[length:var(--text-3xl)] leading-none text-[var(--ink)]">
+          <p className="font-serif text-[length:var(--text-4xl)] leading-none text-[var(--ink)]">
             {holesWon}
           </p>
           <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">

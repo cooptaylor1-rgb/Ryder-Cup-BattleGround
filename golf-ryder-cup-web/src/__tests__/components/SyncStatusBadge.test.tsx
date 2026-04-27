@@ -121,7 +121,7 @@ describe('SyncStatusBadge', () => {
     expect(screen.getByText('Session add')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Sign in to sync' }));
-    expect(routerPushMock).toHaveBeenCalledWith('/login?returnTo=%2Fschedule');
+    expect(routerPushMock).toHaveBeenCalledWith('/login?cloud=1&next=%2Fschedule');
     expect(retryFailedQueueMock).not.toHaveBeenCalled();
     expect(processSyncQueueMock).not.toHaveBeenCalled();
   });
