@@ -276,6 +276,219 @@ export function compareByDependency(a: SyncQueueItem, b: SyncQueueItem): number 
 }
 
 /**
+ * Map of cloud table name (as it appears in PostgREST FK violation
+ * messages) → SyncEntity. Used to translate "Key is not present in
+ * table 'matches'" into "the match parent needs to be uploaded first".
+ */
+const ENTITY_BY_CLOUD_TABLE: Record<string, SyncEntity> = {
+  trips: 'trip',
+  players: 'player',
+  teams: 'team',
+  team_members: 'teamMember',
+  sessions: 'session',
+  matches: 'match',
+  hole_results: 'holeResult',
+  courses: 'course',
+  tee_sets: 'teeSet',
+  side_bets: 'sideBet',
+  practice_scores: 'practiceScore',
+  banter_posts: 'banterPost',
+  dues_line_items: 'duesLineItem',
+  payment_records: 'paymentRecord',
+  trip_invitations: 'tripInvitation',
+  announcements: 'announcement',
+  attendance_records: 'attendanceRecord',
+  cart_assignments: 'cartAssignment',
+};
+
+/**
+ * Map of (child entity → field on the child Dexie row) → parent entity.
+ * When a child row's upsert fails with FK 23503 referencing a specific
+ * cloud table, we look up the local row and read this field to find the
+ * parent's id, then re-queue the parent.
+ *
+ * Only entries that actually appear in failure logs are listed —
+ * adding more is purely additive (no behavior change for entities not
+ * in the map).
+ */
+const PARENT_LOOKUP: Record<
+  SyncEntity,
+  Partial<Record<SyncEntity, (row: Record<string, unknown>) => string | undefined>>
+> = {
+  trip: {},
+  player: {
+    trip: (row) => row.tripId as string | undefined,
+  },
+  team: {
+    trip: (row) => row.tripId as string | undefined,
+  },
+  teamMember: {
+    team: (row) => row.teamId as string | undefined,
+    player: (row) => row.playerId as string | undefined,
+  },
+  session: {
+    trip: (row) => row.tripId as string | undefined,
+    course: (row) => row.defaultCourseId as string | undefined,
+    teeSet: (row) => row.defaultTeeSetId as string | undefined,
+  },
+  match: {
+    session: (row) => row.sessionId as string | undefined,
+    course: (row) => row.courseId as string | undefined,
+    teeSet: (row) => row.teeSetId as string | undefined,
+  },
+  holeResult: {
+    match: (row) => row.matchId as string | undefined,
+  },
+  practiceScore: {
+    match: (row) => row.matchId as string | undefined,
+    player: (row) => row.playerId as string | undefined,
+  },
+  course: {
+    trip: (row) => row.tripId as string | undefined,
+  },
+  teeSet: {
+    course: (row) => row.courseId as string | undefined,
+  },
+  sideBet: {
+    trip: (row) => row.tripId as string | undefined,
+    match: (row) => row.matchId as string | undefined,
+  },
+  banterPost: {
+    trip: (row) => row.tripId as string | undefined,
+  },
+  duesLineItem: {
+    trip: (row) => row.tripId as string | undefined,
+    player: (row) => row.playerId as string | undefined,
+  },
+  paymentRecord: {
+    trip: (row) => row.tripId as string | undefined,
+    player: (row) => row.playerId as string | undefined,
+  },
+  tripInvitation: {
+    trip: (row) => row.tripId as string | undefined,
+  },
+  announcement: {
+    trip: (row) => row.tripId as string | undefined,
+  },
+  attendanceRecord: {
+    trip: (row) => row.tripId as string | undefined,
+    player: (row) => row.playerId as string | undefined,
+  },
+  cartAssignment: {
+    trip: (row) => row.tripId as string | undefined,
+  },
+};
+
+/**
+ * Map of SyncEntity → Dexie table name. Mirrors the writers' table()
+ * lookup but readable from this file without a circular import.
+ */
+const DEXIE_TABLE_BY_ENTITY: Record<SyncEntity, string> = {
+  trip: 'trips',
+  player: 'players',
+  team: 'teams',
+  teamMember: 'teamMembers',
+  session: 'sessions',
+  match: 'matches',
+  holeResult: 'holeResults',
+  course: 'courses',
+  teeSet: 'teeSets',
+  sideBet: 'sideBets',
+  practiceScore: 'practiceScores',
+  banterPost: 'banterPosts',
+  duesLineItem: 'duesLineItems',
+  paymentRecord: 'paymentRecords',
+  tripInvitation: 'tripInvitations',
+  announcement: 'announcements',
+  attendanceRecord: 'attendanceRecords',
+  cartAssignment: 'cartAssignments',
+};
+
+/**
+ * Detect a Postgres FK violation in a sync error message and re-queue
+ * the missing parent so the queue's next pass uploads it before the
+ * child retries. Returns true when a parent was re-queued (in which
+ * case the child should be reset to pending so it gets another shot
+ * after the parent commits).
+ *
+ * The message shape we parse looks like:
+ *   "...code: 23503 | details: Key is not present in table \"matches\"."
+ * — emitted by formatSupabaseSyncError() in tripSyncWriterHelpers.
+ */
+async function tryRequeueParentForFkFailure(
+  child: SyncQueueItem,
+  errorMessage: string
+): Promise<boolean> {
+  if (!errorMessage.includes('code: 23503')) return false;
+
+  // Pull the cloud table name from the details. PostgREST formats
+  // the table reference with double-quotes:
+  //   Key is not present in table "matches".
+  const tableMatch = errorMessage.match(/in table\s+"([^"]+)"/i);
+  const cloudTable = tableMatch?.[1];
+  if (!cloudTable) return false;
+
+  const parentEntity = ENTITY_BY_CLOUD_TABLE[cloudTable];
+  if (!parentEntity) return false;
+
+  const parentLookup = PARENT_LOOKUP[child.entity]?.[parentEntity];
+  if (!parentLookup) return false;
+
+  // Read the child's local row (or its queue payload) to find the
+  // parent's id.
+  const dexieTable = DEXIE_TABLE_BY_ENTITY[child.entity];
+  let childRow: Record<string, unknown> | undefined;
+  if (child.data) {
+    childRow = child.data as unknown as Record<string, unknown>;
+  } else {
+    try {
+      const table = (
+        db as unknown as Record<string, { get: (id: string) => Promise<unknown> }>
+      )[dexieTable];
+      childRow = (await table?.get?.(child.entityId)) as Record<string, unknown> | undefined;
+    } catch {
+      childRow = undefined;
+    }
+  }
+  if (!childRow) return false;
+
+  const parentId = parentLookup(childRow);
+  if (!parentId) return false;
+
+  const parentTable = DEXIE_TABLE_BY_ENTITY[parentEntity];
+  let parentRow: Record<string, unknown> | undefined;
+  try {
+    const table = (
+      db as unknown as Record<string, { get: (id: string) => Promise<unknown> }>
+    )[parentTable];
+    parentRow = (await table?.get?.(parentId)) as Record<string, unknown> | undefined;
+  } catch {
+    parentRow = undefined;
+  }
+  // If the local parent row is missing too, re-queueing won't help —
+  // give up and let the child fail terminally so the user notices.
+  if (!parentRow) return false;
+
+  // Re-queue the parent. queueSyncOperation handles dedup with
+  // existing entries via idempotencyKey, so this is safe to call even
+  // if the parent is already pending — it just resets retryCount.
+  const parentTripId = (parentRow.tripId as string | undefined) ?? child.tripId;
+  queueSyncOperation(
+    parentEntity as SyncEntity,
+    parentId,
+    'create',
+    parentTripId,
+    parentRow as never
+  );
+
+  logger.warn(
+    `[sync] FK 23503 on ${child.entity}:${child.entityId} → re-queued parent ${parentEntity}:${parentId}`
+  );
+
+  return true;
+}
+
+/**
  * Deterministic conflict policy for queued operations on the same entity.
  * Ensures queue transitions are idempotent and converge to the correct final state.
  */
@@ -485,10 +698,23 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
         await persistQueueItem(item);
         synced++;
       } catch (err) {
-        const nextRetryCount = item.retryCount + 1;
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        const nextStatus: SyncQueueItem['status'] =
-          nextRetryCount >= MAX_RETRY_COUNT ? 'failed' : 'pending';
+
+        // FK 23503 means the child landed before the parent. Re-queue
+        // the missing parent so the next pass uploads it, and DO NOT
+        // bump this child's retry budget — the failure was structural,
+        // not the child's fault. Without this, the queue would burn
+        // through MAX_RETRY_COUNT on each child and abandon them while
+        // the parent sat unsynced (the exact pattern that left the
+        // user's matches and practice_scores stuck in this thread).
+        const requeuedParent = await tryRequeueParentForFkFailure(item, errorMessage);
+
+        const nextRetryCount = requeuedParent ? item.retryCount : item.retryCount + 1;
+        const nextStatus: SyncQueueItem['status'] = requeuedParent
+          ? 'pending'
+          : nextRetryCount >= MAX_RETRY_COUNT
+            ? 'failed'
+            : 'pending';
 
         await persistQueueItem({
           ...item,

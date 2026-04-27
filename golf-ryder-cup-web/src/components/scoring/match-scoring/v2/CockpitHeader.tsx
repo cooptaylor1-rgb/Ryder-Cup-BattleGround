@@ -15,9 +15,14 @@
 
 'use client';
 
-import { ChevronLeft, MoreHorizontal, Undo2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { CloudOff, Cloud, ChevronLeft, MoreHorizontal, Undo2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SyncStatusBadge } from '@/components/SyncStatusBadge';
+import {
+  getSyncQueueStatus,
+  TRIP_SYNC_QUEUE_CHANGED_EVENT,
+} from '@/lib/services/tripSyncService';
 
 interface CockpitHeaderProps {
   matchOrder: number;
@@ -57,6 +62,23 @@ export function CockpitHeader({
   onUndo,
   onOpenOverflow,
 }: CockpitHeaderProps) {
+  // Live queue depth so the scorer sees, at a glance from the cockpit,
+  // whether their last hole's worth of writes is still pending or
+  // failed. Without this, the only sync surface visible while scoring
+  // was the SaveStatePill (which only reflects the *current* op) —
+  // pending or failed work behind it sat invisible until the user
+  // navigated back to a page that rendered the SyncFailureBanner.
+  const [queueDepth, setQueueDepth] = useState({ pending: 0, failed: 0 });
+  useEffect(() => {
+    const tick = () => {
+      const s = getSyncQueueStatus();
+      setQueueDepth({ pending: s.pending, failed: s.failed });
+    };
+    tick();
+    window.addEventListener(TRIP_SYNC_QUEUE_CHANGED_EVENT, tick);
+    return () => window.removeEventListener(TRIP_SYNC_QUEUE_CHANGED_EVENT, tick);
+  }, []);
+
   return (
     <header
       className="sticky top-0 z-30 border-b border-[color:var(--rule)] bg-[color:var(--canvas)]/95 backdrop-blur"
@@ -104,6 +126,7 @@ export function CockpitHeader({
           </div>
 
           <SaveStatePill state={saveState} />
+          <QueueDepthPill pending={queueDepth.pending} failed={queueDepth.failed} />
 
           <button
             type="button"
@@ -145,6 +168,45 @@ export function CockpitHeader({
         <SyncStatusBadge />
       </div>
     </header>
+  );
+}
+
+/**
+ * Shows queue depth — how many writes haven't reached the cloud yet —
+ * directly on the cockpit. Splits pending (still trying) from failed
+ * (terminally stuck) so the user can immediately tell whether their
+ * scoring is being absorbed or dropped on the floor.
+ *
+ * Hidden when the queue is clean. Tap-through to the failure banner
+ * isn't needed here — the global SyncFailureBanner handles the action.
+ */
+function QueueDepthPill({ pending, failed }: { pending: number; failed: number }) {
+  if (pending === 0 && failed === 0) return null;
+
+  if (failed > 0) {
+    return (
+      <span
+        className="inline-flex h-7 items-center gap-1 rounded-full bg-[color:var(--error)] px-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--canvas)]"
+        role="status"
+        aria-live="polite"
+        title={`${failed} change${failed === 1 ? '' : 's'} did not reach the cloud — see the alert banner.`}
+      >
+        <CloudOff size={11} />
+        {failed} stuck
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className="inline-flex h-7 items-center gap-1 rounded-full bg-[color:var(--canvas-sunken)] px-2.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)]"
+      role="status"
+      aria-live="polite"
+      title={`${pending} change${pending === 1 ? '' : 's'} waiting to sync to the cloud.`}
+    >
+      <Cloud size={11} />
+      {pending}
+    </span>
   );
 }
 

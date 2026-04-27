@@ -15,15 +15,18 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { AlertTriangle, Clock3, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Clock3, RefreshCw, Upload } from 'lucide-react';
 import {
   getFailedSyncQueueItems,
   getSyncQueueStatus,
   getUnresolvedSyncQueueItems,
   processSyncQueue,
   retryFailedQueue,
+  syncTripToCloudFull,
   TRIP_SYNC_QUEUE_CHANGED_EVENT,
 } from '@/lib/services/tripSyncService';
+import { useTripStore } from '@/lib/stores';
+import { useShallow } from 'zustand/shallow';
 import { cn } from '@/lib/utils';
 import { zIndex } from '@/lib/constants/zIndex';
 import {
@@ -89,6 +92,9 @@ function formatAttemptTime(value?: string) {
 export function SyncFailureBanner({ className }: { className?: string }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { currentTripId } = useTripStore(
+    useShallow((s) => ({ currentTripId: s.currentTrip?.id }))
+  );
   const [pendingCount, setPendingCount] = useState(0);
   const [failedCount, setFailedCount] = useState(0);
   const [lastError, setLastError] = useState<string | undefined>(undefined);
@@ -96,6 +102,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
   const [blockedReason, setBlockedReason] = useState<SyncBlockedReason | undefined>(undefined);
   const [showDetail, setShowDetail] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
+  const [isPushingAll, setIsPushingAll] = useState(false);
   const [retryFeedback, setRetryFeedback] = useState<string | null>(null);
 
   const goToSignIn = () => {
@@ -154,6 +161,53 @@ export function SyncFailureBanner({ className }: { className?: string }) {
       window.removeEventListener(TRIP_SYNC_QUEUE_CHANGED_EVENT, tick);
     };
   }, [refreshSnapshot]);
+
+  /**
+   * Last-resort recovery action. Walks every Dexie row scoped to the
+   * active trip and pushes it to Supabase in dependency order via
+   * syncTripToCloudFull(). This is the right escape hatch when the
+   * queue is stuck because a parent (e.g. a session, course, or
+   * match) failed terminally days ago and the user has been scoring
+   * children that all FK-violate against missing parents.
+   *
+   * Bypasses the queue entirely so a corrupt queue can't block recovery.
+   */
+  const handlePushAll = async () => {
+    if (!currentTripId) {
+      setRetryFeedback('Open a trip before retrying.');
+      return;
+    }
+    setIsPushingAll(true);
+    setRetryFeedback('Pushing every change from this device to the cloud…');
+    try {
+      const result = await syncTripToCloudFull(currentTripId);
+      if (result.success) {
+        // Now drain whatever's left in the queue (e.g. the failed
+        // children that were waiting for their parent).
+        await retryFailedQueue();
+        await processSyncQueue();
+        const status = refreshSnapshot();
+        if (status.failed <= 0 && status.pending <= 0) {
+          setRetryFeedback('All changes are now in the cloud.');
+          setShowDetail(false);
+        } else {
+          setRetryFeedback(
+            `Pushed from this device. ${status.failed + status.pending} item${status.failed + status.pending === 1 ? '' : 's'} still working — try again in a moment.`
+          );
+        }
+      } else {
+        setRetryFeedback(
+          `Couldn't push everything: ${summarizeSyncError(result.error ?? 'Unknown error')}`
+        );
+      }
+    } catch (error) {
+      setRetryFeedback(
+        `Push failed: ${summarizeSyncError(error instanceof Error ? error.message : String(error))}`
+      );
+    } finally {
+      setIsPushingAll(false);
+    }
+  };
 
   const handleRetry = async () => {
     if (blockedReason === 'auth-required') {
@@ -243,12 +297,28 @@ export function SyncFailureBanner({ className }: { className?: string }) {
             <button
               type="button"
               onClick={handleRetry}
-              disabled={isRetrying || (!canRetry && !canOpenSignIn)}
+              disabled={isRetrying || isPushingAll || (!canRetry && !canOpenSignIn)}
               className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--error)]/35 bg-[var(--canvas)]/88 px-3 py-1 text-xs font-semibold text-[var(--error)] transition-colors hover:bg-[color:var(--error)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <RefreshCw className={cn('h-3.5 w-3.5', isRetrying && 'animate-spin')} aria-hidden />
               {isRetrying ? 'Retrying...' : getSyncBlockedActionLabel(blockedReason)}
             </button>
+            {/* Last-resort recovery — only shown when retry has been
+                attempted and didn't drain the queue, or on persistent
+                failure. Pushes every Dexie row directly, bypassing
+                the queue's accumulated retry budget. */}
+            {currentTripId && canRetry && (
+              <button
+                type="button"
+                onClick={handlePushAll}
+                disabled={isRetrying || isPushingAll}
+                title="Push every saved change directly from this device to the cloud (bypasses the retry queue)."
+                className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--error)]/35 bg-[var(--canvas)]/88 px-3 py-1 text-xs font-semibold text-[var(--error)] transition-colors hover:bg-[color:var(--error)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <Upload className={cn('h-3.5 w-3.5', isPushingAll && 'animate-pulse')} aria-hidden />
+                {isPushingAll ? 'Pushing…' : 'Push all from device'}
+              </button>
+            )}
           </div>
         </div>
         {showDetail && detailAvailable && (
