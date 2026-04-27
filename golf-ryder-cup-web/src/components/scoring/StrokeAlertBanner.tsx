@@ -96,7 +96,15 @@ export function StrokeAlertBanner({
         setIsVisible(false);
       });
     }
-  }, [currentHole, hasStrokes, lastAlertedHole, autoDismissMs, currentHoleTeamAStrokes, currentHoleTeamBStrokes, onAlertShown]);
+  }, [
+    currentHole,
+    hasStrokes,
+    lastAlertedHole,
+    autoDismissMs,
+    currentHoleTeamAStrokes,
+    currentHoleTeamBStrokes,
+    onAlertShown,
+  ]);
 
   // Manual dismiss
   const handleDismiss = () => {
@@ -116,7 +124,9 @@ export function StrokeAlertBanner({
           exit={{ opacity: 0, y: position === 'top' ? -20 : 20 }}
           className={cn(
             'fixed left-4 right-4 z-50',
-            position === 'top' ? 'top-20' : 'bottom-24',
+            position === 'top'
+              ? 'top-[calc(5rem+env(safe-area-inset-top,0px))]'
+              : 'bottom-[calc(6rem+env(safe-area-inset-bottom,0px))]',
             className
           )}
         >
@@ -128,8 +138,9 @@ export function StrokeAlertBanner({
                 <span className="font-medium">Stroke Hole</span>
               </div>
               <button
+                type="button"
                 onClick={handleDismiss}
-                className="p-1 rounded hover:bg-[color:var(--canvas)]/20 transition-colors"
+                className="min-h-9 min-w-9 rounded p-1 transition-colors hover:bg-[color:var(--canvas)]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--canvas)]/70"
                 aria-label="Dismiss"
               >
                 <X size={16} />
@@ -174,18 +185,22 @@ export function StrokeAlertBanner({
                     <>Both teams receive {isTeamStrokesFormat ? 'team ' : ''}strokes on this hole</>
                   ) : currentHoleTeamAStrokes > 0 ? (
                     <>
-                      <strong className="text-[var(--team-usa)]">{teamAName}</strong> receives {currentHoleTeamAStrokes}{' '}
-                      {isTeamStrokesFormat ? 'team ' : ''}stroke{currentHoleTeamAStrokes > 1 ? 's' : ''}
+                      <strong className="text-[var(--team-usa)]">{teamAName}</strong> receives{' '}
+                      {currentHoleTeamAStrokes} {isTeamStrokesFormat ? 'team ' : ''}stroke
+                      {currentHoleTeamAStrokes > 1 ? 's' : ''}
                     </>
                   ) : (
                     <>
-                      <strong className="text-[var(--team-europe)]">{teamBName}</strong> receives {currentHoleTeamBStrokes}{' '}
-                      {isTeamStrokesFormat ? 'team ' : ''}stroke{currentHoleTeamBStrokes > 1 ? 's' : ''}
+                      <strong className="text-[var(--team-europe)]">{teamBName}</strong> receives{' '}
+                      {currentHoleTeamBStrokes} {isTeamStrokesFormat ? 'team ' : ''}stroke
+                      {currentHoleTeamBStrokes > 1 ? 's' : ''}
                     </>
                   )}
                 </p>
                 {isTeamStrokesFormat && (
-                  <p className="text-xs mt-1 text-[var(--ink-muted)]">One ball in play — stroke applies to the team</p>
+                  <p className="text-xs mt-1 text-[var(--ink-muted)]">
+                    One ball in play — stroke applies to the team
+                  </p>
                 )}
               </div>
             </div>
@@ -296,10 +311,7 @@ export function CompactStrokeBadge({
   return (
     <span className={cn('inline-flex items-center gap-1', className)}>
       <span
-        className={cn(
-          config.badge,
-          'rounded-full flex items-center justify-center font-bold'
-        )}
+        className={cn(config.badge, 'rounded-full flex items-center justify-center font-bold')}
         style={{
           background: `${color}20`,
           color,
@@ -355,9 +367,11 @@ export function StrokeHolesMiniMap({
 
   return (
     <div className={cn('', className)}>
-      <p className="text-xs font-medium uppercase tracking-wider mb-2 text-[var(--ink-tertiary)]">Stroke Holes</p>
+      <p className="text-xs font-medium uppercase tracking-wider mb-2 text-[var(--ink-tertiary)]">
+        Stroke Holes
+      </p>
       <div className="flex gap-1 flex-wrap">
-        {Array.from({ length: 18 }, (_, i) => i + 1).map(hole => {
+        {Array.from({ length: 18 }, (_, i) => i + 1).map((hole) => {
           const aStrokes = teamAAllocation[hole - 1];
           const bStrokes = teamBAllocation[hole - 1];
           const hasStrokes = aStrokes > 0 || bStrokes > 0;
@@ -380,10 +394,11 @@ export function StrokeHolesMiniMap({
 
           return (
             <button
+              type="button"
               key={hole}
               onClick={() => onHoleClick?.(hole)}
               className={cn(
-                'w-8 h-8 rounded flex flex-col items-center justify-center text-[10px] transition-all',
+                'w-8 h-8 rounded flex flex-col items-center justify-center text-[10px] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface)]',
                 isCurrent && 'ring-2 ring-masters ring-offset-1'
               )}
               style={{

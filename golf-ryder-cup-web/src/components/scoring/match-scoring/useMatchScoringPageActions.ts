@@ -10,13 +10,7 @@ import {
 } from '@/lib/services/analyticsService';
 import { playScoreSound } from '@/lib/services/soundEffects';
 import type { MatchState } from '@/lib/types/computed';
-import type {
-  HoleResult,
-  HoleWinner,
-  Match,
-  PlayerHoleScore,
-  Trip,
-} from '@/lib/types/models';
+import type { HoleResult, HoleWinner, Match, PlayerHoleScore, Trip } from '@/lib/types/models';
 import type { ScoringPreferences } from '@/lib/types/scoringPreferences';
 import { deriveScoreAuditAction } from '@/lib/utils/scoringAudit';
 
@@ -212,7 +206,7 @@ export function useMatchScoringPageActions(
       teamBStrokeScore?: number,
       source?: ScoreSource,
       teamAPlayerScores?: PlayerHoleScore[],
-      teamBPlayerScores?: PlayerHoleScore[],
+      teamBPlayerScores?: PlayerHoleScore[]
     ) => {
       if (!matchState) return;
 
@@ -231,9 +225,7 @@ export function useMatchScoringPageActions(
             ? 'quick'
             : 'manual';
       const wouldCloseOut =
-        Math.abs(
-          matchState.currentScore + (winner === 'teamA' ? 1 : winner === 'teamB' ? -1 : 0)
-        ) >
+        Math.abs(matchState.currentScore + (winner === 'teamA' ? 1 : winner === 'teamB' ? -1 : 0)) >
         matchState.holesRemaining - 1;
 
       ui.setSavingIndicator('Saving score...');
@@ -272,7 +264,7 @@ export function useMatchScoringPageActions(
         method: analyticsMethod,
       });
 
-      ui.setSavingIndicator(isOnline ? 'Score saved' : 'Saved offline');
+      ui.setSavingIndicator(isOnline ? 'Score saved' : 'Saved on this device');
       setTimeout(() => ui.setSavingIndicator(null), 1500);
       if (scoringPreferences.soundEffects) {
         playScoreSound({
@@ -352,9 +344,7 @@ export function useMatchScoringPageActions(
       const scoringSource = source ?? model.effectiveScoringMode;
 
       const wouldCloseOut =
-        Math.abs(
-          matchState.currentScore + (winner === 'teamA' ? 1 : winner === 'teamB' ? -1 : 0)
-        ) >
+        Math.abs(matchState.currentScore + (winner === 'teamA' ? 1 : winner === 'teamB' ? -1 : 0)) >
         matchState.holesRemaining - 1;
 
       if (scoringPreferences.confirmCloseout && wouldCloseOut && winner !== 'halved') {
@@ -382,9 +372,7 @@ export function useMatchScoringPageActions(
       if (isSaving || !matchState) return;
 
       const wouldCloseOut =
-        Math.abs(
-          matchState.currentScore + (winner === 'teamA' ? 1 : winner === 'teamB' ? -1 : 0)
-        ) >
+        Math.abs(matchState.currentScore + (winner === 'teamA' ? 1 : winner === 'teamB' ? -1 : 0)) >
         matchState.holesRemaining - 1;
 
       if (scoringPreferences.confirmCloseout && wouldCloseOut && winner !== 'halved') {
@@ -478,9 +466,7 @@ export function useMatchScoringPageActions(
   const handleExportSummary = useCallback(() => {
     if (!matchState) return;
 
-    const matchUrl = activeMatch
-      ? `${window.location.origin}/score/${activeMatch.id}`
-      : undefined;
+    const matchUrl = activeMatch ? `${window.location.origin}/score/${activeMatch.id}` : undefined;
     const summaryText = buildMatchSummaryText({
       matchState,
       teamAName: model.teamAName,
@@ -506,9 +492,7 @@ export function useMatchScoringPageActions(
 
   const handleShareResult = useCallback(() => {
     if (!matchState) return;
-    const matchUrl = activeMatch
-      ? `${window.location.origin}/score/${activeMatch.id}`
-      : undefined;
+    const matchUrl = activeMatch ? `${window.location.origin}/score/${activeMatch.id}` : undefined;
     const shareText = buildMatchResultShareText({
       matchState,
       teamAName: model.teamAName,

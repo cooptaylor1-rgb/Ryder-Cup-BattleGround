@@ -1,7 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentType,
+  type ReactNode,
+} from 'react';
 import {
   getPreFlightSummary,
   groupValidationsByCategory,
@@ -84,64 +92,67 @@ export function PreFlightChecklist({
   const [showPassedChecks, setShowPassedChecks] = useState(false);
   const lastSuccessfulAnnouncementKey = useRef<string | null>(null);
 
-  const runCheck = useCallback((announceSuccess = false) => {
-    setLoading(true);
+  const runCheck = useCallback(
+    (announceSuccess = false) => {
+      setLoading(true);
 
-    try {
-      const now = new Date().toISOString();
-      const tripData: Trip = trip || {
-        id: tripId,
-        name: 'Trip',
-        startDate: now,
-        endDate: now,
-        isCaptainModeEnabled: true,
-        createdAt: now,
-        updatedAt: now,
-      };
+      try {
+        const now = new Date().toISOString();
+        const tripData: Trip = trip || {
+          id: tripId,
+          name: 'Trip',
+          startDate: now,
+          endDate: now,
+          isCaptainModeEnabled: true,
+          createdAt: now,
+          updatedAt: now,
+        };
 
-      const checkResult = runPreFlightCheck(
-        tripData,
-        players,
-        teams,
-        teamMembers,
-        sessions,
-        matches,
-        courses,
-        teeSets
-      );
+        const checkResult = runPreFlightCheck(
+          tripData,
+          players,
+          teams,
+          teamMembers,
+          sessions,
+          matches,
+          courses,
+          teeSets
+        );
 
-      setResult(checkResult);
-      if (!checkResult.isReady) {
-        lastSuccessfulAnnouncementKey.current = null;
-      }
-
-      if (announceSuccess && checkResult.isReady && onAllClear) {
-        const successKey = JSON.stringify({
-          completionPercentage: checkResult.completionPercentage,
-          errors: checkResult.errors.map((item) => ({
-            category: item.category,
-            title: item.title,
-            description: item.description,
-          })),
-          warnings: checkResult.warnings.map((item) => ({
-            category: item.category,
-            title: item.title,
-            description: item.description,
-          })),
-        });
-
-        if (lastSuccessfulAnnouncementKey.current !== successKey) {
-          lastSuccessfulAnnouncementKey.current = successKey;
-          onAllClear();
+        setResult(checkResult);
+        if (!checkResult.isReady) {
+          lastSuccessfulAnnouncementKey.current = null;
         }
+
+        if (announceSuccess && checkResult.isReady && onAllClear) {
+          const successKey = JSON.stringify({
+            completionPercentage: checkResult.completionPercentage,
+            errors: checkResult.errors.map((item) => ({
+              category: item.category,
+              title: item.title,
+              description: item.description,
+            })),
+            warnings: checkResult.warnings.map((item) => ({
+              category: item.category,
+              title: item.title,
+              description: item.description,
+            })),
+          });
+
+          if (lastSuccessfulAnnouncementKey.current !== successKey) {
+            lastSuccessfulAnnouncementKey.current = successKey;
+            onAllClear();
+          }
+        }
+      } catch (error) {
+        logger.error('Pre-flight check failed:', error);
+        setResult(null);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      logger.error('Pre-flight check failed:', error);
-      setResult(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [courses, matches, onAllClear, players, sessions, teamMembers, teams, teeSets, trip, tripId]);
+    },
+    [courses, matches, onAllClear, players, sessions, teamMembers, teams, teeSets, trip, tripId]
+  );
 
   useEffect(() => {
     runCheck(false);
@@ -155,15 +166,15 @@ export function PreFlightChecklist({
 
   if (loading) {
     return (
-      <div className="rounded-[1.7rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(245,239,232,1))] p-[var(--space-7)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
+      <div className="rounded-[1.7rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,var(--surface-raised)_0%,var(--surface-secondary)_100%)] p-[var(--space-7)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
         <div className="flex items-center gap-[var(--space-4)]">
           <div className="flex h-12 w-12 items-center justify-center rounded-[1.1rem] bg-[color:var(--maroon)]/10 text-[var(--maroon)]">
             <RefreshCw size={20} className="animate-spin" />
           </div>
           <div>
             <p className="type-overline tracking-[0.16em] text-[var(--maroon)]">Captain Check</p>
-            <h3 className="mt-[var(--space-2)] font-serif text-[1.7rem] italic text-[var(--ink)]">
-              Running the board.
+            <h3 className="mt-[var(--space-2)] font-serif text-[1.7rem] text-[var(--ink)]">
+              Checking trip readiness
             </h3>
             <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
               Validating roster, teams, sessions, lineups, and course setup.
@@ -176,23 +187,26 @@ export function PreFlightChecklist({
 
   if (!result || !summary || !groupedIssues) {
     return (
-      <div className="rounded-[1.7rem] border border-[color:var(--error)]/18 bg-[linear-gradient(180deg,rgba(202,82,71,0.08),rgba(255,255,255,0.98))] p-[var(--space-7)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
+      <div className="rounded-[1.7rem] border border-[color:var(--error)]/18 bg-[color:var(--error)]/10 p-[var(--space-7)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
         <div className="flex items-start gap-[var(--space-4)]">
           <div className="flex h-12 w-12 items-center justify-center rounded-[1.1rem] bg-[color:var(--error)]/12 text-[var(--error)]">
             <AlertTriangle size={20} />
           </div>
           <div>
-            <h3 className="font-serif text-[1.7rem] italic text-[var(--ink)]">The check failed to run.</h3>
+            <h3 className="font-serif text-[1.7rem] text-[var(--ink)]">
+              Readiness check could not finish
+            </h3>
             <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
-              Re-run the board. If this keeps happening, the validation service needs attention.
+              Try again. If it still fails, review roster, teams, sessions, lineups, and courses
+              manually before play.
             </p>
-          <button
-            type="button"
-            onClick={() => runCheck(true)}
-            data-testid="preflight-rerun"
-            className="mt-[var(--space-4)] inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--maroon)] px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--canvas)]"
-          >
-            <RefreshCw size={16} />
+            <button
+              type="button"
+              onClick={() => runCheck(true)}
+              data-testid="preflight-rerun"
+              className="mt-[var(--space-4)] inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-[var(--maroon)] px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--canvas)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] active:scale-[0.98]"
+            >
+              <RefreshCw size={16} />
               Run again
             </button>
           </div>
@@ -209,8 +223,8 @@ export function PreFlightChecklist({
         className={cn(
           'overflow-hidden rounded-[1.8rem] border p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]',
           result.isReady
-            ? 'border-[color:var(--success)]/16 bg-[linear-gradient(180deg,rgba(45,122,79,0.12),rgba(255,255,255,0.98))]'
-            : 'border-[color:var(--warning)]/18 bg-[linear-gradient(180deg,rgba(184,134,11,0.12),rgba(255,255,255,0.98))]'
+            ? 'border-[color:var(--success)]/16 bg-[color:var(--success)]/10'
+            : 'border-[color:var(--warning)]/18 bg-[color:var(--warning)]/10'
         )}
       >
         <div className="flex flex-col gap-[var(--space-4)] sm:flex-row sm:items-start sm:justify-between">
@@ -218,15 +232,17 @@ export function PreFlightChecklist({
             <div
               className={cn(
                 'flex h-12 w-12 shrink-0 items-center justify-center rounded-[1.15rem]',
-                result.isReady ? 'bg-[color:var(--success)]/12 text-[var(--success)]' : 'bg-[color:var(--warning)]/12 text-[var(--warning)]'
+                result.isReady
+                  ? 'bg-[color:var(--success)]/12 text-[var(--success)]'
+                  : 'bg-[color:var(--warning)]/12 text-[var(--warning)]'
               )}
             >
               {result.isReady ? <Rocket size={22} /> : <AlertTriangle size={22} />}
             </div>
             <div>
-              <p className="type-overline tracking-[0.16em] text-[var(--maroon)]">Launch Status</p>
-              <h3 className="mt-[var(--space-2)] font-serif text-[1.9rem] italic text-[var(--ink)]">
-                {result.isReady ? 'All systems look playable.' : 'The board still needs work.'}
+              <p className="type-overline tracking-[0.16em] text-[var(--maroon)]">Trip Readiness</p>
+              <h3 className="mt-[var(--space-2)] font-serif text-[1.9rem] text-[var(--ink)]">
+                {result.isReady ? 'Ready for play' : 'A few items need attention'}
               </h3>
               <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
                 {summary.message}
@@ -238,7 +254,7 @@ export function PreFlightChecklist({
             type="button"
             onClick={() => runCheck(true)}
             data-testid="preflight-rerun"
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)]"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/82 px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] active:scale-[0.98]"
           >
             <RefreshCw size={16} />
             Re-run
@@ -246,10 +262,30 @@ export function PreFlightChecklist({
         </div>
 
         <div className="mt-[var(--space-5)] grid gap-[var(--space-3)] sm:grid-cols-2 xl:grid-cols-4">
-          <ChecklistMetric label="Completion" value={`${result.completionPercentage}%`} detail="Overall readiness" tone={result.isReady ? 'green' : 'gold'} />
-          <ChecklistMetric label="Errors" value={result.errors.length} detail="Must be resolved" tone={result.errors.length > 0 ? 'maroon' : 'ink'} />
-          <ChecklistMetric label="Warnings" value={result.warnings.length} detail="Worth a review" tone={result.warnings.length > 0 ? 'gold' : 'ink'} />
-          <ChecklistMetric label="Passed" value={result.info.length} detail="Checks already cleared" tone="green" />
+          <ChecklistMetric
+            label="Completion"
+            value={`${result.completionPercentage}%`}
+            detail="Overall readiness"
+            tone={result.isReady ? 'green' : 'gold'}
+          />
+          <ChecklistMetric
+            label="Errors"
+            value={result.errors.length}
+            detail="Must be resolved"
+            tone={result.errors.length > 0 ? 'maroon' : 'ink'}
+          />
+          <ChecklistMetric
+            label="Warnings"
+            value={result.warnings.length}
+            detail="Worth a review"
+            tone={result.warnings.length > 0 ? 'gold' : 'ink'}
+          />
+          <ChecklistMetric
+            label="Passed"
+            value={result.info.length}
+            detail="Checks already cleared"
+            tone="green"
+          />
         </div>
       </section>
 
@@ -273,14 +309,14 @@ export function PreFlightChecklist({
             })}
         </section>
       ) : (
-        <section className="rounded-[1.7rem] border border-[color:var(--success)]/16 bg-[linear-gradient(180deg,rgba(45,122,79,0.10),rgba(255,255,255,0.98))] p-[var(--space-6)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
+        <section className="rounded-[1.7rem] border border-[color:var(--success)]/16 bg-[color:var(--success)]/10 p-[var(--space-6)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
           <div className="flex items-start gap-[var(--space-4)]">
             <div className="flex h-12 w-12 items-center justify-center rounded-[1.1rem] bg-[color:var(--success)]/12 text-[var(--success)]">
               <CheckCircle2 size={22} />
             </div>
             <div>
-              <p className="type-overline tracking-[0.16em] text-[var(--success)]">Clear Board</p>
-              <h3 className="mt-[var(--space-2)] font-serif text-[1.8rem] italic text-[var(--ink)]">
+              <p className="type-overline tracking-[0.16em] text-[var(--success)]">All Clear</p>
+              <h3 className="mt-[var(--space-2)] font-serif text-[1.8rem] text-[var(--ink)]">
                 Nothing is standing in the way.
               </h3>
               <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
@@ -295,10 +331,12 @@ export function PreFlightChecklist({
         <button
           type="button"
           onClick={() => setShowPassedChecks((current) => !current)}
-          className="flex w-full items-center justify-between px-[var(--space-5)] py-[var(--space-4)] text-left"
+          className="flex w-full items-center justify-between px-[var(--space-5)] py-[var(--space-4)] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus-ring)]"
         >
           <div>
-            <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">Passed Checks</p>
+            <p className="type-overline tracking-[0.15em] text-[var(--ink-tertiary)]">
+              Ready Items
+            </p>
             <p className="mt-[var(--space-1)] text-sm text-[var(--ink-secondary)]">
               See the parts of the trip that already look sound.
             </p>
@@ -320,13 +358,15 @@ export function PreFlightChecklist({
                 >
                   <p className="text-sm font-semibold text-[var(--success)]">{item.title}</p>
                   {item.description ? (
-                    <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">{item.description}</p>
+                    <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
+                      {item.description}
+                    </p>
                   ) : null}
                 </div>
               ))
             ) : (
               <div className="rounded-[1.2rem] border border-dashed border-[color:var(--rule)]/75 bg-[color:var(--canvas)]/74 p-[var(--space-5)] text-sm text-[var(--ink-secondary)]">
-                No informational pass items were returned by the current validation service.
+                No cleared items to show yet.
               </div>
             )}
           </div>
@@ -349,18 +389,17 @@ function ChecklistMetric({
 }) {
   const toneClassNames = {
     ink: 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/80',
-    gold:
-      'border-[color:var(--warning)]/18 bg-[linear-gradient(180deg,rgba(184,134,11,0.10),rgba(255,255,255,0.98))]',
-    green:
-      'border-[color:var(--success)]/16 bg-[linear-gradient(180deg,rgba(45,122,79,0.10),rgba(255,255,255,0.98))]',
-    maroon:
-      'border-[color:var(--maroon)]/16 bg-[linear-gradient(180deg,rgba(104,35,48,0.10),rgba(255,255,255,0.98))]',
+    gold: 'border-[color:var(--warning)]/18 bg-[color:var(--warning)]/10',
+    green: 'border-[color:var(--success)]/16 bg-[color:var(--success)]/10',
+    maroon: 'border-[color:var(--maroon)]/16 bg-[color:var(--maroon)]/10',
   } satisfies Record<'ink' | 'gold' | 'green' | 'maroon', string>;
 
   return (
     <div className={cn('rounded-[1.3rem] border p-[var(--space-4)]', toneClassNames[tone])}>
       <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">{label}</p>
-      <p className="mt-[var(--space-3)] font-serif text-[1.8rem] italic leading-none text-[var(--ink)]">{value}</p>
+      <p className="mt-[var(--space-3)] font-serif text-[1.8rem] leading-none text-[var(--ink)]">
+        {value}
+      </p>
       <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">{detail}</p>
     </div>
   );
@@ -378,7 +417,7 @@ function IssueBoard({
   blockingCount: number;
 }) {
   return (
-    <div className="rounded-[1.7rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(245,239,232,1))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
+    <div className="rounded-[1.7rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,var(--surface-raised)_0%,var(--surface-secondary)_100%)] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
       <div className="flex items-start justify-between gap-[var(--space-3)]">
         <div className="flex items-center gap-[var(--space-3)]">
           <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[color:var(--maroon)]/10 text-[var(--maroon)]">
@@ -386,7 +425,7 @@ function IssueBoard({
           </div>
           <div>
             <p className="type-overline tracking-[0.15em] text-[var(--maroon)]">{title}</p>
-            <h4 className="mt-[var(--space-2)] font-serif text-[1.55rem] italic text-[var(--ink)]">
+            <h4 className="mt-[var(--space-2)] font-serif text-[1.55rem] text-[var(--ink)]">
               {items.length} item{items.length === 1 ? '' : 's'} to review
             </h4>
           </div>
@@ -418,7 +457,7 @@ function IssueCard({ item }: { item: ValidationItem }) {
         'rounded-[1.2rem] border p-[var(--space-4)]',
         item.severity === 'error'
           ? 'border-[color:var(--error)]/18 bg-[color:var(--error)]/10'
-          : 'border-[color:var(--warning)]/18 bg-[color:var(--warning)]/08'
+          : 'border-[color:var(--warning)]/18 bg-[color:var(--warning)]/10'
       )}
     >
       <div className="flex flex-wrap items-center gap-2">
@@ -434,12 +473,14 @@ function IssueCard({ item }: { item: ValidationItem }) {
         </span>
         <p className="text-sm font-semibold text-[var(--ink)]">{item.title}</p>
       </div>
-      <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">{item.description}</p>
+      <p className="mt-[var(--space-2)] text-sm leading-6 text-[var(--ink-secondary)]">
+        {item.description}
+      </p>
       {item.actionLabel && item.actionHref ? (
         <Link
           href={item.actionHref}
           data-action-kind={item.actionKind}
-          className="mt-[var(--space-3)] inline-flex text-sm font-semibold text-[var(--maroon)]"
+          className="mt-[var(--space-3)] inline-flex min-h-10 items-center rounded-full px-1 text-sm font-semibold text-[var(--maroon)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]"
         >
           {item.actionLabel}
         </Link>

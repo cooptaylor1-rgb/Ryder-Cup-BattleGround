@@ -4,11 +4,7 @@ import { HoleMiniMap } from '@/components/scoring';
 import { SyncStatusBadge } from '@/components/SyncStatusBadge';
 import type { MatchState } from '@/lib/types/computed';
 import { cn } from '@/lib/utils';
-import {
-  ScoringFactCard,
-  ScoringStatusBadge,
-  type ScoringModeMeta,
-} from './matchScoringShared';
+import { ScoringFactCard, ScoringStatusBadge, type ScoringModeMeta } from './matchScoringShared';
 
 interface MatchScoringHeroSectionProps {
   matchOrder: number;
@@ -75,7 +71,7 @@ export function MatchScoringHeroSection({
               <button
                 type="button"
                 onClick={onBack}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)]"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.96]"
                 aria-label="Back"
               >
                 <ChevronLeft size={18} />
@@ -98,7 +94,7 @@ export function MatchScoringHeroSection({
               <button
                 type="button"
                 onClick={onOpenVoiceScoring}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)]"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.96]"
                 aria-label="Voice scoring"
               >
                 <Mic size={18} />
@@ -111,7 +107,7 @@ export function MatchScoringHeroSection({
                   // h-11 (44px) meets the iOS touch target recommendation.
                   // High-frequency action during live scoring — needs to be
                   // confidently tappable with a gloved hand in wind.
-                  'inline-flex h-11 items-center gap-2 rounded-full px-4 text-xs font-semibold uppercase tracking-[0.12em] transition-colors',
+                  'inline-flex h-11 items-center gap-2 rounded-full px-4 text-xs font-semibold uppercase tracking-[0.12em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.96] disabled:cursor-not-allowed',
                   undoCount > 0
                     ? 'bg-[var(--gold-subtle)] text-[var(--masters)]'
                     : 'bg-transparent text-[var(--ink-tertiary)] opacity-50'
@@ -131,8 +127,8 @@ export function MatchScoringHeroSection({
           <div className="flex items-start justify-between gap-[var(--space-4)]">
             <div>
               <p className="type-overline text-[var(--masters)]">{sessionLabel}</p>
-              <h1 className="mt-[var(--space-2)] font-serif text-[length:var(--text-3xl)] font-normal tracking-[-0.03em] text-[var(--ink)]">
-                Sacred scoring
+              <h1 className="mt-[var(--space-2)] font-serif text-[length:var(--text-3xl)] font-normal text-[var(--ink)]">
+                Live scoring
               </h1>
               <p className="mt-[var(--space-2)] text-sm text-[var(--ink-secondary)]">
                 {teamALineup} vs {teamBLineup}
@@ -157,7 +153,7 @@ export function MatchScoringHeroSection({
               {(!currentCourseName || !currentTeeSetName) && (
                 <p className="mt-2 text-xs text-[var(--warning)]">
                   {isCaptain
-                    ? 'Assign a course and tee set in Manage Trip → session to turn on handicap-adjusted scoring. You can still score gross without it.'
+                    ? 'Assign a course and tee set in Manage Trip session settings to turn on handicap-adjusted scoring. You can still score gross without it.'
                     : 'Scores will still count, but handicap strokes won’t apply until the captain sets a course and tee.'}
                 </p>
               )}
@@ -214,10 +210,22 @@ export function MatchScoringHeroSection({
             </div>
           </div>
 
-          <div className="mt-[var(--space-5)] grid grid-cols-3 gap-3">
-            <ScoringFactCard eyebrow="Current hole" value={`Hole ${currentHole}`} note={`Par ${currentPar}`} />
-            <ScoringFactCard eyebrow="Remaining" value={matchState.holesRemaining} note="Still in play" />
-            <ScoringFactCard eyebrow="Mode" value={scoringModeMeta.label} note={scoringModeMeta.note} />
+          <div className="mt-[var(--space-5)] grid gap-3 min-[420px]:grid-cols-3">
+            <ScoringFactCard
+              eyebrow="Current hole"
+              value={`Hole ${currentHole}`}
+              note={`Par ${currentPar}`}
+            />
+            <ScoringFactCard
+              eyebrow="Remaining"
+              value={matchState.holesRemaining}
+              note="Still in play"
+            />
+            <ScoringFactCard
+              eyebrow="Mode"
+              value={scoringModeMeta.label}
+              note={scoringModeMeta.note}
+            />
           </div>
         </div>
 
@@ -242,7 +250,7 @@ export function MatchScoringHeroSection({
                 'mx-auto flex w-fit items-center justify-center gap-2 rounded-full px-4 py-2 text-[var(--canvas)]',
                 savingIndicator === 'Saving score...'
                   ? 'bg-[var(--masters)]'
-                  : savingIndicator === 'Saved offline'
+                  : savingIndicator === 'Saved on this device'
                     ? 'bg-[var(--warning)]'
                     : 'bg-[var(--success)]'
               )}

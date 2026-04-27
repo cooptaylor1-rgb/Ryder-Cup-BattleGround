@@ -209,7 +209,7 @@ export function MatchScoringActiveState({
 
             <div className="text-center">
               <p className="type-overline text-[var(--masters)]">Current hole</p>
-              <p className="mt-1 font-serif text-[length:var(--text-2xl)] font-normal tracking-[-0.02em] text-[var(--ink)]">
+              <p className="mt-1 font-serif text-[length:var(--text-2xl)] font-normal text-[var(--ink)]">
                 Hole {currentHole}
               </p>
               <p className="mt-1 text-sm text-[var(--ink-secondary)]">
@@ -254,16 +254,17 @@ export function MatchScoringActiveState({
                   <Sparkles size={16} className="mt-0.5 shrink-0 text-[var(--masters)]" />
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-[var(--ink)]">
-                      Pick the mode that fits the moment.
+                      Choose how to record this hole.
                     </p>
                     <p className="mt-1 text-xs text-[var(--ink-secondary)]">
-                      Swipe when pace matters, use strokes when the hole needs detail, and lean on
-                      one-hand mode for pure on-course convenience.
+                      Keep it quick, enter strokes when the card needs detail, or switch to a
+                      thumb-first layout.
                     </p>
                   </div>
                   <button
+                    type="button"
                     onClick={onDismissScoringModeTip}
-                    className="rounded-full bg-[var(--masters)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--canvas)]"
+                    className="min-h-10 rounded-full bg-[var(--masters)] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--canvas)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98]"
                   >
                     Close
                   </button>
@@ -522,7 +523,7 @@ export function MatchScoringActiveState({
                     Halve
                   </span>
                   <span className="mt-1 block text-[length:var(--text-xs)] text-[var(--ink-tertiary)]">
-                    tie hole
+                    tie the hole
                   </span>
                 </button>
 
@@ -571,7 +572,7 @@ export function MatchScoringActiveState({
           <div className="text-left">
             <p className="type-overline text-[var(--ink-secondary)]">Advanced tools</p>
             <p className="mt-1 text-sm text-[var(--ink-secondary)]">
-              Presses, inside games, stats, and awards live here.
+              Presses, side games, stats, and awards.
             </p>
           </div>
           <ChevronRight

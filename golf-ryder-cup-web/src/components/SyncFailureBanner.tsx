@@ -60,9 +60,9 @@ const OPERATION_LABELS: Record<string, string> = {
 const BLOCKED_MESSAGES: Record<SyncBlockedReason, string> = {
   offline: 'Reconnect to retry cloud sync.',
   'supabase-unconfigured':
-    'Cloud sync is not configured. Your changes are saved on this device, but live sharing needs Supabase set up.',
+    'Cloud sync needs Supabase set up. Changes are saved on this device until live sharing is ready.',
   'auth-pending': 'Checking your cloud session before retrying sync.',
-  'auth-required': 'Sign in to retry cloud sync.',
+  'auth-required': 'Sign in to resume cloud sync.',
 };
 
 function summarizeSyncError(error?: string): string {
@@ -194,7 +194,9 @@ export function SyncFailureBanner({ className }: { className?: string }) {
             <AlertTriangle className="h-4 w-4" aria-hidden />
           </div>
           <div className="min-w-0 sm:flex-1">
-            <p className="text-sm font-semibold text-[var(--ink)]">Cloud sync needs attention</p>
+            <p className="text-sm font-semibold text-[var(--ink)]">
+              Changes are saved on this device
+            </p>
             <p className="text-xs font-medium text-[var(--error)] sm:text-sm">{message}</p>
           </div>
           <div className="col-span-2 flex items-center justify-end gap-2 sm:col-span-1">
@@ -202,7 +204,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
               <button
                 type="button"
                 onClick={() => setShowDetail((v) => !v)}
-                className="min-h-9 rounded-full border border-[color:var(--error)]/35 bg-[var(--canvas)]/88 px-3 py-1 text-xs font-semibold text-[var(--error)] transition-colors hover:bg-[color:var(--error)]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)]"
+                className="min-h-11 rounded-full border border-[color:var(--error)]/35 bg-[var(--canvas)]/88 px-3 py-1 text-xs font-semibold text-[var(--error)] transition-colors hover:bg-[color:var(--error)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)]"
                 aria-expanded={showDetail}
               >
                 {showDetail ? 'Hide details' : 'Details'}
@@ -212,7 +214,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
               type="button"
               onClick={handleRetry}
               disabled={isRetrying || !canRetry}
-              className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--error)]/35 bg-[var(--canvas)]/88 px-3 py-1 text-xs font-semibold text-[var(--error)] transition-colors hover:bg-[color:var(--error)]/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--error)]/35 bg-[var(--canvas)]/88 px-3 py-1 text-xs font-semibold text-[var(--error)] transition-colors hover:bg-[color:var(--error)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <RefreshCw className={cn('h-3.5 w-3.5', isRetrying && 'animate-spin')} aria-hidden />
               {isRetrying ? 'Retrying...' : 'Retry sync'}
@@ -241,7 +243,11 @@ export function SyncFailureBanner({ className }: { className?: string }) {
                       )}
                     </div>
                     <div className="flex shrink-0 items-center gap-2 text-[11px] font-medium text-[var(--ink-tertiary)]">
-                      {item.retryCount > 0 && <span>{item.retryCount} tries</span>}
+                      {item.retryCount > 0 && (
+                        <span>
+                          {item.retryCount} attempt{item.retryCount === 1 ? '' : 's'}
+                        </span>
+                      )}
                       {attemptTime && (
                         <span className="inline-flex items-center gap-1">
                           <Clock3 className="h-3 w-3" aria-hidden />

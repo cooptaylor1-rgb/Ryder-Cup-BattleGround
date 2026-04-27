@@ -71,8 +71,8 @@ export function BottomNav() {
         'nav-premium lg:hidden',
         'fixed bottom-0 left-0 right-0 z-50',
         'flex items-stretch justify-around',
-        'h-[72px] px-[var(--space-1)] border-t border-[var(--rule)] bg-[color:var(--canvas)]/92 backdrop-blur-md',
-        'pb-[env(safe-area-inset-bottom,0px)]'
+        'min-h-[72px] px-[var(--space-1)] pt-1 border-t border-[var(--rule)] bg-[color:var(--canvas)]/92 backdrop-blur-md',
+        'pb-[max(var(--space-1),env(safe-area-inset-bottom,0px))]'
       )}
       aria-label="Main navigation"
     >
@@ -83,6 +83,7 @@ export function BottomNav() {
         return (
           <button
             key={item.href}
+            type="button"
             onClick={() => router.push(item.href)}
             className={cn(
               'relative flex flex-col items-center justify-center',

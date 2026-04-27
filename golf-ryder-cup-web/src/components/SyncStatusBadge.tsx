@@ -25,9 +25,10 @@ type SyncBlockedReason = NonNullable<QueueInfo['blockedReason']>;
 
 const BLOCKED_TOOLTIPS: Record<SyncBlockedReason, string> = {
   offline: 'Reconnect to retry cloud sync.',
-  'supabase-unconfigured': 'Cloud sync is not configured for this build.',
+  'supabase-unconfigured':
+    'Cloud sync needs Supabase set up. Your changes stay saved on this device.',
   'auth-pending': 'Checking your cloud session before retrying sync.',
-  'auth-required': 'Sign in to retry cloud sync.',
+  'auth-required': 'Sign in to resume cloud sync.',
 };
 
 interface SyncStatusBadgeProps {
@@ -145,7 +146,7 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
       case 'failed':
         return {
           icon: <AlertCircle className="h-4 w-4" />,
-          text: `Needs retry (${queueInfo.failed})`,
+          text: `Needs retry${queueInfo.failed > 0 ? ` (${queueInfo.failed})` : ''}`,
           tone: 'text-[var(--error)]',
           bg: 'bg-[color:var(--error)]/15',
         };
@@ -223,9 +224,10 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
         <Button
           variant="ghost"
           size="sm"
-          className="min-h-11 min-w-11 p-0"
+          className="min-h-11 min-w-11 rounded-full p-0"
           onClick={handleManualSync}
           disabled={isSyncing || Boolean(queueInfo.blockedReason)}
+          aria-label={status === 'failed' ? failedTooltip : pendingTooltip}
         >
           {content}
         </Button>

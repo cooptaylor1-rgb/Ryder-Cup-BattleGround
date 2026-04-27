@@ -181,14 +181,14 @@ export function OneHandedScoringPanel({
       ];
 
   return (
-    <div className="relative overflow-hidden rounded-[32px] border border-[color:var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.8)_0%,rgba(245,240,233,0.98)_100%)] p-4 shadow-card sm:p-5">
+    <div className="relative overflow-hidden rounded-[32px] border border-[color:var(--rule)] bg-[linear-gradient(180deg,var(--surface-raised)_0%,var(--surface-secondary)_100%)] p-4 shadow-card sm:p-5">
       <AnimatePresence>
         {confirmingResult && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 z-20 flex items-center justify-center bg-[rgba(26,24,21,0.5)] px-5 backdrop-blur-sm"
+            className="absolute inset-0 z-20 flex items-center justify-center bg-[color:var(--ink)]/50 px-5 backdrop-blur-sm"
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
@@ -197,7 +197,7 @@ export function OneHandedScoringPanel({
               className="w-full max-w-xs rounded-[28px] border border-[color:var(--rule)] bg-[color:var(--canvas)] p-5 text-center shadow-card"
             >
               <p className="type-overline text-[var(--masters)]">Confirm score</p>
-              <h3 className="mt-2 font-serif text-[length:var(--text-2xl)] font-normal tracking-[-0.02em] text-[var(--ink)]">
+              <h3 className="mt-2 font-serif text-[length:var(--text-2xl)] font-normal text-[var(--ink)]">
                 {confirmingResult === 'halved'
                   ? 'Hole halved'
                   : confirmingResult === 'teamA'
@@ -244,13 +244,13 @@ export function OneHandedScoringPanel({
               {teamAName}
             </span>
           </p>
-          <p className="mt-2 text-sm text-[var(--ink-secondary)]">Swipe right or tap to award</p>
+          <p className="mt-2 text-sm text-[var(--ink-secondary)]">Winner on this side</p>
         </div>
 
         <div className="text-center">
           <p className="type-overline text-[var(--masters)]">Match score</p>
           <p
-            className="mt-2 font-serif text-[clamp(3rem,12vw,4.75rem)] font-normal leading-none tracking-[-0.05em]"
+            className="mt-2 font-serif text-[clamp(3rem,12vw,4.75rem)] font-normal leading-none"
             style={{ color: scoreSummary.color }}
           >
             {scoreSummary.scoreLine}
@@ -267,7 +267,7 @@ export function OneHandedScoringPanel({
               {teamBName}
             </span>
           </p>
-          <p className="mt-2 text-sm text-[var(--ink-secondary)]">Swipe left or tap to award</p>
+          <p className="mt-2 text-sm text-[var(--ink-secondary)]">Winner on this side</p>
         </div>
       </div>
 
@@ -275,7 +275,7 @@ export function OneHandedScoringPanel({
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="type-overline text-[var(--masters)]">Current hole</p>
-            <h3 className="mt-1 font-serif text-[length:var(--text-xl)] font-normal tracking-[-0.02em] text-[var(--ink)]">
+            <h3 className="mt-1 font-serif text-[length:var(--text-xl)] font-normal text-[var(--ink)]">
               Hole {holeNumber}
             </h3>
           </div>
@@ -301,7 +301,7 @@ export function OneHandedScoringPanel({
                     ? teamAColor
                     : activeSwipe === 'teamB'
                       ? teamBColor
-                      : 'rgba(26, 24, 21, 0.22)',
+                      : 'color-mix(in srgb, var(--ink) 22%, transparent)',
               }}
               transition={{ duration: 0.18 }}
             />
@@ -415,7 +415,7 @@ export function OneHandedScoringPanel({
             Thumb scoring
           </p>
           <p className="mt-1 text-sm text-[var(--ink-secondary)]">
-            Swipe across the rail or tap a winner.
+            Large targets stay close to your thumb.
           </p>
         </div>
 

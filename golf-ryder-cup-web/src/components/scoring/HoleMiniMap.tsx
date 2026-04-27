@@ -20,35 +20,38 @@ interface CompactHoleButtonProps {
 }
 
 const CompactHoleButton = React.memo(
-  React.forwardRef<HTMLButtonElement, CompactHoleButtonProps>(
-    function CompactHoleButton({ hole, status, tone, isCurrent, onSelect }, ref) {
-      return (
-        <button
-          ref={ref}
-          key={hole}
-          type="button"
-          onClick={() => onSelect(hole)}
-          className="relative flex h-8 w-8 items-center justify-center rounded-xl border text-[11px] font-semibold transition-transform duration-150 active:scale-95 sm:h-9 sm:w-9"
-          style={{
-            background: tone.background,
-            borderColor: tone.border,
-            color: tone.text,
-            boxShadow: isCurrent ? '0 0 0 1px rgba(0, 102, 68, 0.12)' : undefined,
-          }}
-          aria-label={`Go to hole ${hole}`}
-        >
-          {hole}
-          {isCurrent && (
-            <motion.span
-              className="absolute inset-0 rounded-xl border border-[var(--masters)]"
-              animate={{ opacity: [0.95, 0.35, 0.95] }}
-              transition={{ duration: 1.4, repeat: Infinity }}
-            />
-          )}
-        </button>
-      );
-    }
-  )
+  React.forwardRef<HTMLButtonElement, CompactHoleButtonProps>(function CompactHoleButton(
+    { hole, status, tone, isCurrent, onSelect },
+    ref
+  ) {
+    return (
+      <button
+        ref={ref}
+        key={hole}
+        type="button"
+        onClick={() => onSelect(hole)}
+        className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border text-[12px] font-semibold transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-95 sm:h-10 sm:w-10"
+        style={{
+          background: tone.background,
+          borderColor: tone.border,
+          color: tone.text,
+          boxShadow: isCurrent
+            ? '0 0 0 1px color-mix(in srgb, var(--masters) 12%, transparent)'
+            : undefined,
+        }}
+        aria-label={`Go to hole ${hole}${isCurrent ? ', current hole' : status !== 'unscored' ? `, ${status}` : ''}`}
+      >
+        {hole}
+        {isCurrent && (
+          <motion.span
+            className="absolute inset-0 rounded-xl border border-[var(--masters)]"
+            animate={{ opacity: [0.95, 0.35, 0.95] }}
+            transition={{ duration: 1.4, repeat: Infinity }}
+          />
+        )}
+      </button>
+    );
+  })
 );
 
 interface ExpandedHoleButtonProps {
@@ -77,7 +80,7 @@ const ExpandedHoleButton = React.memo(function ExpandedHoleButton({
       key={hole}
       type="button"
       onClick={() => onSelect(hole)}
-      className="relative flex min-h-[72px] flex-col items-start justify-between rounded-2xl border px-3 py-2.5 text-left transition-transform duration-150 active:scale-[0.98]"
+      className="relative flex min-h-[72px] flex-col items-start justify-between rounded-2xl border px-3 py-2.5 text-left transition-transform duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98]"
       style={{
         background: tone.background,
         borderColor: tone.border,
@@ -103,12 +106,7 @@ const ExpandedHoleButton = React.memo(function ExpandedHoleButton({
           Match: {formatRunningScore(runningScore)}
         </p>
       </div>
-      {isCurrent && (
-        <Flag
-          size={14}
-          className="absolute right-2.5 top-2.5 text-[var(--masters)]"
-        />
-      )}
+      {isCurrent && <Flag size={14} className="absolute right-2.5 top-2.5 text-[var(--masters)]" />}
     </button>
   );
 });
@@ -137,6 +135,10 @@ function formatRunningScore(score: number) {
   return score > 0 ? `+${score}` : `${score}`;
 }
 
+function colorWithAlpha(color: string, alphaPercent: number) {
+  return `color-mix(in srgb, ${color} ${alphaPercent}%, transparent)`;
+}
+
 function holeNumbers(start: number, count: number) {
   return Array.from({ length: count }, (_, index) => start + index);
 }
@@ -162,8 +164,12 @@ export function HoleMiniMap({
   const currentHoleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (currentHoleRef.current) {
-      currentHoleRef.current.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    if (typeof currentHoleRef.current?.scrollIntoView === 'function') {
+      currentHoleRef.current.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center',
+        block: 'nearest',
+      });
     }
   }, [currentHole]);
 
@@ -233,32 +239,32 @@ export function HoleMiniMap({
       switch (status) {
         case 'teamA':
           return {
-            background: `${teamAColor}1A`,
-            border: `${teamAColor}33`,
+            background: colorWithAlpha(teamAColor, 10),
+            border: colorWithAlpha(teamAColor, 20),
             text: teamAColor,
           };
         case 'teamB':
           return {
-            background: `${teamBColor}1A`,
-            border: `${teamBColor}33`,
+            background: colorWithAlpha(teamBColor, 10),
+            border: colorWithAlpha(teamBColor, 20),
             text: teamBColor,
           };
         case 'halved':
           return {
-            background: 'rgba(86, 79, 68, 0.11)',
-            border: 'rgba(86, 79, 68, 0.18)',
+            background: 'color-mix(in srgb, var(--ink-secondary) 11%, transparent)',
+            border: 'color-mix(in srgb, var(--ink-secondary) 18%, transparent)',
             text: 'var(--ink-secondary)',
           };
         case 'current':
           return {
-            background: 'rgba(0, 102, 68, 0.10)',
-            border: 'rgba(0, 102, 68, 0.24)',
+            background: 'color-mix(in srgb, var(--masters) 10%, transparent)',
+            border: 'color-mix(in srgb, var(--masters) 24%, transparent)',
             text: 'var(--masters)',
           };
         default:
           return {
-            background: 'rgba(255, 255, 255, 0.66)',
-            border: 'rgba(26, 24, 21, 0.08)',
+            background: 'color-mix(in srgb, var(--canvas) 74%, transparent)',
+            border: 'color-mix(in srgb, var(--rule) 72%, transparent)',
             text: 'var(--ink-tertiary)',
           };
       }
@@ -335,14 +341,14 @@ export function HoleMiniMap({
   return (
     <div
       className={cn(
-        'rounded-[28px] border border-[color:var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.78)_0%,rgba(245,240,233,0.96)_100%)] p-4 shadow-card sm:p-5',
+        'rounded-[28px] border border-[color:var(--rule)] bg-[linear-gradient(180deg,var(--surface-raised)_0%,var(--surface-secondary)_100%)] p-4 shadow-card sm:p-5',
         className
       )}
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="type-overline text-[var(--masters)]">Routing</p>
-          <h3 className="mt-1 font-serif text-[length:var(--text-lg)] font-normal tracking-[-0.02em] text-[var(--ink)]">
+          <p className="type-overline text-[var(--masters)]">Card</p>
+          <h3 className="mt-1 font-serif text-[length:var(--text-lg)] font-normal text-[var(--ink)]">
             Hole map
           </h3>
           <p className="mt-1 text-sm text-[var(--ink-secondary)]">
@@ -352,7 +358,7 @@ export function HoleMiniMap({
         <button
           type="button"
           onClick={toggleExpanded}
-          className="inline-flex items-center gap-1.5 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)] px-3 py-1.5 text-xs font-medium text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)]"
+          className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-[color:var(--rule)] bg-[color:var(--canvas)] px-3 py-1.5 text-xs font-medium text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98]"
           aria-expanded={isExpanded}
         >
           {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -365,8 +371,7 @@ export function HoleMiniMap({
           <div className="inline-flex min-w-full items-center gap-3 rounded-[20px] border border-[color:var(--rule)]/70 bg-[color:var(--canvas)]/78 px-3 py-3">
             {renderCompactRow(holeNumbers(1, Math.min(9, totalHoles)))}
             {totalHoles > 9 && <div className="h-8 w-px bg-[color:var(--rule)]" />}
-            {totalHoles > 9 &&
-              renderCompactRow(holeNumbers(10, Math.max(0, totalHoles - 9)))}
+            {totalHoles > 9 && renderCompactRow(holeNumbers(10, Math.max(0, totalHoles - 9)))}
           </div>
         </div>
 
@@ -375,7 +380,10 @@ export function HoleMiniMap({
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
               {teamAName}
             </p>
-            <p className="mt-1 font-serif text-[length:var(--text-xl)]" style={{ color: teamAColor }}>
+            <p
+              className="mt-1 font-serif text-[length:var(--text-xl)]"
+              style={{ color: teamAColor }}
+            >
               {summary.teamAWins}
             </p>
           </div>
@@ -391,7 +399,10 @@ export function HoleMiniMap({
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
               {teamBName}
             </p>
-            <p className="mt-1 font-serif text-[length:var(--text-xl)]" style={{ color: teamBColor }}>
+            <p
+              className="mt-1 font-serif text-[length:var(--text-xl)]"
+              style={{ color: teamBColor }}
+            >
               {summary.teamBWins}
             </p>
           </div>
@@ -410,17 +421,11 @@ export function HoleMiniMap({
             <div className="mt-5 space-y-5 border-t border-[color:var(--rule)] pt-5">
               {renderExpandedSection('Front 9', holeNumbers(1, Math.min(9, totalHoles)))}
               {totalHoles > 9 &&
-                renderExpandedSection(
-                  'Back 9',
-                  holeNumbers(10, Math.max(0, totalHoles - 9))
-                )}
+                renderExpandedSection('Back 9', holeNumbers(10, Math.max(0, totalHoles - 9)))}
 
               <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-[color:var(--rule)]/80 bg-[color:var(--canvas)]/72 px-4 py-3 text-xs text-[var(--ink-secondary)]">
                 <div className="flex items-center gap-2">
-                  <span
-                    className="h-3 w-3 rounded-full"
-                    style={{ background: teamAColor }}
-                  />
+                  <span className="h-3 w-3 rounded-full" style={{ background: teamAColor }} />
                   {teamAName} won
                 </div>
                 <div className="flex items-center gap-2">
@@ -428,10 +433,7 @@ export function HoleMiniMap({
                   Halved
                 </div>
                 <div className="flex items-center gap-2">
-                  <span
-                    className="h-3 w-3 rounded-full"
-                    style={{ background: teamBColor }}
-                  />
+                  <span className="h-3 w-3 rounded-full" style={{ background: teamBColor }} />
                   {teamBName} won
                 </div>
               </div>

@@ -155,6 +155,9 @@ describe('BottomNav Component', () => {
       render(<BottomNav />);
       const buttons = screen.getAllByRole('button');
       expect(buttons).toHaveLength(5);
+      buttons.forEach((button) => {
+        expect(button).toHaveAttribute('type', 'button');
+      });
     });
 
     it('nav buttons have minimum touch target size', () => {

@@ -101,9 +101,7 @@ export function PressTracker({
             </span>
           ) : (
             betAmount > 0 && (
-              <span className="text-sm text-[var(--ink-secondary)]">
-                ${totalValue} at stake
-              </span>
+              <span className="text-sm text-[var(--ink-secondary)]">${totalValue} at stake</span>
             )
           )}
           {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
@@ -120,10 +118,7 @@ export function PressTracker({
             className="overflow-hidden"
           >
             <div
-              className={cn(
-                'p-4 border-t border-[var(--rule)]',
-                !showSetupState && 'space-y-4'
-              )}
+              className={cn('p-4 border-t border-[var(--rule)]', !showSetupState && 'space-y-4')}
             >
               {showSetupState ? (
                 <div className="flex items-start gap-3 rounded-xl border border-[var(--rule)] bg-[var(--canvas-sunken)] p-4">
@@ -132,10 +127,11 @@ export function PressTracker({
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm font-semibold text-[var(--ink)]">
-                      Press bets not configured yet
+                      No press bets set up yet
                     </p>
                     <p className="text-xs text-[var(--ink-secondary)]">
-                      Set a default press amount in match settings to enable quick tracking during the round.
+                      Set a default press amount in match settings to enable quick tracking during
+                      the round.
                     </p>
                   </div>
                 </div>
@@ -283,12 +279,9 @@ const PressCard = React.memo(function PressCard({
           P{pressNumber}
         </span>
         <div>
-          <p className="text-sm font-medium text-[var(--ink)]">
-            Started hole {press.startHole}
-          </p>
+          <p className="text-sm font-medium text-[var(--ink)]">Started hole {press.startHole}</p>
           <p className="text-xs text-[var(--ink-tertiary)]">
-            By {press.pressedBy === 'teamA' ? teamAName : teamBName} • {holesPlayed}{' '}
-            holes played
+            By {press.pressedBy === 'teamA' ? teamAName : teamBName} • {holesPlayed} holes played
           </p>
         </div>
       </div>
@@ -306,9 +299,7 @@ const PressCard = React.memo(function PressCard({
         >
           {scoreDisplay}
         </p>
-        {leader && (
-          <p className="text-xs text-[var(--ink-tertiary)]">{leader}</p>
-        )}
+        {leader && <p className="text-xs text-[var(--ink-tertiary)]">{leader}</p>}
       </div>
     </div>
   );

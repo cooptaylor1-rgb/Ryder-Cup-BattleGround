@@ -114,9 +114,9 @@ describe('CourseSearch', () => {
       </form>
     );
 
-    await screen.findByText('Search Course Database');
+    await screen.findByText('Find a course');
 
-    fireEvent.change(screen.getByPlaceholderText('Search by course name or city...'), {
+    fireEvent.change(screen.getByPlaceholderText('Course name or city'), {
       target: { value: 'cabot roost' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Search' }));
@@ -130,7 +130,7 @@ describe('CourseSearch', () => {
     fireEvent.click(screen.getByRole('button', { name: '← Back to search' }));
 
     await waitFor(() => {
-      expect(screen.getByText('Search Course Database')).toBeInTheDocument();
+      expect(screen.getByText('Find a course')).toBeInTheDocument();
     });
 
     expect(submitSpy).not.toHaveBeenCalled();
@@ -139,9 +139,9 @@ describe('CourseSearch', () => {
   it('shows extraction status and the extracted source link in detail view', async () => {
     render(<CourseSearch onSelectCourse={vi.fn()} />);
 
-    await screen.findByText('Search Course Database');
+    await screen.findByText('Find a course');
 
-    fireEvent.change(screen.getByPlaceholderText('Search by course name or city...'), {
+    fireEvent.change(screen.getByPlaceholderText('Course name or city'), {
       target: { value: 'cabot roost' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Search' }));
@@ -151,11 +151,11 @@ describe('CourseSearch', () => {
 
     await screen.findByText('Basic course profile only');
     expect(screen.getByText('Linked scorecard PDF')).toBeInTheDocument();
-    expect(screen.getByText('Sources followed')).toBeInTheDocument();
+    expect(screen.getByText('Source details')).toBeInTheDocument();
     expect(screen.getByText(/Scorecard · Scorecard PDF/i)).toBeInTheDocument();
     expect(screen.getByText('Still missing')).toBeInTheDocument();
     expect(screen.getByText(/tee data, 18-hole layout/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'View extracted source' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'View source' })).toHaveAttribute(
       'href',
       detailResult.sourcePageUrl
     );
@@ -176,9 +176,9 @@ describe('CourseSearch', () => {
 
     render(<CourseSearch onSelectCourse={vi.fn()} onClose={vi.fn()} />);
 
-    await screen.findByText('Search Course Database');
+    await screen.findByText('Find a course');
 
-    fireEvent.change(screen.getByPlaceholderText('Search by course name or city...'), {
+    fireEvent.change(screen.getByPlaceholderText('Course name or city'), {
       target: { value: 'cabot roost' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Search' }));

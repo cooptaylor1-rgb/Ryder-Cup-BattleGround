@@ -40,7 +40,7 @@ describe('SyncFailureBanner', () => {
 
     render(<SyncFailureBanner />);
 
-    expect(await screen.findByText('Sign in to retry cloud sync.')).toBeInTheDocument();
+    expect(await screen.findByText('Sign in to resume cloud sync.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Retry sync' })).toBeDisabled();
   });
 
@@ -88,11 +88,11 @@ describe('SyncFailureBanner', () => {
     render(<SyncFailureBanner />);
 
     fireEvent.click(await screen.findByRole('button', { name: 'Details' }));
-    expect(screen.getByText('Cloud sync needs attention')).toBeInTheDocument();
+    expect(screen.getByText('Changes are saved on this device')).toBeInTheDocument();
     expect(screen.getByText('Match update')).toBeInTheDocument();
     expect(screen.getByText('Cloud permissions blocked this change.')).toBeInTheDocument();
     expect(screen.getByText(/\[upsert matches\] row level security/)).toBeInTheDocument();
-    expect(screen.getByText('5 tries')).toBeInTheDocument();
+    expect(screen.getByText('5 attempts')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Retry sync' }));
 

@@ -76,14 +76,15 @@ const STATUS_LABELS: Record<SyncQueueItemDisplay['status'], string> = {
 };
 
 function readableQueueDescription(item: TripSyncQueueItem) {
-  const entity = ENTITY_LABELS[item.entity] ?? String(item.entity).replace(/([a-z])([A-Z])/g, '$1 $2');
+  const entity =
+    ENTITY_LABELS[item.entity] ?? String(item.entity).replace(/([a-z])([A-Z])/g, '$1 $2');
   const operation = OPERATION_LABELS[item.operation] ?? String(item.operation);
   return `${entity} ${operation}`;
 }
 
 // Hook to track sync queue
 export function useSyncQueue() {
-  const { currentTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip })));
+  const { currentTrip } = useTripStore(useShallow((s) => ({ currentTrip: s.currentTrip })));
 
   const pendingQueue = useLiveQuery(
     async () => {
@@ -197,6 +198,8 @@ export function OfflineIndicator() {
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -100, opacity: 0 }}
+            role="status"
+            aria-live="polite"
             className={`fixed top-0 left-0 right-0 z-50 pt-[env(safe-area-inset-top)] ${bannerGradientClass}`}
           >
             <div className="px-4 py-2">
@@ -205,7 +208,9 @@ export function OfflineIndicator() {
                 {!isOnline ? (
                   <>
                     <WifiOff size={16} className="text-[var(--canvas)]" />
-                    <span className="text-sm font-medium text-[var(--canvas)]">You&apos;re offline</span>
+                    <span className="text-sm font-medium text-[var(--canvas)]">
+                      You&apos;re offline
+                    </span>
                     {pendingCount > 0 && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-[color:var(--canvas-raised)]/20 text-[var(--canvas)]">
                         {pendingCount} saved locally
@@ -215,7 +220,9 @@ export function OfflineIndicator() {
                 ) : isSyncing ? (
                   <>
                     <RefreshCw size={16} className="text-[var(--canvas)] animate-spin" />
-                    <span className="text-sm font-medium text-[var(--canvas)]">Saving changes...</span>
+                    <span className="text-sm font-medium text-[var(--canvas)]">
+                      Saving changes...
+                    </span>
                   </>
                 ) : (
                   <>
@@ -230,8 +237,10 @@ export function OfflineIndicator() {
               {/* Expand button for offline state */}
               {!isOnline && pendingCount > 0 && (
                 <button
+                  type="button"
                   onClick={() => setShowDetails(!showDetails)}
-                  className="w-full flex items-center justify-center gap-1 mt-1 text-[color:var(--canvas)]/80 hover:text-[var(--canvas)]"
+                  className="mt-1 flex min-h-11 w-full items-center justify-center gap-1 rounded-full text-[color:var(--canvas)]/80 hover:text-[var(--canvas)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--canvas)]/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--error)]"
+                  aria-expanded={showDetails}
                 >
                   <span className="text-xs">{showDetails ? 'Hide' : 'View'} saved changes</span>
                   {showDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -249,7 +258,10 @@ export function OfflineIndicator() {
                   >
                     <div className="mt-2 pt-2 border-t border-[color:var(--canvas-raised)]/20 space-y-1 max-h-32 overflow-y-auto">
                       {queueItems.slice(0, 5).map((item) => (
-                        <div key={item.id} className="flex flex-col gap-1 text-[color:var(--canvas)]/90 text-xs">
+                        <div
+                          key={item.id}
+                          className="flex flex-col gap-1 text-[color:var(--canvas)]/90 text-xs"
+                        >
                           <div className="flex items-center gap-2">
                             <Clock size={12} className="shrink-0" />
                             <span className="truncate flex-1">{item.description}</span>
@@ -277,7 +289,10 @@ export function OfflineIndicator() {
                             </span>
                           </div>
                           {item.error && (
-                            <div className="text-[10px] text-[color:var(--canvas)]/70 pl-5" title={item.error}>
+                            <div
+                              className="text-[10px] text-[color:var(--canvas)]/70 pl-5"
+                              title={item.error}
+                            >
                               Last error: {item.error}
                             </div>
                           )}
@@ -307,7 +322,9 @@ export function OfflineIndicator() {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
-            className="fixed top-4 right-4 z-50 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--surface)] border border-[var(--rule)] text-[var(--ink-primary)]"
+            role="status"
+            aria-live="polite"
+            className="fixed right-4 top-[calc(1rem+env(safe-area-inset-top,0px))] z-50 flex min-h-11 items-center gap-2 rounded-full border border-[var(--rule)] bg-[var(--surface)] px-3 py-1.5 text-[var(--ink-primary)] shadow-card-sm"
           >
             <Wifi size={14} className="text-[var(--success)]" />
             <span className="text-xs font-medium">Back online</span>
@@ -329,7 +346,7 @@ export function SyncStatusChip() {
 
   return (
     <div
-      className={`flex items-center gap-1.5 px-2 py-1 rounded-full border text-[var(--ink-primary)] ${
+      className={`flex min-h-8 items-center gap-1.5 rounded-full border px-2 py-1 text-[var(--ink-primary)] ${
         !isOnline
           ? 'bg-[color:var(--error)]/15 border-[color:var(--error)]/30'
           : 'bg-[color:var(--info)]/15 border-[color:var(--info)]/30'
@@ -361,7 +378,7 @@ export function OfflineChip() {
   if (isOnline) return null;
 
   return (
-    <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-[color:var(--error)]/15 border border-[color:var(--error)]/30 text-[var(--ink-primary)]">
+    <div className="flex min-h-8 items-center gap-1.5 rounded-full border border-[color:var(--error)]/30 bg-[color:var(--error)]/15 px-2 py-1 text-[var(--ink-primary)]">
       <CloudOff size={12} className="text-[var(--error)]" />
       <span className="text-xs font-medium text-[var(--error)]">Offline</span>
     </div>

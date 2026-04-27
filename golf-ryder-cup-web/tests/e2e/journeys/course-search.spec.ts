@@ -10,11 +10,7 @@ test.describe('Course search detail flow', () => {
 
       window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
         const url =
-          typeof input === 'string'
-            ? input
-            : input instanceof URL
-              ? input.toString()
-              : input.url;
+          typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
 
         if (url.includes('/api/golf-courses?action=check')) {
           return new Response(JSON.stringify({ configured: true }), {
@@ -103,12 +99,12 @@ test.describe('Course search detail flow', () => {
     await dismissAllBlockingModals(page);
     await waitForStableDOM(page);
 
-    await page.getByRole('button', { name: /Search Database/i }).click();
+    await page.getByRole('button', { name: /Course Directory/i }).click();
     await waitForStableDOM(page);
 
-    await expect(page.getByText(/Search Course Database/i)).toBeVisible();
+    await expect(page.getByText(/Find a course/i)).toBeVisible();
 
-    await page.getByPlaceholder('Search by course name or city...').fill('cabot roost');
+    await page.getByPlaceholder('Course name or city').fill('cabot roost');
     await page.getByRole('button', { name: 'Search' }).click();
 
     const roostResult = page.getByRole('button', { name: /Roost/i }).first();
@@ -117,12 +113,12 @@ test.describe('Course search detail flow', () => {
 
     await expect(page.getByText(/Basic course profile only/i)).toBeVisible();
     await expect(page.getByText(/Linked scorecard PDF/i)).toBeVisible();
-    await expect(page.getByRole('link', { name: /View extracted source/i })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: /View source/i })).toHaveAttribute(
       'href',
       'https://cabot.com/uploads/2026/02/Scorecard_CCF_Roost_2025_Digital-min.pdf'
     );
 
     await page.getByRole('button', { name: '← Back to search' }).click();
-    await expect(page.getByText(/Search Course Database/i)).toBeVisible();
+    await expect(page.getByText(/Find a course/i)).toBeVisible();
   });
 });

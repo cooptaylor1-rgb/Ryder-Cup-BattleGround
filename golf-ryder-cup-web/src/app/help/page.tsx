@@ -61,7 +61,7 @@ const FAQ_SECTIONS: FAQSection[] = [
     items: [
       {
         q: 'What is captain mode?',
-        a: 'Captain mode unlocks structural controls: sessions, lineups, roster management, match setup, and corrections. Regular players can still score matches without it.',
+        a: 'Captain mode unlocks captain controls: sessions, lineups, roster management, match setup, and corrections. Regular players can still score matches without it.',
       },
       {
         q: 'How do I set my captain PIN?',
@@ -214,8 +214,8 @@ export default function HelpPage() {
               </h1>
               <p className="mt-[var(--space-3)] max-w-[36rem] text-sm leading-7 text-[var(--ink-secondary)]">
                 Golf trips move too fast to hunt for answers. Start here for the common questions,
-                scoring edge cases, and captain details that players always need five
-                minutes before the round.
+                scoring edge cases, and captain details that players always need five minutes before
+                the round.
               </p>
 
               <div className="relative mt-[var(--space-5)]">
@@ -235,7 +235,8 @@ export default function HelpPage() {
               {searchQuery ? (
                 <div className="mt-[var(--space-4)] flex flex-wrap items-center gap-[var(--space-3)]">
                   <p className="text-sm text-[var(--ink-secondary)]">
-                    {totalMatches} answer{totalMatches === 1 ? '' : 's'} across {filteredSections.length} section{filteredSections.length === 1 ? '' : 's'}
+                    {totalMatches} answer{totalMatches === 1 ? '' : 's'} across{' '}
+                    {filteredSections.length} section{filteredSections.length === 1 ? '' : 's'}
                   </p>
                   <Button variant="ghost" size="sm" onClick={() => setSearchQuery('')}>
                     Clear search
@@ -245,9 +246,22 @@ export default function HelpPage() {
             </div>
 
             <div className="grid gap-[var(--space-3)] sm:grid-cols-3 lg:grid-cols-1">
-              <HelpFactCard label="Topics" value={FAQ_SECTIONS.length} detail="The topics players actually need." />
-              <HelpFactCard label="Answers" value={FAQ_SECTIONS.reduce((sum, section) => sum + section.items.length, 0)} detail="Questions already settled before the first tee." />
-              <HelpFactCard label="Best starting point" value="Search" detail="When the group is in a hurry, start there." valueClassName="font-sans text-[1rem] not-italic leading-[1.25]" />
+              <HelpFactCard
+                label="Topics"
+                value={FAQ_SECTIONS.length}
+                detail="The topics players actually need."
+              />
+              <HelpFactCard
+                label="Answers"
+                value={FAQ_SECTIONS.reduce((sum, section) => sum + section.items.length, 0)}
+                detail="Questions already settled before the first tee."
+              />
+              <HelpFactCard
+                label="Best starting point"
+                value="Search"
+                detail="When the group is in a hurry, start there."
+                valueClassName="font-sans text-[1rem] not-italic leading-[1.25]"
+              />
             </div>
           </div>
         </section>
@@ -285,7 +299,9 @@ export default function HelpPage() {
                       <section.icon size={18} />
                     </div>
                     <div>
-                      <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">FAQ Section</p>
+                      <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">
+                        FAQ Section
+                      </p>
                       <h2 className="mt-[2px] font-serif text-[1.75rem] italic text-[var(--ink)]">
                         {section.title}
                       </h2>
@@ -381,7 +397,12 @@ function HelpFactCard({
   return (
     <div className="rounded-[1.55rem] border border-[color:var(--rule)]/70 bg-[color:var(--surface)]/78 p-[var(--space-4)] shadow-[0_14px_28px_rgba(41,29,17,0.05)]">
       <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">{label}</p>
-      <div className={cn('mt-[var(--space-2)] font-serif text-[2rem] italic leading-none text-[var(--ink)]', valueClassName)}>
+      <div
+        className={cn(
+          'mt-[var(--space-2)] font-serif text-[2rem] italic leading-none text-[var(--ink)]',
+          valueClassName
+        )}
+      >
         {value}
       </div>
       <p className="mt-[var(--space-2)] text-xs leading-5 text-[var(--ink-secondary)]">{detail}</p>
@@ -412,7 +433,9 @@ function HelpSidebarCard({
       <div className="flex h-11 w-11 items-center justify-center rounded-[1rem] bg-[var(--surface-raised)] text-[var(--ink-tertiary)]">
         {icon}
       </div>
-      <h3 className="mt-[var(--space-3)] font-serif text-[1.6rem] italic text-[var(--ink)]">{title}</h3>
+      <h3 className="mt-[var(--space-3)] font-serif text-[1.6rem] italic text-[var(--ink)]">
+        {title}
+      </h3>
       <p className="mt-[var(--space-3)] text-sm leading-7 text-[var(--ink-secondary)]">{body}</p>
     </aside>
   );

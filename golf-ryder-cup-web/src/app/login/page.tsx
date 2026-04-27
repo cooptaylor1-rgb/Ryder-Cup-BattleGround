@@ -3,15 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores';
-import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  ArrowRight,
-  UserPlus,
-  WifiOff,
-} from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, UserPlus, WifiOff } from 'lucide-react';
 import { PageLoadingSkeleton } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import {
@@ -115,7 +107,9 @@ function LoginPageContent() {
     // If the user starts editing the email after asking for a reset,
     // the "sent to X" confirmation is stale — clear it so they don't
     // think the new email is what was sent.
-    setResetSentTo((current) => (current && current !== email.trim().toLowerCase() ? null : current));
+    setResetSentTo((current) =>
+      current && current !== email.trim().toLowerCase() ? null : current
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, password, pin]);
 
@@ -160,22 +154,21 @@ function LoginPageContent() {
       //   - malformed email
       //   - network drops / Supabase 500s
       //   - rate limit
-      const friendly =
-        /already registered/i.test(raw)
-          ? "That email already has an account. Switch to Sign in and use your existing password (or reset it if you've forgotten)."
-          : /invalid login credentials/i.test(raw)
-            ? "Email or password didn't match. Double-check both, or switch to Sign up if you're new here."
-            : /password.*(at least|length|too (short|weak)|characters)/i.test(raw)
-              ? 'Pick a longer password — at least 6 characters.'
-              : /invalid.*email|unable to validate email/i.test(raw)
-                ? "That email doesn't look right. Check for typos and try again."
-                : /rate limit|too many requests/i.test(raw)
-                  ? 'Too many attempts in a short window. Wait a minute and try again.'
-                  : /network|fetch|failed to fetch/i.test(raw)
-                    ? "Couldn't reach the server. Check your connection and try again — your local work is safe."
-                    : /user not found/i.test(raw)
-                      ? "No account on that email yet. Switch to Sign up to create one."
-                      : raw;
+      const friendly = /already registered/i.test(raw)
+        ? "That email already has an account. Switch to Sign in and use your existing password (or reset it if you've forgotten)."
+        : /invalid login credentials/i.test(raw)
+          ? "Email or password didn't match. Double-check both, or switch to Sign up if you're new here."
+          : /password.*(at least|length|too (short|weak)|characters)/i.test(raw)
+            ? 'Pick a longer password — at least 6 characters.'
+            : /invalid.*email|unable to validate email/i.test(raw)
+              ? "That email doesn't look right. Check for typos and try again."
+              : /rate limit|too many requests/i.test(raw)
+                ? 'Too many attempts in a short window. Wait a minute and try again.'
+                : /network|fetch|failed to fetch/i.test(raw)
+                  ? "Couldn't reach the server. Check your connection and try again — your local work is safe."
+                  : /user not found/i.test(raw)
+                    ? 'No account on that email yet. Switch to Sign up to create one.'
+                    : raw;
       useAuthStore.setState({ error: friendly });
     } finally {
       setIsCloudAuthInFlight(false);
@@ -202,7 +195,7 @@ function LoginPageContent() {
       const message =
         requestError instanceof Error
           ? requestError.message
-          : 'Couldn\'t send the reset email. Try again.';
+          : "Couldn't send the reset email. Try again.";
       useAuthStore.setState({ error: message });
     } finally {
       setIsResetInFlight(false);
@@ -283,7 +276,11 @@ function LoginPageContent() {
                     placeholder={authMode === 'sign-up' ? 'At least 6 characters' : 'Your password'}
                     autoComplete={authMode === 'sign-up' ? 'new-password' : 'current-password'}
                     aria-invalid={Boolean(error)}
-                    className={cn(inputBaseClasses, 'pl-11 pr-12', error && 'border-[var(--error)]')}
+                    className={cn(
+                      inputBaseClasses,
+                      'pl-11 pr-12',
+                      error && 'border-[var(--error)]'
+                    )}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && email && password && !isCloudAuthInFlight) {
                         e.preventDefault();
@@ -353,7 +350,7 @@ function LoginPageContent() {
                   className="font-sans text-[length:var(--text-sm)] text-[var(--masters)] underline-offset-4 hover:underline"
                 >
                   {authMode === 'sign-in'
-                    ? "New here? Create an account instead."
+                    ? 'New here? Create an account instead.'
                     : 'Already have an account? Sign in instead.'}
                 </button>
               </div>
@@ -361,7 +358,7 @@ function LoginPageContent() {
               <div className="mx-auto my-[var(--space-6)] flex items-center gap-[var(--space-4)]">
                 <div className="h-px flex-1 bg-[var(--rule)]" />
                 <span className="font-sans text-sm text-[var(--ink-tertiary)]">
-                  Offline fallback only
+                  Use offline PIN
                 </span>
                 <div className="h-px flex-1 bg-[var(--rule)]" />
               </div>
@@ -370,9 +367,7 @@ function LoginPageContent() {
 
           {error && (
             <div className="rounded-[var(--radius-md)] border border-[color:var(--error)]/20 bg-[color:var(--error)]/10 px-[var(--space-4)] py-[var(--space-3)] mb-[var(--space-6)]">
-              <p className="font-sans text-[length:var(--text-sm)] text-[var(--error)]">
-                {error}
-              </p>
+              <p className="font-sans text-[length:var(--text-sm)] text-[var(--error)]">{error}</p>
             </div>
           )}
 
@@ -404,7 +399,8 @@ function LoginPageContent() {
                 <div className="mt-[var(--space-3)] flex items-center gap-[var(--space-2)] rounded-[var(--radius-sm)] bg-[var(--surface)] px-[var(--space-3)] py-[var(--space-2)]">
                   <WifiOff className="h-4 w-4 text-[var(--ink-tertiary)]" />
                   <p className="font-sans text-[length:var(--text-xs)] text-[var(--ink-secondary)]">
-                    Offline detected. Magic-link sign-in will work again when your connection returns.
+                    Offline detected. Magic-link sign-in will work again when your connection
+                    returns.
                   </p>
                 </div>
               )}
@@ -502,7 +498,6 @@ function LoginPageContent() {
           Offline PIN access is device-specific and optional.
         </p>
       </main>
-
     </div>
   );
 }

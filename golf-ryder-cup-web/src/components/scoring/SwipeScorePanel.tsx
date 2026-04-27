@@ -390,7 +390,7 @@ export function SwipeScorePanel({
                   : gestureState === 'teamB'
                     ? teamBColor
                     : gestureState === 'halved'
-                      ? '#666'
+                      ? 'var(--ink-secondary)'
                       : 'var(--masters)',
             }}
           >
@@ -429,7 +429,7 @@ export function SwipeScorePanel({
                     ? teamAColor
                     : confirmedResult === 'teamB'
                       ? teamBColor
-                      : '#666',
+                      : 'var(--ink-secondary)',
               }}
             >
               {confirmedResult === 'halved' ? (
@@ -546,7 +546,7 @@ export function SwipeScorePanel({
                   ? teamAColor
                   : existingResult === 'teamB'
                     ? teamBColor
-                    : '#666',
+                    : 'var(--ink-secondary)',
             }}
           >
             <Check className="w-4 h-4 text-[var(--canvas)]" />

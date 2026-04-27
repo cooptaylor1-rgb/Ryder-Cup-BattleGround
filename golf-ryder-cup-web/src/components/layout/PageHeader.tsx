@@ -35,7 +35,7 @@ const ICON_TONE_CLASSES: Record<PageHeaderIconTone, string> = {
     'bg-[linear-gradient(135deg,var(--maroon)_0%,var(--maroon-dark)_100%)] shadow-[0_0_0_3px_rgba(114,47,55,0.10)]',
   /** Red/danger — used for admin and destructive contexts. */
   admin:
-    'bg-[linear-gradient(135deg,var(--error)_0%,#991b1b_100%)] shadow-[0_2px_8px_color-mix(in_srgb,var(--error)_30%,transparent)]',
+    'bg-[linear-gradient(135deg,var(--error)_0%,var(--maroon-dark)_100%)] shadow-[0_2px_8px_color-mix(in_srgb,var(--error)_30%,transparent)]',
   /** Masters green with extra glow — for active-play / scoring pages. */
   action:
     'bg-[linear-gradient(135deg,var(--masters)_0%,var(--masters-deep)_100%)] shadow-[var(--shadow-glow-green)]',
@@ -153,7 +153,10 @@ export function PageHeader({
                     {breadcrumbs.map((segment, idx) => {
                       const isLast = idx === breadcrumbs.length - 1;
                       return (
-                        <li key={`${segment.label}-${idx}`} className="flex items-center gap-1 min-w-0">
+                        <li
+                          key={`${segment.label}-${idx}`}
+                          className="flex items-center gap-1 min-w-0"
+                        >
                           {segment.href && !isLast ? (
                             <Link
                               href={segment.href}

@@ -44,7 +44,7 @@ export function MatchScoringSupportLayer({
       <AnimatePresence>
         {showVoiceModal && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[color:var(--ink)]/80 px-4 py-[calc(1rem+env(safe-area-inset-top,0px))] backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -59,10 +59,14 @@ export function MatchScoringSupportLayer({
               className="mx-4 w-full max-w-sm rounded-2xl border border-rule bg-canvas p-6"
             >
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-serif text-[length:var(--text-lg)] font-normal text-ink">Voice Score</h3>
+                <h3 className="font-serif text-[length:var(--text-lg)] font-normal text-ink">
+                  Voice Score
+                </h3>
                 <button
+                  type="button"
                   onClick={onCloseVoiceModal}
-                  className="rounded-xl p-2 transition-opacity"
+                  className="min-h-11 min-w-11 rounded-xl p-2 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)]"
+                  aria-label="Close voice scoring"
                 >
                   <X size={18} className="text-ink-secondary" />
                 </button>
@@ -96,7 +100,7 @@ export function MatchScoringSupportLayer({
         )}
 
       {!isMatchComplete && (
-        <div className="fixed bottom-24 left-4 z-40">
+        <div className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom,0px))] left-4 z-40">
           <QuickPhotoCapture
             matchId={matchId}
             holeNumber={currentHole}
@@ -108,10 +112,11 @@ export function MatchScoringSupportLayer({
       )}
 
       {!isMatchComplete && (
-        <div className="fixed bottom-24 right-4 z-40">
+        <div className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom,0px))] right-4 z-40">
           <button
+            type="button"
             onClick={onOpenVoiceModal}
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-masters text-[var(--canvas)] shadow-[0_2px_8px_rgba(0,102,68,0.2)] transition-opacity"
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-masters text-[var(--canvas)] shadow-[0_2px_8px_rgba(0,102,68,0.2)] transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)]"
             aria-label="Voice scoring"
           >
             <Mic size={24} />

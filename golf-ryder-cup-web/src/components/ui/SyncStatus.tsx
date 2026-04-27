@@ -15,14 +15,7 @@
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
-import {
-  Cloud,
-  CloudOff,
-  RefreshCw,
-  Check,
-  AlertTriangle,
-  Upload,
-} from 'lucide-react';
+import { Cloud, CloudOff, RefreshCw, Check, AlertTriangle, Upload } from 'lucide-react';
 import { useSyncQueue } from '@/lib/hooks/useOptimistic';
 
 type SyncState = 'synced' | 'pending' | 'syncing' | 'offline' | 'error';
@@ -33,12 +26,8 @@ interface SyncStatusProps {
   showLabel?: boolean;
 }
 
-export function SyncStatus({
-  variant = 'badge',
-  className,
-  showLabel = true,
-}: SyncStatusProps) {
-  const { isOnline } = useUIStore(useShallow(s => ({ isOnline: s.isOnline })));
+export function SyncStatus({ variant = 'badge', className, showLabel = true }: SyncStatusProps) {
+  const { isOnline } = useUIStore(useShallow((s) => ({ isOnline: s.isOnline })));
   const { pendingCount, isSyncing, processQueue } = useSyncQueue();
 
   // Determine current sync state
@@ -92,11 +81,11 @@ interface SyncDotProps {
 
 function SyncDot({ state, className }: SyncDotProps) {
   const colors: Record<SyncState, string> = {
-    synced: 'var(--success, #22C55E)',
-    pending: 'var(--warning, #F59E0B)',
+    synced: 'var(--success)',
+    pending: 'var(--warning)',
     syncing: 'var(--info)',
-    offline: 'var(--ink-tertiary, #807868)',
-    error: 'var(--error, #DC2626)',
+    offline: 'var(--ink-tertiary)',
+    error: 'var(--error)',
   };
 
   return (
@@ -124,21 +113,21 @@ function SyncBadge({ state, pendingCount, onTap, showLabel, className }: SyncBad
   const config = {
     synced: {
       icon: <Check className="w-3.5 h-3.5" />,
-      label: 'Synced',
+      label: 'Cloud saved',
       color: 'var(--success)',
       bg: 'color-mix(in srgb, var(--success) 12%, transparent)',
       border: 'color-mix(in srgb, var(--success) 25%, transparent)',
     },
     pending: {
       icon: <Upload className="w-3.5 h-3.5" />,
-      label: `${pendingCount} pending`,
+      label: `${pendingCount} waiting`,
       color: 'var(--warning)',
       bg: 'color-mix(in srgb, var(--warning) 12%, transparent)',
       border: 'color-mix(in srgb, var(--warning) 25%, transparent)',
     },
     syncing: {
       icon: <RefreshCw className="w-3.5 h-3.5 animate-spin" />,
-      label: 'Syncing...',
+      label: 'Saving...',
       color: 'var(--info)',
       bg: 'color-mix(in srgb, var(--info) 12%, transparent)',
       border: 'color-mix(in srgb, var(--info) 25%, transparent)',
@@ -152,7 +141,7 @@ function SyncBadge({ state, pendingCount, onTap, showLabel, className }: SyncBad
     },
     error: {
       icon: <AlertTriangle className="w-3.5 h-3.5" />,
-      label: 'Sync failed',
+      label: 'Retry needed',
       color: 'var(--error)',
       bg: 'color-mix(in srgb, var(--error) 12%, transparent)',
       border: 'color-mix(in srgb, var(--error) 25%, transparent)',
@@ -164,11 +153,12 @@ function SyncBadge({ state, pendingCount, onTap, showLabel, className }: SyncBad
 
   return (
     <button
+      type="button"
       onClick={onTap}
       disabled={!isInteractive}
       className={cn(
-        'inline-flex items-center gap-1.5 px-2 py-1 rounded-full',
-        'text-xs font-medium transition-all',
+        'inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 py-1',
+        'text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]',
         isInteractive && 'cursor-pointer hover:scale-105 active:scale-95',
         !isInteractive && 'cursor-default',
         className
@@ -197,33 +187,36 @@ function SyncFull({ state, pendingCount, onTap, className }: SyncFullProps) {
   const config = {
     synced: {
       icon: <Cloud className="w-5 h-5" />,
-      title: 'All synced',
-      subtitle: 'No pending changes',
-      color: 'var(--success, #22C55E)',
+      title: 'Cloud saved',
+      subtitle: 'No changes waiting',
+      color: 'var(--success)',
     },
     pending: {
       icon: <Upload className="w-5 h-5" />,
-      title: `${pendingCount} changes pending`,
-      subtitle: 'Tap to sync now',
-      color: 'var(--warning, #F59E0B)',
+      title: `${pendingCount} changes waiting`,
+      subtitle: 'Tap to save now',
+      color: 'var(--warning)',
     },
     syncing: {
       icon: <RefreshCw className="w-5 h-5 animate-spin" />,
-      title: 'Syncing...',
-      subtitle: 'Please wait',
+      title: 'Saving...',
+      subtitle: 'Keeping this trip up to date',
       color: 'var(--info)',
     },
     offline: {
       icon: <CloudOff className="w-5 h-5" />,
-      title: 'You\'re offline',
-      subtitle: pendingCount > 0 ? `${pendingCount} changes will sync when online` : 'Changes will sync when online',
-      color: 'var(--ink-tertiary, #807868)',
+      title: "You're offline",
+      subtitle:
+        pendingCount > 0
+          ? `${pendingCount} saved changes will sync when online`
+          : 'Saved changes will sync when online',
+      color: 'var(--ink-tertiary)',
     },
     error: {
       icon: <AlertTriangle className="w-5 h-5" />,
-      title: 'Sync failed',
+      title: 'Retry needed',
       subtitle: 'Tap to retry',
-      color: 'var(--error, #DC2626)',
+      color: 'var(--error)',
     },
   };
 
@@ -232,18 +225,19 @@ function SyncFull({ state, pendingCount, onTap, className }: SyncFullProps) {
 
   return (
     <button
+      type="button"
       onClick={onTap}
       disabled={!isInteractive}
       className={cn(
-        'w-full p-4 rounded-xl flex items-center gap-4 text-left',
-        'transition-all',
+        'flex min-h-16 w-full items-center gap-4 rounded-xl p-4 text-left',
+        'transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)]',
         isInteractive && 'cursor-pointer active:scale-[0.98]',
         !isInteractive && 'cursor-default',
         className
       )}
       style={{
-        background: 'var(--surface, #1A1814)',
-        border: '1px solid var(--rule, #3A3530)',
+        background: 'var(--surface)',
+        border: '1px solid var(--rule)',
       }}
     >
       <div
@@ -257,16 +251,10 @@ function SyncFull({ state, pendingCount, onTap, className }: SyncFullProps) {
       </div>
 
       <div className="flex-1 min-w-0">
-        <p
-          className="font-medium text-sm"
-          style={{ color: 'var(--ink, #F5F1E8)' }}
-        >
+        <p className="font-medium text-sm" style={{ color: 'var(--ink)' }}>
           {title}
         </p>
-        <p
-          className="text-xs mt-0.5"
-          style={{ color: 'var(--ink-secondary, #B8B0A0)' }}
-        >
+        <p className="text-xs mt-0.5" style={{ color: 'var(--ink-secondary)' }}>
           {subtitle}
         </p>
       </div>
@@ -275,14 +263,7 @@ function SyncFull({ state, pendingCount, onTap, className }: SyncFullProps) {
       {state === 'syncing' && (
         <div className="w-8 h-8 relative">
           <svg className="w-full h-full -rotate-90" viewBox="0 0 32 32">
-            <circle
-              cx="16"
-              cy="16"
-              r="14"
-              fill="none"
-              stroke="var(--rule, #3A3530)"
-              strokeWidth="3"
-            />
+            <circle cx="16" cy="16" r="14" fill="none" stroke="var(--rule)" strokeWidth="3" />
             <circle
               cx="16"
               cy="16"
@@ -310,7 +291,7 @@ interface FloatingSyncStatusProps {
 }
 
 export function FloatingSyncStatus({ className }: FloatingSyncStatusProps) {
-  const { isOnline } = useUIStore(useShallow(s => ({ isOnline: s.isOnline })));
+  const { isOnline } = useUIStore(useShallow((s) => ({ isOnline: s.isOnline })));
   const { pendingCount, isSyncing, processQueue: _processQueue } = useSyncQueue();
 
   // Don't show if everything is synced
@@ -321,7 +302,7 @@ export function FloatingSyncStatus({ className }: FloatingSyncStatusProps) {
   return (
     <div
       className={cn(
-        'fixed bottom-20 left-4 right-4 z-40',
+        'fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] left-4 right-4 z-40',
         'animate-slide-up',
         className
       )}

@@ -48,7 +48,13 @@ const logger = createLogger('more');
 
 export default function MorePageClient() {
   const router = useRouter();
-  const { currentTrip, loadTrip, clearTrip } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, loadTrip: s.loadTrip, clearTrip: s.clearTrip })));
+  const { currentTrip, loadTrip, clearTrip } = useTripStore(
+    useShallow((s) => ({
+      currentTrip: s.currentTrip,
+      loadTrip: s.loadTrip,
+      clearTrip: s.clearTrip,
+    }))
+  );
   const { currentUser, isAuthenticated } = useAuthStore();
   const {
     isCaptainMode,
@@ -57,8 +63,17 @@ export default function MorePageClient() {
     isAdminMode,
     enableAdminMode,
     disableAdminMode,
-  } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode, enableCaptainMode: s.enableCaptainMode, disableCaptainMode: s.disableCaptainMode, isAdminMode: s.isAdminMode, enableAdminMode: s.enableAdminMode, disableAdminMode: s.disableAdminMode })));
-  const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
+  } = useAccessStore(
+    useShallow((s) => ({
+      isCaptainMode: s.isCaptainMode,
+      enableCaptainMode: s.enableCaptainMode,
+      disableCaptainMode: s.disableCaptainMode,
+      isAdminMode: s.isAdminMode,
+      enableAdminMode: s.enableAdminMode,
+      disableAdminMode: s.disableAdminMode,
+    }))
+  );
+  const { showToast } = useToastStore(useShallow((s) => ({ showToast: s.showToast })));
 
   const [showCaptainModal, setShowCaptainModal] = useState(false);
   const [showAdminModal, setShowAdminModal] = useState(false);
@@ -275,14 +290,12 @@ export default function MorePageClient() {
             id: 'dev-tools',
             eyebrow: 'Development',
             title: 'Local testing tools.',
-            description:
-              'Shortcuts for loading or clearing local demo data while testing.',
+            description: 'Shortcuts for loading or clearing local demo data while testing.',
             items: [
               {
                 id: 'load-demo',
                 label: 'Load demo data',
-                description:
-                  'Create a sample trip with enough data to test the app quickly.',
+                description: 'Create a sample trip with enough data to test the app quickly.',
                 icon: Database,
                 action: handleSeedData,
                 disabled: isSeeding,
@@ -306,8 +319,7 @@ export default function MorePageClient() {
             id: 'admin-tools',
             eyebrow: 'Admin',
             title: 'Admin-only tools.',
-            description:
-              'Reserved for data cleanup and other high-impact actions.',
+            description: 'Reserved for data cleanup and other high-impact actions.',
             items: [
               {
                 id: 'admin-panel',
@@ -371,15 +383,13 @@ export default function MorePageClient() {
         <section className="overflow-hidden rounded-[2rem] border border-[var(--maroon-subtle)] bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(247,239,240,0.99))] shadow-[0_26px_56px_rgba(46,34,18,0.08)]">
           <div className="grid gap-[var(--space-5)] px-[var(--space-5)] py-[var(--space-5)] lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.95fr)]">
             <div>
-              <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">
-                Support Hub
-              </p>
+              <p className="type-overline tracking-[0.18em] text-[var(--maroon)]">Support Hub</p>
               <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,7vw,3.25rem)] italic leading-[1.02] text-[var(--ink)]">
                 Everything you might need between rounds.
               </h1>
               <p className="mt-[var(--space-3)] max-w-[36rem] text-sm leading-7 text-[var(--ink-secondary)]">
-                Find trip tools, support, settings, and access controls in one place without
-                digging through the rest of the app.
+                Find trip tools, support, settings, and access controls in one place without digging
+                through the rest of the app.
               </p>
 
               <div className="mt-[var(--space-5)] flex flex-wrap gap-[var(--space-3)]">
@@ -535,14 +545,14 @@ export default function MorePageClient() {
             </div>
             <div>
               <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">
-                Build Note
+                Trip Toolkit
               </p>
               <h2 className="mt-[var(--space-2)] font-serif text-[1.75rem] italic text-[var(--ink)]">
                 Golf Ryder Cup
               </h2>
               <p className="mt-[var(--space-2)] max-w-[38rem] text-sm leading-7 text-[var(--ink-secondary)]">
-                Offline-first match play scoring for a serious buddies trip, with support and
-                settings kept in the same visual system as the rest of the app.
+                Offline-first match play scoring for a serious buddies trip, with support, settings,
+                and captain tools in one place.
               </p>
               <div className="mt-[var(--space-4)] flex items-center gap-2 text-xs text-[var(--ink-tertiary)]">
                 <Heart size={14} className="text-[var(--error)]" />
@@ -560,7 +570,7 @@ export default function MorePageClient() {
           setCaptainPin('');
         }}
         title="Enable captain mode"
-        description="Use a PIN to unlock lineup editing, session changes, and the structural controls that belong to captains."
+        description="Use a PIN to unlock lineup editing, session changes, and captain-only controls."
         size="sm"
       >
         <div className="space-y-[var(--space-4)] p-[var(--space-5)] pt-0">

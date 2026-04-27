@@ -59,17 +59,8 @@ export function EmptyState({
   return (
     <div className={cn('py-16 px-6 text-center', className)}>
       {/* Single icon -- restrained, warm background */}
-      <div
-        className="w-14 h-14 mx-auto mb-6 rounded-2xl flex items-center justify-center"
-        style={{
-          background: 'var(--canvas-warm, #F0EDE8)',
-          border: '1px solid var(--rule, #E8E4DF)',
-        }}
-      >
-        <Icon
-          className="w-7 h-7"
-          style={{ color: 'var(--ink-tertiary, #A39E98)' }}
-        />
+      <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--rule)] bg-[var(--surface-secondary)]">
+        <Icon className="h-7 w-7 text-[var(--ink-tertiary)]" />
       </div>
 
       {/* Title -- serif for editorial warmth */}
@@ -80,7 +71,7 @@ export function EmptyState({
           fontWeight: 400,
           color: 'var(--ink, #1A1815)',
           lineHeight: 1.25,
-          letterSpacing: '-0.01em',
+          letterSpacing: 0,
         }}
       >
         {title}
@@ -102,11 +93,7 @@ export function EmptyState({
 
       {/* Action -- primary Button for Masters green CTA */}
       {action && (
-        <Button
-          variant="primary"
-          onClick={action.onClick}
-          className="mt-6"
-        >
+        <Button variant="primary" onClick={action.onClick} className="mt-6">
           {action.label}
         </Button>
       )}
