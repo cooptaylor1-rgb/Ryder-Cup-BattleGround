@@ -72,23 +72,29 @@ describe('supabase auth helpers', () => {
   });
 
   it('requests a Supabase email sign-in link with redirect metadata', async () => {
-    // Pin the redirect origin so the test is deterministic regardless of
-    // host env (Railway sets NEXT_PUBLIC_APP_URL on the build container,
-    // which used to leak into this assertion).
-    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'http://localhost:3000');
     signInWithOtpMock.mockResolvedValue({
       data: {},
       error: null,
     });
 
-    const { requestEmailSignInLink } = await import('@/lib/supabase/auth');
+    // Compute the expected redirect from the same helper the production
+    // code uses, rather than hardcoding `http://localhost:3000`. Vite
+    // inlines `process.env.NEXT_PUBLIC_*` at module-load time (the jsdom
+    // environment is treated as a browser context), so vi.stubEnv can't
+    // override what's already been baked into the JS string. Asserting
+    // against `getAuthRedirectOrigin()` makes the test resilient to
+    // whatever value the build container had set — locally that's
+    // unset → localhost fallback, on Railway that's the production URL.
+    const { requestEmailSignInLink, getAuthRedirectOrigin } = await import(
+      '@/lib/supabase/auth'
+    );
 
     await requestEmailSignInLink('  CoOp@Example.com ', '/login?next=%2Fscore');
 
     expect(signInWithOtpMock).toHaveBeenCalledWith({
       email: 'coop@example.com',
       options: {
-        emailRedirectTo: 'http://localhost:3000/login?next=%2Fscore',
+        emailRedirectTo: `${getAuthRedirectOrigin()}/login?next=%2Fscore`,
         shouldCreateUser: true,
       },
     });
