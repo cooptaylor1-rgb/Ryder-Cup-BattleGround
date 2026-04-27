@@ -7,6 +7,7 @@ import { useAuthStore, useToastStore } from '@/lib/stores';
 import {
   completeSupabaseAuthFromUrl,
   getSupabaseSession,
+  resolvePostAuthDestination,
 } from '@/lib/supabase/auth';
 import { safeNextPath } from '@/lib/utils/navigation';
 
@@ -48,14 +49,12 @@ function AuthCallbackContent() {
       useAuthStore.getState().syncSupabaseSession(session);
       const authState = useAuthStore.getState();
       const nextPath = safeNextPath(searchParams?.get('next'));
-      const nextParam = `?next=${encodeURIComponent(nextPath)}`;
-
-      let destination = nextPath;
-      if (!authState.currentUser && authState.authEmail) {
-        destination = `/profile/create${nextParam}`;
-      } else if (authState.currentUser && !authState.currentUser.hasCompletedOnboarding) {
-        destination = `/profile/complete${nextParam}`;
-      }
+      const destination = resolvePostAuthDestination({
+        nextPath,
+        hasCurrentUser: Boolean(authState.currentUser),
+        hasCompletedOnboarding: Boolean(authState.currentUser?.hasCompletedOnboarding),
+        authEmail: authState.authEmail,
+      });
 
       showToast('success', result.message);
 

@@ -150,6 +150,41 @@ describe('supabase auth helpers', () => {
     expect(buildMagicLinkRedirectPath()).toBe('/auth/callback');
   });
 
+  it('keeps password recovery callbacks on the reset password screen', async () => {
+    const { PASSWORD_RESET_PATH, resolvePostAuthDestination } = await import('@/lib/supabase/auth');
+
+    expect(
+      resolvePostAuthDestination({
+        nextPath: PASSWORD_RESET_PATH,
+        hasCurrentUser: false,
+        hasCompletedOnboarding: false,
+        authEmail: 'coop@example.com',
+      })
+    ).toBe(PASSWORD_RESET_PATH);
+  });
+
+  it('still routes non-reset auth callbacks through profile setup when needed', async () => {
+    const { resolvePostAuthDestination } = await import('@/lib/supabase/auth');
+
+    expect(
+      resolvePostAuthDestination({
+        nextPath: '/score',
+        hasCurrentUser: false,
+        hasCompletedOnboarding: false,
+        authEmail: 'coop@example.com',
+      })
+    ).toBe('/profile/create?next=%2Fscore');
+
+    expect(
+      resolvePostAuthDestination({
+        nextPath: '/score',
+        hasCurrentUser: true,
+        hasCompletedOnboarding: false,
+        authEmail: 'coop@example.com',
+      })
+    ).toBe('/profile/complete?next=%2Fscore');
+  });
+
   it('completes auth by exchanging a callback code', async () => {
     exchangeCodeForSessionMock.mockResolvedValue({
       data: {},
@@ -211,6 +246,29 @@ describe('supabase auth helpers', () => {
     expect(verifyOtpMock).toHaveBeenCalledWith({
       token_hash: 'test-hash',
       type: 'magiclink',
+    });
+  });
+
+  it('verifies recovery otp callbacks from password reset links', async () => {
+    verifyOtpMock.mockResolvedValue({
+      data: {},
+      error: null,
+    });
+
+    const { completeSupabaseAuthFromUrl } = await import('@/lib/supabase/auth');
+
+    await expect(
+      completeSupabaseAuthFromUrl(
+        'http://localhost:3000/auth/reset-password?token_hash=recovery-hash&type=recovery'
+      )
+    ).resolves.toEqual({
+      status: 'success',
+      message: 'Secure sign-in complete.',
+    });
+
+    expect(verifyOtpMock).toHaveBeenCalledWith({
+      token_hash: 'recovery-hash',
+      type: 'recovery',
     });
   });
 

@@ -106,7 +106,7 @@ export function computeSessionPracticeLeaderboard({
     for (const player of groupPlayers) {
       const courseHandicap =
         teeSet && player.handicapIndex !== undefined
-          ? Math.round(player.handicapIndex * (teeSet.slope || 113) / 113)
+          ? Math.round((player.handicapIndex * (teeSet.slope || 113)) / 113)
           : 0;
       strokesByPlayer.set(player.id, allocateStrokes(courseHandicap, holeHandicaps));
     }
@@ -239,7 +239,10 @@ export function computeSessionPracticeLeaderboard({
  * formats we haven't modeled yet; that keeps the math safe rather
  * than undefined behavior.
  */
-export function ballsCountedForHole(sessionType: SessionType | string | undefined, hole: number): number {
+export function ballsCountedForHole(
+  sessionType: SessionType | string | undefined,
+  hole: number
+): number {
   switch (sessionType) {
     case 'one-two-three':
       // Block progression: 1 ball holes 1-6, 2 on 7-12, 3 on 13-18.
@@ -259,6 +262,17 @@ export function ballsCountedForHole(sessionType: SessionType | string | undefine
     default:
       return 1;
   }
+}
+
+export function getGroupScoreToPar(group: GroupSessionTotals): number | undefined {
+  let hasScoredHole = false;
+  const total = group.holes.reduce((sum, hole) => {
+    if (typeof hole.groupNet !== 'number' || typeof hole.par !== 'number') return sum;
+    hasScoredHole = true;
+    return sum + (hole.groupNet - hole.par * hole.ballsCounted);
+  }, 0);
+
+  return hasScoredHole ? total : undefined;
 }
 
 function formatLabel(sessionType: SessionType | string | undefined): string {

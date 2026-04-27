@@ -12,6 +12,7 @@ import { describe, expect, it } from 'vitest';
 import {
   ballsCountedForHole,
   computeSessionPracticeLeaderboard,
+  getGroupScoreToPar,
 } from '../components/scoring/practice-scoring/sessionLeaderboard';
 import type { Match, Player, PracticeScore, RyderCupSession, TeeSet } from '../lib/types/models';
 
@@ -76,10 +77,7 @@ function teeSet(overrides: Partial<TeeSet> = {}): TeeSet {
   };
 }
 
-function scoresFromStrokeTable(
-  matchId: string,
-  table: Record<string, number[]>
-): PracticeScore[] {
+function scoresFromStrokeTable(matchId: string, table: Record<string, number[]>): PracticeScore[] {
   const out: PracticeScore[] = [];
   for (const [playerId, byHole] of Object.entries(table)) {
     byHole.forEach((gross, idx) => {
@@ -112,6 +110,62 @@ describe('ballsCountedForHole', () => {
   it('defaults to 1 for unknown formats', () => {
     expect(ballsCountedForHole('whatever-unknown', 5)).toBe(1);
     expect(ballsCountedForHole(undefined, 5)).toBe(1);
+  });
+});
+
+describe('getGroupScoreToPar', () => {
+  it('returns undefined until the group has a scored hole with par', () => {
+    expect(
+      getGroupScoreToPar({
+        groupNumber: 1,
+        matchId: 'm1',
+        players: [],
+        holes: [
+          {
+            holeNumber: 1,
+            par: 4,
+            ballsCounted: 1,
+            groupNet: undefined,
+            groupGross: undefined,
+            contributions: [],
+          },
+        ],
+        grossTotal: undefined,
+        netTotal: undefined,
+        holesPlayed: 0,
+      })
+    ).toBeUndefined();
+  });
+
+  it('sums score-to-par across counted balls', () => {
+    expect(
+      getGroupScoreToPar({
+        groupNumber: 1,
+        matchId: 'm1',
+        players: [],
+        holes: [
+          {
+            holeNumber: 1,
+            par: 4,
+            ballsCounted: 2,
+            groupNet: 7,
+            groupGross: 8,
+            contributions: [],
+          },
+          {
+            holeNumber: 2,
+            par: 5,
+            ballsCounted: 1,
+            groupNet: 6,
+            groupGross: 6,
+            contributions: [],
+          },
+        ],
+        grossTotal: 14,
+        netTotal: 13,
+        holesPlayed: 2,
+      })
+    ).toBe(0);
   });
 });
 
@@ -238,7 +292,9 @@ describe('computeSessionPracticeLeaderboard — 1-2-3 format', () => {
   it('labels unknown formats with the default fallback', () => {
     const match = makeMatch(1, ['p1']);
     const result = computeSessionPracticeLeaderboard({
-      session: session({ sessionType: 'custom-thing' as unknown as RyderCupSession['sessionType'] }),
+      session: session({
+        sessionType: 'custom-thing' as unknown as RyderCupSession['sessionType'],
+      }),
       matches: [match],
       scores: [],
       players: [makePlayer('p1', 'Solo')],

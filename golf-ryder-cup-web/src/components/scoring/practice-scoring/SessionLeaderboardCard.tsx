@@ -8,8 +8,9 @@ import { useTripStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import type { Match, PracticeScore, RyderCupSession, TeeSet } from '@/lib/types/models';
 import { cn, formatPlayerName } from '@/lib/utils';
+import { LeaderboardRankPill, ScoreStatCell, ScoreToParValue } from '../scoreDisplayPrimitives';
 
-import { computeSessionPracticeLeaderboard } from './sessionLeaderboard';
+import { computeSessionPracticeLeaderboard, getGroupScoreToPar } from './sessionLeaderboard';
 
 interface SessionLeaderboardCardProps {
   session: RyderCupSession;
@@ -65,13 +66,11 @@ export function SessionLeaderboardCard({ session, matches }: SessionLeaderboardC
 
   if (leaderboard.groups.length === 0) {
     return (
-      <section className="rounded-[1.5rem] border border-[color:var(--rule)]/75 bg-[color:var(--canvas-raised)] p-[var(--space-5)]">
+      <section className="rounded-[1.35rem] border border-[color:var(--rule)]/75 bg-[color:var(--canvas-raised)] p-4">
         <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
           Session leaderboard
         </p>
-        <p className="mt-[var(--space-2)] type-body-sm text-[var(--ink-secondary)]">
-          Publish practice groups above to start tracking a session leaderboard.
-        </p>
+        <p className="mt-2 text-sm text-[var(--ink-secondary)]">Awaiting practice groups.</p>
       </section>
     );
   }
@@ -79,14 +78,14 @@ export function SessionLeaderboardCard({ session, matches }: SessionLeaderboardC
   const anyScored = leaderboard.groups.some((g) => g.holesPlayed > 0);
 
   return (
-    <section className="rounded-[1.5rem] border border-[color:var(--rule)]/75 bg-[color:var(--canvas-raised)] p-[var(--space-5)]">
+    <section className="rounded-[1.35rem] border border-[color:var(--rule)]/75 bg-[color:var(--canvas-raised)] p-4 shadow-[0_14px_38px_rgba(0,0,0,0.06)]">
       <div className="flex items-start justify-between gap-[var(--space-3)]">
         <div>
           <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
-            Session leaderboard · {leaderboard.formatName}
+            Live net board · {leaderboard.formatName}
           </p>
-          <h2 className="mt-[var(--space-1)] type-title text-[var(--ink)]">
-            {session.name} — all groups
+          <h2 className="mt-1 text-[1.2rem] font-semibold leading-tight text-[var(--ink)]">
+            {session.name} · all groups
           </h2>
         </div>
         {leaderboard.formatSupported ? null : (
@@ -96,15 +95,15 @@ export function SessionLeaderboardCard({ session, matches }: SessionLeaderboardC
         )}
       </div>
 
-      <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">
-        {anyScored
-          ? 'Ranked by net total under the session format. Ties break on gross, then group number.'
-          : 'No scores entered yet — the board updates live as each group enters strokes.'}
+      <p className="mt-2 text-sm text-[var(--ink-secondary)]">
+        {anyScored ? 'Net total · gross tiebreak' : 'Awaiting scores'}
       </p>
 
-      <div className="mt-[var(--space-4)] space-y-[var(--space-2)]">
+      <div className="mt-3 space-y-2">
         {leaderboard.groups.map((group, index) => {
           const rank = anyScored && group.holesPlayed > 0 ? index + 1 : undefined;
+          const isLeader = index === 0 && group.holesPlayed > 0;
+          const toPar = getGroupScoreToPar(group);
           const captainLine = group.players
             .map((p) => formatPlayerName(p.firstName, p.lastName, 'short'))
             .join(', ');
@@ -113,41 +112,48 @@ export function SessionLeaderboardCard({ session, matches }: SessionLeaderboardC
             <div
               key={group.matchId}
               className={cn(
-                'rounded-[1rem] border border-[var(--rule)] bg-[var(--canvas)] px-[var(--space-3)] py-[var(--space-3)]'
+                'rounded-[1rem] border px-3 py-2.5 transition-colors duration-200',
+                isLeader
+                  ? 'border-[color:var(--gold)]/55 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--gold)_10%,var(--canvas))_0%,var(--canvas)_72%)]'
+                  : 'border-[var(--rule)] bg-[var(--canvas)]'
               )}
             >
-              <div className="flex items-center justify-between gap-[var(--space-3)]">
-                <div className="flex items-center gap-[var(--space-3)] min-w-0">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--rule)] bg-[var(--canvas-raised)] font-serif text-[1.05rem] italic text-[var(--ink)]">
-                    {rank ?? '—'}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="type-title-sm text-[var(--ink)]">Group {group.groupNumber}</p>
-                    <p className="type-meta text-[var(--ink-tertiary)] truncate">
-                      {captainLine || 'No players yet'}
+              <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-2.5">
+                <LeaderboardRankPill rank={rank} leader={isLeader} />
+                <div className="min-w-0">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <p className="truncate text-[0.95rem] font-semibold leading-tight text-[var(--ink)]">
+                      Group {group.groupNumber}
                     </p>
+                    {isLeader ? (
+                      <span className="shrink-0 rounded-full border border-[color:var(--gold)]/55 bg-[color:var(--gold)]/12 px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-none tracking-[0.12em] text-[var(--masters-deep)]">
+                        Leader
+                      </span>
+                    ) : null}
                   </div>
+                  <p className="mt-1 truncate text-[0.72rem] font-medium text-[var(--ink-tertiary)]">
+                    {captainLine || 'No players yet'}
+                  </p>
                 </div>
-                <div className="flex items-center gap-[var(--space-4)] text-right">
-                  <div>
-                    <p className="type-micro text-[var(--ink-tertiary)]">Holes</p>
-                    <p className="font-serif text-[1.05rem] italic text-[var(--ink)]">
-                      {group.holesPlayed}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="type-micro text-[var(--ink-tertiary)]">Gross</p>
-                    <p className="font-serif text-[1.05rem] italic text-[var(--ink)]">
-                      {group.grossTotal ?? '—'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="type-micro text-[var(--ink-tertiary)]">Net</p>
-                    <p className="font-serif text-[1.2rem] italic text-[var(--ink)]">
-                      {group.netTotal ?? '—'}
-                    </p>
-                  </div>
-                </div>
+                <ScoreToParValue
+                  value={group.holesPlayed > 0 ? toPar : undefined}
+                  label="To par"
+                  size="md"
+                />
+              </div>
+
+              <div className="mt-2 grid grid-cols-3 gap-1.5">
+                <ScoreStatCell label="Thru" value={group.holesPlayed || '—'} muted />
+                <ScoreStatCell
+                  label="Gross"
+                  value={group.grossTotal !== undefined ? group.grossTotal : '—'}
+                  muted
+                />
+                <ScoreStatCell
+                  label="Net"
+                  value={group.netTotal !== undefined ? group.netTotal : '—'}
+                  muted
+                />
               </div>
             </div>
           );

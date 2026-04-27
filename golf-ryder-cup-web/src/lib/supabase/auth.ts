@@ -13,6 +13,36 @@ export interface SupabaseAuthCompletionResult {
   message: string;
 }
 
+export const PASSWORD_RESET_PATH = '/auth/reset-password';
+
+export function resolvePostAuthDestination({
+  nextPath,
+  hasCurrentUser,
+  hasCompletedOnboarding,
+  authEmail,
+}: {
+  nextPath: string;
+  hasCurrentUser: boolean;
+  hasCompletedOnboarding: boolean;
+  authEmail: string | null | undefined;
+}): string {
+  if (nextPath === PASSWORD_RESET_PATH) {
+    return nextPath;
+  }
+
+  const nextParam = `?next=${encodeURIComponent(nextPath)}`;
+
+  if (!hasCurrentUser && authEmail) {
+    return `/profile/create${nextParam}`;
+  }
+
+  if (hasCurrentUser && !hasCompletedOnboarding) {
+    return `/profile/complete${nextParam}`;
+  }
+
+  return nextPath;
+}
+
 const SUPPORTED_OTP_TYPES = new Set<EmailOtpType>([
   'magiclink',
   'recovery',
@@ -250,7 +280,7 @@ export async function sendPasswordResetEmail(email: string): Promise<void> {
   const normalizedEmail = email.trim().toLowerCase();
   if (!normalizedEmail) throw new Error('Enter the email on your account first.');
 
-  const redirectTo = `${getAuthRedirectOrigin()}/auth/callback?next=${encodeURIComponent('/auth/reset-password')}`;
+  const redirectTo = `${getAuthRedirectOrigin()}/auth/callback?next=${encodeURIComponent(PASSWORD_RESET_PATH)}`;
 
   const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
     redirectTo,

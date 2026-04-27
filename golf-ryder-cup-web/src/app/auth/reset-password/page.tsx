@@ -14,7 +14,11 @@ import { useRouter } from 'next/navigation';
 import { Lock, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { useAuthStore, useToastStore } from '@/lib/stores';
-import { setNewPassword, getSupabaseSession } from '@/lib/supabase/auth';
+import {
+  completeSupabaseAuthFromUrl,
+  setNewPassword,
+  getSupabaseSession,
+} from '@/lib/supabase/auth';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -27,11 +31,46 @@ export default function ResetPasswordPage() {
   const [error, setError] = useState<string | null>(null);
   const [hasRecoverySession, setHasRecoverySession] = useState<boolean | null>(null);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const completeRecoveryFromUrl = async () => {
+      const result = await completeSupabaseAuthFromUrl(window.location.href);
+      if (cancelled || result.status === 'noop') return;
+
+      if (result.status === 'error') {
+        setError(result.message);
+        setHasRecoverySession(false);
+        return;
+      }
+
+      const session = await getSupabaseSession();
+      if (cancelled) return;
+
+      useAuthStore.getState().syncSupabaseSession(session);
+      setHasRecoverySession(Boolean(session));
+
+      if (window.location.search || window.location.hash) {
+        window.history.replaceState(null, '', '/auth/reset-password');
+      }
+    };
+
+    void completeRecoveryFromUrl().catch((err) => {
+      if (cancelled) return;
+      setError(err instanceof Error ? err.message : 'Could not verify this reset link.');
+      setHasRecoverySession(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // Guard the page: without a recovery session the reset has no
   // authority. If the user hit this URL directly or their session
   // expired, send them back to login with a helpful message.
   useEffect(() => {
-    if (!hasResolvedSupabaseSession) return;
+    if (!hasResolvedSupabaseSession || hasRecoverySession === true) return;
     let cancelled = false;
     void getSupabaseSession().then((session) => {
       if (cancelled) return;
@@ -40,7 +79,7 @@ export default function ResetPasswordPage() {
     return () => {
       cancelled = true;
     };
-  }, [hasResolvedSupabaseSession]);
+  }, [hasRecoverySession, hasResolvedSupabaseSession]);
 
   const handleSubmit = useCallback(
     async (event: React.FormEvent) => {
@@ -51,16 +90,16 @@ export default function ResetPasswordPage() {
         return;
       }
       if (password.length < 6) {
-        setError('Pick a password that\'s at least 6 characters.');
+        setError("Pick a password that's at least 6 characters.");
         return;
       }
       setSubmitting(true);
       try {
         await setNewPassword(password);
-        showToast('success', 'Password updated. You\'re signed in.');
+        showToast('success', "Password updated. You're signed in.");
         router.replace('/');
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Couldn\'t update password.');
+        setError(err instanceof Error ? err.message : "Couldn't update password.");
       } finally {
         setSubmitting(false);
       }
@@ -79,8 +118,8 @@ export default function ResetPasswordPage() {
             Reset link expired
           </h1>
           <p className="mt-3 text-sm text-[var(--ink-secondary)]">
-            Password reset links are single-use and expire quickly. Request a new one from the
-            login page.
+            Password reset links are single-use and expire quickly. Request a new one from the login
+            page.
           </p>
           <Button
             variant="primary"

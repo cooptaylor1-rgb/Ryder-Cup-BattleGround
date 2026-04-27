@@ -16,9 +16,27 @@ import { useAuthStore } from '@/lib/stores';
  * - /join/* (trip invitations)
  */
 
-const ALWAYS_PUBLIC_ROUTES = ['/profile/create', '/login', '/join', '/spectator', '/auth/callback'];
+const ALWAYS_PUBLIC_ROUTES = [
+  '/profile/create',
+  '/login',
+  '/join',
+  '/spectator',
+  '/auth/callback',
+  '/auth/reset-password',
+];
 const PROTECTED_ROUTE_PREFIXES = ['/settings'];
 const PROTECTED_ROUTE_EXACT = ['/profile', '/profile/complete'];
+
+interface AuthStorePersistApi {
+  hasHydrated: () => boolean;
+  onHydrate: (callback: () => void) => () => void;
+  onFinishHydration: (callback: () => void) => () => void;
+  rehydrate: () => void | Promise<void>;
+}
+
+function getAuthStorePersistApi(): AuthStorePersistApi | undefined {
+  return (useAuthStore as typeof useAuthStore & { persist?: AuthStorePersistApi }).persist;
+}
 
 export function isProtectedAppRoute(pathname?: string | null) {
   if (!pathname) {
@@ -51,12 +69,19 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated, currentUser, hasResolvedSupabaseSession } = useAuthStore();
-  const [isHydrated, setIsHydrated] = useState(useAuthStore.persist.hasHydrated());
+  const [isHydrated, setIsHydrated] = useState(
+    () => getAuthStorePersistApi()?.hasHydrated() ?? true
+  );
   const requiresAuth = isProtectedAppRoute(pathname);
   const isAuthReady = isHydrated && hasResolvedSupabaseSession;
   const shouldRedirectToProfile = requiresAuth && isAuthReady && (!isAuthenticated || !currentUser);
 
   useEffect(() => {
+    const persistApi = getAuthStorePersistApi();
+    if (!persistApi) {
+      return;
+    }
+
     const finishHydration = () => {
       setIsHydrated(true);
     };
@@ -65,11 +90,11 @@ export function AuthGuard({ children }: AuthGuardProps) {
       setIsHydrated(false);
     };
 
-    const unsubscribeHydrate = useAuthStore.persist.onHydrate(startHydration);
-    const unsubscribeFinishHydration = useAuthStore.persist.onFinishHydration(finishHydration);
+    const unsubscribeHydrate = persistApi.onHydrate(startHydration);
+    const unsubscribeFinishHydration = persistApi.onFinishHydration(finishHydration);
 
-    if (!useAuthStore.persist.hasHydrated()) {
-      void useAuthStore.persist.rehydrate();
+    if (!persistApi.hasHydrated()) {
+      void persistApi.rehydrate();
     }
 
     return () => {

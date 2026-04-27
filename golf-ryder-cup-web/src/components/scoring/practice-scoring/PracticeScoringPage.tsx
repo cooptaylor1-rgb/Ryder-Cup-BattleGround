@@ -25,6 +25,13 @@ import { useShallow } from 'zustand/shallow';
 import type { Match, Player, PracticeScore, TeeSet } from '@/lib/types/models';
 import { cn, formatPlayerName } from '@/lib/utils';
 import {
+  LeaderboardRankPill,
+  ScoreStatCell,
+  ScoreToParValue,
+  formatScoreToPar,
+  scoreToParToneClass,
+} from '../scoreDisplayPrimitives';
+import {
   allocateStrokes,
   computePracticeLeaderboard,
   type LeaderboardRow,
@@ -32,7 +39,7 @@ import {
 import {
   ballsCountedForHole,
   computeSessionPracticeLeaderboard,
-  type GroupSessionTotals,
+  getGroupScoreToPar,
 } from './sessionLeaderboard';
 
 interface PracticeScoringPageProps {
@@ -108,13 +115,23 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
   // left off rather than always at hole 1.
   useEffect(() => {
     if (!match || scores.length === 0) return;
+    let nextHole: number | null = null;
     for (let hole = 1; hole <= 18; hole += 1) {
       const entered = scores.filter((s) => s.holeNumber === hole);
       if (entered.length < match.teamAPlayerIds.length + match.teamBPlayerIds.length) {
-        setCurrentHole(hole);
-        return;
+        nextHole = hole;
+        break;
       }
     }
+
+    if (nextHole === null) return;
+    const updateTimer = window.setTimeout(() => {
+      setCurrentHole(nextHole);
+    }, 0);
+
+    return () => {
+      window.clearTimeout(updateTimer);
+    };
   }, [match, scores]);
 
   const groupPlayers = useMemo<Player[]>(() => {
@@ -154,7 +171,9 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
   );
   const activeGroupRank = useMemo(() => {
     if (!sessionLeaderboard || !activeGroup) return undefined;
-    const index = sessionLeaderboard.groups.findIndex((group) => group.matchId === activeGroup.matchId);
+    const index = sessionLeaderboard.groups.findIndex(
+      (group) => group.matchId === activeGroup.matchId
+    );
     return index >= 0 && activeGroup.holesPlayed > 0 ? index + 1 : undefined;
   }, [activeGroup, sessionLeaderboard]);
   const activeHoleResult = activeGroup?.holes[currentHole - 1];
@@ -193,7 +212,7 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
   const currentGroupGross = activeHoleResult?.groupGross;
   const currentGroupVsPar =
     typeof currentGroupNet === 'number' ? currentGroupNet - groupParTarget : undefined;
-  const groupTotalVsPar = activeGroup ? getGroupToPar(activeGroup) : undefined;
+  const groupTotalVsPar = activeGroup ? getGroupScoreToPar(activeGroup) : undefined;
   const countedContributions =
     activeHoleResult?.contributions.filter((contribution) => contribution.counted) ?? [];
   const waitingForCountedBalls = Math.max(ballsRequired - countedContributions.length, 0);
@@ -225,12 +244,18 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
         const net = typeof gross === 'number' ? gross - strokesReceived : undefined;
         const toPar = typeof net === 'number' ? net - holePar : undefined;
         const leaderboardRow = leaderboard.find((row) => row.player.id === player.id);
+        const leaderboardIndex = leaderboard.findIndex((row) => row.player.id === player.id);
+        const rank =
+          leaderboardRow && leaderboardRow.holesPlayed > 0 && leaderboardIndex >= 0
+            ? leaderboardIndex + 1
+            : undefined;
 
         return {
           player,
           gross,
           net,
           toPar,
+          rank,
           strokesReceived,
           courseHandicap,
           leaderboardRow,
@@ -294,10 +319,10 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
         onBack={() => router.push('/score')}
       />
 
-      <main className="container-editorial py-[var(--space-6)] space-y-[var(--space-5)]">
-        <section className="overflow-hidden rounded-[2rem] border border-[color:var(--rule)] bg-[var(--canvas-raised)] shadow-[0_24px_70px_rgba(26,24,21,0.10)]">
-          <div className="h-1.5 bg-[linear-gradient(90deg,var(--masters)_0%,var(--gold)_46%,var(--masters-deep)_100%)]" />
-          <div className="space-y-[var(--space-5)] p-[var(--space-5)] lg:p-[var(--space-6)]">
+      <main className="container-editorial space-y-[var(--space-4)] py-[var(--space-4)]">
+        <section className="overflow-hidden rounded-[1.5rem] border border-[color:var(--rule)] bg-[var(--canvas-raised)] shadow-[0_14px_44px_rgba(26,24,21,0.07)]">
+          <div className="h-1 bg-[linear-gradient(90deg,var(--masters)_0%,var(--gold)_46%,var(--masters-deep)_100%)]" />
+          <div className="space-y-4 p-4 lg:p-5">
             <div className="flex flex-wrap items-center gap-[var(--space-2)]">
               <span className="inline-flex items-center gap-2 rounded-full bg-[var(--masters-subtle)] px-[var(--space-3)] py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--masters)] ring-1 ring-[color:var(--masters)]/18">
                 <CircleDot size={13} />
@@ -311,37 +336,32 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
               </span>
             </div>
 
-            <div className="grid gap-[var(--space-5)] lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-stretch">
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-stretch">
               <div className="min-w-0">
                 <p className="type-overline text-[var(--ink-tertiary)]">
                   {sessionLeaderboard?.formatName ?? 'Practice format'}
                 </p>
-                <div className="mt-[var(--space-3)] flex flex-col gap-[var(--space-4)] sm:flex-row sm:items-end sm:justify-between">
+                <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                   <div>
-                    <div className="flex items-end gap-[var(--space-3)]">
-                      <span className="font-serif text-[5.4rem] italic leading-[0.78] text-[var(--masters)] sm:text-[6.5rem]">
+                    <div className="flex items-end gap-3">
+                      <span className="font-serif text-[4.25rem] italic leading-[0.78] text-[var(--masters)] sm:text-[5.1rem]">
                         {currentHole}
                       </span>
                       <div className="pb-1">
-                        <p className="text-[1.8rem] font-semibold leading-none text-[var(--ink)]">
+                        <p className="text-[1.35rem] font-semibold leading-none text-[var(--ink)] sm:text-[1.55rem]">
                           Count best {ballsRequired} net {ballsRequired === 1 ? 'ball' : 'balls'}
                         </p>
-                        <p className="mt-2 text-sm font-semibold text-[var(--ink-secondary)]">
+                        <p className="mt-1.5 text-[0.82rem] font-semibold text-[var(--ink-secondary)]">
                           Hole {currentHole} · Par {holePar}
                           {holeYardage ? ` · ${holeYardage} yards` : ''}
                           {holeStrokeIndex ? ` · Stroke index ${holeStrokeIndex}` : ''}
                         </p>
                       </div>
                     </div>
-                    <p className="mt-[var(--space-3)] max-w-2xl text-sm leading-relaxed text-[var(--ink-secondary)]">
-                      The score that matters here is the group total under the session format.
-                      Individual gross scores feed the best-ball math; the counted balls decide the
-                      board.
-                    </p>
                   </div>
 
-                  <div className="min-w-[13rem] rounded-[1.25rem] border border-[color:var(--masters)]/20 bg-[var(--masters-subtle)] p-[var(--space-3)]">
-                    <div className="flex items-center justify-between text-sm font-semibold text-[var(--masters-deep)]">
+                  <div className="min-w-[13rem] rounded-[1rem] border border-[color:var(--masters)]/20 bg-[var(--masters-subtle)] p-3">
+                    <div className="flex items-center justify-between text-[0.82rem] font-semibold text-[var(--masters-deep)]">
                       <span>Hole entered</span>
                       <span>
                         {enteredOnCurrentHole}/{groupPlayers.length || 0}
@@ -353,15 +373,15 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
                         style={{ width: `${currentHoleProgress}%` }}
                       />
                     </div>
-                    <p className="mt-[var(--space-2)] text-[11px] font-medium text-[var(--ink-secondary)]">
+                    <p className="mt-2 truncate text-[11px] font-medium text-[var(--ink-secondary)]">
                       {currentHoleComplete
-                        ? 'Every score is in. Check the counted balls below.'
+                        ? 'Complete'
                         : `${Math.max(groupPlayers.length - enteredOnCurrentHole, 0)} scores left on this hole.`}
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-[var(--space-5)] grid grid-cols-2 gap-[var(--space-2)] lg:grid-cols-4">
+                <div className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-4">
                   <HeroMetric
                     icon={<ListChecks size={16} />}
                     label="This hole"
@@ -371,7 +391,7 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
                   <HeroMetric
                     icon={<Medal size={16} />}
                     label="Vs format par"
-                    value={currentGroupVsPar !== undefined ? formatToPar(currentGroupVsPar) : '—'}
+                    value={formatScoreToPar(currentGroupVsPar)}
                     note="Current hole"
                   />
                   <HeroMetric
@@ -386,31 +406,31 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
                     value={activeGroupRank ? `#${activeGroupRank}` : '—'}
                     note={
                       groupTotalVsPar !== undefined
-                        ? `${formatToPar(groupTotalVsPar)} format par`
+                        ? `${formatScoreToPar(groupTotalVsPar)} format par`
                         : match.teeTime || 'Awaiting scores'
                     }
                   />
                 </div>
               </div>
 
-              <div className="rounded-[1.5rem] border border-[color:var(--gold)]/45 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--gold)_14%,var(--canvas-raised))_0%,var(--canvas-raised)_58%,var(--masters-subtle)_100%)] p-[var(--space-4)] shadow-[0_18px_44px_rgba(26,24,21,0.08)]">
+              <div className="rounded-[1.15rem] border border-[color:var(--gold)]/40 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--gold)_10%,var(--canvas-raised))_0%,var(--canvas-raised)_64%,var(--masters-subtle)_100%)] p-3.5 shadow-[0_12px_30px_rgba(26,24,21,0.06)]">
                 <div className="flex items-start justify-between gap-[var(--space-3)]">
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[var(--gold-dark)]">
                       Counting now
                     </p>
-                    <h2 className="mt-[var(--space-1)] text-[length:var(--text-xl)] font-semibold leading-tight text-[var(--ink)]">
+                    <h2 className="mt-1 text-[1.12rem] font-semibold leading-tight text-[var(--ink)]">
                       {currentGroupNet !== undefined
                         ? `${currentGroupNet} net on this hole`
                         : `Need ${waitingForCountedBalls} more ${waitingForCountedBalls === 1 ? 'ball' : 'balls'}`}
                     </h2>
                   </div>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--gold)] text-[var(--masters-deep)] shadow-[0_10px_30px_rgba(26,24,21,0.14)]">
-                    <CheckCircle2 size={22} />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--gold)] text-[var(--masters-deep)] shadow-[0_8px_20px_rgba(26,24,21,0.12)]">
+                    <CheckCircle2 size={19} />
                   </div>
                 </div>
 
-                <div className="mt-[var(--space-4)] grid grid-cols-2 gap-[var(--space-2)]">
+                <div className="mt-3 grid grid-cols-2 gap-2">
                   <LiveLeaderMetric
                     label="Group gross"
                     value={currentGroupGross !== undefined ? currentGroupGross : '—'}
@@ -421,7 +441,7 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
                   />
                 </div>
 
-                <div className="mt-[var(--space-4)] space-y-[var(--space-2)]">
+                <div className="mt-3 space-y-2">
                   {activeHoleResult && activeHoleResult.contributions.length > 0 ? (
                     activeHoleResult.contributions
                       .slice()
@@ -430,7 +450,7 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
                         <div
                           key={contribution.playerId}
                           className={cn(
-                            'flex items-center justify-between gap-[var(--space-3)] rounded-[1rem] border px-[var(--space-3)] py-[var(--space-2)]',
+                            'flex items-center justify-between gap-3 rounded-xl border px-3 py-2',
                             contribution.counted
                               ? 'border-[color:var(--gold)]/55 bg-[color:var(--gold)]/10'
                               : 'border-[color:var(--rule)] bg-[var(--canvas-raised)]'
@@ -439,15 +459,14 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
                           <span className="truncate text-sm font-semibold text-[var(--ink)]">
                             {contribution.playerName}
                           </span>
-                          <span className="font-serif text-[1.15rem] italic text-[var(--masters)]">
+                          <span className="text-[1rem] font-semibold tabular-nums text-[var(--masters)]">
                             {contribution.net !== undefined ? contribution.net : '—'}
                           </span>
                         </div>
                       ))
                   ) : (
-                    <p className="rounded-[1rem] border border-[color:var(--rule)] bg-[var(--canvas-raised)] px-[var(--space-3)] py-[var(--space-3)] text-sm leading-relaxed text-[var(--ink-secondary)]">
-                      Enter gross strokes and this panel will show which balls count for the
-                      format.
+                    <p className="rounded-xl border border-[color:var(--rule)] bg-[var(--canvas-raised)] px-3 py-3 text-sm text-[var(--ink-secondary)]">
+                      Awaiting gross scores.
                     </p>
                   )}
                 </div>
@@ -530,24 +549,23 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
           </div>
         </section>
 
-        <section className="grid gap-[var(--space-5)] 2xl:grid-cols-[minmax(0,1fr)_22rem]">
-          <div className="rounded-[1.75rem] border border-[color:var(--rule)]/75 bg-[color:var(--canvas-raised)] p-[var(--space-4)] shadow-[0_22px_70px_rgba(0,0,0,0.08)] sm:p-[var(--space-5)]">
+        <section className="grid gap-[var(--space-4)] 2xl:grid-cols-[minmax(0,1fr)_22rem]">
+          <div className="rounded-[1.35rem] border border-[color:var(--rule)]/75 bg-[color:var(--canvas-raised)] p-3 shadow-[0_14px_38px_rgba(0,0,0,0.06)] sm:p-4">
             <div className="flex flex-col gap-[var(--space-2)] sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
                   Score hole {currentHole}
                 </p>
-                <h2 className="mt-[var(--space-1)] type-title text-[var(--ink)]">
+                <h2 className="mt-1 text-[1.2rem] font-semibold leading-tight text-[var(--ink)]">
                   Enter gross scores
                 </h2>
               </div>
-              <p className="type-meta text-[var(--ink-tertiary)]">
-                The format board counts the best {ballsRequired} net{' '}
-                {ballsRequired === 1 ? 'ball' : 'balls'} automatically.
+              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[var(--ink-tertiary)]">
+                Best {ballsRequired} net {ballsRequired === 1 ? 'ball' : 'balls'}
               </p>
             </div>
 
-            <div className="mt-[var(--space-4)] grid gap-[var(--space-3)]">
+            <div className="mt-3 grid gap-2.5">
               {groupPlayers.length === 0 ? (
                 <p className="type-body-sm text-[var(--ink-tertiary)]">No players in this group.</p>
               ) : (
@@ -568,17 +586,17 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
             </div>
           </div>
 
-          <div className="rounded-[1.75rem] border border-[color:var(--rule)]/75 bg-[color:var(--canvas-raised)] p-[var(--space-4)] shadow-[0_22px_70px_rgba(0,0,0,0.08)] sm:p-[var(--space-5)]">
+          <div className="rounded-[1.35rem] border border-[color:var(--rule)]/75 bg-[color:var(--canvas-raised)] p-3 shadow-[0_14px_38px_rgba(0,0,0,0.06)] sm:p-4">
             <div>
               <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
-                Session leaderboard
+                Live net board
               </p>
-              <h2 className="mt-[var(--space-1)] type-title text-[var(--ink)]">
+              <h2 className="mt-1 text-[1.2rem] font-semibold leading-tight text-[var(--ink)]">
                 Tee-time teams
               </h2>
             </div>
 
-            <div className="mt-[var(--space-4)] space-y-[var(--space-2)]">
+            <div className="mt-3 space-y-2">
               {!sessionLeaderboard || sessionLeaderboard.groups.length === 0 ? (
                 <p className="type-body-sm text-[var(--ink-tertiary)]">
                   No practice groups yet. Publish tee times and the board will build.
@@ -586,8 +604,9 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
               ) : (
                 sessionLeaderboard.groups.map((group, index) => {
                   const isCurrentGroup = group.matchId === match.id;
-                  const toPar = getGroupToPar(group);
+                  const toPar = getGroupScoreToPar(group);
                   const rank = group.holesPlayed > 0 ? index + 1 : undefined;
+                  const isLeader = index === 0 && group.holesPlayed > 0;
                   const playerLine = group.players
                     .map((player) => formatPlayerName(player.firstName, player.lastName, 'short'))
                     .join(', ');
@@ -596,47 +615,53 @@ export function PracticeScoringPage({ matchId }: PracticeScoringPageProps) {
                     <div
                       key={group.matchId}
                       className={cn(
-                        'rounded-[1.15rem] border px-[var(--space-3)] py-[var(--space-3)] transition duration-200',
+                        'rounded-[1rem] border px-3 py-2.5 transition-colors duration-200',
                         isCurrentGroup
-                          ? 'border-[color:var(--masters)]/45 bg-[var(--masters-subtle)] shadow-[0_14px_32px_rgba(0,77,64,0.10)]'
-                          : index === 0 && group.holesPlayed > 0
-                          ? 'border-[color:var(--gold)]/55 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--gold)_14%,var(--canvas))_0%,var(--canvas)_70%)] shadow-[0_14px_32px_rgba(0,0,0,0.08)]'
-                          : 'border-[var(--rule)] bg-[var(--canvas)]'
+                          ? 'border-[color:var(--masters)]/40 bg-[var(--masters-subtle)]'
+                          : isLeader
+                            ? 'border-[color:var(--gold)]/55 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--gold)_10%,var(--canvas))_0%,var(--canvas)_72%)]'
+                            : 'border-[var(--rule)] bg-[var(--canvas)]'
                       )}
                     >
-                      <div className="flex items-start justify-between gap-[var(--space-3)]">
-                        <div className="flex min-w-0 items-center gap-[var(--space-3)]">
-                          <span
-                            className={cn(
-                              'flex h-8 w-8 shrink-0 items-center justify-center rounded-full border font-serif text-[1rem] italic',
-                              isCurrentGroup
-                                ? 'border-[color:var(--masters)]/35 bg-[var(--masters)] text-white'
-                                : index === 0 && group.holesPlayed > 0
-                                ? 'border-[color:var(--gold)]/55 bg-[var(--gold)] text-[var(--masters-deep)]'
-                                : 'border-[var(--rule)] bg-[var(--canvas-raised)] text-[var(--ink-tertiary)]'
-                            )}
-                          >
-                            {rank ?? '—'}
-                          </span>
-                          <div className="min-w-0">
-                            <p className="truncate type-body font-semibold text-[var(--ink)]">
+                      <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-2.5">
+                        <LeaderboardRankPill
+                          rank={rank}
+                          leader={isLeader}
+                          active={isCurrentGroup}
+                        />
+                        <div className="min-w-0">
+                          <div className="flex min-w-0 items-center gap-2">
+                            <p className="truncate text-[0.92rem] font-semibold leading-tight text-[var(--ink)]">
                               Group {group.groupNumber}
                             </p>
-                            <p className="type-micro text-[var(--ink-tertiary)]">
-                              {playerLine || 'No players'}
-                            </p>
+                            {isLeader ? (
+                              <span className="shrink-0 rounded-full border border-[color:var(--gold)]/55 bg-[color:var(--gold)]/12 px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-none tracking-[0.12em] text-[var(--masters-deep)]">
+                                Leader
+                              </span>
+                            ) : null}
+                            {isCurrentGroup ? (
+                              <span className="shrink-0 rounded-full border border-[color:var(--masters)]/30 bg-[var(--canvas-raised)] px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-none tracking-[0.12em] text-[var(--masters)]">
+                                Now
+                              </span>
+                            ) : null}
                           </div>
+                          <p className="mt-1 truncate text-[0.72rem] font-medium text-[var(--ink-tertiary)]">
+                            {playerLine || 'No players'}
+                          </p>
                         </div>
-                        <p className="font-serif text-[1.65rem] italic leading-none text-[var(--ink)]">
-                          {group.holesPlayed > 0 ? formatToPar(toPar) : '—'}
-                        </p>
+                        <ScoreToParValue
+                          value={group.holesPlayed > 0 ? toPar : undefined}
+                          label="To par"
+                          size="md"
+                        />
                       </div>
 
-                      <div className="mt-[var(--space-3)] grid grid-cols-2 gap-[var(--space-2)]">
-                        <ScoreMiniStat label="Holes" value={group.holesPlayed || '—'} />
-                        <ScoreMiniStat
+                      <div className="mt-2 grid grid-cols-2 gap-1.5">
+                        <ScoreStatCell label="Thru" value={group.holesPlayed || '—'} muted />
+                        <ScoreStatCell
                           label="Format net"
                           value={group.netTotal !== undefined ? group.netTotal : '—'}
+                          muted
                         />
                       </div>
                     </div>
@@ -671,6 +696,7 @@ interface PlayerScoreSnapshot {
   gross: number | undefined;
   net: number | undefined;
   toPar: number | undefined;
+  rank: number | undefined;
   strokesReceived: number;
   courseHandicap: number | null;
   leaderboardRow: LeaderboardRow | undefined;
@@ -698,6 +724,7 @@ function PlayerScorePanel({
     gross,
     net,
     toPar,
+    rank,
     strokesReceived,
     courseHandicap,
     leaderboardRow,
@@ -705,96 +732,128 @@ function PlayerScorePanel({
     practiceSide,
   } = snapshot;
   const options = getScoreOptions(holePar);
+  const playerName = formatPlayerName(player.firstName, player.lastName);
+  const hasScore = gross !== undefined;
+  const isLeader = rank === 1 && Boolean(leaderboardRow?.holesPlayed);
+  const handicapLabel = courseHandicap ?? player.handicapIndex ?? '—';
+  const thruLabel = leaderboardRow?.holesPlayed ? `Thru ${leaderboardRow.holesPlayed}` : 'Thru —';
 
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-[1.35rem] border bg-[var(--canvas)] transition duration-200',
-        counted
-          ? 'border-[color:var(--gold)]/70 shadow-[0_16px_40px_rgba(201,162,39,0.14)]'
-          : gross === undefined
-            ? 'border-[var(--rule)]'
-            : 'border-[color:var(--masters)]/35 shadow-[0_16px_40px_rgba(0,77,64,0.08)]'
+        'overflow-hidden rounded-[1.1rem] border bg-[var(--canvas)] transition-colors duration-200',
+        isLeader
+          ? 'border-[color:var(--gold)]/55 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--gold)_10%,var(--canvas))_0%,var(--canvas)_58%)]'
+          : hasScore
+            ? 'border-[color:var(--masters)]/28'
+            : 'border-[var(--rule)]'
       )}
     >
-      <div className="grid gap-[var(--space-3)] p-[var(--space-3)] sm:grid-cols-[minmax(0,1fr)_auto] sm:p-[var(--space-4)]">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-[var(--space-2)]">
-            <h3 className="truncate text-[1.05rem] font-semibold text-[var(--ink)]">
-              {formatPlayerName(player.firstName, player.lastName)}
-            </h3>
-            <span className="rounded-full border border-[var(--rule)] bg-[var(--canvas-raised)] px-2 py-0.5 type-micro text-[var(--ink-tertiary)]">
-              HCP {courseHandicap ?? player.handicapIndex ?? '—'}
-            </span>
-            {hasPracticeSides && practiceSide ? (
-              <span className="rounded-full border border-[color:var(--masters)]/25 bg-[var(--masters-subtle)] px-2 py-0.5 type-micro font-semibold text-[var(--masters)]">
-                {practiceSide === 'teamA' ? 'Side A' : 'Side B'}
-              </span>
-            ) : null}
-            {strokesReceived > 0 ? (
-              <span className="rounded-full border border-[color:var(--gold)]/45 bg-[color:var(--gold)]/10 px-2 py-0.5 type-micro font-semibold text-[var(--masters-deep)]">
-                {strokesReceived} stroke{strokesReceived === 1 ? '' : 's'}
-              </span>
-            ) : null}
+      <div className="p-3">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-2.5">
+          <LeaderboardRankPill rank={rank} leader={isLeader} />
+
+          <div className="min-w-0">
+            <div className="flex min-w-0 items-center gap-2">
+              <h3 className="truncate text-[0.98rem] font-semibold leading-tight text-[var(--ink)]">
+                {playerName}
+              </h3>
+              {isLeader ? (
+                <span className="shrink-0 rounded-full border border-[color:var(--gold)]/55 bg-[color:var(--gold)]/12 px-1.5 py-0.5 text-[9px] font-semibold uppercase leading-none tracking-[0.12em] text-[var(--masters-deep)]">
+                  Leader
+                </span>
+              ) : null}
+            </div>
+
+            <p className="mt-1 truncate text-[0.72rem] font-medium text-[var(--ink-tertiary)]">
+              {thruLabel} · HCP {handicapLabel}
+              {strokesReceived > 0
+                ? ` · ${strokesReceived} stroke${strokesReceived === 1 ? '' : 's'}`
+                : ''}
+              {hasPracticeSides && practiceSide
+                ? ` · ${practiceSide === 'teamA' ? 'Side A' : 'Side B'}`
+                : ''}
+            </p>
+          </div>
+
+          <ScoreToParValue value={toPar} label="Hole" size="md" />
+        </div>
+
+        <div className="mt-2.5 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-stretch gap-2">
+          <ScoreStatCell
+            label="Gross"
+            value={gross ?? '—'}
+            tone={scoreToParToneClass(toPar)}
+            className={cn(
+              'border-[color:var(--masters)]/20 bg-[var(--canvas-raised)]',
+              !hasScore && 'border-dashed'
+            )}
+          />
+          <ScoreStatCell
+            label="Net"
+            value={net ?? '—'}
+            tone={scoreToParToneClass(toPar)}
+            className="bg-[color:var(--surface)]/72"
+          />
+          <StrokeStepper value={value} onChange={onChange} />
+        </div>
+
+        <div className="mt-2 grid grid-cols-4 gap-1.5">
+          {options.map((option) => {
+            const selected = value === option.value;
+            return (
+              <button
+                key={`${option.label}-${option.value}`}
+                type="button"
+                onClick={() => onChange(option.value)}
+                aria-label={`Set ${playerName} to ${option.label.toLowerCase()} ${option.value}`}
+                className={cn(
+                  'min-h-11 rounded-lg border px-2 py-1.5 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.99]',
+                  selected
+                    ? 'border-[var(--masters)] bg-[var(--masters)] text-white'
+                    : 'border-[var(--rule)] bg-[color:var(--canvas-raised)]/76 text-[var(--ink)] hover:border-[var(--gold)]'
+                )}
+                aria-pressed={selected}
+              >
+                <span className="block text-[0.82rem] font-semibold leading-none tabular-nums">
+                  {option.value}
+                </span>
+                <span
+                  className={cn(
+                    'mt-1 block truncate text-[0.62rem]',
+                    selected ? 'text-white/78' : option.tone
+                  )}
+                >
+                  {option.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-t border-[color:var(--rule)]/70 pt-2">
+          <div className="grid min-w-0 grid-cols-2 gap-1.5">
+            <ScoreStatCell
+              label="Total gross"
+              value={leaderboardRow?.grossTotal || '—'}
+              muted
+              className="px-0 py-0"
+            />
+            <ScoreStatCell
+              label="Total net"
+              value={leaderboardRow?.netTotal !== null ? (leaderboardRow?.netTotal ?? '—') : '—'}
+              muted
+              className="px-0 py-0"
+            />
+          </div>
+          <div className="flex items-center gap-1.5">
             {counted ? (
-              <span className="rounded-full border border-[color:var(--gold)]/55 bg-[var(--gold)] px-2 py-0.5 type-micro font-semibold text-[var(--masters-deep)]">
+              <span className="rounded-full border border-[color:var(--gold)]/45 bg-[color:var(--gold)]/12 px-2 py-1 text-[10px] font-semibold uppercase leading-none tracking-[0.12em] text-[var(--masters-deep)]">
                 Counts
               </span>
             ) : null}
           </div>
-
-          <div className="mt-[var(--space-3)] flex flex-wrap gap-[var(--space-2)]">
-            {options.map((option) => {
-              const selected = value === option.value;
-              return (
-                <button
-                  key={`${option.label}-${option.value}`}
-                  type="button"
-                  onClick={() => onChange(option.value)}
-                  aria-label={`Set ${formatPlayerName(player.firstName, player.lastName)} to ${option.label.toLowerCase()} ${option.value}`}
-                  className={cn(
-                    'min-h-11 rounded-xl border px-[var(--space-3)] text-left transition duration-150 active:scale-[0.98]',
-                    selected
-                      ? 'border-[var(--masters)] bg-[var(--masters)] text-white shadow-[0_10px_24px_rgba(0,77,64,0.18)]'
-                      : 'border-[var(--rule)] bg-[var(--canvas-raised)] text-[var(--ink)] hover:border-[var(--gold)]'
-                  )}
-                  aria-pressed={selected}
-                >
-                  <span className="block text-[0.78rem] font-semibold">{option.value}</span>
-                  <span
-                    className={cn('block type-micro', selected ? 'text-white/75' : option.tone)}
-                  >
-                    {option.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
         </div>
-
-        <div className="flex items-center justify-between gap-[var(--space-3)] sm:justify-end">
-          <div className="min-w-[5rem] text-left sm:text-right">
-            <p className="type-micro text-[var(--ink-tertiary)]">This hole</p>
-            <p className={cn('font-serif text-[2.25rem] italic leading-none', scoreTone(toPar))}>
-              {gross ?? '—'}
-            </p>
-            <p className="mt-1 type-micro text-[var(--ink-tertiary)]">
-              {net !== undefined
-                ? `Net ${net} / ${formatToPar(toPar ?? 0)}${counted ? ' / counts' : ''}`
-                : 'Not entered'}
-            </p>
-          </div>
-          <StrokeStepper value={value} onChange={onChange} />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-3 border-t border-[var(--rule)] bg-[var(--surface)]/60">
-        <ScoreStripStat label="Thru" value={leaderboardRow?.holesPlayed || '—'} />
-        <ScoreStripStat label="Gross" value={leaderboardRow?.grossTotal || '—'} />
-        <ScoreStripStat
-          label="Net"
-          value={leaderboardRow?.netTotal !== null ? (leaderboardRow?.netTotal ?? '—') : '—'}
-        />
       </div>
     </div>
   );
@@ -812,12 +871,12 @@ function HeroMetric({
   note?: string;
 }) {
   return (
-    <div className="rounded-[1.1rem] border border-[color:var(--rule)] bg-[var(--canvas)] px-[var(--space-3)] py-[var(--space-3)] shadow-[0_8px_22px_rgba(26,24,21,0.05)]">
+    <div className="rounded-xl border border-[color:var(--rule)] bg-[var(--canvas)] px-3 py-2.5">
       <div className="flex items-center gap-2 text-[var(--ink-tertiary)]">
         {icon}
         <span className="text-[11px] font-semibold uppercase tracking-[0.12em]">{label}</span>
       </div>
-      <p className="mt-1 truncate font-serif text-[1.55rem] italic leading-none text-[var(--ink)]">
+      <p className="mt-1 truncate text-[1.25rem] font-semibold leading-none tabular-nums text-[var(--ink)]">
         {value}
       </p>
       {note ? <p className="mt-1 type-micro text-[var(--ink-tertiary)]">{note}</p> : null}
@@ -827,29 +886,13 @@ function HeroMetric({
 
 function LiveLeaderMetric({ label, value }: { label: string; value: number | string }) {
   return (
-    <div className="rounded-[1rem] border border-[color:var(--rule)] bg-[var(--canvas-raised)] px-[var(--space-3)] py-[var(--space-3)]">
+    <div className="rounded-xl border border-[color:var(--rule)] bg-[var(--canvas-raised)] px-3 py-2.5">
       <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--ink-tertiary)]">
         {label}
       </p>
-      <p className="mt-1 font-serif text-[1.8rem] italic leading-none text-[var(--ink)]">{value}</p>
-    </div>
-  );
-}
-
-function ScoreMiniStat({ label, value }: { label: string; value: number | string }) {
-  return (
-    <div className="rounded-xl border border-[var(--rule)] bg-[var(--canvas-raised)] px-[var(--space-2)] py-[var(--space-2)]">
-      <p className="type-micro text-[var(--ink-tertiary)]">{label}</p>
-      <p className="font-serif text-[1.15rem] italic text-[var(--ink)]">{value}</p>
-    </div>
-  );
-}
-
-function ScoreStripStat({ label, value }: { label: string; value: number | string }) {
-  return (
-    <div className="px-[var(--space-3)] py-[var(--space-2)] text-center">
-      <p className="type-micro text-[var(--ink-tertiary)]">{label}</p>
-      <p className="font-serif text-[1.1rem] italic text-[var(--ink)]">{value}</p>
+      <p className="mt-1 text-[1.35rem] font-semibold leading-none tabular-nums text-[var(--ink)]">
+        {value}
+      </p>
     </div>
   );
 }
@@ -878,27 +921,33 @@ function StrokeStepper({ value, onChange }: StrokeStepperProps) {
   };
 
   return (
-    <div className="flex items-center gap-[var(--space-2)]">
-      <Button
-        variant="secondary"
-        size="icon"
+    <div className="grid min-h-11 grid-cols-[2.75rem_2.5rem_2.75rem] overflow-hidden rounded-xl border border-[var(--rule)] bg-[var(--canvas-raised)]">
+      <button
+        type="button"
         onClick={handleDec}
         disabled={value === undefined}
         aria-label="Decrease strokes"
+        className="flex min-h-11 items-center justify-center border-r border-[var(--rule)] text-[var(--ink-secondary)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus-ring)] disabled:pointer-events-none disabled:text-[var(--ink-faint)]"
       >
         <Minus size={14} />
-      </Button>
+      </button>
       <span
         className={cn(
-          'w-10 text-center font-serif text-[1.55rem] italic',
+          'flex min-h-11 items-center justify-center text-center text-[1.15rem] font-semibold tabular-nums',
           value === undefined ? 'text-[var(--ink-tertiary)]' : 'text-[var(--ink)]'
         )}
       >
         {value ?? '—'}
       </span>
-      <Button variant="secondary" size="icon" onClick={handleInc} aria-label="Increase strokes">
+      <button
+        type="button"
+        onClick={handleInc}
+        disabled={value !== undefined && value >= 20}
+        aria-label="Increase strokes"
+        className="flex min-h-11 items-center justify-center border-l border-[var(--rule)] text-[var(--ink-secondary)] transition-colors hover:bg-[var(--surface)] hover:text-[var(--ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus-ring)] disabled:pointer-events-none disabled:text-[var(--ink-faint)]"
+      >
         <Plus size={14} />
-      </Button>
+      </button>
     </div>
   );
 }
@@ -912,26 +961,6 @@ function getScoreOptions(par: number) {
   ].filter(
     (option, index, options) => options.findIndex((o) => o.value === option.value) === index
   );
-}
-
-function getGroupToPar(group: GroupSessionTotals): number {
-  return group.holes.reduce((total, hole) => {
-    if (typeof hole.groupNet !== 'number' || typeof hole.par !== 'number') return total;
-    return total + (hole.groupNet - hole.par * hole.ballsCounted);
-  }, 0);
-}
-
-function formatToPar(value: number): string {
-  if (value === 0) return 'E';
-  return value > 0 ? `+${value}` : `${value}`;
-}
-
-function scoreTone(toPar: number | undefined): string {
-  if (toPar === undefined) return 'text-[var(--ink-tertiary)]';
-  if (toPar < 0) return 'text-[var(--success)]';
-  if (toPar === 0) return 'text-[var(--masters)]';
-  if (toPar === 1) return 'text-[var(--warning)]';
-  return 'text-[var(--error)]';
 }
 
 export default PracticeScoringPage;

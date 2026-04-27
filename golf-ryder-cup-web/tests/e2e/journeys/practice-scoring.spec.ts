@@ -136,9 +136,9 @@ test.describe('Practice scoring cockpit', () => {
     await waitForStableDOM(page);
     await dismissAllBlockingModals(page);
 
-    await expect(page.getByText(/Live practice scoring/i)).toBeVisible();
+    await expect(page.getByText(/Practice · Group 1/i)).toBeVisible();
     await expect(page.getByText(/Live net board/i)).toBeVisible();
-    await expect(page.getByText(/Every player, one pass/i)).toBeVisible();
+    await expect(page.getByText(/Enter gross scores/i)).toBeVisible();
 
     await page
       .getByRole('button', { name: /Set .* to par 4/i })

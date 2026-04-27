@@ -16,6 +16,7 @@ describe('AuthGuard route protection', () => {
     expect(isProtectedAppRoute('/profile/create')).toBe(false);
     expect(isProtectedAppRoute('/join/ABCDEFGH')).toBe(false);
     expect(isProtectedAppRoute('/auth/callback')).toBe(false);
+    expect(isProtectedAppRoute('/auth/reset-password')).toBe(false);
     expect(isProtectedAppRoute('/spectator/trip-123')).toBe(false);
   });
 
