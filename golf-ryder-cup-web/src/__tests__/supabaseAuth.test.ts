@@ -72,6 +72,10 @@ describe('supabase auth helpers', () => {
   });
 
   it('requests a Supabase email sign-in link with redirect metadata', async () => {
+    // Pin the redirect origin so the test is deterministic regardless of
+    // host env (Railway sets NEXT_PUBLIC_APP_URL on the build container,
+    // which used to leak into this assertion).
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'http://localhost:3000');
     signInWithOtpMock.mockResolvedValue({
       data: {},
       error: null,
