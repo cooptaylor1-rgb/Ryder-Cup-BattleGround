@@ -18,7 +18,7 @@ import {
   useAccessStore,
 } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
-import { useHaptic, useMatchState } from '@/lib/hooks';
+import { useAmbientLight, useHaptic, useMatchState } from '@/lib/hooks';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { usePrefersReducedMotion } from '@/lib/utils/accessibility';
 import { withTripPlayerIdentity } from '@/lib/utils/tripPlayerIdentity';
@@ -74,6 +74,9 @@ export default function MatchScoringPageClient() {
   const haptic = useHaptic();
   const isOnline = useOnlineStatus();
   const prefersReducedMotion = usePrefersReducedMotion();
+  // Phase 5: only fires on devices that expose AmbientLightSensor and
+  // only when the user has opted in. No-op everywhere else.
+  useAmbientLight(scoringPreferences.outdoorAuto);
   const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
   const handleBackToScore = () => router.push('/score');
 

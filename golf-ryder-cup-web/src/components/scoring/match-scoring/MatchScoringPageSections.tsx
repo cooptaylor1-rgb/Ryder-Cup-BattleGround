@@ -35,6 +35,8 @@ import {
   MatchCockpit,
   ScoringDrawer,
 } from './v2';
+import { LiveRegion } from './v2/LiveRegion';
+import { useCockpitShortcuts } from './v2/useCockpitShortcuts';
 
 const ScoreCelebration = lazy(() =>
   import('@/components/scoring').then((mod) => ({ default: mod.ScoreCelebration }))
@@ -221,6 +223,21 @@ export function MatchScoringPageSections({
 }: MatchScoringPageSectionsProps) {
   const [overflowOpen, setOverflowOpen] = useState(false);
 
+  // Phase 5 power-user shortcuts. Disabled when match is complete (the
+  // recap and complete-state surfaces are read-only, so navigation
+  // shortcuts would be confusing).
+  useCockpitShortcuts({
+    onPrevHole,
+    onNextHole,
+    onJumpToHole: onHoleSelect,
+    onUndo: actions.handleUndo,
+    onOpenScorecard: () => {
+      if (typeof window !== 'undefined') {
+        window.location.assign(`/score/${matchId}/scorecard`);
+      }
+    },
+  });
+
   // Derive a single live status line for the header. This is the only
   // place the match score should appear above the cockpit body — v1
   // rendered it three times.
@@ -316,6 +333,16 @@ export function MatchScoringPageSections({
         onCloseVoiceModal={onCloseVoiceModal}
         onVoiceScoreConfirmed={actions.handleVoiceScore}
         onStrokeAlertShown={onStrokeAlertShown}
+      />
+
+      <LiveRegion
+        matchState={matchState}
+        currentHole={currentHole}
+        currentPar={model.currentPar}
+        currentStrokeIndex={model.currentStrokeIndex}
+        teamAName={model.teamAName}
+        teamBName={model.teamBName}
+        saveState={saveState}
       />
 
       <CockpitHeader

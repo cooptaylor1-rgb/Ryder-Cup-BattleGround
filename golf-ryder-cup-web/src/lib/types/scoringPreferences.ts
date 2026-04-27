@@ -34,6 +34,12 @@ export interface ScoringPreferences {
   hapticsNavigation: boolean;
   /** Haptics for warnings and alerts */
   hapticsAlerts: boolean;
+  /**
+   * Auto-flip to outdoor (high-contrast) theme when the device's
+   * ambient light sensor reports sustained bright light. Off by default
+   * — the user owns their theme; this is opt-in for on-course play.
+   */
+  outdoorAuto: boolean;
 }
 
 export const DEFAULT_SCORING_PREFERENCES: ScoringPreferences = {
@@ -51,6 +57,7 @@ export const DEFAULT_SCORING_PREFERENCES: ScoringPreferences = {
   hapticsScore: true,
   hapticsNavigation: true,
   hapticsAlerts: true,
+  outdoorAuto: false,
 };
 
 export const BUTTON_SCALE_SIZES = {

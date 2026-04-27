@@ -153,9 +153,16 @@ export default function ScoringPreferencesPage() {
             ]}
             onChange={(v) => setTheme(v as 'light' | 'dark' | 'outdoor')}
           />
-          <p className="px-1 text-xs text-[var(--ink-tertiary)]">
+          <ToggleRow
+            label="Auto-switch to outdoor in bright light"
+            description="Uses the device ambient light sensor when available."
+            checked={scoringPreferences.outdoorAuto}
+            onChange={(v) => set('outdoorAuto', v)}
+          />
+          <p className="px-1 pb-3 text-xs text-[var(--ink-tertiary)]">
             Outdoor mode pumps contrast on text, scores, and team blocks for
-            sunlight legibility.
+            sunlight legibility. Auto-switch only flips to outdoor; you keep
+            control of when to flip back.
           </p>
         </Section>
 
