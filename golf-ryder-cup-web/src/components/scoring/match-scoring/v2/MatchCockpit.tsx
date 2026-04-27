@@ -14,7 +14,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, Pencil, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScoreInputPanel } from './ScoreInputPanel';
@@ -53,6 +53,16 @@ export function MatchCockpit({
 
   const [strokeSheetOpen, setStrokeSheetOpen] = useState(false);
   const [fourballSheetOpen, setFourballSheetOpen] = useState(false);
+
+  // Phase 2 collapse: the legacy 5-mode picker still flows in via
+  // `scoring.scoringMode` from the model, but the cockpit only ever
+  // renders the unified ScoreInputPanel. If the user (or store) picks
+  // "strokes" or "fourball", we open the corresponding sheet rather
+  // than replacing the panel.
+  useEffect(() => {
+    if (scoring.scoringMode === 'strokes' && !isFourball) setStrokeSheetOpen(true);
+    if (scoring.scoringMode === 'fourball' && isFourball) setFourballSheetOpen(true);
+  }, [scoring.scoringMode, isFourball]);
 
   const factParts = [
     `Par ${currentPar}`,
