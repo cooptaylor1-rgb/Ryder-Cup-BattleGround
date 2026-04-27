@@ -16,6 +16,14 @@ vi.mock('../lib/services/baseSyncService', () => ({
   syncSleep: vi.fn(() => Promise.resolve()),
 }));
 
+// Each entity table needs a `get(id)` for the FK auto-recovery path
+// that reads child + parent rows when a Postgres 23503 error fires.
+function makeFakeTable() {
+  return {
+    get: vi.fn(() => Promise.resolve(undefined)),
+  };
+}
+
 vi.mock('../lib/db', () => ({
   db: {
     tripSyncQueue: {
@@ -24,6 +32,24 @@ vi.mock('../lib/db', () => ({
       clear: vi.fn(),
       toArray: vi.fn(() => Promise.resolve([])),
     },
+    matches: makeFakeTable(),
+    practiceScores: makeFakeTable(),
+    sessions: makeFakeTable(),
+    courses: makeFakeTable(),
+    teeSets: makeFakeTable(),
+    holeResults: makeFakeTable(),
+    sideBets: makeFakeTable(),
+    banterPosts: makeFakeTable(),
+    duesLineItems: makeFakeTable(),
+    paymentRecords: makeFakeTable(),
+    tripInvitations: makeFakeTable(),
+    announcements: makeFakeTable(),
+    attendanceRecords: makeFakeTable(),
+    cartAssignments: makeFakeTable(),
+    teamMembers: makeFakeTable(),
+    teams: makeFakeTable(),
+    players: makeFakeTable(),
+    trips: makeFakeTable(),
   },
 }));
 
@@ -151,6 +177,60 @@ describe('trip sync queue processing', () => {
       error: 'permission denied',
     });
     expect(tripSyncRuntime.syncDebounceTimer).toBeNull();
+  });
+
+  it('FK 23503 on a child re-queues the parent and resets the child without burning retries', async () => {
+    // Real production scenario: a practice_score upserted to Supabase
+    // before its parent match row landed. The first attempt produces
+    // the canonical PostgREST FK error. Without this guard the child
+    // would chew through MAX_RETRY_COUNT and end up as a "stuck"
+    // failure while the parent never got requeued.
+    syncEntityToCloudMock.mockRejectedValueOnce(
+      new Error(
+        '[upsert practice_scores] insert or update on table "practice_scores" violates foreign key constraint "practice_scores_match_id_fkey" | code: 23503 | details: Key is not present in table "matches".'
+      )
+    );
+
+    const childItem = makeQueueItem({
+      id: 'queue-ps-1',
+      entity: 'practiceScore',
+      entityId: 'ps-1',
+      operation: 'create',
+      data: {
+        id: 'ps-1',
+        matchId: 'match-1',
+        playerId: 'player-1',
+        holeNumber: 1,
+        gross: 4,
+      } as never,
+      idempotencyKey: 'trip-1:practiceScore:ps-1:create',
+    });
+    tripSyncRuntime.syncQueue.push(childItem);
+
+    const dbMock = vi.mocked(db) as unknown as {
+      matches: { get: ReturnType<typeof vi.fn> };
+    };
+    dbMock.matches.get.mockResolvedValueOnce({
+      id: 'match-1',
+      sessionId: 'session-1',
+      tripId: 'trip-1',
+    });
+
+    await processSyncQueue();
+
+    // Parent now in the queue, fresh.
+    const parentItem = tripSyncRuntime.syncQueue.find((q) => q.entity === 'match');
+    expect(parentItem).toBeDefined();
+    expect(parentItem).toMatchObject({
+      entityId: 'match-1',
+      status: 'pending',
+      retryCount: 0,
+    });
+    // Child kept its retry budget — still pending, not bumped.
+    expect(childItem).toMatchObject({
+      status: 'pending',
+      retryCount: 0,
+    });
   });
 
   it('hydrates persisted queue work before processing after a cold page load', async () => {

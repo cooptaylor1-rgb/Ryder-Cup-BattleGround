@@ -29,7 +29,6 @@ import {
   ScoreStatCell,
   ScoreToParValue,
   formatScoreToPar,
-  scoreToParToneClass,
 } from '../scoreDisplayPrimitives';
 import {
   allocateStrokes,
@@ -779,80 +778,87 @@ function PlayerScorePanel({
           <ScoreToParValue value={toPar} label="Hole" size="md" />
         </div>
 
-        <div className="mt-2.5 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-stretch gap-2">
-          <ScoreStatCell
-            label="Gross"
-            value={gross ?? '—'}
-            tone={scoreToParToneClass(toPar)}
-            className={cn(
-              'border-[color:var(--masters)]/20 bg-[var(--canvas-raised)]',
-              !hasScore && 'border-dashed'
-            )}
-          />
-          <ScoreStatCell
-            label="Net"
-            value={net ?? '—'}
-            tone={scoreToParToneClass(toPar)}
-            className="bg-[color:var(--surface)]/72"
-          />
+        {/*
+          Slim entry row. Previous design had three redundant input
+          surfaces per player (Gross stat cell, Net stat cell, +/-
+          stepper) plus a fourth row of preset chips — four ways to
+          enter the same number. With four players that's 16 input
+          zones competing for thumb space on phones.
+          Now: chips on the left (the 95% case — birdie/par/bogey/
+          double) and a tight ±  stepper on the right for outliers.
+          The Net + Gross numbers reappear in the Net pill and totals
+          line below, where they belong.
+        */}
+        <div className="mt-2.5 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+          <div className="grid grid-cols-4 gap-1.5">
+            {options.map((option) => {
+              const selected = value === option.value;
+              return (
+                <button
+                  key={`${option.label}-${option.value}`}
+                  type="button"
+                  onClick={() => onChange(option.value)}
+                  aria-label={`Set ${playerName} to ${option.label.toLowerCase()} ${option.value}`}
+                  className={cn(
+                    'min-h-11 rounded-lg border px-2 py-1.5 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.99]',
+                    selected
+                      ? 'border-[var(--masters)] bg-[var(--masters)] text-white'
+                      : 'border-[var(--rule)] bg-[color:var(--canvas-raised)]/76 text-[var(--ink)] hover:border-[var(--gold)]'
+                  )}
+                  aria-pressed={selected}
+                >
+                  <span className="block text-[0.82rem] font-semibold leading-none tabular-nums">
+                    {option.value}
+                  </span>
+                  <span
+                    className={cn(
+                      'mt-1 block truncate text-[0.62rem]',
+                      selected ? 'text-white/78' : option.tone
+                    )}
+                  >
+                    {option.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
           <StrokeStepper value={value} onChange={onChange} />
         </div>
 
-        <div className="mt-2 grid grid-cols-4 gap-1.5">
-          {options.map((option) => {
-            const selected = value === option.value;
-            return (
-              <button
-                key={`${option.label}-${option.value}`}
-                type="button"
-                onClick={() => onChange(option.value)}
-                aria-label={`Set ${playerName} to ${option.label.toLowerCase()} ${option.value}`}
-                className={cn(
-                  'min-h-11 rounded-lg border px-2 py-1.5 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.99]',
-                  selected
-                    ? 'border-[var(--masters)] bg-[var(--masters)] text-white'
-                    : 'border-[var(--rule)] bg-[color:var(--canvas-raised)]/76 text-[var(--ink)] hover:border-[var(--gold)]'
-                )}
-                aria-pressed={selected}
-              >
-                <span className="block text-[0.82rem] font-semibold leading-none tabular-nums">
-                  {option.value}
-                </span>
-                <span
-                  className={cn(
-                    'mt-1 block truncate text-[0.62rem]',
-                    selected ? 'text-white/78' : option.tone
-                  )}
-                >
-                  {option.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-t border-[color:var(--rule)]/70 pt-2">
-          <div className="grid min-w-0 grid-cols-2 gap-1.5">
-            <ScoreStatCell
-              label="Total gross"
-              value={leaderboardRow?.grossTotal || '—'}
-              muted
-              className="px-0 py-0"
-            />
-            <ScoreStatCell
-              label="Total net"
-              value={leaderboardRow?.netTotal !== null ? (leaderboardRow?.netTotal ?? '—') : '—'}
-              muted
-              className="px-0 py-0"
-            />
-          </div>
-          <div className="flex items-center gap-1.5">
+        {/*
+          One-line totals strip. Replaces the previous 4-cell grid
+          (Total gross | Total net | "Counts" badge | empty) with a
+          single horizontal line: net hole result on the left,
+          running totals + counts badge on the right.
+        */}
+        <div className="mt-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 border-t border-[color:var(--rule)]/70 pt-2 text-[11px] font-medium text-[var(--ink-tertiary)]">
+          <span>
+            <span className="uppercase tracking-[0.12em]">Net </span>
+            <span className="font-semibold tabular-nums text-[var(--ink)]">{net ?? '—'}</span>
+            {strokesReceived > 0 && hasScore && (
+              <span className="ml-1 text-[var(--ink-tertiary)]">
+                (gross {gross} – {strokesReceived})
+              </span>
+            )}
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="uppercase tracking-[0.12em]">Total </span>
+            <span className="tabular-nums">
+              <span className="font-semibold text-[var(--ink)]">
+                {leaderboardRow?.grossTotal || '—'}
+              </span>
+              <span className="px-1 text-[var(--ink-tertiary)]">/</span>
+              <span className="font-semibold text-[var(--ink)]">
+                {leaderboardRow?.netTotal !== null ? (leaderboardRow?.netTotal ?? '—') : '—'}
+              </span>
+              <span className="ml-1 normal-case text-[var(--ink-tertiary)]">net</span>
+            </span>
             {counted ? (
-              <span className="rounded-full border border-[color:var(--gold)]/45 bg-[color:var(--gold)]/12 px-2 py-1 text-[10px] font-semibold uppercase leading-none tracking-[0.12em] text-[var(--masters-deep)]">
+              <span className="rounded-full border border-[color:var(--gold)]/45 bg-[color:var(--gold)]/12 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--masters-deep)]">
                 Counts
               </span>
             ) : null}
-          </div>
+          </span>
         </div>
       </div>
     </div>
