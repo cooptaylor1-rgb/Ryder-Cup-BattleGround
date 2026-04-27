@@ -489,6 +489,89 @@ async function tryRequeueParentForFkFailure(
 }
 
 /**
+ * Per-trip throttle for the auto full-sync rescue. Prevents an
+ * RLS-rejected trip from spinning the radio every time the queue
+ * processor runs.
+ */
+const fullSyncRescueLastAttemptByTrip = new Map<string, number>();
+const FULL_SYNC_RESCUE_THROTTLE_MS = 60_000;
+
+/**
+ * If the queue still holds items that failed with FK 23503 after a
+ * normal processing pass, fire syncTripToCloudFull(tripId) for each
+ * affected trip. That helper walks every Dexie row for the trip and
+ * upserts in dependency order, bypassing the queue's accumulated
+ * retry budget — the same recovery the SyncFailureBanner exposes as
+ * "Push all from device", just automatic.
+ *
+ * Fire-and-forget so the current processSyncQueue() return stays
+ * accurate. After the full-sync resolves, schedules another drain so
+ * any children that were FK-blocked retry against the now-uploaded
+ * parent.
+ *
+ * Dynamic import keeps this off the cold-start critical path and
+ * avoids any chance of a circular-import surprise between
+ * tripSyncQueue and tripSyncTripTransfer.
+ */
+async function maybeAutoFullSyncStuckTrips(): Promise<void> {
+  const fkStuckTrips = new Set<string>();
+  for (const item of tripSyncRuntime.syncQueue) {
+    if (item.status === 'completed') continue;
+    const err = item.error ?? '';
+    if (err.includes('code: 23503') || err.includes('foreign key')) {
+      if (item.tripId) fkStuckTrips.add(item.tripId);
+    }
+  }
+  if (fkStuckTrips.size === 0) return;
+
+  const now = Date.now();
+  const tripsToRescue: string[] = [];
+  for (const tripId of fkStuckTrips) {
+    const last = fullSyncRescueLastAttemptByTrip.get(tripId) ?? 0;
+    if (now - last < FULL_SYNC_RESCUE_THROTTLE_MS) continue;
+    fullSyncRescueLastAttemptByTrip.set(tripId, now);
+    tripsToRescue.push(tripId);
+  }
+  if (tripsToRescue.length === 0) return;
+
+  let rescueModule: typeof import('./tripSyncTripTransfer') | null = null;
+  try {
+    rescueModule = await import('./tripSyncTripTransfer');
+  } catch (error) {
+    logger.warn('[sync] auto-rescue: failed to load full-sync helper', error);
+    return;
+  }
+
+  for (const tripId of tripsToRescue) {
+    logger.warn(`[sync] auto-rescue: pushing every Dexie row for trip ${tripId}`);
+    void rescueModule
+      .syncTripToCloudFull(tripId)
+      .then((result) => {
+        if (!result.success) {
+          logger.warn(
+            `[sync] auto-rescue for ${tripId} reported a failure: ${result.error ?? 'unknown'}`
+          );
+          return;
+        }
+        // Drain again so any children that were FK-blocked get a fresh
+        // shot now that the parents have landed.
+        scheduleSyncQueueProcessing();
+      })
+      .catch((error) => {
+        logger.warn(`[sync] auto-rescue for ${tripId} threw`, error);
+      });
+  }
+}
+
+/**
+ * Test-only helper to clear the auto-rescue throttle. Lets unit tests
+ * fire two rescue cycles back-to-back without faking timers.
+ */
+export function __resetFullSyncRescueThrottleForTests(): void {
+  fullSyncRescueLastAttemptByTrip.clear();
+}
+
+/**
  * Deterministic conflict policy for queued operations on the same entity.
  * Ensures queue transitions are idempotent and converge to the correct final state.
  */
@@ -786,6 +869,17 @@ export async function processSyncQueue(): Promise<BulkSyncResult> {
         await removeQueueItem(item.id);
       }
     }
+
+    // Auto-rescue: if the queue still has items stuck on FK 23503 errors
+    // after a normal pass, fire a direct full-trip sync for each affected
+    // trip. The full-sync helper uploads every Dexie row in dependency
+    // order, bypassing the queue's accumulated retry budget — exactly
+    // what the user would do manually with "Push all from device", but
+    // automatic. Throttled per-trip so a permanent failure doesn't spin
+    // the radio forever; cleared by a successful drain. The full-sync
+    // call is fire-and-forget so the current processSyncQueue() return
+    // remains accurate; the result schedules another drain when done.
+    void maybeAutoFullSyncStuckTrips();
 
     const remaining = tripSyncRuntime.syncQueue.filter(
       (item) => item.status !== 'completed'

@@ -57,11 +57,18 @@ vi.mock('../lib/services/trip-sync/tripSyncEntityWriters', () => ({
   syncEntityToCloud: vi.fn(),
 }));
 
+vi.mock('../lib/services/trip-sync/tripSyncTripTransfer', () => ({
+  syncTripToCloudFull: vi.fn(() => Promise.resolve({ success: true, tripId: 'trip-1' })),
+}));
+
 import {
+  __resetFullSyncRescueThrottleForTests,
   clearScheduledSyncQueueProcessing,
   processSyncQueue,
   queueSyncOperation,
 } from '../lib/services/trip-sync/tripSyncQueue';
+import { syncTripToCloudFull } from '../lib/services/trip-sync/tripSyncTripTransfer';
+const syncTripToCloudFullMock = vi.mocked(syncTripToCloudFull);
 import { db } from '../lib/db';
 import {
   setOnlineStatus,
@@ -93,6 +100,7 @@ describe('trip sync queue processing', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     clearScheduledSyncQueueProcessing();
+    __resetFullSyncRescueThrottleForTests();
     tripSyncRuntime.syncQueue.length = 0;
     tripSyncRuntime.queueHydrated = true;
     tripSyncRuntime.queueHydrationPromise = null;
@@ -231,6 +239,83 @@ describe('trip sync queue processing', () => {
       status: 'pending',
       retryCount: 0,
     });
+  });
+
+  it('auto-fires syncTripToCloudFull when the queue is left with FK-stuck items', async () => {
+    // The user shouldn't have to push a button. When a sync pass leaves
+    // the queue holding items that failed with FK 23503 (and the parent
+    // can't be resolved from local Dexie), the processor should
+    // automatically fall back to a full per-trip push that uploads
+    // every Dexie row in dependency order.
+    syncEntityToCloudMock.mockRejectedValueOnce(
+      new Error(
+        '[upsert sessions] insert or update on table "sessions" violates foreign key constraint "sessions_default_course_id_fkey" | code: 23503 | details: Key is not present in table "courses".'
+      )
+    );
+
+    const stuckItem = makeQueueItem({
+      id: 'queue-sess-stuck',
+      entity: 'session',
+      entityId: 'sess-stuck',
+      operation: 'create',
+      tripId: 'trip-1',
+      // Parent course is NOT in the fake Dexie tables, so the FK
+      // recovery path can't requeue it locally — the auto-rescue is
+      // the only thing that can save this scorer.
+      data: {
+        id: 'sess-stuck',
+        tripId: 'trip-1',
+        defaultCourseId: 'course-orphan',
+      } as never,
+      idempotencyKey: 'trip-1:session:sess-stuck:create',
+    });
+    tripSyncRuntime.syncQueue.push(stuckItem);
+
+    await processSyncQueue();
+    // The auto-rescue is fire-and-forget inside processSyncQueue's
+    // finalize step. Yield to let the promise chain settle so the
+    // mock observes the call.
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(syncTripToCloudFullMock).toHaveBeenCalledTimes(1);
+    expect(syncTripToCloudFullMock).toHaveBeenCalledWith('trip-1');
+  });
+
+  it('throttles auto-rescue: a second FK failure within 60s does not fire it again', async () => {
+    syncEntityToCloudMock
+      .mockRejectedValueOnce(
+        new Error(
+          '[upsert sessions] code: 23503 | details: Key is not present in table "courses".'
+        )
+      )
+      .mockRejectedValueOnce(
+        new Error(
+          '[upsert sessions] code: 23503 | details: Key is not present in table "courses".'
+        )
+      );
+
+    const item = makeQueueItem({
+      id: 'queue-sess-throttle',
+      entity: 'session',
+      entityId: 'sess-throttle',
+      operation: 'create',
+      tripId: 'trip-throttle',
+      data: { id: 'sess-throttle', tripId: 'trip-throttle' } as never,
+      idempotencyKey: 'trip-throttle:session:sess-throttle:create',
+    });
+    tripSyncRuntime.syncQueue.push(item);
+
+    await processSyncQueue();
+    await new Promise((r) => setTimeout(r, 0));
+    expect(syncTripToCloudFullMock).toHaveBeenCalledTimes(1);
+
+    // Second pass on the same trip (still within the 60s window) —
+    // the rescue should NOT fire again.
+    item.status = 'pending';
+    item.retryCount = 0;
+    await processSyncQueue();
+    await new Promise((r) => setTimeout(r, 0));
+    expect(syncTripToCloudFullMock).toHaveBeenCalledTimes(1);
   });
 
   it('hydrates persisted queue work before processing after a cold page load', async () => {
