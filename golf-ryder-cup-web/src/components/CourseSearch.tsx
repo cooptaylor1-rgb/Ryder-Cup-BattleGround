@@ -24,7 +24,7 @@ function getCourseResultSubline(course: GolfCourseAPICourse): string {
   if (course.website) {
     try {
       return new URL(course.website).hostname.replace(/^www\./, '');
-    } catch {
+    } catch (err) {
       // fall through
     }
   }
@@ -213,9 +213,9 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
       });
 
       setSelectedCourse(fullCourse ?? course);
-    } catch (err) {
+    } catch {
       setSelectedCourse(course);
-      setError(err instanceof Error ? err.message : 'Failed to load course');
+      setError('Could not load full course details. Showing the search result instead.');
     } finally {
       setIsLoadingDetails(false);
     }
@@ -445,7 +445,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
         ) : (
           <>
             <p className="text-sm text-[var(--ink-secondary)] mb-3">
-              Choose tees to import ({allTees.length} available):
+              Choose the tee set to use ({allTees.length} available):
             </p>
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {allTees.map((tee, idx) => (
@@ -497,6 +497,7 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           placeholder="Course name or city"
+          aria-label="Search courses"
           className="w-full px-4 py-3 pl-10 border border-[var(--rule)] bg-[var(--surface-raised)] text-[var(--ink-primary)] placeholder:text-[var(--ink-tertiary)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[color:var(--masters)]/40"
         />
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--ink-tertiary)]" />
@@ -523,9 +524,20 @@ export function CourseSearch({ onSelectCourse, onClose }: CourseSearchProps) {
         </div>
       )}
 
+      {isLoadingDetails && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mb-4 flex items-center gap-2 rounded-lg border border-[color:var(--masters)]/20 bg-[color:var(--masters)]/10 px-3 py-2 text-sm text-[var(--ink-secondary)]"
+        >
+          <Loader2 className="h-4 w-4 animate-spin text-[var(--masters)]" aria-hidden />
+          Loading course details...
+        </div>
+      )}
+
       {/* Results */}
       {results.length > 0 && (
-        <div className="space-y-2 max-h-80 overflow-y-auto">
+        <div className="space-y-2 max-h-80 overflow-y-auto" aria-busy={isLoadingDetails}>
           {results.map((course) => (
             <button
               type="button"
@@ -594,6 +606,7 @@ function TeeOption({
   importLabel?: string;
 }) {
   const hasHoleData = tee.holes && tee.holes.length > 0;
+  const teeFacts = formatTeeFacts(tee);
 
   return (
     <button
@@ -606,18 +619,17 @@ function TeeOption({
           : 'border-[var(--rule)] bg-[var(--surface-secondary)]'
       )}
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="font-medium text-[var(--ink-primary)]">{tee.tee_name}</div>
-          <div className="text-sm text-[var(--ink-secondary)]">
-            {tee.total_yards?.toLocaleString()} yards • Par {tee.par_total} • Rating{' '}
-            {tee.course_rating}/{tee.slope_rating}
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="truncate font-medium text-[var(--ink-primary)]" title={tee.tee_name}>
+            {tee.tee_name}
           </div>
+          <div className="text-sm text-[var(--ink-secondary)]">{teeFacts.join(' • ')}</div>
           {!hasHoleData && (
             <div className="text-xs text-[var(--warning)] mt-1">No hole-by-hole data</div>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2">
           <span className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--masters)]">
             {importLabel}
           </span>
@@ -626,6 +638,25 @@ function TeeOption({
       </div>
     </button>
   );
+}
+
+function formatTeeFacts(tee: GolfCourseAPITee): string[] {
+  const facts: string[] = [];
+
+  facts.push(tee.total_yards ? `${tee.total_yards.toLocaleString()} yards` : 'Yardage missing');
+  facts.push(tee.par_total ? `Par ${tee.par_total}` : 'Par missing');
+
+  if (tee.course_rating && tee.slope_rating) {
+    facts.push(`Rating ${tee.course_rating}/${tee.slope_rating}`);
+  } else if (tee.course_rating) {
+    facts.push(`Rating ${tee.course_rating}`);
+  } else if (tee.slope_rating) {
+    facts.push(`Slope ${tee.slope_rating}`);
+  } else {
+    facts.push('Rating missing');
+  }
+
+  return facts;
 }
 
 export default CourseSearch;

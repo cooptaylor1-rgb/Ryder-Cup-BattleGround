@@ -75,16 +75,24 @@ const CATEGORY_META: Record<
   handicaps: { label: 'Handicaps', icon: CheckCircle2 },
 };
 
+const EMPTY_PLAYERS: Player[] = [];
+const EMPTY_TEAMS: Team[] = [];
+const EMPTY_TEAM_MEMBERS: TeamMember[] = [];
+const EMPTY_SESSIONS: RyderCupSession[] = [];
+const EMPTY_MATCHES: Match[] = [];
+const EMPTY_COURSES: Course[] = [];
+const EMPTY_TEE_SETS: TeeSet[] = [];
+
 export function PreFlightChecklist({
   tripId,
   trip,
-  players = [],
-  teams = [],
-  teamMembers = [],
-  sessions = [],
-  matches = [],
-  courses = [],
-  teeSets = [],
+  players = EMPTY_PLAYERS,
+  teams = EMPTY_TEAMS,
+  teamMembers = EMPTY_TEAM_MEMBERS,
+  sessions = EMPTY_SESSIONS,
+  matches = EMPTY_MATCHES,
+  courses = EMPTY_COURSES,
+  teeSets = EMPTY_TEE_SETS,
   onAllClear,
 }: PreFlightChecklistProps) {
   const [result, setResult] = useState<PreFlightCheckResult | null>(null);
@@ -216,6 +224,7 @@ export function PreFlightChecklist({
   }
 
   const allIssues = [...result.errors, ...result.warnings];
+  const primaryIssue = result.errors[0] ?? result.warnings[0] ?? null;
 
   return (
     <div className="space-y-[var(--space-4)]">
@@ -260,6 +269,8 @@ export function PreFlightChecklist({
             Re-run
           </button>
         </div>
+
+        {!result.isReady && primaryIssue ? <PrimaryIssueCallout item={primaryIssue} /> : null}
 
         <div className="mt-[var(--space-5)] grid gap-[var(--space-3)] sm:grid-cols-2 xl:grid-cols-4">
           <ChecklistMetric
@@ -416,6 +427,10 @@ function IssueBoard({
   items: ValidationItem[];
   blockingCount: number;
 }) {
+  const sortedItems = items
+    .slice()
+    .sort((a, b) => (a.severity === b.severity ? 0 : a.severity === 'error' ? -1 : 1));
+
   return (
     <div className="rounded-[1.7rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,var(--surface-raised)_0%,var(--surface-secondary)_100%)] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.05)]">
       <div className="flex items-start justify-between gap-[var(--space-3)]">
@@ -442,9 +457,36 @@ function IssueBoard({
       </div>
 
       <div className="mt-[var(--space-4)] space-y-3">
-        {items.map((item) => (
+        {sortedItems.map((item) => (
           <IssueCard key={item.id} item={item} />
         ))}
+      </div>
+    </div>
+  );
+}
+
+function PrimaryIssueCallout({ item }: { item: ValidationItem }) {
+  return (
+    <div className="mt-[var(--space-5)] rounded-[1.25rem] border border-[color:var(--warning)]/22 bg-[color:var(--canvas)]/78 p-[var(--space-4)]">
+      <div className="flex flex-col gap-[var(--space-3)] sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <p className="type-overline tracking-[0.14em] text-[var(--warning)]">Next fix</p>
+          <p className="mt-[var(--space-2)] text-sm font-semibold text-[var(--ink)]">
+            {item.title}
+          </p>
+          <p className="mt-[var(--space-1)] text-sm leading-6 text-[var(--ink-secondary)]">
+            {item.description}
+          </p>
+        </div>
+        {item.actionLabel && item.actionHref ? (
+          <Link
+            href={item.actionHref}
+            data-action-kind={item.actionKind}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-[var(--maroon)] px-[var(--space-4)] py-[var(--space-3)] text-sm font-semibold text-[var(--canvas)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] active:scale-[0.98]"
+          >
+            {item.actionLabel}
+          </Link>
+        ) : null}
       </div>
     </div>
   );

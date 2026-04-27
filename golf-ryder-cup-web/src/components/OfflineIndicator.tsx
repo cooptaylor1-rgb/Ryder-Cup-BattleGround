@@ -30,6 +30,7 @@ import { useTripStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { useLiveQuery } from 'dexie-react-hooks';
 import type { SyncQueueItem as TripSyncQueueItem } from '@/lib/types/sync';
+import { summarizeSyncError } from '@/lib/utils/syncMessages';
 
 type SyncStatus = 'offline' | 'online' | 'syncing' | 'synced';
 
@@ -241,6 +242,7 @@ export function OfflineIndicator() {
                   onClick={() => setShowDetails(!showDetails)}
                   className="mt-1 flex min-h-11 w-full items-center justify-center gap-1 rounded-full text-[color:var(--canvas)]/80 hover:text-[var(--canvas)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--canvas)]/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--error)]"
                   aria-expanded={showDetails}
+                  aria-label={showDetails ? 'Hide saved changes' : 'View saved changes'}
                 >
                   <span className="text-xs">{showDetails ? 'Hide' : 'View'} saved changes</span>
                   {showDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -267,7 +269,7 @@ export function OfflineIndicator() {
                             <span className="truncate flex-1">{item.description}</span>
                             {item.retryCount > 0 && (
                               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[color:var(--canvas-raised)]/10 text-[color:var(--canvas)]/80">
-                                Tried {item.retryCount}x
+                                {item.retryCount} attempt{item.retryCount === 1 ? '' : 's'}
                               </span>
                             )}
                             <span
@@ -293,7 +295,7 @@ export function OfflineIndicator() {
                               className="text-[10px] text-[color:var(--canvas)]/70 pl-5"
                               title={item.error}
                             >
-                              Last error: {item.error}
+                              {summarizeSyncError(item.error)}
                             </div>
                           )}
                         </div>

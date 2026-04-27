@@ -27,8 +27,22 @@ const trip: Trip = {
 };
 
 const teams: Team[] = [
-  { id: 'team-usa', tripId: trip.id, name: 'Team USA', color: 'usa', mode: 'ryderCup', createdAt: now },
-  { id: 'team-europe', tripId: trip.id, name: 'Team Europe', color: 'europe', mode: 'ryderCup', createdAt: now },
+  {
+    id: 'team-usa',
+    tripId: trip.id,
+    name: 'Team USA',
+    color: 'usa',
+    mode: 'ryderCup',
+    createdAt: now,
+  },
+  {
+    id: 'team-europe',
+    tripId: trip.id,
+    name: 'Team Europe',
+    color: 'europe',
+    mode: 'ryderCup',
+    createdAt: now,
+  },
 ];
 
 const players: Player[] = Array.from({ length: 8 }, (_, index) => {
@@ -112,6 +126,29 @@ const matches: Match[] = [
 ];
 
 describe('PreFlightChecklist', () => {
+  it('surfaces the next blocking fix before the full issue list', async () => {
+    render(
+      <PreFlightChecklist
+        tripId={trip.id}
+        trip={trip}
+        players={[]}
+        teams={[]}
+        teamMembers={[]}
+        sessions={[]}
+        matches={[]}
+        courses={[]}
+        teeSets={[]}
+      />
+    );
+
+    expect(await screen.findByText('Next fix')).toBeInTheDocument();
+    expect(screen.getAllByText('Not enough players').length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: 'Add Players' })[0]).toHaveAttribute(
+      'href',
+      '/players'
+    );
+  });
+
   it('only announces success once for identical ready reruns', async () => {
     const user = userEvent.setup();
     const onAllClear = vi.fn();

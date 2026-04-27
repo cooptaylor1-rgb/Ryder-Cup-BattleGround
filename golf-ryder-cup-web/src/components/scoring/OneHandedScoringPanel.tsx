@@ -57,7 +57,7 @@ function buildScoreSummary(currentScore: number, teamAName: string, teamBName: s
 
 function outcomeLabel(result: HoleWinner | null | undefined, teamAName: string, teamBName: string) {
   if (!result || result === 'none') return 'Ready to score';
-  if (result === 'halved') return `Hole ${teamAName === teamBName ? '' : 'was '}halved`;
+  if (result === 'halved') return 'Hole halved';
   return result === 'teamA' ? `${teamAName} won this hole` : `${teamBName} won this hole`;
 }
 
@@ -213,7 +213,7 @@ export function OneHandedScoringPanel({
                     type="button"
                     onClick={action.onClick}
                     className={cn(
-                      'inline-flex min-w-[116px] items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm font-semibold transition-colors active:scale-[0.98]',
+                      'inline-flex min-w-[116px] items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98]',
                       action.className
                     )}
                   >
@@ -328,6 +328,7 @@ export function OneHandedScoringPanel({
           onClick={() => handleTapScore('teamA')}
           disabled={disabled}
           aria-pressed={existingResult === 'teamA'}
+          aria-label={`${teamAName} wins hole`}
           className="min-h-[96px] min-w-0 overflow-hidden rounded-[24px] border px-4 py-5 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           style={{
             borderColor:
@@ -356,10 +357,13 @@ export function OneHandedScoringPanel({
           onClick={() => handleTapScore('halved')}
           disabled={disabled}
           aria-pressed={existingResult === 'halved'}
+          aria-label="Hole halved"
           className="min-h-[96px] rounded-[24px] border border-[color:var(--rule)] bg-[color:var(--canvas)] px-4 py-5 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           style={{
             boxShadow:
-              existingResult === 'halved' ? '0 0 0 2px rgba(86, 79, 68, 0.16) inset' : undefined,
+              existingResult === 'halved'
+                ? '0 0 0 2px color-mix(in srgb, var(--ink-secondary) 16%, transparent) inset'
+                : undefined,
           }}
         >
           <p className="font-serif text-[length:var(--text-2xl)] leading-none text-[var(--ink)]">
@@ -375,6 +379,7 @@ export function OneHandedScoringPanel({
           onClick={() => handleTapScore('teamB')}
           disabled={disabled}
           aria-pressed={existingResult === 'teamB'}
+          aria-label={`${teamBName} wins hole`}
           className="min-h-[96px] min-w-0 overflow-hidden rounded-[24px] border px-4 py-5 text-right transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           style={{
             borderColor:
@@ -404,7 +409,7 @@ export function OneHandedScoringPanel({
           type="button"
           onClick={onPrevHole}
           disabled={disabled || holeNumber <= 1}
-          className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-transform active:scale-[0.96] disabled:opacity-35"
+          className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-35"
           aria-label="Previous hole"
         >
           <ChevronLeft size={20} />
@@ -423,7 +428,7 @@ export function OneHandedScoringPanel({
           type="button"
           onClick={onNextHole}
           disabled={disabled || holeNumber >= 18}
-          className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-transform active:scale-[0.96] disabled:opacity-35"
+          className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[color:var(--canvas)] text-[var(--ink-secondary)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-35"
           aria-label="Next hole"
         >
           <ChevronRight size={20} />
@@ -436,12 +441,12 @@ export function OneHandedScoringPanel({
           onClick={onUndo}
           disabled={disabled}
           className={cn(
-            'mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm font-semibold transition-transform active:scale-[0.98] disabled:opacity-60',
+            'mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border px-4 py-3 text-sm font-semibold transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60',
             isRightHanded ? 'text-[var(--masters)]' : 'text-[var(--ink)]'
           )}
           style={{
-            borderColor: 'rgba(0, 102, 68, 0.16)',
-            background: 'rgba(0, 102, 68, 0.08)',
+            borderColor: 'color-mix(in srgb, var(--masters) 16%, transparent)',
+            background: 'color-mix(in srgb, var(--masters) 8%, transparent)',
           }}
         >
           <RotateCcw size={16} />

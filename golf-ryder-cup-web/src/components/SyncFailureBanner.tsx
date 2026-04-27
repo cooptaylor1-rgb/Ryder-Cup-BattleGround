@@ -24,11 +24,16 @@ import {
 } from '@/lib/services/tripSyncService';
 import { cn } from '@/lib/utils';
 import { zIndex } from '@/lib/constants/zIndex';
+import {
+  getSyncBlockedActionLabel,
+  summarizeSyncError,
+  SYNC_BLOCKED_MESSAGES,
+  type SyncBlockedReason,
+} from '@/lib/utils/syncMessages';
 
 const POLL_INTERVAL_MS = 8000;
 
 type FailedSyncItem = ReturnType<typeof getFailedSyncQueueItems>[number];
-type SyncBlockedReason = NonNullable<ReturnType<typeof getSyncQueueStatus>['blockedReason']>;
 
 const ENTITY_LABELS: Record<string, string> = {
   trip: 'Trip',
@@ -57,34 +62,6 @@ const OPERATION_LABELS: Record<string, string> = {
   delete: 'remove',
 };
 
-const BLOCKED_MESSAGES: Record<SyncBlockedReason, string> = {
-  offline: 'Reconnect to retry cloud sync.',
-  'supabase-unconfigured':
-    'Cloud sync needs Supabase set up. Changes are saved on this device until live sharing is ready.',
-  'auth-pending': 'Checking your cloud session before retrying sync.',
-  'auth-required': 'Sign in to resume cloud sync.',
-};
-
-function summarizeSyncError(error?: string): string {
-  if (!error) return 'Sync failed';
-  if (/row level security|42501|permission/i.test(error)) {
-    return 'Cloud permissions blocked this change.';
-  }
-  if (/foreign key|23503|violates.*constraint/i.test(error)) {
-    return 'A related trip item needs to save first.';
-  }
-  if (/duplicate key|23505|unique/i.test(error)) {
-    return 'Cloud already has this change.';
-  }
-  if (/network|fetch|timeout|offline/i.test(error)) {
-    return 'Connection dropped while saving.';
-  }
-  if (/not found locally/i.test(error)) {
-    return 'This saved change is no longer on this device.';
-  }
-  return error;
-}
-
 function describeFailedItem(item: FailedSyncItem): string {
   const entity = ENTITY_LABELS[item.entity] ?? item.entity;
   const operation = OPERATION_LABELS[item.operation] ?? item.operation;
@@ -105,6 +82,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
   const [blockedReason, setBlockedReason] = useState<SyncBlockedReason | undefined>(undefined);
   const [showDetail, setShowDetail] = useState(false);
   const [isRetrying, setIsRetrying] = useState(false);
+  const [retryFeedback, setRetryFeedback] = useState<string | null>(null);
 
   useEffect(() => {
     const tick = () => {
@@ -113,7 +91,10 @@ export function SyncFailureBanner({ className }: { className?: string }) {
       setLastError(status.lastError);
       setFailedItems(getFailedSyncQueueItems(5));
       setBlockedReason(status.blockedReason);
-      if (status.failed <= 0) setShowDetail(false);
+      if (status.failed <= 0) {
+        setShowDetail(false);
+        setRetryFeedback(null);
+      }
     };
     tick();
 
@@ -147,6 +128,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
 
   const handleRetry = async () => {
     setIsRetrying(true);
+    setRetryFeedback('Retrying saved changes...');
     try {
       // Reset any items that already exhausted their retry budget back
       // to 'pending'. Without this step the subsequent processSyncQueue
@@ -159,7 +141,21 @@ export function SyncFailureBanner({ className }: { className?: string }) {
       setLastError(status.lastError);
       setFailedItems(getFailedSyncQueueItems(5));
       setBlockedReason(status.blockedReason);
-      if (status.failed <= 0) setShowDetail(false);
+      if (status.failed <= 0) {
+        setShowDetail(false);
+        setRetryFeedback(null);
+      } else {
+        setRetryFeedback('Still saved locally. Try again after the connection is stable.');
+      }
+    } catch (error) {
+      const status = getSyncQueueStatus();
+      setFailedCount(status.failed);
+      setLastError(status.lastError);
+      setFailedItems(getFailedSyncQueueItems(5));
+      setBlockedReason(status.blockedReason);
+      setRetryFeedback(
+        `${summarizeSyncError(error instanceof Error ? error.message : String(error))} Changes are still saved on this device.`
+      );
     } finally {
       setIsRetrying(false);
     }
@@ -168,17 +164,20 @@ export function SyncFailureBanner({ className }: { className?: string }) {
   if (failedCount <= 0) return null;
   if (blockedReason === 'offline') return null;
 
-  const blockedMessage = blockedReason ? BLOCKED_MESSAGES[blockedReason] : undefined;
+  const blockedMessage = blockedReason ? SYNC_BLOCKED_MESSAGES[blockedReason] : undefined;
   const canRetry = !blockedReason;
-  const message = blockedMessage
-    ? blockedMessage
-    : `${failedCount} change${failedCount === 1 ? '' : 's'} could not sync. Saved on this device.`;
+  const message = retryFeedback
+    ? retryFeedback
+    : blockedMessage
+      ? blockedMessage
+      : `${failedCount} change${failedCount === 1 ? '' : 's'} could not sync. Saved on this device.`;
   const detailAvailable = failedItems.length > 0 || Boolean(lastError);
 
   return (
     <div
       role="alert"
       aria-live="assertive"
+      aria-busy={isRetrying || undefined}
       style={{ zIndex: zIndex.nav + 1 }}
       className={cn(
         'fixed inset-x-0 top-0 border-b border-[color:var(--error)]/30',
@@ -217,7 +216,7 @@ export function SyncFailureBanner({ className }: { className?: string }) {
               className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--error)]/35 bg-[var(--canvas)]/88 px-3 py-1 text-xs font-semibold text-[var(--error)] transition-colors hover:bg-[color:var(--error)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-elevated)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <RefreshCw className={cn('h-3.5 w-3.5', isRetrying && 'animate-spin')} aria-hidden />
-              {isRetrying ? 'Retrying...' : 'Retry sync'}
+              {isRetrying ? 'Retrying...' : getSyncBlockedActionLabel(blockedReason)}
             </button>
           </div>
         </div>

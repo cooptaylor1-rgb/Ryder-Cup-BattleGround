@@ -361,7 +361,7 @@ export function SwipeScorePanel({
                   : gestureState === 'teamB'
                     ? colorWithAlpha(teamBColor, 18)
                     : gestureState === 'halved'
-                      ? 'rgba(100, 100, 100, 0.3)'
+                      ? colorWithAlpha('var(--ink-secondary)', 30)
                       : 'transparent',
               boxShadow:
                 gestureState !== 'idle'
@@ -370,7 +370,7 @@ export function SwipeScorePanel({
                         ? colorWithAlpha(teamAColor, 40)
                         : gestureState === 'teamB'
                           ? colorWithAlpha(teamBColor, 40)
-                          : 'rgba(100, 100, 100, 0.25)'
+                          : colorWithAlpha('var(--ink-secondary)', 25)
                     }`
                   : 'none',
             }}
@@ -522,9 +522,14 @@ export function SwipeScorePanel({
         </div>
       </div>
 
-      {/* Current score display */}
-      <div className="absolute top-4 left-1/2 max-w-[68%] -translate-x-1/2">
-        <div className="rounded-full bg-[color:var(--ink)]/12 px-4 py-1.5 backdrop-blur-sm">
+      {/* Current score and existing result */}
+      <div className="absolute left-3 right-3 top-3 flex items-start justify-between gap-2 sm:left-4 sm:right-4 sm:top-4">
+        <div
+          className={cn(
+            'min-w-0 max-w-[72%] rounded-full bg-[color:var(--ink)]/12 px-4 py-1.5 backdrop-blur-sm',
+            (!existingResult || existingResult === 'none') && 'mx-auto'
+          )}
+        >
           <span
             className="block truncate text-sm font-semibold"
             style={{ color: 'var(--ink-primary)' }}
@@ -533,33 +538,35 @@ export function SwipeScorePanel({
             {getScoreDisplay()}
           </span>
         </div>
-      </div>
 
-      {/* Existing result indicator */}
-      {existingResult && existingResult !== 'none' && (
-        <div className="absolute top-4 right-4 flex items-center gap-2 rounded-full bg-[color:var(--surface-elevated)]/84 p-1 shadow-card-sm backdrop-blur-sm">
+        {existingResult && existingResult !== 'none' && (
           <div
-            className="w-8 h-8 rounded-full flex items-center justify-center"
-            style={{
-              background:
-                existingResult === 'teamA'
-                  ? teamAColor
-                  : existingResult === 'teamB'
-                    ? teamBColor
-                    : 'var(--ink-secondary)',
-            }}
+            data-testid="existing-result-indicator"
+            className="flex shrink-0 items-center gap-2 rounded-full bg-[color:var(--surface-elevated)]/86 p-1 shadow-card-sm backdrop-blur-sm"
           >
-            <Check className="w-4 h-4 text-[var(--canvas)]" />
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center"
+              style={{
+                background:
+                  existingResult === 'teamA'
+                    ? teamAColor
+                    : existingResult === 'teamB'
+                      ? teamBColor
+                      : 'var(--ink-secondary)',
+              }}
+            >
+              <Check className="w-4 h-4 text-[var(--canvas)]" />
+            </div>
+            <span className="hidden max-w-24 truncate pr-2 text-xs font-semibold text-[var(--ink-secondary)] sm:block">
+              {existingResult === 'halved'
+                ? 'Halved'
+                : existingResult === 'teamA'
+                  ? teamAName
+                  : teamBName}
+            </span>
           </div>
-          <span className="hidden max-w-24 truncate pr-2 text-xs font-semibold text-[var(--ink-secondary)] sm:block">
-            {existingResult === 'halved'
-              ? 'Halved'
-              : existingResult === 'teamA'
-                ? teamAName
-                : teamBName}
-          </span>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

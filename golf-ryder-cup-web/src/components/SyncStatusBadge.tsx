@@ -19,17 +19,9 @@ import { useTripStore } from '@/lib/stores/tripStore';
 import { Cloud, CloudOff, RefreshCw, AlertCircle, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { summarizeSyncError, SYNC_BLOCKED_MESSAGES } from '@/lib/utils/syncMessages';
 
 type QueueInfo = ReturnType<typeof getSyncQueueStatus>;
-type SyncBlockedReason = NonNullable<QueueInfo['blockedReason']>;
-
-const BLOCKED_TOOLTIPS: Record<SyncBlockedReason, string> = {
-  offline: 'Reconnect to retry cloud sync.',
-  'supabase-unconfigured':
-    'Cloud sync needs Supabase set up. Your changes stay saved on this device.',
-  'auth-pending': 'Checking your cloud session before retrying sync.',
-  'auth-required': 'Sign in to resume cloud sync.',
-};
 
 interface SyncStatusBadgeProps {
   /** Show full status text (not just icon) */
@@ -116,7 +108,7 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
 
   const getStatusConfig = () => {
     const blockedTooltip = queueInfo.blockedReason
-      ? BLOCKED_TOOLTIPS[queueInfo.blockedReason]
+      ? SYNC_BLOCKED_MESSAGES[queueInfo.blockedReason]
       : undefined;
 
     switch (status) {
@@ -207,12 +199,13 @@ export function SyncStatusBadge({ showText = false, className = '' }: SyncStatus
   if (status === 'failed' || status === 'pending') {
     const effectiveFailedCount = failedChangeCount || 1;
     const blockedTooltip = queueInfo.blockedReason
-      ? BLOCKED_TOOLTIPS[queueInfo.blockedReason]
+      ? SYNC_BLOCKED_MESSAGES[queueInfo.blockedReason]
       : undefined;
+    const summarizedError = summarizeSyncError(queueInfo.lastError);
     const failedTooltip = blockedTooltip
       ? `${effectiveFailedCount} cloud sync ${effectiveFailedCount === 1 ? 'change is' : 'changes are'} blocked. ${blockedTooltip}`
       : queueInfo.lastError
-        ? `${effectiveFailedCount} cloud sync ${effectiveFailedCount === 1 ? 'change needs' : 'changes need'} a retry. Last error: ${queueInfo.lastError}.`
+        ? `${effectiveFailedCount} cloud sync ${effectiveFailedCount === 1 ? 'change needs' : 'changes need'} a retry. ${summarizedError}`
         : `${effectiveFailedCount} cloud sync ${effectiveFailedCount === 1 ? 'change needs' : 'changes need'} a retry.`;
     const effectivePendingCount = pendingChangeCount || 1;
     const pendingTooltip = blockedTooltip

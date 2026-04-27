@@ -41,7 +41,7 @@ describe('SyncFailureBanner', () => {
     render(<SyncFailureBanner />);
 
     expect(await screen.findByText('Sign in to resume cloud sync.')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Retry sync' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Sign in to sync' })).toBeDisabled();
   });
 
   it('stays hidden while offline so the offline banner owns that state', () => {
@@ -100,5 +100,23 @@ describe('SyncFailureBanner', () => {
       expect(retryFailedQueueMock).toHaveBeenCalledTimes(1);
       expect(processSyncQueueMock).toHaveBeenCalledTimes(1);
     });
+  });
+
+  it('confirms changes stay local when retry still leaves failed work', async () => {
+    getSyncQueueStatusMock.mockReturnValue({
+      pending: 0,
+      failed: 2,
+      total: 2,
+      lastError: 'network timeout',
+      blockedReason: undefined,
+    });
+
+    render(<SyncFailureBanner />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Retry sync' }));
+
+    expect(
+      await screen.findByText('Still saved locally. Try again after the connection is stable.')
+    ).toBeInTheDocument();
   });
 });
