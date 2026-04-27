@@ -201,6 +201,8 @@ export default function SchedulePageClient() {
         selectedTab={selectedTab}
         myHref={myScheduleHref}
         allHref={fullScheduleHref}
+        onSelectMy={() => router.push(myScheduleHref)}
+        onSelectAll={() => router.push(fullScheduleHref)}
       />
 
       <main className="container-editorial pb-8" id="schedule-content" role="tabpanel">

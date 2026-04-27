@@ -18,17 +18,32 @@ export function ScheduleTabSelector({
   selectedTab,
   myHref,
   allHref,
+  onSelectMy,
+  onSelectAll,
 }: {
   selectedTab: 'my' | 'all';
   myHref: string;
   allHref: string;
+  onSelectMy?: () => void;
+  onSelectAll?: () => void;
 }) {
+  const handleTabClick =
+    (onSelect?: () => void) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+      if (!onSelect) {
+        return;
+      }
+
+      event.preventDefault();
+      onSelect();
+    };
+
   return (
     <div className="container-editorial py-4" role="tablist" aria-label="Schedule views">
       <div className="flex gap-2">
         <Link
           href={myHref}
           scroll={false}
+          onClick={handleTabClick(onSelectMy)}
           role="tab"
           aria-selected={selectedTab === 'my'}
           aria-controls="schedule-content"
@@ -45,6 +60,7 @@ export function ScheduleTabSelector({
         <Link
           href={allHref}
           scroll={false}
+          onClick={handleTabClick(onSelectAll)}
           role="tab"
           aria-selected={selectedTab === 'all'}
           aria-controls="schedule-content"
