@@ -8,17 +8,24 @@ export interface PracticeGroupDraft {
   localId: string;
   /** 1-indexed, matches the "Group N" label. */
   groupNumber: number;
+  /** All players in the tee-time group. Kept for roster assignment and legacy drafts. */
   playerIds: UUID[];
+  /** Optional captain-set practice side A inside the tee-time group. */
+  teamAPlayerIds?: UUID[];
+  /** Optional captain-set practice side B inside the tee-time group. Empty means tee-time team. */
+  teamBPlayerIds?: UUID[];
   /** ISO string like "2026-04-30T08:00" — empty string means unset. */
   teeTime?: string;
 }
 
 /**
  * Persist a set of practice groups for a session. Each group becomes a
- * single Match row with mode='practice': the group's players all sit in
- * teamAPlayerIds, teamBPlayerIds stays empty, and handicap allowances
- * are zeroed because there's no head-to-head to allowance against. The
- * tee time flows into Match.teeTime so it shows up on the schedule.
+ * single Match row with mode='practice'. By default the tee-time group
+ * is one team (all players in teamAPlayerIds). Captains can also split
+ * a group into two practice sides; those persist in the existing
+ * teamA/teamB arrays without changing the DB schema. Handicap
+ * allowances stay zero because practice format scoring derives net
+ * strokes per player from the tee set.
  *
  * Intentionally separate from saveLineup (which is Ryder Cup specific):
  * sharing one persistence path would mean threading practice/regular
@@ -52,7 +59,8 @@ export async function savePracticeLineup(
   }
 
   for (const group of groups) {
-    if (group.playerIds.length === 0) continue;
+    const { teamAPlayerIds, teamBPlayerIds, allPlayerIds } = resolvePracticeGroupTeams(group);
+    if (allPlayerIds.length === 0) continue;
 
     const matchId = crypto.randomUUID();
     const newMatch: Match = {
@@ -62,8 +70,8 @@ export async function savePracticeLineup(
       matchOrder: group.groupNumber,
       status: 'scheduled',
       currentHole: 1,
-      teamAPlayerIds: group.playerIds,
-      teamBPlayerIds: [],
+      teamAPlayerIds,
+      teamBPlayerIds,
       teamAHandicapAllowance: 0,
       teamBHandicapAllowance: 0,
       courseId: session.defaultCourseId,
@@ -84,4 +92,41 @@ export async function savePracticeLineup(
   }
 
   return { success: true, matchIds };
+}
+
+export function resolvePracticeGroupTeams(group: PracticeGroupDraft): {
+  allPlayerIds: UUID[];
+  teamAPlayerIds: UUID[];
+  teamBPlayerIds: UUID[];
+} {
+  const rosterOrder = uniqueIds(group.playerIds);
+  const sideB = uniqueIds(group.teamBPlayerIds ?? []).filter((id) => rosterOrder.includes(id));
+
+  if (sideB.length === 0) {
+    return {
+      allPlayerIds: rosterOrder,
+      teamAPlayerIds: rosterOrder,
+      teamBPlayerIds: [],
+    };
+  }
+
+  const sideASeed =
+    group.teamAPlayerIds && group.teamAPlayerIds.length > 0
+      ? group.teamAPlayerIds
+      : rosterOrder.filter((id) => !sideB.includes(id));
+  const sideA = uniqueIds(sideASeed).filter(
+    (id) => rosterOrder.includes(id) && !sideB.includes(id)
+  );
+  const assigned = new Set([...sideA, ...sideB]);
+  const unassigned = rosterOrder.filter((id) => !assigned.has(id));
+
+  return {
+    allPlayerIds: rosterOrder,
+    teamAPlayerIds: [...sideA, ...unassigned],
+    teamBPlayerIds: sideB,
+  };
+}
+
+function uniqueIds(ids: UUID[]): UUID[] {
+  return Array.from(new Set(ids));
 }

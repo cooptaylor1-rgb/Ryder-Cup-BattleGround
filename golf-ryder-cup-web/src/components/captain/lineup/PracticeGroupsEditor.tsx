@@ -119,6 +119,51 @@ export function applyAutoStagger(
   });
 }
 
+function isSplitPracticeGroup(group: PracticeGroupDraft): boolean {
+  return Boolean(group.teamBPlayerIds?.length);
+}
+
+function getPracticeSideIds(group: PracticeGroupDraft): {
+  teamAPlayerIds: string[];
+  teamBPlayerIds: string[];
+} {
+  const playerIds = group.playerIds;
+  const teamBPlayerIds = (group.teamBPlayerIds ?? []).filter((id) => playerIds.includes(id));
+  if (teamBPlayerIds.length === 0) {
+    return { teamAPlayerIds: playerIds, teamBPlayerIds: [] };
+  }
+  const explicitTeamA = (group.teamAPlayerIds ?? []).filter(
+    (id) => playerIds.includes(id) && !teamBPlayerIds.includes(id)
+  );
+  const teamAPlayerIds =
+    explicitTeamA.length > 0
+      ? explicitTeamA
+      : playerIds.filter((id) => !teamBPlayerIds.includes(id));
+  const assigned = new Set([...teamAPlayerIds, ...teamBPlayerIds]);
+  return {
+    teamAPlayerIds: [...teamAPlayerIds, ...playerIds.filter((id) => !assigned.has(id))],
+    teamBPlayerIds,
+  };
+}
+
+function splitPracticeGroup(playerIds: string[]): {
+  teamAPlayerIds: string[];
+  teamBPlayerIds: string[];
+} {
+  const midpoint = Math.ceil(playerIds.length / 2);
+  return {
+    teamAPlayerIds: playerIds.slice(0, midpoint),
+    teamBPlayerIds: playerIds.slice(midpoint),
+  };
+}
+
+function isPublishablePracticeGroup(group: PracticeGroupDraft): boolean {
+  if (group.playerIds.length < 2) return false;
+  if (!isSplitPracticeGroup(group)) return true;
+  const { teamAPlayerIds, teamBPlayerIds } = getPracticeSideIds(group);
+  return teamAPlayerIds.length > 0 && teamBPlayerIds.length > 0;
+}
+
 /**
  * Practice-round pairing editor. Simpler than the Ryder Cup lineup
  * builder — there are no teams to split players across, no handicap
@@ -175,21 +220,35 @@ export function PracticeGroupsEditor({
 
   const addPlayer = useCallback((localId: string, playerId: string) => {
     setGroups((current) =>
-      current.map((g) =>
-        g.localId === localId && g.playerIds.length < MAX_GROUP_SIZE
-          ? { ...g, playerIds: [...g.playerIds, playerId] }
-          : g
-      )
+      current.map((g) => {
+        if (g.localId !== localId || g.playerIds.length >= MAX_GROUP_SIZE) return g;
+        const nextPlayerIds = [...g.playerIds, playerId];
+        if (!isSplitPracticeGroup(g)) {
+          return { ...g, playerIds: nextPlayerIds };
+        }
+        const { teamAPlayerIds, teamBPlayerIds } = getPracticeSideIds(g);
+        const addToA = teamAPlayerIds.length <= teamBPlayerIds.length;
+        return {
+          ...g,
+          playerIds: nextPlayerIds,
+          teamAPlayerIds: addToA ? [...teamAPlayerIds, playerId] : teamAPlayerIds,
+          teamBPlayerIds: addToA ? teamBPlayerIds : [...teamBPlayerIds, playerId],
+        };
+      })
     );
   }, []);
 
   const removePlayer = useCallback((localId: string, playerId: string) => {
     setGroups((current) =>
-      current.map((g) =>
-        g.localId === localId
-          ? { ...g, playerIds: g.playerIds.filter((id) => id !== playerId) }
-          : g
-      )
+      current.map((g) => {
+        if (g.localId !== localId) return g;
+        return {
+          ...g,
+          playerIds: g.playerIds.filter((id) => id !== playerId),
+          teamAPlayerIds: g.teamAPlayerIds?.filter((id) => id !== playerId),
+          teamBPlayerIds: g.teamBPlayerIds?.filter((id) => id !== playerId),
+        };
+      })
     );
   }, []);
 
@@ -207,14 +266,63 @@ export function PracticeGroupsEditor({
         }
         return current.map((g) => {
           if (g.localId === fromLocalId) {
-            return { ...g, playerIds: g.playerIds.filter((id) => id !== playerId) };
+            return {
+              ...g,
+              playerIds: g.playerIds.filter((id) => id !== playerId),
+              teamAPlayerIds: g.teamAPlayerIds?.filter((id) => id !== playerId),
+              teamBPlayerIds: g.teamBPlayerIds?.filter((id) => id !== playerId),
+            };
           }
           if (g.localId === toLocalId) {
-            return { ...g, playerIds: [...g.playerIds, playerId] };
+            if (!isSplitPracticeGroup(g)) {
+              return { ...g, playerIds: [...g.playerIds, playerId] };
+            }
+            const { teamAPlayerIds, teamBPlayerIds } = getPracticeSideIds(g);
+            const addToA = teamAPlayerIds.length <= teamBPlayerIds.length;
+            return {
+              ...g,
+              playerIds: [...g.playerIds, playerId],
+              teamAPlayerIds: addToA ? [...teamAPlayerIds, playerId] : teamAPlayerIds,
+              teamBPlayerIds: addToA ? teamBPlayerIds : [...teamBPlayerIds, playerId],
+            };
           }
           return g;
         });
       });
+    },
+    []
+  );
+
+  const setPracticeSideMode = useCallback((localId: string, mode: 'teeTime' | 'split') => {
+    setGroups((current) =>
+      current.map((group) => {
+        if (group.localId !== localId) return group;
+        if (mode === 'teeTime') {
+          return { ...group, teamAPlayerIds: undefined, teamBPlayerIds: [] };
+        }
+        const { teamAPlayerIds, teamBPlayerIds } = splitPracticeGroup(group.playerIds);
+        return { ...group, teamAPlayerIds, teamBPlayerIds };
+      })
+    );
+  }, []);
+
+  const setPlayerSide = useCallback(
+    (localId: string, playerId: string, side: 'teamA' | 'teamB') => {
+      setGroups((current) =>
+        current.map((group) => {
+          if (group.localId !== localId || !group.playerIds.includes(playerId)) return group;
+          const { teamAPlayerIds, teamBPlayerIds } = getPracticeSideIds(group);
+          const nextTeamA = teamAPlayerIds.filter((id) => id !== playerId);
+          const nextTeamB = teamBPlayerIds.filter((id) => id !== playerId);
+          if (side === 'teamA') nextTeamA.push(playerId);
+          if (side === 'teamB') nextTeamB.push(playerId);
+          return {
+            ...group,
+            teamAPlayerIds: nextTeamA,
+            teamBPlayerIds: nextTeamB,
+          };
+        })
+      );
     },
     []
   );
@@ -284,7 +392,7 @@ export function PracticeGroupsEditor({
   // schedule. Now blank group tee times publish as undefined, and the
   // schedule renderer falls back to session.firstTeeTime + per-hole
   // stagger. Explicit per-group edits are preserved as overrides.
-  const publishableGroups = groups.filter((g) => g.playerIds.length >= 2);
+  const publishableGroups = groups.filter(isPublishablePracticeGroup);
   const canPublish = publishableGroups.length > 0 && !isPublishing;
 
   // For the UI preview only — show the computed stagger in each row's
@@ -361,6 +469,8 @@ export function PracticeGroupsEditor({
             onMovePlayer={(playerId, toLocalId) =>
               movePlayer(group.localId, playerId, toLocalId)
             }
+            onPracticeSideModeChange={(mode) => setPracticeSideMode(group.localId, mode)}
+            onPlayerSideChange={(playerId, side) => setPlayerSide(group.localId, playerId, side)}
             onTeeTimeChange={(value) => setTeeTime(group.localId, value)}
             onRemoveGroup={() => removeGroup(group.localId)}
             canRemove={groups.length > 1}
@@ -421,6 +531,8 @@ interface GroupCardProps {
   onAddPlayer: (playerId: string) => void;
   onRemovePlayer: (playerId: string) => void;
   onMovePlayer: (playerId: string, toLocalId: string) => void;
+  onPracticeSideModeChange: (mode: 'teeTime' | 'split') => void;
+  onPlayerSideChange: (playerId: string, side: 'teamA' | 'teamB') => void;
   onTeeTimeChange: (value: string) => void;
   onRemoveGroup: () => void;
   canRemove: boolean;
@@ -435,6 +547,8 @@ function GroupCard({
   onAddPlayer,
   onRemovePlayer,
   onMovePlayer,
+  onPracticeSideModeChange,
+  onPlayerSideChange,
   onTeeTimeChange,
   onRemoveGroup,
   canRemove,
@@ -443,6 +557,8 @@ function GroupCard({
     .map((id) => playerById.get(id))
     .filter((p): p is Player => Boolean(p));
   const canAddMore = group.playerIds.length < MAX_GROUP_SIZE;
+  const isSplit = isSplitPracticeGroup(group);
+  const { teamAPlayerIds, teamBPlayerIds } = getPracticeSideIds(group);
 
   return (
     <div className="rounded-[1.35rem] border border-[var(--rule)] bg-[rgba(255,255,255,0.82)] p-[var(--space-4)] shadow-[0_10px_20px_rgba(46,34,18,0.05)]">
@@ -496,6 +612,75 @@ function GroupCard({
         </label>
       </div>
 
+      <div className="mt-[var(--space-4)] rounded-[1rem] border border-[color:var(--rule)] bg-[var(--canvas)] px-[var(--space-3)] py-[var(--space-3)]">
+        <div className="flex flex-col gap-[var(--space-3)] sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="type-meta font-semibold text-[var(--ink)]">Practice team scoring</p>
+            <p className="mt-1 type-micro text-[var(--ink-tertiary)]">
+              Use the whole tee time as one format team, or split the group into two sides.
+            </p>
+          </div>
+          <div
+            className="inline-flex rounded-full border border-[var(--rule)] bg-[var(--canvas-raised)] p-1"
+            role="group"
+            aria-label={`Practice team scoring for group ${group.groupNumber}`}
+          >
+            <button
+              type="button"
+              onClick={() => onPracticeSideModeChange('teeTime')}
+              className={cn(
+                'rounded-full px-3 py-1.5 text-xs font-semibold transition',
+                !isSplit
+                  ? 'bg-[var(--masters)] text-white'
+                  : 'text-[var(--ink-secondary)] hover:text-[var(--ink)]'
+              )}
+              aria-pressed={!isSplit}
+            >
+              Tee-time team
+            </button>
+            <button
+              type="button"
+              onClick={() => onPracticeSideModeChange('split')}
+              disabled={group.playerIds.length < 2}
+              className={cn(
+                'rounded-full px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-45',
+                isSplit
+                  ? 'bg-[var(--masters)] text-white'
+                  : 'text-[var(--ink-secondary)] hover:text-[var(--ink)]'
+              )}
+              aria-pressed={isSplit}
+            >
+              Two sides
+            </button>
+          </div>
+        </div>
+
+        {isSplit ? (
+          <div className="mt-[var(--space-3)] grid gap-[var(--space-2)] sm:grid-cols-2">
+            <SideRoster
+              label="Side A"
+              playerIds={teamAPlayerIds}
+              playerById={playerById}
+              side="teamA"
+              allPlayerIds={group.playerIds}
+              onPlayerSideChange={onPlayerSideChange}
+            />
+            <SideRoster
+              label="Side B"
+              playerIds={teamBPlayerIds}
+              playerById={playerById}
+              side="teamB"
+              allPlayerIds={group.playerIds}
+              onPlayerSideChange={onPlayerSideChange}
+            />
+          </div>
+        ) : (
+          <p className="mt-[var(--space-3)] rounded-[0.85rem] bg-[var(--masters-subtle)] px-[var(--space-3)] py-[var(--space-2)] type-meta text-[var(--masters)]">
+            This foursome scores as one team against the other tee times under the session format.
+          </p>
+        )}
+      </div>
+
       <div className="mt-[var(--space-4)] space-y-[var(--space-2)]">
         {groupPlayers.length === 0 ? (
           <p className="type-body-sm text-[var(--ink-tertiary)]">No players yet.</p>
@@ -506,6 +691,7 @@ function GroupCard({
                 candidate.localId !== group.localId &&
                 candidate.playerIds.length < MAX_GROUP_SIZE
             );
+            const playerSide = teamBPlayerIds.includes(player.id) ? 'Side B' : 'Side A';
             return (
               <div
                 key={player.id}
@@ -516,6 +702,11 @@ function GroupCard({
                   {player.handicapIndex !== undefined ? (
                     <span className="ml-[var(--space-2)] type-micro text-[var(--ink-tertiary)]">
                       HCP {player.handicapIndex}
+                    </span>
+                  ) : null}
+                  {isSplit ? (
+                    <span className="ml-[var(--space-2)] rounded-full bg-[var(--masters-subtle)] px-2 py-0.5 type-micro font-semibold text-[var(--masters)]">
+                      {playerSide}
                     </span>
                   ) : null}
                 </span>
@@ -587,6 +778,57 @@ function GroupCard({
           No unassigned players. Remove a player from another group to reassign.
         </p>
       ) : null}
+    </div>
+  );
+}
+
+function SideRoster({
+  label,
+  playerIds,
+  playerById,
+  side,
+  allPlayerIds,
+  onPlayerSideChange,
+}: {
+  label: string;
+  playerIds: string[];
+  playerById: Map<string, Player>;
+  side: 'teamA' | 'teamB';
+  allPlayerIds: string[];
+  onPlayerSideChange: (playerId: string, side: 'teamA' | 'teamB') => void;
+}) {
+  return (
+    <div className="rounded-[0.9rem] border border-[var(--rule)] bg-[var(--canvas-raised)] px-[var(--space-3)] py-[var(--space-3)]">
+      <div className="flex items-center justify-between gap-[var(--space-2)]">
+        <p className="type-meta font-semibold text-[var(--ink)]">{label}</p>
+        <span className="type-micro text-[var(--ink-tertiary)]">{playerIds.length} players</span>
+      </div>
+      <div className="mt-[var(--space-2)] space-y-[var(--space-2)]">
+        {allPlayerIds.map((playerId) => {
+          const player = playerById.get(playerId);
+          if (!player) return null;
+          const isOnSide = playerIds.includes(playerId);
+          return (
+            <button
+              key={`${side}-${playerId}`}
+              type="button"
+              onClick={() => onPlayerSideChange(playerId, side)}
+              className={cn(
+                'flex min-h-10 w-full items-center justify-between gap-[var(--space-2)] rounded-[0.75rem] border px-[var(--space-2)] py-[var(--space-2)] text-left transition active:scale-[0.98]',
+                isOnSide
+                  ? 'border-[color:var(--masters)]/40 bg-[var(--masters-subtle)] text-[var(--masters)]'
+                  : 'border-[var(--rule)] bg-[var(--canvas)] text-[var(--ink-secondary)] hover:text-[var(--ink)]'
+              )}
+              aria-pressed={isOnSide}
+            >
+              <span className="truncate type-meta font-semibold">
+                {formatPlayerName(player.firstName, player.lastName, 'short')}
+              </span>
+              <span className="type-micro">{isOnSide ? 'Set' : 'Move'}</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

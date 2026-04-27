@@ -1,11 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { getSessionMock, signInWithOtpMock, exchangeCodeForSessionMock, verifyOtpMock, setSessionMock } = vi.hoisted(() => ({
+const {
+  getSessionMock,
+  signInWithOtpMock,
+  exchangeCodeForSessionMock,
+  verifyOtpMock,
+  setSessionMock,
+  resetPasswordForEmailMock,
+} = vi.hoisted(() => ({
   getSessionMock: vi.fn(),
   signInWithOtpMock: vi.fn(),
   exchangeCodeForSessionMock: vi.fn(),
   verifyOtpMock: vi.fn(),
   setSessionMock: vi.fn(),
+  resetPasswordForEmailMock: vi.fn(),
 }));
 
 vi.mock('@/lib/supabase/client', () => ({
@@ -16,12 +24,14 @@ vi.mock('@/lib/supabase/client', () => ({
       exchangeCodeForSession: exchangeCodeForSessionMock,
       verifyOtp: verifyOtpMock,
       setSession: setSessionMock,
+      resetPasswordForEmail: resetPasswordForEmailMock,
     },
   },
 }));
 
 describe('supabase auth helpers', () => {
   beforeEach(() => {
+    vi.unstubAllEnvs();
     vi.clearAllMocks();
   });
 
@@ -39,9 +49,8 @@ describe('supabase auth helpers', () => {
       error: null,
     });
 
-    const { getSupabaseAccessToken, getSupabaseSessionIdentity } = await import(
-      '@/lib/supabase/auth'
-    );
+    const { getSupabaseAccessToken, getSupabaseSessionIdentity } =
+      await import('@/lib/supabase/auth');
 
     await expect(getSupabaseAccessToken()).resolves.toBe('live-access-token');
     await expect(getSupabaseSessionIdentity()).resolves.toEqual({
@@ -81,12 +90,63 @@ describe('supabase auth helpers', () => {
     });
   });
 
+  it('prefers NEXT_PUBLIC_APP_URL for auth email redirects', async () => {
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://ryder-cup-battleground.app/some/path');
+    signInWithOtpMock.mockResolvedValue({
+      data: {},
+      error: null,
+    });
+
+    const { requestEmailSignInLink } = await import('@/lib/supabase/auth');
+
+    await requestEmailSignInLink('coop@example.com', '/login?next=%2Fschedule');
+
+    expect(signInWithOtpMock).toHaveBeenCalledWith({
+      email: 'coop@example.com',
+      options: {
+        emailRedirectTo: 'https://ryder-cup-battleground.app/login?next=%2Fschedule',
+        shouldCreateUser: true,
+      },
+    });
+  });
+
+  it('sends password reset emails to the public app origin', async () => {
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'https://ryder-cup-battleground.app');
+    resetPasswordForEmailMock.mockResolvedValue({
+      data: {},
+      error: null,
+    });
+
+    const { sendPasswordResetEmail } = await import('@/lib/supabase/auth');
+
+    await sendPasswordResetEmail(' CoOp@Example.com ');
+
+    expect(resetPasswordForEmailMock).toHaveBeenCalledWith('coop@example.com', {
+      redirectTo: 'https://ryder-cup-battleground.app/auth/callback?next=%2Fauth%2Freset-password',
+    });
+  });
+
+  it('avoids localhost password reset redirects in production shells', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', '');
+    resetPasswordForEmailMock.mockResolvedValue({
+      data: {},
+      error: null,
+    });
+
+    const { sendPasswordResetEmail } = await import('@/lib/supabase/auth');
+
+    await sendPasswordResetEmail('coop@example.com');
+
+    expect(resetPasswordForEmailMock).toHaveBeenCalledWith('coop@example.com', {
+      redirectTo: 'https://ryder-cup-battleground.app/auth/callback?next=%2Fauth%2Freset-password',
+    });
+  });
+
   it('builds the shared callback redirect path', async () => {
     const { buildMagicLinkRedirectPath } = await import('@/lib/supabase/auth');
 
-    expect(buildMagicLinkRedirectPath('/score/123')).toBe(
-      '/auth/callback?next=%2Fscore%2F123'
-    );
+    expect(buildMagicLinkRedirectPath('/score/123')).toBe('/auth/callback?next=%2Fscore%2F123');
     expect(buildMagicLinkRedirectPath()).toBe('/auth/callback');
   });
 

@@ -67,6 +67,18 @@ RATE_LIMIT_REDIS_REST_URL=<your-redis-rest-url>
 RATE_LIMIT_REDIS_REST_TOKEN=<your-redis-rest-token>
 ```
 
+`NEXT_PUBLIC_APP_URL` is also the canonical return URL for Supabase magic-link
+and password-reset emails. In Supabase Auth settings, set Site URL to the same
+production domain and add these redirect URLs for each environment:
+
+- `https://your-production-domain.com/auth/callback`
+- `https://your-staging-domain.com/auth/callback`
+- `http://localhost:3000/auth/callback` for local development only
+
+If the Site URL or redirect allow-list points at localhost in production,
+password-reset emails can verify successfully and then dump the user at
+`localhost`, where no deployed app is listening.
+
 ## Deployment Steps
 
 ### 1. Staging Supabase

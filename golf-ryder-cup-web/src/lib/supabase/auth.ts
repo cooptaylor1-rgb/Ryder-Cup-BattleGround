@@ -22,14 +22,63 @@ const SUPPORTED_OTP_TYPES = new Set<EmailOtpType>([
   'email',
 ]);
 
+const FALLBACK_PUBLIC_APP_ORIGIN = 'https://ryder-cup-battleground.app';
+const PLACEHOLDER_APP_HOSTS = new Set(['your-app-domain.com']);
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0']);
+
+function parseHttpOrigin(rawOrigin?: string | null): string | null {
+  const value = rawOrigin?.trim();
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const url = new URL(value);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      return null;
+    }
+    if (PLACEHOLDER_APP_HOSTS.has(url.hostname)) {
+      return null;
+    }
+    return url.origin;
+  } catch {
+    return null;
+  }
+}
+
+function isLocalOrigin(origin: string): boolean {
+  try {
+    return LOCAL_HOSTS.has(new URL(origin).hostname);
+  } catch {
+    return false;
+  }
+}
+
+export function getAuthRedirectOrigin(): string {
+  const configuredOrigin = parseHttpOrigin(process.env.NEXT_PUBLIC_APP_URL);
+  if (configuredOrigin) {
+    return configuredOrigin;
+  }
+
+  const browserOrigin =
+    typeof window !== 'undefined' ? parseHttpOrigin(window.location.origin) : null;
+  if (browserOrigin && !(process.env.NODE_ENV === 'production' && isLocalOrigin(browserOrigin))) {
+    return browserOrigin;
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    return FALLBACK_PUBLIC_APP_ORIGIN;
+  }
+
+  return browserOrigin ?? 'http://localhost:3000';
+}
+
 function createCallbackUrl(rawUrl: string | URL): URL {
   if (rawUrl instanceof URL) {
     return rawUrl;
   }
 
-  const base =
-    typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
-  return new URL(rawUrl, base);
+  return new URL(rawUrl, getAuthRedirectOrigin());
 }
 
 function getHashParams(url: URL): URLSearchParams {
@@ -106,10 +155,7 @@ export async function requestEmailSignInLink(
     throw new Error('Please enter your email address.');
   }
 
-  const emailRedirectTo =
-    typeof window === 'undefined'
-      ? undefined
-      : new URL(redirectPath, window.location.origin).toString();
+  const emailRedirectTo = new URL(redirectPath, getAuthRedirectOrigin()).toString();
 
   const { error } = await supabase.auth.signInWithOtp({
     email: normalizedEmail,
@@ -129,7 +175,7 @@ export async function requestEmailSignInLink(
     throw new Error(
       detail
         ? `Couldn’t send the sign-in link: ${detail}`
-        : 'Couldn’t send the sign-in link. Check your email address and try again.',
+        : 'Couldn’t send the sign-in link. Check your email address and try again.'
     );
   }
 }
@@ -183,7 +229,7 @@ export async function signInWithEmailPassword(email: string, password: string): 
     authLogger.warn('Supabase password sign-in failed:', error);
     const detail = error.message?.trim();
     throw new Error(
-      detail ? `Sign-in failed: ${detail}` : 'Sign-in failed. Check your email and password.',
+      detail ? `Sign-in failed: ${detail}` : 'Sign-in failed. Check your email and password.'
     );
   }
 }
@@ -204,9 +250,7 @@ export async function sendPasswordResetEmail(email: string): Promise<void> {
   const normalizedEmail = email.trim().toLowerCase();
   if (!normalizedEmail) throw new Error('Enter the email on your account first.');
 
-  const origin =
-    typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
-  const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent('/auth/reset-password')}`;
+  const redirectTo = `${getAuthRedirectOrigin()}/auth/callback?next=${encodeURIComponent('/auth/reset-password')}`;
 
   const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
     redirectTo,
@@ -215,7 +259,7 @@ export async function sendPasswordResetEmail(email: string): Promise<void> {
     authLogger.warn('Supabase password reset request failed:', error);
     const detail = error.message?.trim();
     throw new Error(
-      detail ? `Couldn't send reset email: ${detail}` : 'Couldn\'t send reset email. Try again.'
+      detail ? `Couldn't send reset email: ${detail}` : "Couldn't send reset email. Try again."
     );
   }
 }
@@ -231,14 +275,14 @@ export async function setNewPassword(password: string): Promise<void> {
     throw new Error('Cloud auth is unavailable on this device right now.');
   }
   if (!password || password.length < 6) {
-    throw new Error('Pick a password that\'s at least 6 characters.');
+    throw new Error("Pick a password that's at least 6 characters.");
   }
 
   const { error } = await supabase.auth.updateUser({ password });
   if (error) {
     authLogger.warn('Supabase password update failed:', error);
     const detail = error.message?.trim();
-    throw new Error(detail ? `Couldn't update password: ${detail}` : 'Couldn\'t update password.');
+    throw new Error(detail ? `Couldn't update password: ${detail}` : "Couldn't update password.");
   }
 }
 
