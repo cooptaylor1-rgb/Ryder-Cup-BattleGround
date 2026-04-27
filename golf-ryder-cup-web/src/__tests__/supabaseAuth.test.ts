@@ -310,4 +310,38 @@ describe('supabase auth helpers', () => {
       message: 'Link expired',
     });
   });
+
+  it('verifies legacy token+type recovery links via verifyOtp', async () => {
+    verifyOtpMock.mockResolvedValue({ error: null });
+    const { completeSupabaseAuthFromUrl } = await import('@/lib/supabase/auth');
+
+    const result = await completeSupabaseAuthFromUrl(
+      'http://localhost:3000/auth/reset-password?token=abc123&type=recovery'
+    );
+
+    expect(verifyOtpMock).toHaveBeenCalledWith({ token_hash: 'abc123', type: 'recovery' });
+    expect(result).toEqual({ status: 'success', message: 'Secure sign-in complete.' });
+  });
+
+  it('describeAuthUrl reports which auth params a callback URL contains', async () => {
+    const { describeAuthUrl } = await import('@/lib/supabase/auth');
+
+    const code = describeAuthUrl('http://localhost:3000/auth/reset-password?code=xyz');
+    expect(code.hasCode).toBe(true);
+    expect(code.hasTokenHash).toBe(false);
+    expect(code.presentKeys).toContain('code');
+
+    const tokenHash = describeAuthUrl(
+      'http://localhost:3000/auth/reset-password?token_hash=hash&type=recovery'
+    );
+    expect(tokenHash.hasTokenHash).toBe(true);
+    expect(tokenHash.type).toBe('recovery');
+
+    const empty = describeAuthUrl('http://localhost:3000/auth/reset-password');
+    expect(empty.hasCode).toBe(false);
+    expect(empty.hasTokenHash).toBe(false);
+    expect(empty.hasLegacyToken).toBe(false);
+    expect(empty.hasAccessToken).toBe(false);
+    expect(empty.presentKeys).toEqual([]);
+  });
 });

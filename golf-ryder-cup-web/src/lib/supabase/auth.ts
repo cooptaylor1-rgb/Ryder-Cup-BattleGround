@@ -387,6 +387,29 @@ export async function completeSupabaseAuthFromUrl(
     };
   }
 
+  // Legacy / customized email templates sometimes send `?token=<long>` instead
+  // of the modern `?token_hash=<hash>` shape. Supabase JS v2 still accepts
+  // these via verifyOtp using token_hash as the parameter name. Without this
+  // fallback, those links silently fall through to "noop" and the page
+  // displays nothing useful.
+  const legacyToken = url.searchParams.get('token');
+  if (legacyToken && otpType && SUPPORTED_OTP_TYPES.has(otpType as EmailOtpType)) {
+    const { error } = await supabase.auth.verifyOtp({
+      token_hash: legacyToken,
+      type: otpType as EmailOtpType,
+    });
+
+    if (error) {
+      authLogger.warn('Failed to verify legacy Supabase OTP token:', error);
+      return { status: 'error', message: linkFailureMessage(error) };
+    }
+
+    return {
+      status: 'success',
+      message: 'Secure sign-in complete.',
+    };
+  }
+
   const accessToken = hashParams.get('access_token');
   const refreshToken = hashParams.get('refresh_token');
   if (accessToken && refreshToken) {
@@ -423,5 +446,45 @@ export async function completeSupabaseAuthFromUrl(
   return {
     status: 'noop',
     message: 'No sign-in details were found in this link.',
+  };
+}
+
+/**
+ * Snapshot the auth-relevant params present on a callback URL. Used by the
+ * reset-password page to surface "your link is missing X" instead of an
+ * empty page when Supabase's redirect didn't include the expected token.
+ *
+ * Strips any actual token *values* — we only want to know *which keys*
+ * were present, never log secrets.
+ */
+export function describeAuthUrl(rawUrl: string | URL): {
+  hasCode: boolean;
+  hasTokenHash: boolean;
+  hasLegacyToken: boolean;
+  hasAccessToken: boolean;
+  hasRefreshToken: boolean;
+  type: string | null;
+  errorCode: string | null;
+  presentKeys: string[];
+} {
+  const url = createCallbackUrl(rawUrl);
+  const hashParams = getHashParams(url);
+  const presentKeys = [
+    ...Array.from(url.searchParams.keys()),
+    ...Array.from(hashParams.keys()).map((k) => `#${k}`),
+  ];
+  return {
+    hasCode: url.searchParams.has('code'),
+    hasTokenHash: url.searchParams.has('token_hash'),
+    hasLegacyToken: url.searchParams.has('token'),
+    hasAccessToken: hashParams.has('access_token'),
+    hasRefreshToken: hashParams.has('refresh_token'),
+    type: url.searchParams.get('type'),
+    errorCode:
+      url.searchParams.get('error_code') ??
+      url.searchParams.get('error') ??
+      hashParams.get('error_code') ??
+      hashParams.get('error'),
+    presentKeys,
   };
 }
