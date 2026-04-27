@@ -57,13 +57,24 @@ function createMatch(
 }
 
 describe('new lineup session helpers', () => {
-  it('uses the highest existing session number when creating a new session', () => {
+  it('uses the earliest open session number when creating a new session', () => {
     const sessions = [createSession('s1', 1), createSession('s4', 4), createSession('s5', 5)];
 
-    expect(getNextSessionNumber(sessions)).toBe(6);
+    expect(getNextSessionNumber(sessions)).toBe(2);
     expect(generateSessionName(1)).toBe('Day 1 AM');
     expect(generateSessionName(2)).toBe('Day 1 PM');
+    expect(generateSessionName(3)).toBe('Day 2 AM');
     expect(generateSessionName(5)).toBe('Day 3 AM');
+  });
+
+  it('fills the deleted Day 2 AM slot before continuing after stale later sessions', () => {
+    const sessions = [createSession('s1', 1), createSession('s2', 2), createSession('stale', 6)];
+
+    const nextSessionNumber = getNextSessionNumber(sessions);
+
+    expect(nextSessionNumber).toBe(3);
+    expect(generateSessionName(nextSessionNumber)).toBe('Day 2 AM');
+    expect(getDefaultTeeTimeForSessionNumber(nextSessionNumber)).toBe('08:00');
   });
 
   it('finds the earliest scheduled session with incomplete lineups', () => {

@@ -48,10 +48,13 @@ import {
   countPlayersWithoutHandicap,
 } from './managePageModel';
 
+const EMPTY_SESSIONS: RyderCupSession[] = [];
+const EMPTY_MATCHES: Match[] = [];
+
 export function ManagePageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentTrip, players, teams, teamMembers, courses, teeSets, updatePlayer, updateSession } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, teams: s.teams, teamMembers: s.teamMembers, courses: s.courses, teeSets: s.teeSets, updatePlayer: s.updatePlayer, updateSession: s.updateSession })));
+  const { currentTrip, players, teams, teamMembers, courses, teeSets, loadTrip, updatePlayer, updateSession } = useTripStore(useShallow(s => ({ currentTrip: s.currentTrip, players: s.players, teams: s.teams, teamMembers: s.teamMembers, courses: s.courses, teeSets: s.teeSets, loadTrip: s.loadTrip, updatePlayer: s.updatePlayer, updateSession: s.updateSession })));
   const { isCaptainMode } = useAccessStore(useShallow(s => ({ isCaptainMode: s.isCaptainMode })));
   const { showToast } = useToastStore(useShallow(s => ({ showToast: s.showToast })));
   const { showConfirm, ConfirmDialogComponent } = useConfirmDialog();
@@ -65,8 +68,8 @@ export function ManagePageClient() {
   const requestedFocus = searchParams?.get('focus') ?? null;
 
   const tripData = useTripScopedMatches(currentTrip?.id);
-  const sessions = tripData?.sessions ?? [];
-  const matches = tripData?.matches ?? [];
+  const sessions = tripData?.sessions ?? EMPTY_SESSIONS;
+  const matches = tripData?.matches ?? EMPTY_MATCHES;
 
   const teamById = useMemo(() => buildTeamById(teams), [teams]);
   const playerById = useMemo(() => buildPlayerById(players), [players]);
@@ -188,6 +191,9 @@ export function ManagePageClient() {
 
       try {
         await deleteSessionCascade(sessionId);
+        if (currentTrip?.id) {
+          await loadTrip(currentTrip.id);
+        }
         showToast('success', 'Session deleted');
       } catch (error) {
         captainLogger.error('Failed to delete session:', error);
@@ -196,7 +202,7 @@ export function ManagePageClient() {
         setIsSubmitting(false);
       }
     },
-    [isSubmitting, showToast]
+    [currentTrip?.id, isSubmitting, loadTrip, showToast]
   );
 
   const handleDeleteSession = useCallback(

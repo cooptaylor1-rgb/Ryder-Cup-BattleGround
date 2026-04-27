@@ -5,11 +5,18 @@ export function getTimeSlotForSessionNumber(sessionNumber: number): 'AM' | 'PM' 
 }
 
 export function getNextSessionNumber(sessions: Pick<RyderCupSession, 'sessionNumber'>[]): number {
-  const highestSessionNumber = sessions.reduce(
-    (highest, session) => Math.max(highest, session.sessionNumber),
-    0
+  const takenSessionNumbers = new Set(
+    sessions
+      .map((session) => session.sessionNumber)
+      .filter((sessionNumber) => Number.isInteger(sessionNumber) && sessionNumber > 0)
   );
-  return highestSessionNumber + 1;
+
+  let candidate = 1;
+  while (takenSessionNumbers.has(candidate)) {
+    candidate += 1;
+  }
+
+  return candidate;
 }
 
 export function getDefaultTeeTimeForSessionNumber(sessionNumber: number): string {
