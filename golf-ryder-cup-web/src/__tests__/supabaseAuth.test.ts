@@ -122,7 +122,7 @@ describe('supabase auth helpers', () => {
     await sendPasswordResetEmail(' CoOp@Example.com ');
 
     expect(resetPasswordForEmailMock).toHaveBeenCalledWith('coop@example.com', {
-      redirectTo: 'https://ryder-cup-battleground.app/auth/callback?next=%2Fauth%2Freset-password',
+      redirectTo: 'https://ryder-cup-battleground.app/auth/reset-password',
     });
   });
 
@@ -139,7 +139,7 @@ describe('supabase auth helpers', () => {
     await sendPasswordResetEmail('coop@example.com');
 
     expect(resetPasswordForEmailMock).toHaveBeenCalledWith('coop@example.com', {
-      redirectTo: 'https://ryder-cup-battleground.app/auth/callback?next=%2Fauth%2Freset-password',
+      redirectTo: 'https://ryder-cup-battleground.app/auth/reset-password',
     });
   });
 
@@ -223,6 +223,32 @@ describe('supabase auth helpers', () => {
     expect(setSessionMock).toHaveBeenCalledWith({
       access_token: 'access-token',
       refresh_token: 'refresh-token',
+    });
+  });
+
+  it('continues when an auth callback was already consumed into a session', async () => {
+    getSessionMock.mockResolvedValue({
+      data: {
+        session: {
+          access_token: 'already-stored-access-token',
+          user: {
+            id: 'user-1',
+            email: 'coop@example.com',
+          },
+        },
+      },
+      error: null,
+    });
+
+    const { completeSupabaseAuthFromUrl } = await import('@/lib/supabase/auth');
+
+    await expect(
+      completeSupabaseAuthFromUrl(
+        'http://localhost:3000/auth/callback?next=%2Fauth%2Freset-password'
+      )
+    ).resolves.toEqual({
+      status: 'success',
+      message: 'Secure sign-in complete.',
     });
   });
 

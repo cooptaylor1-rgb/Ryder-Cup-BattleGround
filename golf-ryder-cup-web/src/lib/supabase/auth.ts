@@ -126,6 +126,10 @@ function getAuthErrorMessage(url: URL): string | null {
   );
 }
 
+function isAuthCompletionUrl(url: URL): boolean {
+  return url.pathname === '/auth/callback' || url.pathname === PASSWORD_RESET_PATH;
+}
+
 export function buildMagicLinkRedirectPath(nextPath?: string | null): string {
   const normalizedNextPath = nextPath?.trim();
   if (!normalizedNextPath) {
@@ -266,11 +270,10 @@ export async function signInWithEmailPassword(email: string, password: string): 
 
 /**
  * Email a password-reset link. Supabase sends a one-time recovery link
- * that redirects back to /auth/callback?next=/auth/reset-password; the
- * callback establishes a short-lived recovery session and hands off to
- * the set-new-password screen. Used by the Forgot Password link on
- * /login for players who signed up during onboarding and can't
- * remember the password they picked.
+ * that redirects directly to the set-new-password screen. That screen
+ * establishes the short-lived recovery session before calling updateUser.
+ * Used by the Forgot Password link on /login for players who signed up
+ * during onboarding and can't remember the password they picked.
  */
 export async function sendPasswordResetEmail(email: string): Promise<void> {
   if (!supabase) {
@@ -280,7 +283,7 @@ export async function sendPasswordResetEmail(email: string): Promise<void> {
   const normalizedEmail = email.trim().toLowerCase();
   if (!normalizedEmail) throw new Error('Enter the email on your account first.');
 
-  const redirectTo = `${getAuthRedirectOrigin()}/auth/callback?next=${encodeURIComponent(PASSWORD_RESET_PATH)}`;
+  const redirectTo = `${getAuthRedirectOrigin()}${PASSWORD_RESET_PATH}`;
 
   const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
     redirectTo,
@@ -401,6 +404,20 @@ export async function completeSupabaseAuthFromUrl(
       status: 'success',
       message: 'Secure sign-in complete.',
     };
+  }
+
+  // Defensive recovery for links that were already consumed by an older
+  // Supabase client instance before this helper ran. That client stores the
+  // session and clears the URL hash, so the route can safely continue if a
+  // session is now present.
+  if (isAuthCompletionUrl(url)) {
+    const session = await getSupabaseSession();
+    if (session) {
+      return {
+        status: 'success',
+        message: 'Secure sign-in complete.',
+      };
+    }
   }
 
   return {

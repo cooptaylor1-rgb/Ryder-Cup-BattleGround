@@ -72,8 +72,11 @@ and password-reset emails. In Supabase Auth settings, set Site URL to the same
 production domain and add these redirect URLs for each environment:
 
 - `https://your-production-domain.com/auth/callback`
+- `https://your-production-domain.com/auth/reset-password`
 - `https://your-staging-domain.com/auth/callback`
+- `https://your-staging-domain.com/auth/reset-password`
 - `http://localhost:3000/auth/callback` for local development only
+- `http://localhost:3000/auth/reset-password` for local development only
 
 If the Site URL or redirect allow-list points at localhost in production,
 password-reset emails can verify successfully and then dump the user at

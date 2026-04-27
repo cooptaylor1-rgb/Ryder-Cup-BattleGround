@@ -25,6 +25,11 @@ export const supabase: SupabaseClient<Database> | null = isSupabaseConfigured
         auth: {
             persistSession: true,
             autoRefreshToken: true,
+            // Auth links are handled explicitly by /auth/callback and
+            // /auth/reset-password. Leaving Supabase's eager URL detector on
+            // can consume and clear recovery tokens before those pages route
+            // the user to the password form.
+            detectSessionInUrl: false,
         },
     })
     : null;
