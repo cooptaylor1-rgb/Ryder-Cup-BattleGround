@@ -16,7 +16,7 @@
 
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AnimatePresence,
   motion,
@@ -24,7 +24,7 @@ import {
   useTransform,
   type PanInfo,
 } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, Lock, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useHaptic } from '@/lib/hooks';
 import { useSwipeBackProtection } from '@/lib/hooks/useSwipeBackProtection';
@@ -76,7 +76,41 @@ export function ScoreInputPanel({
   const y = useMotionValue(0);
 
   const [confirmedWinner, setConfirmedWinner] = useState<HoleWinner | null>(null);
+  /**
+   * When the hole already has a recorded result, a tap on a *different*
+   * winner doesn't commit immediately — it arms a pending change.
+   * A second tap on the same target then commits. This prevents the
+   * overwhelmingly common "I tapped while reviewing the scorecard"
+   * accidental overwrite. Keyboard, gestures, and tap all flow through
+   * the same `fire` path so the rule holds for every input.
+   */
+  const [pendingChange, setPendingChange] = useState<HoleWinner | null>(null);
+  const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastFireRef = useRef(0);
+
+  const isLocked = Boolean(existingResult && existingResult !== 'none');
+
+  // Reset pending change whenever the hole or its recorded winner
+  // changes — moving to a new hole shouldn't carry an armed state with
+  // it. The setState call here IS the intended side effect (external
+  // prop changed → clear local arming), which is exactly what
+  // useEffect is for; the React 19 set-state-in-effect rule's
+  // suggestion to derive at render time would just split the logic.
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    setPendingChange(null);
+    if (pendingTimerRef.current) {
+      clearTimeout(pendingTimerRef.current);
+      pendingTimerRef.current = null;
+    }
+  }, [existingResult]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  useEffect(() => {
+    return () => {
+      if (pendingTimerRef.current) clearTimeout(pendingTimerRef.current);
+    };
+  }, []);
 
   const aOpacity = useTransform(x, [-SWIPE_THRESHOLD, 0], [1, 0]);
   const bOpacity = useTransform(x, [0, SWIPE_THRESHOLD], [0, 1]);
@@ -92,12 +126,46 @@ export function ScoreInputPanel({
     ]
   );
 
+  const armPendingChange = useCallback(
+    (winner: HoleWinner) => {
+      haptic.warning();
+      setPendingChange(winner);
+      if (pendingTimerRef.current) clearTimeout(pendingTimerRef.current);
+      pendingTimerRef.current = setTimeout(() => {
+        setPendingChange((current) => (current === winner ? null : current));
+        pendingTimerRef.current = null;
+      }, 3000);
+    },
+    [haptic]
+  );
+
   const fire = useCallback(
     (winner: HoleWinner) => {
       if (disabled) return;
       const now = Date.now();
       if (now - lastFireRef.current < 250) return;
       lastFireRef.current = now;
+
+      // Locked-hole edit gate. Tapping the same winner that's already
+      // recorded is a no-op (nothing to change). Tapping a different
+      // winner first arms it; a second tap commits.
+      if (isLocked) {
+        if (winner === existingResult) {
+          // Best UX is silent rejection rather than a buzz — they're
+          // confirming the recorded value by tapping it again.
+          return;
+        }
+        if (pendingChange !== winner) {
+          armPendingChange(winner);
+          return;
+        }
+        // Second tap on the armed target — fall through and commit.
+        if (pendingTimerRef.current) {
+          clearTimeout(pendingTimerRef.current);
+          pendingTimerRef.current = null;
+        }
+        setPendingChange(null);
+      }
 
       haptic.scorePoint();
       setConfirmedWinner(winner);
@@ -108,7 +176,7 @@ export function ScoreInputPanel({
         window.setTimeout(() => setConfirmedWinner(null), 220);
       }, CONFIRM_DELAY_MS);
     },
-    [disabled, haptic, onScore]
+    [disabled, haptic, onScore, isLocked, existingResult, pendingChange, armPendingChange]
   );
 
   const handlePanEnd = useCallback(
@@ -221,11 +289,25 @@ export function ScoreInputPanel({
 
       <div className="relative z-10 grid grid-cols-[minmax(0,1fr)_5rem_minmax(0,1fr)] gap-2 p-3 sm:gap-3 sm:p-4">
         {order.map((slot) => {
+          // Locked-state visual model:
+          //   - The recorded winner stays at full saturation with a
+          //     "RECORDED" badge so it reads as the active state.
+          //   - Other options drop to ~40% opacity so they don't
+          //     compete for the eye but stay tappable to start a
+          //     change.
+          //   - When the user has armed a change (pending), the
+          //     pending option lights up with a gold "TAP AGAIN"
+          //     ring so they know what their next tap will do.
+          const isRecorded = isLocked && existingResult === slot;
+          const isArmed = pendingChange === slot;
+          const isDimmed = isLocked && !isRecorded && !isArmed;
           if (slot === 'halved') {
             return (
               <HalveButton
                 key="halved"
-                selected={existingResult === 'halved'}
+                recorded={isRecorded}
+                armed={isArmed}
+                dimmed={isDimmed}
                 pending={confirmedWinner === 'halved'}
                 onClick={() => fire('halved')}
                 disabled={disabled}
@@ -238,7 +320,9 @@ export function ScoreInputPanel({
               key={slot}
               teamName={isA ? teamAName : teamBName}
               teamColor={isA ? teamAColor : teamBColor}
-              selected={existingResult === slot}
+              recorded={isRecorded}
+              armed={isArmed}
+              dimmed={isDimmed}
               pending={confirmedWinner === slot}
               onClick={() => fire(slot)}
               disabled={disabled}
@@ -249,22 +333,54 @@ export function ScoreInputPanel({
         })}
       </div>
 
-      {(helperLine || (strokesAvailable && onOpenStrokeEntry)) && (
-        <div className="relative z-10 flex flex-wrap items-center justify-between gap-2 border-t border-[color:var(--rule)] bg-[var(--canvas-sunken)] px-4 py-2.5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
-            {helperLine ?? 'Tap or swipe — gestures and taps both work.'}
-          </p>
-          {strokesAvailable && onOpenStrokeEntry && (
-            <button
-              type="button"
-              onClick={onOpenStrokeEntry}
-              className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[color:var(--rule)] bg-[var(--canvas)] px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas-sunken)]"
-            >
-              Enter strokes
-            </button>
-          )}
-        </div>
-      )}
+      {/*
+        Contextual footer. Three states:
+          • Pending change → "Tap [TARGET] again to confirm change"
+            with team-color accent. This is the loudest state because
+            the user is mid-decision.
+          • Locked (recorded, no pending) → "Recorded · X wins · Tap
+            any team to change". Surfaces the recorded value AND the
+            mechanism for changing it without burying it in a chip.
+          • Clean → original helper line + "Enter strokes" link.
+      */}
+      <div className="relative z-10 border-t border-[color:var(--rule)] bg-[var(--canvas-sunken)] px-4 py-2.5">
+        {pendingChange ? (
+          <PendingChangeBanner
+            target={pendingChange}
+            teamAName={teamAName}
+            teamBName={teamBName}
+            teamAColor={teamAColor}
+            teamBColor={teamBColor}
+          />
+        ) : isLocked ? (
+          <RecordedBanner
+            existingResult={existingResult as HoleWinner}
+            teamAName={teamAName}
+            teamBName={teamBName}
+            teamAColor={teamAColor}
+            teamBColor={teamBColor}
+            strokesAvailable={strokesAvailable}
+            onOpenStrokeEntry={onOpenStrokeEntry}
+          />
+        ) : (
+          (helperLine || (strokesAvailable && onOpenStrokeEntry)) && (
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+                {helperLine ?? 'Tap or swipe — gestures and taps both work.'}
+              </p>
+              {strokesAvailable && onOpenStrokeEntry && (
+                <button
+                  type="button"
+                  onClick={onOpenStrokeEntry}
+                  className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[color:var(--rule)] bg-[var(--canvas)] px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas-sunken)]"
+                >
+                  Enter strokes
+                </button>
+              )}
+            </div>
+          )
+        )}
+      </div>
 
       <AnimatePresence>
         {confirmedWinner && (
@@ -299,7 +415,9 @@ export function ScoreInputPanel({
 function TeamButton({
   teamName,
   teamColor,
-  selected,
+  recorded,
+  armed,
+  dimmed,
   pending,
   onClick,
   disabled,
@@ -308,24 +426,41 @@ function TeamButton({
 }: {
   teamName: string;
   teamColor: string;
-  selected: boolean;
+  recorded: boolean;
+  armed: boolean;
+  dimmed: boolean;
   pending: boolean;
   onClick: () => void;
   disabled: boolean;
   align: 'left' | 'right';
   prefersReducedMotion: boolean;
 }) {
+  const ariaParts = [`${teamName} wins this hole`];
+  if (recorded) ariaParts.push('(currently recorded)');
+  if (armed) ariaParts.push('(tap again to change)');
+
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      aria-pressed={selected}
-      aria-label={`${teamName} wins this hole${selected ? ' (recorded)' : ''}`}
+      aria-pressed={recorded}
+      aria-label={ariaParts.join(' ')}
       className={cn(
-        'group relative z-10 flex min-h-[120px] flex-col justify-between overflow-hidden rounded-[20px] px-4 py-4 text-left transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas-raised)] active:scale-[0.98] disabled:cursor-not-allowed',
+        'group relative z-10 flex min-h-[120px] flex-col justify-between overflow-hidden rounded-[20px] px-4 py-4 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas-raised)] active:scale-[0.98] disabled:cursor-not-allowed',
         align === 'right' && 'text-right',
-        selected && 'ring-2 ring-[var(--gold)] ring-offset-2 ring-offset-[var(--canvas-raised)]',
+        // Recorded state: matt gold ring + a RECORDED corner badge.
+        recorded &&
+          'ring-2 ring-[var(--gold)] ring-offset-2 ring-offset-[var(--canvas-raised)]',
+        // Armed (pending change): pulsing gold ring to communicate
+        // "tap again to commit" without making it look identical to
+        // the recorded state.
+        armed &&
+          'animate-pulse ring-4 ring-[var(--gold)] ring-offset-2 ring-offset-[var(--canvas-raised)]',
+        // Dimmed: locked-but-not-this-team. Stays visible/tappable
+        // (the user may want to change to this team) but recedes
+        // visually so the recorded state reads as the active one.
+        dimmed && 'opacity-40 saturate-[0.7]',
         pending && 'scale-[0.97]'
       )}
       style={{
@@ -334,52 +469,182 @@ function TeamButton({
       }}
     >
       <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[color:var(--canvas)]/75">
-        {align === 'left' ? '← Swipe or tap' : 'Tap or swipe →'}
+        {recorded
+          ? '✓ Recorded'
+          : armed
+            ? 'Tap again →'
+            : align === 'left'
+              ? '← Swipe or tap'
+              : 'Tap or swipe →'}
       </span>
       <span className="block text-[length:var(--text-xl)] font-semibold leading-tight">
         {teamName}
       </span>
       <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-[color:var(--canvas)]/75">
-        wins hole
+        {recorded ? 'won hole' : armed ? 'change to' : 'wins hole'}
       </span>
     </button>
   );
 }
 
 function HalveButton({
-  selected,
+  recorded,
+  armed,
+  dimmed,
   pending,
   onClick,
   disabled,
 }: {
-  selected: boolean;
+  recorded: boolean;
+  armed: boolean;
+  dimmed: boolean;
   pending: boolean;
   onClick: () => void;
   disabled: boolean;
 }) {
+  const ariaParts = ['Halve this hole'];
+  if (recorded) ariaParts.push('(currently recorded)');
+  if (armed) ariaParts.push('(tap again to change)');
+
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      aria-pressed={selected}
-      aria-label={`Halve this hole${selected ? ' (recorded)' : ''}`}
+      aria-pressed={recorded}
+      aria-label={ariaParts.join(' ')}
       className={cn(
-        'group relative z-10 flex min-h-[120px] flex-col items-center justify-center gap-1 overflow-hidden rounded-[20px] border bg-[var(--canvas)] px-2 py-3 text-center transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas-raised)] active:scale-[0.98] disabled:cursor-not-allowed',
-        selected
+        'group relative z-10 flex min-h-[120px] flex-col items-center justify-center gap-1 overflow-hidden rounded-[20px] border bg-[var(--canvas)] px-2 py-3 text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas-raised)] active:scale-[0.98] disabled:cursor-not-allowed',
+        recorded
           ? 'border-[color:var(--gold)] ring-2 ring-[var(--gold)] ring-offset-2 ring-offset-[var(--canvas-raised)]'
           : 'border-[color:var(--rule)]',
+        armed &&
+          'animate-pulse ring-4 ring-[var(--gold)] ring-offset-2 ring-offset-[var(--canvas-raised)]',
+        dimmed && 'opacity-40',
         pending && 'scale-[0.97]'
       )}
     >
       <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[var(--ink-tertiary)]">
-        ↑
+        {recorded ? '✓' : armed ? 'Tap again' : '↑'}
       </span>
       <span className="text-base font-semibold text-[var(--ink)]">Halve</span>
       <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
-        Tie
+        {recorded ? 'recorded' : armed ? 'change to' : 'Tie'}
       </span>
     </button>
+  );
+}
+
+/**
+ * Footer banner shown when the hole already has a recorded result and
+ * the user has not yet tapped a different option. Communicates the
+ * recorded value with the team's color, plus an explicit hint that
+ * tapping any team will start a change. Replaces the previous tiny
+ * grey chip on the cockpit.
+ */
+function RecordedBanner({
+  existingResult,
+  teamAName,
+  teamBName,
+  teamAColor,
+  teamBColor,
+  strokesAvailable,
+  onOpenStrokeEntry,
+}: {
+  existingResult: HoleWinner;
+  teamAName: string;
+  teamBName: string;
+  teamAColor: string;
+  teamBColor: string;
+  strokesAvailable?: boolean;
+  onOpenStrokeEntry?: () => void;
+}) {
+  const winnerLabel =
+    existingResult === 'teamA'
+      ? `${teamAName} wins`
+      : existingResult === 'teamB'
+        ? `${teamBName} wins`
+        : 'Halved';
+  const accent =
+    existingResult === 'teamA'
+      ? teamAColor
+      : existingResult === 'teamB'
+        ? teamBColor
+        : 'var(--ink-secondary)';
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex min-w-0 items-center gap-2">
+        <span
+          aria-hidden
+          className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[var(--canvas)]"
+          style={{ background: accent }}
+        >
+          <Lock size={12} strokeWidth={2.5} />
+        </span>
+        <p className="min-w-0 truncate text-[11px] font-semibold uppercase tracking-[0.14em]">
+          <span style={{ color: accent }}>Recorded · {winnerLabel}</span>
+          <span className="ml-2 text-[var(--ink-tertiary)]">Tap any team to change</span>
+        </p>
+      </div>
+      {strokesAvailable && onOpenStrokeEntry && (
+        <button
+          type="button"
+          onClick={onOpenStrokeEntry}
+          className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[color:var(--rule)] bg-[var(--canvas)] px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)] transition-colors hover:text-[var(--ink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas-sunken)]"
+        >
+          Enter strokes
+        </button>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Footer banner shown after the first tap of a different option on a
+ * locked hole. Tells the user explicitly what the second tap will do
+ * and gives a 3-second window to confirm or back off (auto-disarms).
+ */
+function PendingChangeBanner({
+  target,
+  teamAName,
+  teamBName,
+  teamAColor,
+  teamBColor,
+}: {
+  target: HoleWinner;
+  teamAName: string;
+  teamBName: string;
+  teamAColor: string;
+  teamBColor: string;
+}) {
+  const targetLabel =
+    target === 'teamA' ? teamAName : target === 'teamB' ? teamBName : 'Halved';
+  const accent =
+    target === 'teamA'
+      ? teamAColor
+      : target === 'teamB'
+        ? teamBColor
+        : 'var(--ink-secondary)';
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span
+        aria-hidden
+        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[var(--canvas)]"
+        style={{ background: 'var(--gold)' }}
+      >
+        <RefreshCw size={12} strokeWidth={2.5} />
+      </span>
+      <p
+        role="status"
+        aria-live="polite"
+        className="min-w-0 truncate text-[11px] font-semibold uppercase tracking-[0.14em]"
+      >
+        <span style={{ color: accent }}>Tap {targetLabel} again to change</span>
+        <span className="ml-2 text-[var(--ink-tertiary)]">or wait to cancel</span>
+      </p>
+    </div>
   );
 }
 

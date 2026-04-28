@@ -15,7 +15,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Pencil, Shield } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ScoreInputPanel } from './ScoreInputPanel';
 import { HoleStrip } from './HoleStrip';
@@ -133,14 +133,14 @@ export function MatchCockpit({
         <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink-secondary)]">
           {factParts.join(' · ')}
         </p>
-        {currentHoleResult && currentHoleResult.winner !== 'none' && (
-          <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[var(--canvas-sunken)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)]">
-            <Pencil size={11} />
-            {currentHoleResult.winner === 'halved'
-              ? 'Halved — tap below to change'
-              : `${currentHoleResult.winner === 'teamA' ? teams.teamAName : teams.teamBName} won — tap to change`}
-          </p>
-        )}
+        {/*
+          Recorded-result feedback used to live here as a small grey
+          chip ("Halved — tap below to change"), which was easy to
+          miss while reviewing a card. The ScoreInputPanel below now
+          surfaces the recorded state with a full team-coloured
+          banner + locked button styling, so this duplicated chip
+          would just dilute the signal.
+        */}
       </div>
 
       {/* The single sacred surface */}
