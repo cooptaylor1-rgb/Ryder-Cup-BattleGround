@@ -41,6 +41,7 @@ import {
   type StandingsTab,
 } from '@/components/standings/StandingsPageSections';
 import { RecentlyClosedMatchBanner } from '@/components/standings/RecentlyClosedMatchBanner';
+import { TripCompleteCelebration } from '@/components/standings/TripCompleteCelebration';
 
 /**
  * STANDINGS PAGE — The Complete Leaderboard
@@ -380,6 +381,47 @@ export default function StandingsPage() {
       <section className="container-editorial pt-[var(--space-6)]">
         <RecentlyClosedMatchBanner />
       </section>
+
+      {/*
+        Trip-complete celebration. Standalone component owns its own
+        once-per-device gating and renders nothing until the trip is
+        actually finished. When complete it shows a persistent banner
+        every visit AND a one-shot full-screen overlay the first time
+        a captain hits this page after the result is decided.
+      */}
+      {standings && magicNumber && (() => {
+        const isComplete =
+          magicNumber.hasClinched ||
+          (standings.remainingMatches === 0 && standings.matchesCompleted > 0);
+        if (!isComplete) return null;
+
+        const winningTeamName = magicNumber.hasClinched
+          ? magicNumber.clinchingTeam === 'A'
+            ? teamAName
+            : teamBName
+          : standings.leader === 'teamA'
+            ? teamAName
+            : standings.leader === 'teamB'
+              ? teamBName
+              : null;
+
+        const finalScoreLine =
+          standings.teamAPoints !== undefined && standings.teamBPoints !== undefined
+            ? `${standings.teamAPoints}–${standings.teamBPoints}`
+            : undefined;
+
+        return (
+          <section className="container-editorial pt-[var(--space-3)]">
+            <TripCompleteCelebration
+              isComplete={isComplete}
+              tripId={currentTrip.id}
+              tripName={currentTrip.name}
+              winningTeamName={winningTeamName}
+              finalScoreLine={finalScoreLine}
+            />
+          </section>
+        );
+      })()}
 
       <section className="container-editorial pt-[var(--space-4)]">
         <StandingsMasthead
