@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import Link from 'next/link';
 import { cn, getCountdown, getCountdownColor, isToday, parseDateInLocalZone } from '@/lib/utils';
 import type { DaySchedule, ScheduleEntry } from '@/components/schedule/scheduleData';
 import { Calendar, ChevronRight, Clock, Flag, Sunrise, Sunset, User } from 'lucide-react';
@@ -14,60 +13,51 @@ export function ScheduleTabSelector({
   onSelectAll,
 }: {
   selectedTab: 'my' | 'all';
+  /** Canonical route for the "your matches" tab — exposed as `data-href`
+   *  for tests that want to assert what URL each tab maps to. The button
+   *  itself drives navigation through the explicit click handler. */
   myHref: string;
   allHref: string;
   onSelectMy?: () => void;
   onSelectAll?: () => void;
 }) {
-  const handleTabClick =
-    (onSelect?: () => void) => (event: React.MouseEvent<HTMLAnchorElement>) => {
-      if (!onSelect) {
-        return;
-      }
+  const baseClass =
+    'flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-all active:scale-[0.99] sm:text-base ' +
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)]';
 
-      event.preventDefault();
-      onSelect();
-    };
+  const selectedClass = 'bg-[var(--masters)] text-[var(--canvas)] shadow-card-sm';
+  const unselectedClass =
+    'border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink)] hover:border-[color:var(--masters)]/35 hover:bg-[color:var(--masters)]/5';
 
   return (
     <div className="container-editorial py-4" role="tablist" aria-label="Schedule views">
       <div className="flex gap-2">
-        <Link
-          href={myHref}
-          scroll={false}
-          onClick={handleTabClick(onSelectMy)}
+        <button
+          type="button"
+          onClick={onSelectMy}
+          disabled={!onSelectMy}
           role="tab"
           aria-selected={selectedTab === 'my'}
           aria-controls="schedule-content"
-          className={cn(
-            'flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold no-underline transition-all active:scale-[0.99] sm:text-base',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)]',
-            selectedTab === 'my'
-              ? 'bg-[var(--masters)] text-[var(--canvas)] shadow-card-sm'
-              : 'border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink)] hover:border-[color:var(--masters)]/35 hover:bg-[color:var(--masters)]/5'
-          )}
+          data-href={myHref}
+          className={cn(baseClass, selectedTab === 'my' ? selectedClass : unselectedClass)}
         >
           <User size={18} className="shrink-0" />
           Your Matches
-        </Link>
-        <Link
-          href={allHref}
-          scroll={false}
-          onClick={handleTabClick(onSelectAll)}
+        </button>
+        <button
+          type="button"
+          onClick={onSelectAll}
+          disabled={!onSelectAll}
           role="tab"
           aria-selected={selectedTab === 'all'}
           aria-controls="schedule-content"
-          className={cn(
-            'flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold no-underline transition-all active:scale-[0.99] sm:text-base',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)]',
-            selectedTab === 'all'
-              ? 'bg-[var(--masters)] text-[var(--canvas)] shadow-card-sm'
-              : 'border border-[var(--rule)] bg-[var(--surface)] text-[var(--ink)] hover:border-[color:var(--masters)]/35 hover:bg-[color:var(--masters)]/5'
-          )}
+          data-href={allHref}
+          className={cn(baseClass, selectedTab === 'all' ? selectedClass : unselectedClass)}
         >
           <Calendar size={18} className="shrink-0" />
           Full Schedule
-        </Link>
+        </button>
       </div>
     </div>
   );
