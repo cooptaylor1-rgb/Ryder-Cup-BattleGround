@@ -16,9 +16,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Shield } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CloudOff, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useWakeLock } from '@/lib/hooks';
+import { useOnlineStatus, useWakeLock } from '@/lib/hooks';
 import type { HoleWinner } from '@/lib/types/models';
 import { ScoreInputPanel } from './ScoreInputPanel';
 import { HoleStrip } from './HoleStrip';
@@ -64,6 +64,15 @@ export function MatchCockpit({
   // is in a recap/edit state — the captain is reviewing, not stroking.
   // Released on unmount; re-acquired on visibility change.
   useWakeLock(!isMatchComplete || isEditingScores);
+
+  // Surface offline state inline on the cockpit. The global pill in
+  // NavigationShell tells the captain there are pending writes, but
+  // the cockpit itself stays cheerful even when the device just lost
+  // connectivity — which is the moment the captain most wants
+  // reassurance that their tap was actually captured. This banner
+  // sits with the editing banner and quietly says "keep scoring,
+  // we'll catch up when you're back."
+  const isOnline = useOnlineStatus();
 
   /**
    * Brief team-color "wash" over the cockpit body when a hole result
@@ -191,6 +200,19 @@ export function MatchCockpit({
           >
             Done
           </button>
+        </div>
+      )}
+
+      {!isOnline && (
+        <div
+          className="flex items-center gap-2 rounded-[14px] border border-[color:var(--ink-tertiary)]/22 bg-[var(--canvas-raised)] px-3 py-2"
+          role="status"
+          aria-live="polite"
+        >
+          <CloudOff size={14} className="shrink-0 text-[var(--ink-secondary)]" />
+          <p className="text-xs font-medium text-[var(--ink-secondary)]">
+            Offline — saving to this phone. We&rsquo;ll sync when you&rsquo;re back.
+          </p>
         </div>
       )}
 

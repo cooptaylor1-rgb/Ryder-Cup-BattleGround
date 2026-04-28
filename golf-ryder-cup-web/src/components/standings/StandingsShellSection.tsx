@@ -1,6 +1,24 @@
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { RefreshCw } from 'lucide-react';
 
 import type { MagicNumber, TeamStandings } from '@/lib/types/computed';
+
+/**
+ * Compact "X min ago" formatter used by the masthead's refresh pill.
+ * Returns null when we don't have a timestamp yet — the pill hides
+ * the relative line entirely in that case rather than showing a
+ * placeholder that would just be visual noise.
+ */
+function formatRelativeShort(ms: number, now: number): string | null {
+  if (!Number.isFinite(ms)) return null;
+  const diffSec = Math.max(0, Math.round((now - ms) / 1000));
+  if (diffSec < 30) return 'just now';
+  if (diffSec < 90) return '1 min ago';
+  const diffMin = Math.round(diffSec / 60);
+  if (diffMin < 60) return `${diffMin} min ago`;
+  const diffHr = Math.floor(diffMin / 60);
+  return `${diffHr}h ago`;
+}
 
 export function StandingsMasthead({
   standings,
@@ -10,6 +28,9 @@ export function StandingsMasthead({
   currentTripName,
   matchesCompleted,
   totalMatches,
+  lastUpdatedAt,
+  onRefresh,
+  isRefreshing,
 }: {
   standings: TeamStandings | null;
   magicNumber: MagicNumber | null;
@@ -18,7 +39,19 @@ export function StandingsMasthead({
   currentTripName: string;
   matchesCompleted: number;
   totalMatches: number;
+  lastUpdatedAt: Date | null;
+  onRefresh: () => void;
+  isRefreshing: boolean;
 }) {
+  // Tick once a minute so "2 min ago" stays current without a parent
+  // re-render. Cheap — only re-renders this component, and React
+  // diff'ing skips the rest of the page.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const interval = window.setInterval(() => setNow(Date.now()), 30_000);
+    return () => window.clearInterval(interval);
+  }, []);
+  const relativeUpdate = lastUpdatedAt ? formatRelativeShort(lastUpdatedAt.getTime(), now) : null;
   const summary = !standings
     ? 'The board will take shape once matches are underway.'
     : standings.leader === 'teamA'
@@ -35,10 +68,37 @@ export function StandingsMasthead({
   return (
     <div className="overflow-hidden rounded-[2rem] border border-[var(--rule)] bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(248,244,237,0.94))] shadow-[0_22px_48px_rgba(46,34,18,0.08)]">
       <div className="border-b border-[color:var(--rule)]/80 px-[var(--space-5)] py-[var(--space-5)]">
-        <p className="type-overline tracking-[0.2em] text-[var(--ink-tertiary)]">Leaderboard</p>
-        <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,8vw,3.3rem)] italic leading-[1.02] text-[var(--ink)]">
-          {currentTripName}
-        </h1>
+        <div className="flex items-start justify-between gap-[var(--space-3)]">
+          <div className="min-w-0">
+            <p className="type-overline tracking-[0.2em] text-[var(--ink-tertiary)]">Leaderboard</p>
+            <h1 className="mt-[var(--space-2)] font-serif text-[clamp(2rem,8vw,3.3rem)] italic leading-[1.02] text-[var(--ink)]">
+              {currentTripName}
+            </h1>
+          </div>
+          {/* Refresh affordance. The aggregates already auto-update
+              from Dexie's live invalidation, but captains who suspect
+              data is stale (rare proxy hiccup, returning from
+              background, etc.) want a one-tap "force refresh" button
+              instead of having to navigate away and back. The
+              "X min ago" line gives them confidence in the data they
+              are looking at. */}
+          <button
+            type="button"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            className="inline-flex items-center gap-[var(--space-2)] rounded-full border border-[var(--rule)] bg-[rgba(255,255,255,0.78)] px-[var(--space-3)] py-[var(--space-2)] text-xs font-medium text-[var(--ink-secondary)] shadow-card-sm transition-colors hover:bg-[var(--canvas-raised)] disabled:opacity-60"
+            aria-label="Refresh standings"
+          >
+            <RefreshCw
+              size={14}
+              className={isRefreshing ? 'animate-spin' : ''}
+              aria-hidden
+            />
+            <span className="hidden sm:inline">
+              {relativeUpdate ? `Updated ${relativeUpdate}` : 'Refresh'}
+            </span>
+          </button>
+        </div>
         <p className="mt-[var(--space-3)] type-body-sm text-[var(--ink-secondary)]">{summary}</p>
       </div>
 

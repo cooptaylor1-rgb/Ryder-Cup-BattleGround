@@ -27,6 +27,7 @@ import { HeroMetaPill, HeroMetaStat, HomeSectionHeader } from './HomeSharedCompo
 import { TripCard } from './TripCard';
 import { CaptainSetupGuide } from './CaptainSetupGuide';
 import { EventDayPreFlightBanner } from './EventDayPreFlightBanner';
+import { SessionHandoffBanner } from '@/components/SessionHandoffBanner';
 import { TeamLogo } from '@/components/team/TeamLogo';
 
 function readPendingJoinCode(): string | undefined {
@@ -328,6 +329,7 @@ export default function HomePage() {
               />
             ) : null}
             <EventDayPreFlightBanner />
+            <SessionHandoffBanner />
           </div>
 
           {/* ── ACTIVE TOURNAMENT ── */}
