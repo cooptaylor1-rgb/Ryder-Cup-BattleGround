@@ -31,6 +31,7 @@ interface LiveRegionProps {
   teamAName: string;
   teamBName: string;
   saveState: 'idle' | 'saving' | 'saved' | 'offline';
+  totalHoles: number;
 }
 
 export function LiveRegion({
@@ -41,6 +42,7 @@ export function LiveRegion({
   teamAName,
   teamBName,
   saveState,
+  totalHoles,
 }: LiveRegionProps) {
   const [holeMessage, setHoleMessage] = useState('');
   const [scoreMessage, setScoreMessage] = useState('');
@@ -83,9 +85,9 @@ export function LiveRegion({
     if (lastHoleNavigated.current === currentHole) return;
     lastHoleNavigated.current = currentHole;
     setHoleMessage(
-      `Hole ${currentHole} of 18, par ${currentPar}, stroke index ${currentStrokeIndex}.`
+      `Hole ${currentHole} of ${totalHoles}, par ${currentPar}, stroke index ${currentStrokeIndex}.`
     );
-  }, [currentHole, currentPar, currentStrokeIndex]);
+  }, [currentHole, currentPar, currentStrokeIndex, totalHoles]);
 
   useEffect(() => {
     if (lastSaveState.current === saveState) return;

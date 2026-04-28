@@ -23,6 +23,7 @@ import {
   type CurrentTripPlayerIdentity,
 } from '@/lib/utils/tripPlayerIdentity';
 import { buildMatchHandicapContext } from '@/lib/services/matchHandicapService';
+import { getMatchPlayStrokesOnHole } from '@/lib/services/handicapCalculator';
 import { calculateMatchState } from '@/lib/services/scoringEngine';
 import type { SideBet as ReminderSideBet } from '@/components/live-play/SideBetReminder';
 
@@ -56,6 +57,8 @@ export interface MatchScoringPageModel {
   preferredScoringMode: ScoringMode;
   scoringModeMeta: ScoringModeMeta;
   scoringModeSessionKey: string;
+  totalHoles: number;
+  strokesByHole: Array<{ teamAStrokes: number; teamBStrokes: number }>;
   sessionLeaderboard: Array<{
     matchId: string;
     matchOrder: number;
@@ -335,6 +338,32 @@ export function useMatchScoringPageModel(
   const currentPar = currentTeeSet?.holePars?.[currentHole - 1] || 4;
   const currentStrokeIndex = holeHandicaps[currentHole - 1] || currentHole;
   const currentYardage = currentTeeSet?.yardages?.[currentHole - 1];
+  // Hole count is whatever the teeSet defines — most courses are 18,
+  // but 9-hole and 11-hole tracks need to render only those holes.
+  // The arrays in TeeSet (holePars / holeHandicaps) are the source
+  // of truth; default to 18 when no teeSet is attached.
+  const totalHoles =
+    currentTeeSet?.holePars?.length ??
+    (currentTeeSet?.holeHandicaps?.length && currentTeeSet.holeHandicaps.length > 0
+      ? currentTeeSet.holeHandicaps.length
+      : undefined) ??
+    18;
+
+  // Per-hole stroke allocation for both teams. Lets the HoleStrip
+  // render a small coloured dot under each hole the team gets a
+  // stroke on — answers "which holes do I get strokes" at a glance
+  // without tapping into the handicap-detail panel.
+  const strokesByHole: Array<{ teamAStrokes: number; teamBStrokes: number }> = [];
+  for (let hole = 1; hole <= totalHoles; hole += 1) {
+    strokesByHole.push(
+      getMatchPlayStrokesOnHole(
+        hole,
+        matchHandicapContext.teamAHandicapAllowance,
+        matchHandicapContext.teamBHandicapAllowance,
+        holeHandicaps
+      )
+    );
+  }
   const scoringModeMeta = getScoringModeMeta(effectiveScoringMode, isFourball);
   const isMatchComplete = Boolean(
     matchState && (matchState.isClosedOut || matchState.holesRemaining === 0)
@@ -419,6 +448,8 @@ export function useMatchScoringPageModel(
     preferredScoringMode,
     scoringModeMeta,
     scoringModeSessionKey,
+    totalHoles,
+    strokesByHole,
     sessionLeaderboard,
     summaryText,
     teamAColor,
