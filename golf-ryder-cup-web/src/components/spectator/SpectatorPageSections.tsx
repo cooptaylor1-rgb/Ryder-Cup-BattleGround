@@ -1,11 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
     ArrowLeft,
+    ChevronLeft,
+    ChevronRight,
     Clock,
     Flag,
+    LayoutGrid,
+    Pause,
+    Pin,
+    PinOff,
+    Play,
     RefreshCw,
     Share2,
     Target,
@@ -16,6 +23,8 @@ import {
 } from 'lucide-react';
 import { colors } from '@/lib/design-system/tokens';
 import type { SpectatorMatch, SpectatorView } from '@/lib/types/captain';
+
+const SPECTATOR_SPOTLIGHT_INTERVAL_MS = 8000;
 
 export function SpectatorLoadingState() {
     return (
@@ -205,19 +214,7 @@ export function SpectatorPageSections({
                 ) : null}
 
                 {spectatorView.liveMatches.length > 0 ? (
-                    <section className="mb-8">
-                        <div className="mb-4 flex items-center gap-2">
-                            <div className="h-2 w-2 animate-pulse rounded-full bg-[var(--success)]" />
-                            <h2 className="text-lg font-semibold text-[var(--ink-primary)]">
-                                Live Matches
-                            </h2>
-                        </div>
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {spectatorView.liveMatches.map((match) => (
-                                <LiveMatchCard key={match.id} match={match} />
-                            ))}
-                        </div>
-                    </section>
+                    <SpectatorLiveSection liveMatches={spectatorView.liveMatches} />
                 ) : null}
 
                 {spectatorView.recentResults.length > 0 ? (
@@ -350,6 +347,156 @@ function MagicNumberBanner({
                 </span>
             </div>
         </motion.div>
+    );
+}
+
+/**
+ * "Live Matches" wrapper that adds a Spotlight toggle on top of the
+ * existing grid. In spotlight mode the section cycles through every
+ * live match every 8s, dropping to a single tall card so a clubhouse
+ * TV or shared iPad can run unattended. Pause and pin work the same
+ * as on the captain-facing /live page.
+ */
+function SpectatorLiveSection({ liveMatches }: { liveMatches: SpectatorMatch[] }) {
+    const [spotlightEnabled, setSpotlightEnabled] = useState(false);
+    const [paused, setPaused] = useState(false);
+    const [pinnedId, setPinnedId] = useState<string | null>(null);
+    // See LiveSpotlightView — `rotationIndex` is the cycling slot, clamped
+    // on display so a shrinking match list doesn't need an effect to fix
+    // the stored value.
+    const [rotationIndex, setRotationIndex] = useState(0);
+
+    const pinnedIndex = useMemo(() => {
+        if (!pinnedId) return -1;
+        return liveMatches.findIndex((match) => match.id === pinnedId);
+    }, [liveMatches, pinnedId]);
+    const isPinned = pinnedIndex >= 0;
+
+    useEffect(() => {
+        if (!spotlightEnabled || paused || isPinned || liveMatches.length <= 1) return undefined;
+        const id = window.setInterval(() => {
+            if (document.hidden) return;
+            setRotationIndex((current) => (current + 1) % liveMatches.length);
+        }, SPECTATOR_SPOTLIGHT_INTERVAL_MS);
+        return () => window.clearInterval(id);
+    }, [spotlightEnabled, paused, isPinned, liveMatches.length]);
+
+    const safeIndex = isPinned
+        ? pinnedIndex
+        : Math.min(Math.max(0, rotationIndex), Math.max(0, liveMatches.length - 1));
+    const currentMatch = liveMatches[safeIndex];
+    const rotationActive = spotlightEnabled && !paused && !isPinned && liveMatches.length > 1;
+
+    const goPrev = () =>
+        setRotationIndex((current) => (current - 1 + liveMatches.length) % liveMatches.length);
+    const goNext = () =>
+        setRotationIndex((current) => (current + 1) % liveMatches.length);
+
+    return (
+        <section className="mb-8">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 animate-pulse rounded-full bg-[var(--success)]" />
+                    <h2 className="text-lg font-semibold text-[var(--ink-primary)]">
+                        Live Matches
+                    </h2>
+                    {spotlightEnabled ? (
+                        <span className="ml-1 rounded-full border border-[var(--rule)] bg-[var(--surface-secondary)] px-2 py-0.5 text-xs text-[var(--ink-secondary)]">
+                            Spotlight {safeIndex + 1} / {liveMatches.length}
+                        </span>
+                    ) : null}
+                </div>
+                <button
+                    type="button"
+                    onClick={() => {
+                        setSpotlightEnabled((current) => {
+                            const next = !current;
+                            if (!next) {
+                                setPaused(false);
+                                setPinnedId(null);
+                            }
+                            return next;
+                        });
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--rule)] bg-[var(--surface-raised)] px-3 py-1.5 text-xs font-medium text-[var(--ink-secondary)] hover:bg-[var(--surface-secondary)]"
+                    aria-pressed={spotlightEnabled}
+                    title={spotlightEnabled ? 'Switch to grid view' : 'Auto-rotate one match at a time'}
+                >
+                    {spotlightEnabled ? <LayoutGrid className="h-3.5 w-3.5" /> : <Tv className="h-3.5 w-3.5" />}
+                    {spotlightEnabled ? 'Grid' : 'Spotlight'}
+                </button>
+            </div>
+
+            {spotlightEnabled && currentMatch ? (
+                <div className="space-y-3">
+                    <div
+                        className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[var(--rule)] bg-[var(--surface-raised)] px-3 py-2"
+                        aria-live="polite"
+                    >
+                        <span className="text-xs text-[var(--ink-tertiary)]">
+                            {rotationActive
+                                ? 'Cycling every 8 seconds'
+                                : isPinned
+                                  ? 'Pinned to this match'
+                                  : 'Rotation paused'}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                            <button
+                                type="button"
+                                onClick={goPrev}
+                                disabled={liveMatches.length <= 1}
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--rule)] text-[var(--ink-secondary)] hover:bg-[var(--surface-secondary)] disabled:opacity-50"
+                                aria-label="Previous match"
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setPaused((current) => !current)}
+                                disabled={isPinned || liveMatches.length <= 1}
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--rule)] text-[var(--ink-secondary)] hover:bg-[var(--surface-secondary)] disabled:opacity-50"
+                                aria-label={paused ? 'Resume rotation' : 'Pause rotation'}
+                                aria-pressed={paused}
+                            >
+                                {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setPinnedId((current) =>
+                                        current === currentMatch.id ? null : currentMatch.id
+                                    )
+                                }
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--rule)] hover:bg-[var(--surface-secondary)]"
+                                aria-label={isPinned ? 'Unpin and resume rotation' : 'Pin this match'}
+                                aria-pressed={isPinned}
+                                style={{ color: isPinned ? 'var(--warning)' : 'var(--ink-secondary)' }}
+                            >
+                                {isPinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={goNext}
+                                disabled={liveMatches.length <= 1}
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--rule)] text-[var(--ink-secondary)] hover:bg-[var(--surface-secondary)] disabled:opacity-50"
+                                aria-label="Next match"
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="mx-auto max-w-2xl">
+                        <LiveMatchCard match={currentMatch} />
+                    </div>
+                </div>
+            ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {liveMatches.map((match) => (
+                        <LiveMatchCard key={match.id} match={match} />
+                    ))}
+                </div>
+            )}
+        </section>
     );
 }
 

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { Pin, PinOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
 import type { LucideIcon } from 'lucide-react';
@@ -231,7 +232,16 @@ function ModeRow({
   );
 }
 
-export function MenuTile({ item }: { item: MenuItem }) {
+export function MenuTile({
+  item,
+  isPinned,
+  onTogglePin,
+}: {
+  item: MenuItem;
+  /** When provided, renders a small pin/unpin control in the tile corner. */
+  isPinned?: boolean;
+  onTogglePin?: (itemId: string) => void;
+}) {
   const toneClassName = getTileToneClassName(item.tone || 'default');
   const Icon = item.icon;
 
@@ -260,22 +270,47 @@ export function MenuTile({ item }: { item: MenuItem }) {
   );
 
   const className = cn(
-    'rounded-[1.55rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 p-[var(--space-4)] text-left shadow-[0_14px_32px_rgba(41,29,17,0.05)] transition-transform duration-150 hover:scale-[1.01] hover:bg-[var(--surface)]',
+    'block w-full rounded-[1.55rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 p-[var(--space-4)] text-left shadow-[0_14px_32px_rgba(41,29,17,0.05)] transition-transform duration-150 hover:scale-[1.01] hover:bg-[var(--surface)]',
     item.disabled && 'cursor-wait opacity-70'
   );
 
-  if (item.href) {
-    return (
-      <Link href={item.href} className={className}>
-        {content}
-      </Link>
-    );
-  }
-
-  return (
+  // The pin control is rendered as an absolute sibling — Link is an <a> and
+  // button-in-anchor is invalid HTML, so we wrap both in a relative div and
+  // overlay the pin button instead of nesting it inside the tile.
+  const tile = item.href ? (
+    <Link href={item.href} className={className}>
+      {content}
+    </Link>
+  ) : (
     <button type="button" onClick={item.action} className={className} disabled={item.disabled}>
       {content}
     </button>
+  );
+
+  if (!onTogglePin) return tile;
+
+  return (
+    <div className="relative">
+      {tile}
+      <button
+        type="button"
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          onTogglePin(item.id);
+        }}
+        aria-label={isPinned ? `Unpin ${item.label}` : `Pin ${item.label} to top`}
+        title={isPinned ? 'Unpin from top' : 'Pin to top'}
+        className={cn(
+          'absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full border text-[var(--ink-tertiary)] transition-colors',
+          isPinned
+            ? 'border-[color:var(--maroon)]/30 bg-[color:var(--maroon)]/10 text-[var(--maroon)]'
+            : 'border-[color:var(--rule)]/70 bg-[color:var(--surface)]/90 hover:text-[var(--ink)]'
+        )}
+      >
+        {isPinned ? <PinOff size={14} /> : <Pin size={14} />}
+      </button>
+    </div>
   );
 }
 

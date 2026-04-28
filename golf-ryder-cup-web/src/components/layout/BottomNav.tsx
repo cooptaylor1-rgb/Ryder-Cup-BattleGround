@@ -10,12 +10,21 @@
 
 'use client';
 
+import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useAccessStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { Target, Trophy, Home, Settings, Shield, CalendarDays } from 'lucide-react';
 import { useUserInProgressMatch } from '@/lib/hooks';
+// Imported via leaf path so the existing `vi.mock('@/lib/hooks', ...)` in
+// BottomNav.test.tsx (which mocks only `useUserInProgressMatch`) doesn't
+// shadow this hook and turn it into undefined at test time.
+import { useHaptic } from '@/lib/hooks/useHaptic';
+import {
+  getSyncQueueStatus,
+  TRIP_SYNC_QUEUE_CHANGED_EVENT,
+} from '@/lib/services/tripSyncService';
 
 interface NavItem {
   href: string;
@@ -59,6 +68,8 @@ export function BottomNav() {
   const pathname = usePathname();
   const { isCaptainMode } = useAccessStore(useShallow((s) => ({ isCaptainMode: s.isCaptainMode })));
   const { hasInProgress: hasLiveScoring } = useUserInProgressMatch();
+  const haptic = useHaptic();
+  const pendingSyncCount = usePendingSyncCount();
 
   const navItems = getNavItemsForMode(isCaptainMode);
 
@@ -66,6 +77,23 @@ export function BottomNav() {
     if (item.href === '/') return pathname === '/';
     return pathname.startsWith(item.href);
   };
+
+  const handleNavTap = (item: NavItem) => {
+    // Light selection haptic — fires only on a real cross-route tap so
+    // re-tapping the active tab doesn't buzz the phone for nothing.
+    if (!isActive(item)) {
+      haptic.select();
+    }
+    router.push(item.href);
+  };
+
+  // The "More" slot is the catch-all for the items that need sync (settings,
+  // backup, captain handoff). Showing a numeric badge there mirrors what the
+  // SyncStatusBadge already surfaces on individual pages, but at-a-glance.
+  // In captain mode the slot is repurposed to "Captain", which is itself
+  // the place that cares about pending writes the most.
+  const showSyncBadge = pendingSyncCount > 0;
+  const syncBadgeLabel = pendingSyncCount > 9 ? '9+' : String(pendingSyncCount);
 
   return (
     <nav
@@ -81,12 +109,13 @@ export function BottomNav() {
       {navItems.map((item) => {
         const active = isActive(item);
         const Icon = item.icon;
+        const isSyncSlot = item.href === '/more' || item.href === '/captain';
 
         return (
           <button
             key={item.href}
             type="button"
-            onClick={() => router.push(item.href)}
+            onClick={() => handleNavTap(item)}
             className={cn(
               'relative flex flex-col items-center justify-center',
               'flex-1 min-w-[56px] min-h-[56px] py-1.5',
@@ -138,6 +167,19 @@ export function BottomNav() {
                   <span className="relative h-2 w-2 rounded-full bg-[var(--masters)] ring-2 ring-[var(--canvas)]" />
                 </span>
               )}
+              {/* Pending-sync count badge on the catch-all slot (More, or
+                  Captain when captain mode is on). Shows only when the
+                  outbox is non-empty. The captain shield indicator above
+                  is hidden when this badge is present so they don't
+                  collide on the same icon corner. */}
+              {isSyncSlot && showSyncBadge && (
+                <span
+                  className="absolute -top-1.5 -right-2 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-[var(--maroon)] px-[3px] text-[9px] font-bold leading-none text-[var(--canvas)] ring-2 ring-[var(--canvas)]"
+                  aria-label={`${pendingSyncCount} pending sync ${pendingSyncCount === 1 ? 'item' : 'items'}`}
+                >
+                  {syncBadgeLabel}
+                </span>
+              )}
             </div>
 
             {/* Label — text-[11px] for outdoor legibility. 10px is too
@@ -158,3 +200,44 @@ export function BottomNav() {
 }
 
 export default BottomNav;
+
+/**
+ * Subscribe the nav to the trip-sync queue size so a pending-write count
+ * can ride on the More/Captain tab without each page re-implementing it.
+ * We piggy-back on the existing TRIP_SYNC_QUEUE_CHANGED_EVENT (already
+ * dispatched by the queue on enqueue/flush) instead of polling so the
+ * badge updates the moment the outbox changes. A single visibility-aware
+ * fallback poll handles cases where the event fired while this nav was
+ * unmounted (route transitions remount it).
+ */
+function usePendingSyncCount(): number {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const refresh = () => {
+      try {
+        const status = getSyncQueueStatus();
+        setCount(status.pending + status.failed);
+      } catch {
+        setCount(0);
+      }
+    };
+
+    refresh();
+    window.addEventListener(TRIP_SYNC_QUEUE_CHANGED_EVENT, refresh);
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') refresh();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      window.removeEventListener(TRIP_SYNC_QUEUE_CHANGED_EVENT, refresh);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, []);
+
+  return count;
+}

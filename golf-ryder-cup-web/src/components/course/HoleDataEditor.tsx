@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { ChevronDown, ChevronUp, AlertCircle, Check } from 'lucide-react';
+import { ChevronDown, ChevronUp, AlertCircle, Check, Flame } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 /**
@@ -66,6 +66,100 @@ function resizeHoles(current: HoleData[], nextCount: number): HoleData[] {
     } satisfies HoleData;
   });
   return [...current, ...additional];
+}
+
+/**
+ * A condensed hole-by-hole strip that visualizes the stroke index
+ * (handicap rank) as a heat gradient — the toughest holes burn red,
+ * the friendliest run pale green. Sits above the editor table so a
+ * captain can size up where strokes will fall before drilling into
+ * yardages. Cells also surface par chips when the data has it, which
+ * doubles as a sanity check that the entered handicaps line up with
+ * the par profile.
+ */
+function HoleHeatmap({ holes }: { holes: HoleData[] }) {
+  const total = holes.length;
+  if (total === 0) return null;
+
+  // Map handicap rank (1 = hardest) onto a 0..1 difficulty value where
+  // 1 is the toughest. Using rank rather than absolute par avoids
+  // double-counting two par-3s that are nominally easier but ranked
+  // hard by the course's actual play history.
+  const difficultyFor = (handicap: number): number => {
+    if (!Number.isFinite(handicap) || handicap < 1) return 0.5;
+    const clamped = Math.min(total, Math.max(1, handicap));
+    return 1 - (clamped - 1) / Math.max(1, total - 1);
+  };
+
+  // Hard-coded gradient stops keep the cell color decisions self-contained
+  // — reaching into Tailwind theme tokens here would tie the heatmap to a
+  // specific palette, but the stroke-index spectrum is its own visual.
+  const colorFor = (difficulty: number): string => {
+    if (difficulty >= 0.78) return 'rgba(220, 38, 38, 0.78)'; // top 4: red
+    if (difficulty >= 0.55) return 'rgba(234, 88, 12, 0.62)'; // tougher half: orange
+    if (difficulty >= 0.33) return 'rgba(202, 138, 4, 0.42)'; // middle: amber
+    if (difficulty >= 0.15) return 'rgba(101, 163, 13, 0.32)'; // friendly: lime
+    return 'rgba(22, 163, 74, 0.28)'; // easiest: green
+  };
+
+  return (
+    <div
+      className="mt-3 rounded-lg p-3"
+      style={{ background: 'var(--surface-elevated)', border: '1px solid var(--rule)' }}
+    >
+      <div className="mb-2 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Flame size={14} className="text-[var(--error)]" />
+          <span className="type-meta font-medium">Difficulty heatmap</span>
+        </div>
+        <span className="type-micro text-[var(--ink-tertiary)]">By stroke index</span>
+      </div>
+      <div className="overflow-x-auto">
+        <div
+          className="grid gap-1"
+          style={{ gridTemplateColumns: `repeat(${total}, minmax(28px, 1fr))` }}
+        >
+          {holes.map((hole, i) => {
+            const difficulty = difficultyFor(hole.handicap);
+            return (
+              <div
+                key={i}
+                className="flex flex-col items-center justify-between rounded-md px-1 py-1.5"
+                style={{
+                  background: colorFor(difficulty),
+                  minHeight: '52px',
+                }}
+                title={`Hole ${i + 1} · Par ${hole.par} · Stroke ${hole.handicap}`}
+              >
+                <span className="text-[9px] font-semibold uppercase tracking-wider text-[var(--ink-tertiary)]">
+                  {i + 1}
+                </span>
+                <span className="text-[13px] font-bold leading-none text-[var(--ink)]">
+                  {hole.handicap}
+                </span>
+                <span className="text-[9px] font-medium leading-none text-[var(--ink-secondary)]">
+                  P{hole.par}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="mt-2 flex items-center justify-between text-[10px] text-[var(--ink-tertiary)]">
+        <span>Toughest</span>
+        <div className="flex flex-1 gap-[2px] px-3">
+          {[0.92, 0.7, 0.45, 0.22, 0.08].map((d) => (
+            <span
+              key={d}
+              className="h-1.5 flex-1 rounded-full"
+              style={{ background: colorFor(d) }}
+            />
+          ))}
+        </div>
+        <span>Friendliest</span>
+      </div>
+    </div>
+  );
 }
 
 export function HoleDataEditor({ holes, onChange, readonly = false }: HoleDataEditorProps) {
@@ -156,11 +250,13 @@ export function HoleDataEditor({ holes, onChange, readonly = false }: HoleDataEd
 
   return (
     <div className="mt-4">
+      <HoleHeatmap holes={holes} />
+
       {/* Toggle Header */}
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between p-3 rounded-lg transition-colors"
+        className="w-full flex items-center justify-between p-3 rounded-lg transition-colors mt-3"
         style={{
           background: 'var(--surface-elevated)',
           border: '1px solid var(--rule)',
