@@ -13,7 +13,7 @@
  * reaching the cloud.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { AlertTriangle, Clock3, RefreshCw, Upload } from 'lucide-react';
 import {
@@ -243,8 +243,6 @@ export function SyncFailureBanner({ className }: { className?: string }) {
 
   const hasBlockedPending =
     pendingCount > 0 && Boolean(blockedReason) && blockedReason !== 'offline';
-  if (failedCount <= 0 && !hasBlockedPending) return null;
-  if (blockedReason === 'offline') return null;
 
   const blockedMessage = blockedReason ? SYNC_BLOCKED_MESSAGES[blockedReason] : undefined;
   const canRetry = !blockedReason && failedCount > 0;
@@ -257,18 +255,50 @@ export function SyncFailureBanner({ className }: { className?: string }) {
       : `${failedCount} change${failedCount === 1 ? '' : 's'} did not reach the cloud. Saved on this device.`;
   const detailAvailable = syncItems.length > 0 || Boolean(lastError);
 
+  // Auto-expand the details panel when we cross the urgent threshold
+  // so the captain can see *which* items are stuck without having to
+  // tap "Details" first. We only flip the state on the way up — once
+  // the user has chosen to hide details on a still-urgent banner we
+  // respect that for the session (otherwise the banner would re-pop
+  // open every poll). Hooks live above any early returns so they're
+  // unconditional.
+  const wasUrgentRef = useRef(false);
+  useEffect(() => {
+    const isUrgent = failedCount >= 6;
+    if (isUrgent && !wasUrgentRef.current && detailAvailable) {
+      setShowDetail(true);
+    }
+    wasUrgentRef.current = isUrgent;
+  }, [failedCount, detailAvailable]);
+
+  if (failedCount <= 0 && !hasBlockedPending) return null;
+  if (blockedReason === 'offline') return null;
+
+  // Urgency escalation by stuck-item count.
+  //   1–2 stuck → quiet banner, dismissible (existing behaviour)
+  //   3–5 stuck → louder: solid error background, can't be hidden
+  //   6+ stuck → urgent: pulsing border + auto-expanded details so
+  //              the captain can't accidentally swipe past real
+  //              data loss mid-round.
+  const urgency: 'quiet' | 'loud' | 'urgent' =
+    failedCount >= 6 ? 'urgent' : failedCount >= 3 ? 'loud' : 'quiet';
+
   return (
     <div
       role="alert"
-      aria-live="assertive"
+      aria-live={urgency === 'quiet' ? 'polite' : 'assertive'}
       aria-busy={isRetrying || undefined}
       style={{ zIndex: zIndex.toast }}
       className={cn(
-        'fixed left-3 right-3 bottom-[calc(5rem+env(safe-area-inset-bottom,0px)+0.75rem)] rounded-[22px] border border-[color:var(--error)]/30',
-        'bg-[color:var(--surface-elevated)]/94 text-[var(--error)] shadow-card',
-        'backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-elevated)]/88',
+        'fixed left-3 right-3 bottom-[calc(5rem+env(safe-area-inset-bottom,0px)+0.75rem)] rounded-[22px] border shadow-card',
         'sm:inset-x-0 sm:top-0 sm:bottom-auto sm:rounded-none sm:border-x-0 sm:border-t-0',
         'sm:pt-[env(safe-area-inset-top,0px)]',
+        urgency === 'quiet' &&
+          'border-[color:var(--error)]/30 bg-[color:var(--surface-elevated)]/94 text-[var(--error)] backdrop-blur supports-[backdrop-filter]:bg-[color:var(--surface-elevated)]/88',
+        urgency === 'loud' &&
+          'border-[color:var(--error)]/60 bg-[color:var(--error)]/14 text-[var(--error)]',
+        urgency === 'urgent' &&
+          'border-2 border-[color:var(--error)] bg-[color:var(--error)]/18 text-[var(--error)] animate-pulse',
         className
       )}
     >
@@ -278,8 +308,24 @@ export function SyncFailureBanner({ className }: { className?: string }) {
             <AlertTriangle className="h-4 w-4" aria-hidden />
           </div>
           <div className="min-w-0 sm:flex-1">
-            <p className="text-sm font-semibold text-[var(--ink)]">
-              {blockedReason ? 'Cloud saving is paused' : 'Changes are saved on this device'}
+            <p className="flex items-center gap-2 text-sm font-semibold text-[var(--ink)]">
+              {urgency === 'urgent'
+                ? 'Stop scoring — sync needs attention'
+                : blockedReason
+                  ? 'Cloud saving is paused'
+                  : 'Changes are saved on this device'}
+              {failedCount > 0 && (
+                <span
+                  className={cn(
+                    'inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1.5 text-[10px] font-bold leading-none text-[var(--canvas)]',
+                    urgency === 'urgent' || urgency === 'loud'
+                      ? 'bg-[color:var(--error)]'
+                      : 'bg-[color:var(--error)]/85'
+                  )}
+                >
+                  {failedCount}
+                </span>
+              )}
             </p>
             <p className="text-xs font-medium text-[var(--error)] sm:text-sm">{message}</p>
           </div>
