@@ -40,6 +40,7 @@ import {
   type HighlightStat,
   type StandingsTab,
 } from '@/components/standings/StandingsPageSections';
+import { RecentlyClosedMatchBanner } from '@/components/standings/RecentlyClosedMatchBanner';
 
 /**
  * STANDINGS PAGE — The Complete Leaderboard
@@ -369,7 +370,18 @@ export default function StandingsPage() {
         onBack={() => router.back()}
       />
 
+      {/*
+        Post-match handoff banner. Surfaces when a captain finishes a
+        match and the cockpit redirects them here via ?matchClosed=<id>.
+        Renders above the masthead so the first thing they see is the
+        result they just produced, plus one-tap routes to the recap or
+        the next incomplete match.
+      */}
       <section className="container-editorial pt-[var(--space-6)]">
+        <RecentlyClosedMatchBanner />
+      </section>
+
+      <section className="container-editorial pt-[var(--space-4)]">
         <StandingsMasthead
           standings={standings}
           magicNumber={magicNumber}

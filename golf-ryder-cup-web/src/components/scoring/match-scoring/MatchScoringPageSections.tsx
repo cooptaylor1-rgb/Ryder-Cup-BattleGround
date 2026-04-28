@@ -22,9 +22,7 @@ import type { ScoringPreferences } from '@/lib/types/scoringPreferences';
 import { StickyUndoBanner, WeatherAlerts } from '@/components/live-play';
 import { EmptyStatePremium, ErrorEmpty, PageLoadingSkeleton } from '@/components/ui';
 
-import { MatchScoringCompleteState } from './MatchScoringCompleteState';
 import { MatchScoringSupportLayer } from './MatchScoringSupportLayer';
-import { countHalvedHoles } from './matchScoringReport';
 import type { MatchScoringPageModel } from './matchScoringPageModel';
 import type { ScoringMode } from './matchScoringShared';
 import type { MatchScoringPageActions } from './useMatchScoringPageActions';
@@ -181,11 +179,15 @@ interface MatchScoringPageSectionsProps {
   onStrokeAlertShown: (_hole: number, aStrokes: number, bStrokes: number) => void;
   onOpenVoiceModal: () => void;
   onCloseVoiceModal: () => void;
-  onViewStandings: () => void;
-  onScoreNextMatch: (matchId: string) => void;
-  onBackToMatches: () => void;
   onEditScores: () => void;
   onSelectMatch: (matchId: string) => void;
+  /**
+   * Fires when the celebration overlay finishes for a match-close
+   * (`matchWon` / `matchHalved`). The page client uses this to route
+   * to standings; without this hook the user would be stranded
+   * looking at a frozen cockpit until they tapped Back.
+   */
+  onMatchCloseHandoff: () => void;
 }
 
 export function MatchScoringPageSections({
@@ -215,11 +217,9 @@ export function MatchScoringPageSections({
   onStrokeAlertShown,
   onOpenVoiceModal,
   onCloseVoiceModal,
-  onViewStandings,
-  onScoreNextMatch,
-  onBackToMatches,
   onEditScores,
   onSelectMatch,
+  onMatchCloseHandoff,
 }: MatchScoringPageSectionsProps) {
   const [overflowOpen, setOverflowOpen] = useState(false);
 
@@ -291,7 +291,19 @@ export function MatchScoringPageSections({
               holeNumber={ui.celebration.holeNumber}
               finalScore={ui.celebration.finalScore}
               show={true}
-              onComplete={() => ui.setCelebration(null)}
+              onComplete={() => {
+                // Match-close celebrations hand off to standings —
+                // captains finishing a match want to see how the
+                // trip stands. Other celebration types (hole won,
+                // hole halved) just dismiss back to the cockpit.
+                const wasMatchClose =
+                  ui.celebration?.type === 'matchWon' ||
+                  ui.celebration?.type === 'matchHalved';
+                ui.setCelebration(null);
+                if (wasMatchClose) {
+                  onMatchCloseHandoff();
+                }
+              }}
               duration={ui.celebration.type === 'matchWon' ? 3500 : 1500}
             />
           </Suspense>
@@ -369,8 +381,20 @@ export function MatchScoringPageSections({
       <main className="container-editorial">
         <WeatherAlertsBar />
 
-        {!model.isMatchComplete || ui.isEditingScores ? (
-          <MatchCockpit
+        {/*
+          The cockpit body is the only renderable here now. The
+          legacy MatchScoringCompleteState (confetti + 4-button
+          stack) is retired in favour of the post-match handoff:
+            • In-flight close → celebration plays → onMatchCloseHandoff
+              routes to /standings?matchClosed=<id>
+            • Direct mount of completed match → MatchScoringPageClient
+              redirects to /score/<id>/recap before this body renders
+          So the only path that lands here with a complete match is
+          the brief "celebration in flight" window, where we want to
+          freeze the cockpit's last-hole view under the overlay.
+          isEditingScores still gates the captain-correction case.
+        */}
+        <MatchCockpit
             scoring={{
               matchState,
               currentHole,
@@ -423,30 +447,6 @@ export function MatchScoringPageSections({
             }}
             isCaptainMode={isCaptainMode}
           />
-        ) : (
-          <MatchScoringCompleteState
-            confettiPieces={ui.confettiPieces}
-            prefersReducedMotion={prefersReducedMotion}
-            winningTeam={matchState.winningTeam}
-            displayScore={matchState.displayScore}
-            teamAHolesWon={matchState.teamAHolesWon}
-            teamBHolesWon={matchState.teamBHolesWon}
-            halvedHoles={countHalvedHoles(matchState)}
-            holesPlayed={matchState.holesPlayed}
-            teamAName={model.teamAName}
-            teamBName={model.teamBName}
-            summaryText={model.summaryText}
-            nextIncompleteMatchId={model.nextIncompleteMatch?.id}
-            canEditScores={isCaptainMode}
-            onScoreNextMatch={onScoreNextMatch}
-            onViewStandings={onViewStandings}
-            onShareSummary={actions.handleShareSummary}
-            onExportSummary={actions.handleExportSummary}
-            onShareResult={actions.handleShareResult}
-            onEditScores={onEditScores}
-            onBackToMatches={onBackToMatches}
-          />
-        )}
       </main>
 
       {/* Bottom drawer — the new home for standings, presses, side bets. */}

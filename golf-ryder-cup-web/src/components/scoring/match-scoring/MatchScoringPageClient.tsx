@@ -218,6 +218,30 @@ export default function MatchScoringPageClient() {
     return <PracticeScoringPage matchId={activeMatch.id} />;
   }
 
+  // Direct mount of an already-completed match: skip the cockpit
+  // entirely and route to the persistent recap surface. The legacy
+  // in-cockpit complete state (a confetti + 4-button stack) is
+  // retired; recap is the deep-linkable, shareable home for the
+  // match after it's been closed. Captains who actually need to
+  // correct a score reopen via the recap's "Reopen" CTA, which
+  // restores the cockpit's editing path.
+  //
+  // The celebration check (ui.celebration) is the in-flight escape
+  // hatch — when the user just scored the closing hole, we want to
+  // play the celebration animation inline before navigating away,
+  // so we let MatchScoringPageSections render until the celebration
+  // resolves and triggers its own routing.
+  if (
+    activeMatch.status === 'completed' &&
+    !ui.isEditingScores &&
+    !ui.celebration
+  ) {
+    if (typeof window !== 'undefined') {
+      router.replace(`/score/${activeMatch.id}/recap`);
+    }
+    return <MatchScoringLoadingState />;
+  }
+
   return (
     <>
       <MatchScoringPageSections
@@ -250,10 +274,15 @@ export default function MatchScoringPageClient() {
         }}
         onOpenVoiceModal={() => ui.setShowVoiceModal(true)}
         onCloseVoiceModal={() => ui.setShowVoiceModal(false)}
-        onViewStandings={() => router.push('/standings')}
-        onScoreNextMatch={(nextMatchId) => router.push(`/score/${nextMatchId}`)}
-        onBackToMatches={handleBackToScore}
         onSelectMatch={(otherMatchId) => router.push(`/score/${otherMatchId}`)}
+        onMatchCloseHandoff={() => {
+          // Per the post-match UX research: captains finishing a match
+          // immediately want to see how the trip stands. Standings is
+          // the natural next stop; the recap is preserved as a
+          // deep-linkable surface (banner on standings, overflow on
+          // the cockpit if reopened) so it isn't lost.
+          router.replace(`/standings?matchClosed=${activeMatch.id}`);
+        }}
         onEditScores={async () => {
           // Flip the match out of completed state so the rest of the UI
           // treats it as live and subsequent scoring writes follow the
