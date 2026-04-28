@@ -1,11 +1,50 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { EmptyStatePremium } from '@/components/ui';
 import { Clock3, Flag, Maximize2, RefreshCw, Volume2, VolumeX, Wifi, WifiOff } from 'lucide-react';
 import type { Match, Player } from '@/lib/types/models';
 import type { MatchState } from '@/lib/types/computed';
+
+/**
+ * Compact "2 min ago" formatter for the live cards. Skips the leading
+ * "about" / "ago" wrapper so we can mix the value into a longer line
+ * like "Hole 7 · 2 min ago" without it reading clunky.
+ */
+function formatRelativeShort(updatedAt: string | undefined, now: number): string | null {
+    if (!updatedAt) return null;
+    const updatedMs = new Date(updatedAt).getTime();
+    if (!Number.isFinite(updatedMs)) return null;
+
+    const diffSec = Math.max(0, Math.round((now - updatedMs) / 1000));
+    if (diffSec < 30) return 'just now';
+    if (diffSec < 90) return '1 min ago';
+    const diffMin = Math.round(diffSec / 60);
+    if (diffMin < 60) return `${diffMin} min ago`;
+    const diffHr = Math.floor(diffMin / 60);
+    const remMin = diffMin % 60;
+    if (diffHr < 24) {
+        return remMin > 0 ? `${diffHr}h ${remMin}m ago` : `${diffHr}h ago`;
+    }
+    return null;
+}
+
+/**
+ * Re-renders the live page once a minute so the per-card "X min ago"
+ * counters keep ticking without needing a sync round-trip. We piggy-back
+ * on a single shared interval (one timer for the whole page) and pass
+ * `now` down — the formatter is cheap and React only diffs the changed
+ * text nodes.
+ */
+function useLiveClock(): number {
+    const [now, setNow] = useState(() => Date.now());
+    useEffect(() => {
+        const interval = window.setInterval(() => setNow(Date.now()), 30_000);
+        return () => window.clearInterval(interval);
+    }, []);
+    return now;
+}
 
 interface LivePageSectionsProps {
     activeSession: { id: string; name: string } | null;
@@ -172,17 +211,12 @@ export function LivePageSections({
                     ))}
                 </div>
             ) : matches && matches.length > 0 ? (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {matches.map((match) => (
-                        <LiveMatchCard
-                            key={match.id}
-                            match={match}
-                            state={getMatchState(match.id)}
-                            getPlayer={getPlayer}
-                            isFlashing={flashMatchId === match.id}
-                        />
-                    ))}
-                </div>
+                <LiveMatchGrid
+                    matches={matches}
+                    getMatchState={getMatchState}
+                    getPlayer={getPlayer}
+                    flashMatchId={flashMatchId}
+                />
             ) : (
                 <div className="mx-auto max-w-xl py-12">
                     <EmptyStatePremium
@@ -220,14 +254,50 @@ function LiveNoSessionState({
     );
 }
 
+/**
+ * Wraps the match grid in a single live-clock subscription so each card
+ * gets a fresh `now` once a minute without each card running its own
+ * timer. Splitting it out keeps `LiveMatchCard` itself purely
+ * presentational and React.memo-friendly.
+ */
+function LiveMatchGrid({
+    matches,
+    getMatchState,
+    getPlayer,
+    flashMatchId,
+}: {
+    matches: Match[];
+    getMatchState: (matchId: string) => MatchState | undefined;
+    getPlayer: (id: string) => Player | undefined;
+    flashMatchId: string | null;
+}) {
+    const now = useLiveClock();
+    return (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {matches.map((match) => (
+                <LiveMatchCard
+                    key={match.id}
+                    match={match}
+                    state={getMatchState(match.id)}
+                    getPlayer={getPlayer}
+                    isFlashing={flashMatchId === match.id}
+                    now={now}
+                />
+            ))}
+        </div>
+    );
+}
+
 interface LiveMatchCardProps {
     match: Match;
     state?: MatchState;
     getPlayer: (id: string) => Player | undefined;
     isFlashing?: boolean;
+    /** Shared "now" timestamp from the parent grid's live clock. */
+    now: number;
 }
 
-const LiveMatchCard = React.memo(function LiveMatchCard({ match, state, getPlayer, isFlashing }: LiveMatchCardProps) {
+const LiveMatchCard = React.memo(function LiveMatchCard({ match, state, getPlayer, isFlashing, now }: LiveMatchCardProps) {
     const teamAPlayers = match.teamAPlayerIds.map((id) => getPlayer(id)).filter(Boolean) as Player[];
     const teamBPlayers = match.teamBPlayerIds.map((id) => getPlayer(id)).filter(Boolean) as Player[];
 
@@ -260,6 +330,14 @@ const LiveMatchCard = React.memo(function LiveMatchCard({ match, state, getPlaye
 
     const statusText = getStatusText();
     const scoreDisplay = getScoreDisplay();
+    // "2 min ago" line under the match label so a captain scanning the
+    // wall of cards can tell which matches are still actively scoring
+    // versus which have stalled mid-round (bathroom break, slow group
+    // ahead, captain wandered off, etc.). Hidden for completed matches
+    // since the freshness signal there is just noise — the result is
+    // already final.
+    const relativeUpdate =
+        state?.status === 'completed' ? null : formatRelativeShort(match.updatedAt, now);
 
     return (
         <div
@@ -270,7 +348,12 @@ const LiveMatchCard = React.memo(function LiveMatchCard({ match, state, getPlaye
             }`}
         >
             <div className="flex items-center justify-between border-b border-[var(--rule)] bg-[color:var(--surface-raised)]/70 px-4 py-3">
-                <span className="type-overline text-[var(--ink-tertiary)]">Match {match.matchOrder}</span>
+                <div className="min-w-0">
+                    <span className="type-overline text-[var(--ink-tertiary)]">Match {match.matchOrder}</span>
+                    {relativeUpdate ? (
+                        <span className="ml-2 type-micro text-[var(--ink-faint)]">· {relativeUpdate}</span>
+                    ) : null}
+                </div>
                 <span
                     className={
                         `rounded-full border px-2.5 py-1 text-xs font-medium ` +
