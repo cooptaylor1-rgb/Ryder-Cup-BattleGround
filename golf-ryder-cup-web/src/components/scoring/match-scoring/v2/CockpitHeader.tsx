@@ -83,6 +83,7 @@ export function CockpitHeader({
     <header
       className="sticky top-0 z-30 border-b border-[color:var(--rule)] bg-[color:var(--canvas)]/95 backdrop-blur"
       style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      data-cockpit-text
     >
       {/* Single thin team-color rule across the top — replaces the large
           tri-color gradient bar from v1. Reads as "this is THIS match"
@@ -155,8 +156,20 @@ export function CockpitHeader({
         </div>
 
         {/* Single live status line. Replaces "Match position" card,
-            duplicate scoreboard, and the "Live match" badge. */}
-        <p className="mt-2 text-center font-mono text-[length:var(--text-xs)] font-semibold uppercase tracking-[0.18em] text-[var(--ink-secondary)]">
+            duplicate scoreboard, and the "Live match" badge.
+            Sized via the cockpit fact token so outdoor mode bumps
+            it from 11px → 14px and switches to the higher-contrast
+            ink for sunlight legibility. */}
+        <p
+          data-cockpit-overline
+          className="mt-2 text-center font-mono uppercase"
+          style={{
+            fontSize: 'var(--cockpit-fact-size)',
+            fontWeight: 'var(--cockpit-fact-weight)' as React.CSSProperties['fontWeight'],
+            letterSpacing: 'var(--cockpit-overline-tracking)',
+            color: 'var(--cockpit-secondary-text)',
+          }}
+        >
           {isMatchComplete ? 'Final · ' : ''}
           {matchScoreLabel} · {matchProgressLabel}
         </p>
