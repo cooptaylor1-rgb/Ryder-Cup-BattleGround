@@ -160,17 +160,27 @@ export default function ScorecardEditorClient() {
     // Reuse existing scoring engine via a one-shot navigation to the hole
     // and a writeHoleResult. We don't go through the cockpit's auto-
     // advance flow here — this is a deliberate edit.
-    await scoreHole(winner, undefined, undefined, undefined, undefined, { advanceHole: false });
-    showToast('success', `Hole ${editingHole} updated`);
+    const result = await scoreHole(winner, undefined, undefined, undefined, undefined, {
+      advanceHole: false,
+    });
+    if (result?.conflict) {
+      showToast('info', `Another captain just scored hole ${result.conflict.holeNumber} — kept their score`);
+    } else {
+      showToast('success', `Hole ${editingHole} updated`);
+    }
     setEditingHole(null);
   };
 
   const submitStrokes = async (winner: HoleWinner, a: number, b: number) => {
     if (editingHole == null) return;
-    await scoreHole(winner, a, b, undefined, undefined, { advanceHole: false });
+    const result = await scoreHole(winner, a, b, undefined, undefined, { advanceHole: false });
     setStrokeOpen(false);
     setEditingHole(null);
-    showToast('success', `Hole ${editingHole} updated`);
+    if (result?.conflict) {
+      showToast('info', `Another captain just scored hole ${result.conflict.holeNumber} — kept their score`);
+    } else {
+      showToast('success', `Hole ${editingHole} updated`);
+    }
   };
 
   const submitFourball = async (
@@ -181,10 +191,14 @@ export default function ScorecardEditorClient() {
     bPlayer: PlayerHoleScore[]
   ) => {
     if (editingHole == null) return;
-    await scoreHole(winner, aBest, bBest, aPlayer, bPlayer, { advanceHole: false });
+    const result = await scoreHole(winner, aBest, bBest, aPlayer, bPlayer, { advanceHole: false });
     setFourballOpen(false);
     setEditingHole(null);
-    showToast('success', `Hole ${editingHole} updated`);
+    if (result?.conflict) {
+      showToast('info', `Another captain just scored hole ${result.conflict.holeNumber} — kept their score`);
+    } else {
+      showToast('success', `Hole ${editingHole} updated`);
+    }
   };
 
   const handleOpenEdit = async (hole: number) => {

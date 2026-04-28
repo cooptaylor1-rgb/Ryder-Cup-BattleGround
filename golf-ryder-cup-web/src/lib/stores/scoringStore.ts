@@ -31,6 +31,19 @@ import type { UndoEntry } from './scoring-store/scoringStoreTypes';
 // TYPES
 // ============================================
 
+export interface ScoreHoleConflict {
+    holeNumber: number;
+    /** Identifier of the captain whose score is already on the hole. */
+    existingBy: string;
+    /** Identifier of the captain whose tap was just rejected. */
+    incomingBy: string;
+    existingWinner: HoleWinner;
+}
+
+export interface ScoreHoleResult {
+    conflict?: ScoreHoleConflict;
+}
+
 interface ScoringState {
     // Active scoring context
     activeMatch: Match | null;
@@ -64,6 +77,13 @@ interface ScoringState {
     clearActiveMatch: () => void;
 
     // Scoring actions
+    //
+    // Returns a `conflict` descriptor when another captain already
+    // scored the same hole within the conflict window. The store does
+    // not overwrite the existing record in that case — the caller
+    // should surface a toast and bail out of any success-path UI
+    // (celebration, undo bar, etc.). Returns `undefined` on the happy
+    // path (or after a no-op such as a session-locked attempt).
     scoreHole: (
         winner: HoleWinner,
         teamAScore?: number,
@@ -71,7 +91,7 @@ interface ScoringState {
         teamAPlayerScores?: PlayerHoleScore[],
         teamBPlayerScores?: PlayerHoleScore[],
         options?: { advanceHole?: boolean }
-    ) => Promise<void>;
+    ) => Promise<ScoreHoleResult | undefined>;
     undoLastHole: () => Promise<void>;
     goToHole: (holeNumber: number) => void;
     nextHole: () => void;
@@ -206,6 +226,11 @@ export const useScoringStore = create<ScoringState>((set, get) => ({
                 isSaving: false,
                 lastSavedAt: scoringResult.lastSavedAt,
             });
+
+            if (scoringResult.conflict) {
+                return { conflict: scoringResult.conflict };
+            }
+            return undefined;
         } catch (error) {
             const appError = handleError(error, { action: 'scoreActiveHole', matchId: activeMatch.id }, { severity: 'high' });
             trackSyncFailure({
