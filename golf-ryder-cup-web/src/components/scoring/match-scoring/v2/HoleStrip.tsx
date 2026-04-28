@@ -181,6 +181,9 @@ export function HoleStrip({
           handicap detail panel. Capped at 4 dots per team to keep
           the cell narrow; in match play 2+ on a hole is already
           rare, but we render multi-stroke dots stacked anyway.
+          Dot size is driven by --cockpit-stroke-dot-size so the
+          outdoor theme can bump it from 4px → 7px (where 4px
+          previously vanished in direct sun).
         */}
         {(teamAStrokes > 0 || teamBStrokes > 0) && (
           <span aria-hidden className="flex items-center gap-[2px]">
@@ -188,16 +191,24 @@ export function HoleStrip({
               Array.from({ length: Math.min(teamAStrokes, 4) }).map((_, i) => (
                 <span
                   key={`a-${i}`}
-                  className="h-1 w-1 rounded-full"
-                  style={{ background: teamAColor }}
+                  className="rounded-full"
+                  style={{
+                    background: teamAColor,
+                    width: 'var(--cockpit-stroke-dot-size)',
+                    height: 'var(--cockpit-stroke-dot-size)',
+                  }}
                 />
               ))}
             {teamBStrokes > 0 &&
               Array.from({ length: Math.min(teamBStrokes, 4) }).map((_, i) => (
                 <span
                   key={`b-${i}`}
-                  className="h-1 w-1 rounded-full"
-                  style={{ background: teamBColor }}
+                  className="rounded-full"
+                  style={{
+                    background: teamBColor,
+                    width: 'var(--cockpit-stroke-dot-size)',
+                    height: 'var(--cockpit-stroke-dot-size)',
+                  }}
                 />
               ))}
           </span>

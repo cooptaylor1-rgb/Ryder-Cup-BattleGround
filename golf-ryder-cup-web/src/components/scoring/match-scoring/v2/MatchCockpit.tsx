@@ -220,7 +220,19 @@ export function MatchCockpit({
             {currentHole}
           </motion.h1>
         </AnimatePresence>
-        <p className="absolute inset-x-0 bottom-0 mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink-secondary)]">
+        {/* Par / SI / yardage fact line. Sized + weighted via CSS
+            tokens (--cockpit-fact-size + --cockpit-fact-weight) so
+            outdoor mode bumps it from 12px/600 to 14px/700 without
+            this component having to know which theme is on. */}
+        <p
+          className="absolute inset-x-0 bottom-0 mt-1 uppercase"
+          style={{
+            fontSize: 'var(--cockpit-fact-size)',
+            fontWeight: 'var(--cockpit-fact-weight)' as React.CSSProperties['fontWeight'],
+            letterSpacing: 'var(--cockpit-overline-tracking)',
+            color: 'var(--cockpit-secondary-text)',
+          }}
+        >
           {factParts.join(' · ')}
         </p>
       </div>

@@ -128,6 +128,22 @@
   --space-20: 80px;
   --space-24: 96px;
 
+  /* ---- COCKPIT SIZING TOKENS ----
+     Drive the small text and stroke dots on the scoring cockpit so a
+     single set of variables can tune for sunlight legibility instead
+     of hard-coded 10–11px Tailwind utilities scattered across the
+     cockpit components.
+     Defaults are the editorial values that look right indoors at a
+     desk; html.outdoor overrides bump them for direct-sun reading
+     without changing the layout shape. */
+  --cockpit-overline-size: 11px;
+  --cockpit-overline-tracking: 0.16em;
+  --cockpit-fact-size: 12px;
+  --cockpit-fact-weight: 600;
+  --cockpit-stroke-dot-size: 4px;
+  --cockpit-secondary-text: var(--ink-secondary);
+  --cockpit-tertiary-text: var(--ink-tertiary);
+
   /* ---- TYPOGRAPHY SCALE ----
      Fluid where possible, fixed where precise */
   --text-xs: 0.6875rem;   /* 11px */
@@ -2177,7 +2193,39 @@ html.outdoor:root {
   --warning: #a16207 !important;
   --error: #991b1b !important;
 
+  /* ---- COCKPIT SIZING (Outdoor) ----
+     Glove-friendly, sunlight-legible: small text scales up, stroke
+     dots almost double, secondary/tertiary text use higher contrast
+     ink than the editorial defaults so overlines and the par/SI
+     fact line stay readable on green at noon. */
+  --cockpit-overline-size: 13px !important;
+  --cockpit-overline-tracking: 0.18em !important;
+  --cockpit-fact-size: 14px !important;
+  --cockpit-fact-weight: 700 !important;
+  --cockpit-stroke-dot-size: 7px !important;
+  --cockpit-secondary-text: #1f1f1f !important;
+  --cockpit-tertiary-text: #3a3a3a !important;
+
   color-scheme: light !important;
+}
+
+/* ---- COCKPIT TEXT (Outdoor) ----
+   Overlines and the par/SI fact line scattered across the scoring
+   cockpit and its sticky header use small caps + low-contrast ink
+   that's editorial-pretty but hard to read in direct sunlight.
+   Outdoor mode bumps font size, weight, tracking, and contrast on
+   anything tagged data-cockpit-text or living inside the cockpit's
+   sacred surface (`<section aria-label="Score this hole">`). The
+   specificity is intentional — this should NOT affect the broader
+   home / standings / settings pages, which keep the editorial
+   defaults. */
+html.outdoor section[aria-label='Score this hole'] .type-overline,
+html.outdoor [data-cockpit-text] .type-overline,
+html.outdoor section[aria-label='Score this hole'] [data-cockpit-overline],
+html.outdoor [data-cockpit-text] [data-cockpit-overline] {
+  font-size: var(--cockpit-overline-size) !important;
+  letter-spacing: var(--cockpit-overline-tracking) !important;
+  color: var(--cockpit-secondary-text) !important;
 }
 
 html.outdoor .header-premium {
