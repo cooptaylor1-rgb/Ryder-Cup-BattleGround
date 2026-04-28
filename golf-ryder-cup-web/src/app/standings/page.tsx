@@ -42,6 +42,7 @@ import {
 } from '@/components/standings/StandingsPageSections';
 import { RecentlyClosedMatchBanner } from '@/components/standings/RecentlyClosedMatchBanner';
 import { TripCompleteCelebration } from '@/components/standings/TripCompleteCelebration';
+import { SessionHandoffBanner } from '@/components/SessionHandoffBanner';
 
 /**
  * STANDINGS PAGE — The Complete Leaderboard
@@ -71,6 +72,15 @@ export default function StandingsPage() {
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSharingStandings, setIsSharingStandings] = useState(false);
+  // Manual-refresh plumbing for the masthead pill. The Dexie-backed
+  // aggregateSignature already retriggers the load effect on real data
+  // changes, but a captain who suspects stale data (rare proxy hiccup,
+  // background-fetch race) can bump this counter to force a re-run.
+  // We track the load timestamp separately so the pill can show
+  // "Updated 2 min ago" using the captain's local clock.
+  const [refreshNonce, setRefreshNonce] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
 
   // Get fun stats from database
   const tripStats = useLiveQuery(
@@ -150,18 +160,27 @@ export default function StandingsPage() {
         setLeaderboard(playerLeaderboard);
         setAwards(computedAwards);
         setPlayerStats(stats);
+        setLastUpdatedAt(new Date());
       } catch (error) {
         if (cancelled) return;
         logger.error('Failed to load standings', { error });
         showToastRef.current('error', 'Failed to load standings');
       } finally {
-        if (!cancelled) setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+          setIsRefreshing(false);
+        }
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [tripId, aggregateSignature]);
+  }, [tripId, aggregateSignature, refreshNonce]);
+
+  const handleRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    setRefreshNonce((nonce) => nonce + 1);
+  }, []);
 
   useEffect(() => {
     if (!tripId || isLoading) return;
@@ -378,8 +397,9 @@ export default function StandingsPage() {
         result they just produced, plus one-tap routes to the recap or
         the next incomplete match.
       */}
-      <section className="container-editorial pt-[var(--space-6)]">
+      <section className="container-editorial pt-[var(--space-6)] space-y-[var(--space-3)]">
         <RecentlyClosedMatchBanner />
+        <SessionHandoffBanner />
       </section>
 
       {/*
@@ -432,6 +452,9 @@ export default function StandingsPage() {
           currentTripName={currentTrip.name}
           matchesCompleted={standings?.matchesCompleted ?? 0}
           totalMatches={standings?.totalMatches ?? 0}
+          lastUpdatedAt={lastUpdatedAt}
+          onRefresh={handleRefresh}
+          isRefreshing={isRefreshing}
         />
       </section>
 
