@@ -21,6 +21,7 @@ import {
 } from './matchScoringReport';
 import type { MatchScoringPageModel } from './matchScoringPageModel';
 import type { MatchScoringPageUiState } from './useMatchScoringPageUiState';
+import type { ScoreHoleResult } from '@/lib/stores/scoringStore';
 
 type ScoreSource = 'swipe' | 'buttons' | 'strokes' | 'fourball' | 'oneHanded' | 'voice';
 
@@ -48,7 +49,7 @@ interface MatchScoringPageActionsOptions {
     teamAPlayerScores?: PlayerHoleScore[],
     teamBPlayerScores?: PlayerHoleScore[],
     options?: { advanceHole?: boolean }
-  ) => Promise<void>;
+  ) => Promise<ScoreHoleResult | undefined>;
   undoLastHole: () => Promise<void>;
   showConfirm: (options: {
     title: string;
@@ -231,8 +232,9 @@ export function useMatchScoringPageActions(
       ui.setSavingIndicator('Saving score...');
 
       haptic.scorePoint();
+      let result: ScoreHoleResult | undefined;
       if (teamAStrokeScore !== undefined && teamBStrokeScore !== undefined) {
-        await scoreHole(
+        result = await scoreHole(
           winner,
           teamAStrokeScore,
           teamBStrokeScore,
@@ -241,9 +243,25 @@ export function useMatchScoringPageActions(
           { advanceHole: scoringPreferences.autoAdvance && wasUnscored && !wouldCloseOut }
         );
       } else {
-        await scoreHole(winner, undefined, undefined, undefined, undefined, {
+        result = await scoreHole(winner, undefined, undefined, undefined, undefined, {
           advanceHole: scoringPreferences.autoAdvance && wasUnscored && !wouldCloseOut,
         });
+      }
+
+      // Conflict path: another captain scored this hole within the
+      // 30s window and the store deliberately did NOT overwrite their
+      // record. Surface a toast so the captain knows their tap was
+      // ignored, skip the success-path UI (celebration, audit, undo
+      // bar, sound), and let the activeMatchState refresh do the
+      // visual reconciliation.
+      if (result?.conflict) {
+        haptic.warning();
+        ui.setSavingIndicator(null);
+        ui.setToast({
+          type: 'info',
+          message: `Another captain just scored hole ${result.conflict.holeNumber} — kept their score`,
+        });
+        return;
       }
 
       if (activeMatch) {

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 
 import { NoStandingsEmpty } from '@/components/ui';
 import { PathToVictoryCard } from '@/components/gamification/PathToVictoryCard';
@@ -7,6 +8,36 @@ import type { MagicNumber, PlayerLeaderboard, TeamStandings } from '@/lib/types/
 import { PartyPopper, Share2, Trophy } from 'lucide-react';
 
 import { StandingsFactCard, StandingsSectionHeading } from './StandingsShellSection';
+
+/**
+ * Returns `true` for `durationMs` whenever `value` changes from its
+ * previous render. We use this to briefly highlight standings cells
+ * when a remote write lands — captains scanning the board can tell at
+ * a glance "something just moved" without needing a full toast.
+ *
+ * Initial mount does NOT flash; only subsequent changes do. Otherwise
+ * every navigation back to /standings would light up the whole page.
+ */
+function useFlashOnChange(value: number, durationMs = 1500): boolean {
+  const previous = useRef(value);
+  const [flashing, setFlashing] = useState(false);
+
+  useEffect(() => {
+    if (previous.current === value) return;
+    previous.current = value;
+    // setState in effect is intentional here — we're synchronising a
+    // visual flash with an external prop change, and the cascading
+    // render is exactly what we want (one render to mount the flash,
+    // one to clear it via the timeout). Suppress the lint rule for
+    // this narrow case.
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
+    setFlashing(true);
+    const t = window.setTimeout(() => setFlashing(false), durationMs);
+    return () => window.clearTimeout(t);
+  }, [value, durationMs]);
+
+  return flashing;
+}
 
 function StandingsScoreBlock({
   teamName,
@@ -28,13 +59,19 @@ function StandingsScoreBlock({
     color === 'usa'
       ? 'linear-gradient(180deg,rgba(27,59,119,0.08),rgba(255,255,255,0.62))'
       : 'linear-gradient(180deg,rgba(160,42,63,0.08),rgba(255,255,255,0.62))';
+  const justChanged = useFlashOnChange(score);
 
   return (
     <div
-      className="rounded-[1.5rem] border px-[var(--space-4)] py-[var(--space-5)] text-center"
+      className={`rounded-[1.5rem] border px-[var(--space-4)] py-[var(--space-5)] text-center transition-shadow duration-700 ${justChanged ? 'standings-flash' : ''}`}
       style={{
-        borderColor: `color-mix(in srgb, ${teamColor} 16%, white)`,
+        borderColor: justChanged
+          ? `color-mix(in srgb, ${teamColor} 55%, white)`
+          : `color-mix(in srgb, ${teamColor} 16%, white)`,
         background: gradient,
+        boxShadow: justChanged
+          ? `0 0 0 4px color-mix(in srgb, ${teamColor} 18%, transparent)`
+          : undefined,
       }}
     >
       {teamIcon ? (
@@ -80,14 +117,20 @@ function PlayerRow({
 }) {
   const isTopThree = rank <= 3;
   const accent = isTeamA ? 'var(--team-usa)' : 'var(--team-europe)';
+  const justChanged = useFlashOnChange(entry.points);
 
   return (
     <div
-      className="player-row stagger-item flex items-center gap-[var(--space-4)] rounded-[1.1rem] border px-[var(--space-4)] py-[var(--space-3)]"
+      className={`player-row stagger-item flex items-center gap-[var(--space-4)] rounded-[1.1rem] border px-[var(--space-4)] py-[var(--space-3)] transition-shadow duration-700 ${justChanged ? 'standings-flash' : ''}`}
       style={{
         animationDelay: `${animationDelay}ms`,
-        borderColor: `color-mix(in srgb, ${accent} 14%, white)`,
-        background: `linear-gradient(90deg, color-mix(in srgb, ${accent} 7%, white) 0%, rgba(255,255,255,0.82) 30%, rgba(255,255,255,0.82) 100%)`,
+        borderColor: justChanged
+          ? `color-mix(in srgb, ${accent} 55%, white)`
+          : `color-mix(in srgb, ${accent} 14%, white)`,
+        background: `linear-gradient(90deg, color-mix(in srgb, ${accent} ${justChanged ? 18 : 7}%, white) 0%, rgba(255,255,255,0.82) 30%, rgba(255,255,255,0.82) 100%)`,
+        boxShadow: justChanged
+          ? `0 0 0 3px color-mix(in srgb, ${accent} 18%, transparent)`
+          : undefined,
       }}
     >
       <span

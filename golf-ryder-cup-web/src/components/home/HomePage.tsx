@@ -7,7 +7,7 @@ import { useTripStore, useAccessStore, useToastStore } from '@/lib/stores';
 import { useShallow } from 'zustand/shallow';
 import { useHomeData } from '@/lib/hooks/useHomeData';
 import { ensureTripShareCode } from '@/lib/services/tripSyncService';
-import { ChevronRight, MapPin, Calendar, Plus, Trophy, Shield, Tv } from 'lucide-react';
+import { ChevronRight, MapPin, Calendar, Plus, Trophy, Shield, Tv, Clock } from 'lucide-react';
 import { formatDate, parseDateInLocalZone } from '@/lib/utils';
 import { shareTrip } from '@/lib/utils/share';
 import { Button } from '@/components/ui/Button';
@@ -75,7 +75,16 @@ export default function HomePage() {
     readPendingJoinInviteId
   );
   const [showJoinTrip, setShowJoinTrip] = useState(() => !!readPendingJoinCode());
-  const [homeClock] = useState(() => Date.now());
+  // Re-render the home page once a minute so the "First tee in X min"
+  // pill counts down without requiring the user to navigate away. We
+  // only re-tick when an upcoming tee time is plausibly relevant —
+  // checked downstream by tucking the live clock into a useMemo so the
+  // string update is cheap.
+  const [homeClock, setHomeClock] = useState(() => Date.now());
+  useEffect(() => {
+    const interval = window.setInterval(() => setHomeClock(Date.now()), 60_000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   // Check for a pending join code from /join deep link
   useEffect(() => {
@@ -166,6 +175,66 @@ export default function HomePage() {
 
     return `${leader} leads by ${diff} point${diff !== 1 ? 's' : ''}`;
   }, [standings, teamAName, teamBName]);
+
+  // Next-tee-time pill. Picks the earliest upcoming session that has a
+  // firstTeeTime set. Only shows when the tee is within a 36-hour window
+  // — beyond that the pill is more clutter than information; the date
+  // already makes the timing clear. Returns null when nothing imminent.
+  const firstTeeMessage = useMemo(() => {
+    if (!activeTrip || !tripSessions || tripSessions.length === 0) return null;
+
+    const now = homeClock;
+    const horizonMs = 36 * 60 * 60 * 1000;
+
+    type Candidate = { date: Date; sessionStatus: string };
+    const candidates: Candidate[] = [];
+    for (const session of tripSessions) {
+      if (!session.firstTeeTime || !session.scheduledDate) continue;
+      if (session.status === 'completed') continue;
+
+      const baseDate = parseDateInLocalZone(session.scheduledDate);
+      const [hourStr, minuteStr] = session.firstTeeTime.split(':');
+      const hour = Number(hourStr);
+      const minute = Number(minuteStr);
+      if (!Number.isFinite(hour) || !Number.isFinite(minute)) continue;
+
+      baseDate.setHours(hour, minute, 0, 0);
+      candidates.push({ date: baseDate, sessionStatus: session.status });
+    }
+
+    if (candidates.length === 0) return null;
+
+    candidates.sort((a, b) => a.date.getTime() - b.date.getTime());
+    const next = candidates.find((c) => c.date.getTime() > now - 5 * 60_000);
+    if (!next) return null;
+
+    const diffMs = next.date.getTime() - now;
+    if (diffMs > horizonMs) return null;
+
+    if (diffMs <= 0) {
+      const minsAgo = Math.round(-diffMs / 60_000);
+      if (minsAgo <= 5) return 'First tee any minute';
+      return null;
+    }
+
+    const totalMinutes = Math.round(diffMs / 60_000);
+    if (totalMinutes < 60) return `First tee in ${totalMinutes} min`;
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (hours < 12) {
+      return minutes > 0 ? `First tee in ${hours}h ${minutes}m` : `First tee in ${hours}h`;
+    }
+
+    // Beyond ~12 hours we switch to a clock display so the captain
+    // sees a concrete time-of-day instead of a flat "in 14h" pill.
+    const formatter = new Intl.DateTimeFormat(undefined, {
+      weekday: 'short',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+    return `First tee ${formatter.format(next.date)}`;
+  }, [activeTrip, tripSessions, homeClock]);
 
   const tripStateLabel = useMemo(() => {
     if (!activeTrip) return null;
@@ -298,6 +367,11 @@ export default function HomePage() {
                       <HeroMetaPill icon={<Trophy size={13} strokeWidth={1.7} />}>
                         {scoreNarrative ?? 'Trip in motion'}
                       </HeroMetaPill>
+                      {firstTeeMessage && (
+                        <HeroMetaPill icon={<Clock size={13} strokeWidth={1.7} />}>
+                          {firstTeeMessage}
+                        </HeroMetaPill>
+                      )}
                     </div>
                   </div>
 

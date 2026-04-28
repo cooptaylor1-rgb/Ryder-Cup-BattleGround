@@ -60,6 +60,18 @@ export async function scoreActiveHoleData({
   undoStack: UndoEntry[];
   matchStates: Map<string, MatchState>;
   lastSavedAt: Date;
+  /**
+   * Set when recordHoleResult detected a recent score on this hole
+   * from another user. The store leaves the existing record in place
+   * and surfaces this so the UI can show a polite "someone else just
+   * scored" toast instead of silently no-op'ing the captain's tap.
+   */
+  conflict?: {
+    holeNumber: number;
+    existingBy: string;
+    incomingBy: string;
+    existingWinner: HoleWinner;
+  };
 }> {
   // Ensure the match is ready before we mutate any state. Throws
   // MatchNotReadyForScoringError if course/tee set is missing; the caller
@@ -70,7 +82,7 @@ export async function scoreActiveHoleData({
     (await db.holeResults.where({ matchId: activeMatch.id, holeNumber: currentHole }).first()) ||
     null;
 
-  await recordHoleResult(
+  const recordResult = await recordHoleResult(
     activeMatch.id,
     currentHole,
     winner,
@@ -82,6 +94,31 @@ export async function scoreActiveHoleData({
     teamAPlayerScores,
     teamBPlayerScores
   );
+
+  // Conflict path: another captain scored this hole within the
+  // 30-second conflict window. recordHoleResult deliberately does NOT
+  // overwrite — it returns the conflict descriptor instead. Surface
+  // it back to the caller (the UI shows a toast) and short-circuit
+  // the rest of this function: no broadcast, no queue write, no
+  // match-state advance — the existing remote score is the truth.
+  if ('type' in recordResult && recordResult.type === 'conflict') {
+    const holeResults = await db.holeResults.where('matchId').equals(activeMatch.id).toArray();
+    const newMatchState = calculateMatchState(activeMatch, holeResults);
+    return {
+      activeMatch,
+      activeMatchState: newMatchState,
+      currentHole,
+      undoStack,
+      matchStates,
+      lastSavedAt: new Date(),
+      conflict: {
+        holeNumber: currentHole,
+        existingBy: recordResult.existingBy,
+        incomingBy: recordResult.incomingBy,
+        existingWinner: recordResult.existingResult.winner,
+      },
+    };
+  }
 
   const holeResults = await db.holeResults.where('matchId').equals(activeMatch.id).toArray();
   const newMatchState = calculateMatchState(activeMatch, holeResults);
