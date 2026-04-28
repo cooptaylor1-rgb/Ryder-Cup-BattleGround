@@ -589,24 +589,54 @@ function GroupCard({
 
       <div className="mt-[var(--space-4)] grid gap-[var(--space-3)] sm:grid-cols-[1fr_auto]">
         <label className="block">
-          <span className="type-meta font-semibold text-[var(--ink)]">Tee time</span>
+          <span className="flex items-center gap-2">
+            <span className="type-meta font-semibold text-[var(--ink)]">Tee time</span>
+            {/*
+              "Auto" pill makes the data-unification visible: when the
+              field shows the staggered preview time but the captain
+              hasn't explicitly typed it, we tell them so. Tapping any
+              other time in the input commits it as an explicit value
+              (the pill disappears). Group 1 is always explicit — its
+              time IS the session's first tee time.
+            */}
+            {group.groupNumber > 1 && !group.teeTime && inheritedTeeTime ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--canvas-sunken)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--ink-tertiary)]">
+                Auto
+              </span>
+            ) : null}
+          </span>
           <input
             type="time"
-            value={group.teeTime ?? ''}
+            // Show the staggered preview as the actual input value when
+            // the captain hasn't picked one — previously the field was
+            // visibly blank with a "Will render as 12:22" caption, which
+            // meant the captain had to mentally compute or trust the
+            // hint. Now the field shows 12:22; if they want to change
+            // it, they tap and pick. The displayed-but-unset state is
+            // tracked via group.teeTime — when blank, the value is
+            // computed; when set, it's an explicit override.
+            value={
+              group.teeTime ||
+              (group.groupNumber > 1 ? inheritedTeeTime : '') ||
+              ''
+            }
             onChange={(event) => onTeeTimeChange(event.target.value)}
             className="input mt-[var(--space-1)]"
             placeholder={inheritedTeeTime || 'Auto'}
           />
-          {group.teeTime ? null : (
+          {group.groupNumber > 1 && group.teeTime ? (
+            <button
+              type="button"
+              onClick={() => onTeeTimeChange('')}
+              className="mt-[var(--space-1)] inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--masters)] hover:text-[var(--masters-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:rounded-sm"
+              aria-label={`Reset Group ${group.groupNumber} tee time to auto-stagger`}
+            >
+              Reset to auto
+            </button>
+          ) : null}
+          {group.groupNumber === 1 && !group.teeTime ? (
             <span className="mt-[var(--space-1)] block type-micro text-[var(--ink-tertiary)]">
-              {inheritedTeeTime
-                ? `Will render as ${inheritedTeeTime} from the session's first tee time.`
-                : 'Inherits from the session’s first tee time.'}
-            </span>
-          )}
-          {group.groupNumber > 1 && !group.teeTime ? (
-            <span className="mt-[var(--space-1)] block type-micro text-[var(--ink-tertiary)]">
-              Leave blank to stagger from Group 1.
+              Set Group 1’s tee time to anchor the session.
             </span>
           ) : null}
         </label>

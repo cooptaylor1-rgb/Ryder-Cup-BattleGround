@@ -22,6 +22,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import { AuthGuard } from '@/components/AuthGuard';
 import { CourseSyncInitializer } from '@/components/CourseSyncInitializer';
 import { TripSyncInitializer } from '@/components/TripSyncInitializer';
+import { TripRealtimeBridge } from '@/components/TripRealtimeBridge';
 import { CapacitorProvider } from '@/components/CapacitorProvider';
 import { SupabaseAuthBridge } from '@/components/SupabaseAuthBridge';
 import { baseMetadata, viewport as baseViewport } from '@/lib/utils/metadata';
@@ -230,6 +231,14 @@ export default function RootLayout({
               <OfflineIndicator />
               <CourseSyncInitializer />
               <TripSyncInitializer />
+              {/* Subscribes to Supabase Realtime for the active trip
+                  so cross-device updates (other captains' scores,
+                  session changes, lineup edits) flow into Dexie
+                  within ~1s. Without this, surfaces other than the
+                  Live page only saw remote changes after a refresh.
+                  No-ops when there's no active trip or the user
+                  isn't signed in. */}
+              <TripRealtimeBridge />
               <ToastContainer />
               {/* Install-the-app prompts are gated behind PWAPromptGate:
                   they render only after the user is signed in, has a

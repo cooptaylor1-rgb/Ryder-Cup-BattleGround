@@ -18,6 +18,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useWakeLock } from '@/lib/hooks';
 import type { HoleWinner } from '@/lib/types/models';
 import { ScoreInputPanel } from './ScoreInputPanel';
 import { HoleStrip } from './HoleStrip';
@@ -57,6 +58,12 @@ export function MatchCockpit({
 
   const [strokeSheetOpen, setStrokeSheetOpen] = useState(false);
   const [fourballSheetOpen, setFourballSheetOpen] = useState(false);
+
+  // Keep the phone awake while the cockpit is mounted *and* the match
+  // is actively being scored. We don't hold the lock when the match
+  // is in a recap/edit state — the captain is reviewing, not stroking.
+  // Released on unmount; re-acquired on visibility change.
+  useWakeLock(!isMatchComplete || isEditingScores);
 
   /**
    * Brief team-color "wash" over the cockpit body when a hole result

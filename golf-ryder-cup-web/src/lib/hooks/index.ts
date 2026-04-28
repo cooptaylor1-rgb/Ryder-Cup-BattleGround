@@ -122,6 +122,11 @@ export { useUserInProgressMatch } from './useUserInProgressMatch';
 // Ambient-light driver for auto-flipping to sunlight (outdoor) theme
 export { useAmbientLight } from './useAmbientLight';
 
+// Screen wake lock — used by the scoring cockpit to keep the phone
+// awake during a round so captains aren't unlocking 60 times across
+// 18 holes. Cockpit-only on purpose (battery cost).
+export { useWakeLock } from './useWakeLock';
+
 // Session timeout management
 export {
   useSessionTimeout,

@@ -13,6 +13,7 @@ import { shareTrip } from '@/lib/utils/share';
 import { Button } from '@/components/ui/Button';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
+  ContinueScoringBanner,
   NoTournamentsEmpty,
   WhatsNew,
   YourMatchCard,
@@ -25,6 +26,7 @@ import { TripDashboardSections } from './TripDashboardSections';
 import { HeroMetaPill, HeroMetaStat, HomeSectionHeader } from './HomeSharedComponents';
 import { TripCard } from './TripCard';
 import { CaptainSetupGuide } from './CaptainSetupGuide';
+import { EventDayPreFlightBanner } from './EventDayPreFlightBanner';
 import { TeamLogo } from '@/components/team/TeamLogo';
 
 function readPendingJoinCode(): string | undefined {
@@ -237,6 +239,28 @@ export default function HomePage() {
         />
 
         <main className="container-editorial">
+          {/*
+            Top-of-home action stack — ordered for cold-start. When a
+            captain unlocks their phone at the 5th tee Thursday and
+            opens the app, the first thing they should see is a
+            one-tap path back to scoring (no scrolling past the big
+            hero card). Pre-flight comes first only on event-day
+            morning before the first tee, when scoring hasn't started
+            yet — once an active match exists the resume banner takes
+            the spot.
+
+            Both surfaces auto-hide when not relevant.
+          */}
+          <div className="pt-[var(--space-6)] space-y-[var(--space-3)]">
+            {userMatchData?.match ? (
+              <ContinueScoringBanner
+                match={userMatchData.match}
+                matchState={userMatchData.matchState ?? undefined}
+              />
+            ) : null}
+            <EventDayPreFlightBanner />
+          </div>
+
           {/* ── ACTIVE TOURNAMENT ── */}
           {activeTrip && (
             <div className="pt-[var(--space-8)] space-y-[var(--space-6)]">
