@@ -14,9 +14,11 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { HoleWinner } from '@/lib/types/models';
 import { ScoreInputPanel } from './ScoreInputPanel';
 import { HoleStrip } from './HoleStrip';
 import { StrokeEntrySheet } from './StrokeEntrySheet';
@@ -56,6 +58,38 @@ export function MatchCockpit({
   const [strokeSheetOpen, setStrokeSheetOpen] = useState(false);
   const [fourballSheetOpen, setFourballSheetOpen] = useState(false);
 
+  /**
+   * Brief team-color "wash" over the cockpit body when a hole result
+   * commits. Fixes the gap where a score-tap previously confirmed
+   * only via the small spin pill in the header — outside the user's
+   * visual focus. The wash covers the cockpit zone they were just
+   * looking at, fades to transparent over ~700ms, and uses the
+   * winning team's colour so the user feels which team they just
+   * credited. Honours prefers-reduced-motion by skipping animation
+   * but still flashing the colour briefly so the moment is felt
+   * without movement.
+   */
+  const [washWinner, setWashWinner] = useState<HoleWinner | null>(null);
+  const washTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (washTimerRef.current) clearTimeout(washTimerRef.current);
+    };
+  }, []);
+
+  const onScoreWithWash = useCallback(
+    (winner: HoleWinner) => {
+      setWashWinner(winner);
+      if (washTimerRef.current) clearTimeout(washTimerRef.current);
+      washTimerRef.current = setTimeout(() => {
+        setWashWinner(null);
+        washTimerRef.current = null;
+      }, 700);
+      handlers.onScore(winner);
+    },
+    [handlers]
+  );
+
   // Phase 2 collapse: the legacy 5-mode picker still flows in via
   // `scoring.scoringMode` from the model, but the cockpit only ever
   // renders the unified ScoreInputPanel. If the user (or store) picks
@@ -91,11 +125,47 @@ export function MatchCockpit({
     else setStrokeSheetOpen(true);
   };
 
+  const washColor =
+    washWinner === 'teamA'
+      ? teams.teamAColor
+      : washWinner === 'teamB'
+        ? teams.teamBColor
+        : washWinner === 'halved'
+          ? 'var(--ink-secondary)'
+          : null;
+
   return (
     <section
-      className="space-y-4 px-4 pb-[calc(72px+env(safe-area-inset-bottom,0px))] pt-4 sm:px-5"
+      className="relative space-y-4 px-4 pb-[calc(72px+env(safe-area-inset-bottom,0px))] pt-4 sm:px-5"
       aria-label="Score this hole"
     >
+      {/* Score-commit wash. Sits over the cockpit at very low opacity
+          for ~700ms after a score commits, fading to transparent.
+          Covers the visual zone the user was just looking at, with
+          the winning team's colour, so the commit *feels* like
+          something happened — not just a tiny check icon flash. */}
+      <AnimatePresence>
+        {washColor && (
+          <motion.div
+            key={washColor}
+            aria-hidden
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: preferences.prefersReducedMotion ? 0.18 : [0, 0.28, 0],
+            }}
+            exit={{ opacity: 0 }}
+            transition={{
+              duration: 0.65,
+              ease: 'easeOut',
+              times: preferences.prefersReducedMotion ? undefined : [0, 0.18, 1],
+            }}
+            className="pointer-events-none absolute inset-0 -z-10 rounded-[28px]"
+            style={{
+              background: `radial-gradient(circle at 50% 35%, ${washColor} 0%, transparent 65%)`,
+            }}
+          />
+        )}
+      </AnimatePresence>
       {isEditingScores && isMatchComplete && (
         <div
           className="flex items-center justify-between gap-3 rounded-[18px] border border-[var(--gold)] bg-[var(--gold-subtle)] px-3 py-2.5"
@@ -117,30 +187,42 @@ export function MatchCockpit({
         </div>
       )}
 
-      {/* Hole hero — one zone, one fact line. No card-within-card. */}
-      <div className="text-center">
+      {/* Hole hero — one zone, one fact line. No card-within-card.
+          The hole number animates on advance: AnimatePresence keys on
+          currentHole so the old number slides + fades out and the new
+          one slides in from below, giving the auto-advance a felt
+          beat instead of a silent number swap. Reduced-motion users
+          get a soft cross-fade instead of vertical motion. */}
+      <div className="relative h-[120px] text-center sm:h-[140px]">
         <p className="type-overline text-[var(--masters)]">
           {isMatchComplete && !isEditingScores ? 'Recap hole' : 'Score this hole'}
         </p>
-        <h1
-          className={cn(
-            'mt-1 font-serif font-normal leading-none tracking-[-0.02em] text-[var(--ink)]',
-            'text-[88px] sm:text-[104px]'
-          )}
-        >
-          {currentHole}
-        </h1>
-        <p className="mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink-secondary)]">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.h1
+            key={currentHole}
+            initial={
+              preferences.prefersReducedMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: 28 }
+            }
+            animate={{ opacity: 1, y: 0 }}
+            exit={
+              preferences.prefersReducedMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: -28 }
+            }
+            transition={{ duration: preferences.prefersReducedMotion ? 0.18 : 0.32, ease: [0.32, 0.72, 0, 1] }}
+            className={cn(
+              'mt-1 font-serif font-normal leading-none tracking-[-0.02em] text-[var(--ink)]',
+              'text-[88px] sm:text-[104px]'
+            )}
+          >
+            {currentHole}
+          </motion.h1>
+        </AnimatePresence>
+        <p className="absolute inset-x-0 bottom-0 mt-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ink-secondary)]">
           {factParts.join(' · ')}
         </p>
-        {/*
-          Recorded-result feedback used to live here as a small grey
-          chip ("Halved — tap below to change"), which was easy to
-          miss while reviewing a card. The ScoreInputPanel below now
-          surfaces the recorded state with a full team-coloured
-          banner + locked button styling, so this duplicated chip
-          would just dilute the signal.
-        */}
       </div>
 
       {/* The single sacred surface */}
@@ -153,7 +235,7 @@ export function MatchCockpit({
         disabled={isSaving}
         preferredHand={preferences.preferredHand}
         prefersReducedMotion={preferences.prefersReducedMotion}
-        onScore={handlers.onScore}
+        onScore={onScoreWithWash}
         onOpenStrokeEntry={openStrokeEntry}
         helperLine={helperLine}
         strokesAvailable
