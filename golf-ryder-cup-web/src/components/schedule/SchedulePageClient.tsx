@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { PageHeader } from '@/components/layout';
 import {
   ScheduleDaySection,
@@ -87,6 +87,37 @@ export default function SchedulePageClient() {
     [currentUserPlayer, scheduleByDay]
   );
 
+  const displaySchedule = selectedTab === 'my' ? mySchedule : scheduleByDay;
+  const hasUserSchedule = mySchedule.length > 0;
+
+  // On open, scroll the day-section that matches today's local date
+  // into view so a captain landing on /schedule on event day doesn't
+  // see Day 0's practice round at the top of the viewport. Falls back
+  // to the next upcoming day if nothing is scheduled today (e.g. a
+  // mid-week off-day). Runs once per (selectedTab × tripId × schedule
+  // length) so swapping tabs re-anchors to the right section instead
+  // of staying at the previous scroll position. Lives above the early
+  // returns so the hook order stays stable across renders.
+  const tripId = currentTrip?.id;
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (displaySchedule.length === 0) return;
+
+    const todayKey = new Date().toLocaleDateString('en-CA');
+    const target =
+      displaySchedule.find((day) => day.date === todayKey) ??
+      displaySchedule.find((day) => day.date >= todayKey);
+    if (!target) return;
+
+    // Defer to the next animation frame so React has a chance to mount
+    // the section nodes before we ask the browser to scroll to them.
+    const raf = window.requestAnimationFrame(() => {
+      const el = document.getElementById(`schedule-day-${target.date}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [displaySchedule, selectedTab, tripId]);
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
@@ -146,9 +177,6 @@ export default function SchedulePageClient() {
   if (isScheduleLoading) {
     return <PageLoadingSkeleton title="Schedule" variant="list" />;
   }
-
-  const displaySchedule = selectedTab === 'my' ? mySchedule : scheduleByDay;
-  const hasUserSchedule = mySchedule.length > 0;
 
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">

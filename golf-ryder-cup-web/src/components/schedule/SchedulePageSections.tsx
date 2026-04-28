@@ -80,8 +80,11 @@ export const ScheduleDaySection = React.memo(function ScheduleDaySection({
   day: DaySchedule;
   onEntryPress: (entry: ScheduleEntry) => void;
 }) {
+  // Stable id per day so the page-level "scroll to today" effect can
+  // find this section by date without piping refs through. Using the
+  // date string keeps it deterministic across renders.
   return (
-    <div className="mb-8">
+    <div className="mb-8" id={`schedule-day-${day.date}`} data-schedule-date={day.date}>
       <div className="mb-4 flex items-center gap-3">
         <div className="flex h-12 w-12 flex-col items-center justify-center rounded-xl bg-[var(--masters)] text-[var(--canvas)]">
           <span className="text-xs font-medium opacity-80">Day</span>
