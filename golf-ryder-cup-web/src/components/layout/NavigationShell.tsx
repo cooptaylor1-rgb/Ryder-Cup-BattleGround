@@ -17,6 +17,7 @@ import { zIndex } from '@/lib/constants/zIndex';
 import { SidebarNav } from './SidebarNav';
 import { BottomNav } from './BottomNav';
 import { SyncFailureBanner } from '@/components/SyncFailureBanner';
+import { GlobalSyncIndicator } from '@/components/GlobalSyncIndicator';
 
 // Lazy-load live-play widgets (they touch IndexedDB)
 const FloatingMyMatch = dynamic(
@@ -60,6 +61,13 @@ export function NavigationShell({ children }: { children: ReactNode }) {
           flex layout so it overlays the page without shifting content.
           Renders nothing when the queue has no failed operations. */}
       {!hideNav && <SyncFailureBanner />}
+
+      {/* Always-on pending-sync indicator. Top-right pill that
+          surfaces queue activity on every page (standings, home,
+          schedule, etc.) — previously only the cockpit showed
+          pending state. Hides itself when the queue is clean and
+          when the failure banner takes over. */}
+      {!hideNav && <GlobalSyncIndicator />}
 
       <div className="flex min-h-screen">
         {/* Desktop sidebar */}
