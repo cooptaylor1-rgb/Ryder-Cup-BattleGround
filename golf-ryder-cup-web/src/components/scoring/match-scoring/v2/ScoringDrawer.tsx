@@ -13,7 +13,7 @@
 
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, useDragControls, type PanInfo } from 'framer-motion';
 import { ChevronDown, ChevronUp, Coins, ListOrdered, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -29,9 +29,17 @@ import type { SideBet } from '@/lib/types/models';
 
 type TabId = 'match' | 'standings' | 'bets';
 
-const PEEK_HEIGHT = 56; // px — collapsed strip height
+const PEEK_HEIGHT = 72; // px — collapsed strip height (was 56; bumped so the
+                        // drag handle and primary copy don't compete for space)
 const EXPANDED_VH = 70; // 70% of viewport when expanded
 const DRAG_THRESHOLD = 64;
+/**
+ * localStorage key for "user has opened the drawer at least once".
+ * Once true, we stop showing the discoverability hint and let the
+ * peek strip carry the live status info instead. Keyed broadly so a
+ * captain on a multi-trip device doesn't see the hint twice.
+ */
+const HAS_USED_KEY = 'scoring-drawer-used';
 
 interface ScoringDrawerProps {
   scoring: CockpitScoring;
@@ -61,6 +69,36 @@ export function ScoringDrawer({
   const dragControls = useDragControls();
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>('match');
+
+  // Discoverability: track whether the user has opened the drawer
+  // before. Until they have, the peek strip shows a louder
+  // "Pull up for standings & bets" call-to-action with an animated
+  // chevron — the previous 1px-tall handle was invisible at arm's
+  // length and most users never realized standings + bets sat behind
+  // a swipe. Once they've expanded it once we trust they remember and
+  // reclaim that real-estate for the live status pill.
+  // The setState IS the intentional sync-from-localStorage here — the
+  // React 19 set-state-in-effect rule's preferred "derive at render"
+  // doesn't apply because we're reading a side-channel (localStorage).
+  const [hasUsedDrawer, setHasUsedDrawer] = useState<boolean | null>(null);
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      setHasUsedDrawer(true);
+      return;
+    }
+    setHasUsedDrawer(window.localStorage.getItem(HAS_USED_KEY) === '1');
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
+  const markUsed = useCallback(() => {
+    setHasUsedDrawer((current) => {
+      if (current === true) return current;
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(HAS_USED_KEY, '1');
+      }
+      return true;
+    });
+  }, []);
 
   const drawerRef = useRef<HTMLDivElement>(null);
 
@@ -98,6 +136,7 @@ export function ScoringDrawer({
       if (dy > 60 && !expanded) {
         haptic.tap();
         setExpanded(true);
+        markUsed();
         startY = null;
       }
     };
@@ -108,16 +147,26 @@ export function ScoringDrawer({
       window.removeEventListener('touchstart', onTouchStart);
       window.removeEventListener('touchmove', onTouchMove);
     };
-  }, [expanded, haptic]);
+  }, [expanded, haptic, markUsed]);
 
   const handleDragEnd = (_: never, info: PanInfo) => {
     if (info.offset.y < -DRAG_THRESHOLD) {
       setExpanded(true);
+      markUsed();
       haptic.tap();
     } else if (info.offset.y > DRAG_THRESHOLD) {
       setExpanded(false);
       haptic.tap();
     }
+  };
+
+  const togglePeek = () => {
+    haptic.tap();
+    setExpanded((v) => {
+      const next = !v;
+      if (next) markUsed();
+      return next;
+    });
   };
 
   const peekLabel = (() => {
@@ -179,40 +228,94 @@ export function ScoringDrawer({
           // expanded — extra padding keeps content above it.
         }}
       >
-        {/* Drag handle + peek strip */}
+        {/* Drag handle + peek strip.
+            First-run state (hasUsedDrawer === false) is louder: the
+            handle is gold, gently breathing, and the copy explicitly
+            tells the user what's behind the drawer. Once they've
+            opened it for the first time we revert to a status pill
+            with the live score + bets — the drawer is then a known
+            tool and the handle just needs to be visible, not selling.
+            null state (SSR / not yet hydrated) renders the calmer
+            second look so we don't flash the hint on every refresh. */}
         <button
           type="button"
-          onClick={() => {
-            haptic.tap();
-            setExpanded((v) => !v);
-          }}
+          onClick={togglePeek}
           onPointerDown={(e) => dragControls.start(e)}
-          aria-label={expanded ? 'Collapse details' : 'Expand details'}
+          aria-label={
+            expanded
+              ? 'Collapse match details'
+              : hasUsedDrawer === false
+                ? 'Pull up for standings, bets, and match details'
+                : 'Expand match details, standings, and bets'
+          }
           aria-expanded={expanded}
-          className="relative flex h-14 shrink-0 items-center justify-between gap-3 px-4 text-left"
+          className={cn(
+            'relative flex h-[72px] shrink-0 items-center justify-between gap-3 px-4 text-left transition-colors',
+            hasUsedDrawer === false &&
+              !expanded &&
+              'bg-[linear-gradient(180deg,var(--gold-subtle)_0%,var(--canvas-raised)_72%)]'
+          )}
           style={{ touchAction: 'none' }}
         >
+          {/* Drag handle — taller and team-toned for visibility.
+              In first-run state the handle is gold and gently breathes;
+              once used it settles to a calmer rule-strong fill. */}
           <span
             aria-hidden
-            className="absolute left-1/2 top-1.5 h-1 w-10 -translate-x-1/2 rounded-full bg-[color:var(--rule-strong)]"
+            className={cn(
+              'absolute left-1/2 top-2 h-1.5 w-14 -translate-x-1/2 rounded-full transition-colors',
+              hasUsedDrawer === false && !expanded
+                ? 'bg-[var(--gold)]'
+                : 'bg-[color:var(--rule-strong)]'
+            )}
           />
+          {hasUsedDrawer === false && !expanded && !reducedMotion && (
+            <motion.span
+              aria-hidden
+              className="absolute left-1/2 top-2 h-1.5 w-14 -translate-x-1/2 rounded-full bg-[var(--gold)]"
+              initial={{ opacity: 0.6, scale: 1 }}
+              animate={{ opacity: [0.6, 0.15, 0.6], scale: [1, 1.4, 1] }}
+              transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          )}
 
-          <div className="flex min-w-0 items-center gap-3 pt-1.5">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--ink-tertiary)]">
-              Match
-            </span>
-            <span className="truncate font-mono text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)]">
-              {peekLabel}
-            </span>
-            {peekBets > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--gold-subtle)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--gold-dark)]">
-                <Coins size={10} />
-                {peekBets} bet{peekBets === 1 ? '' : 's'}
-              </span>
+          <div className="flex min-w-0 items-center gap-3 pt-3">
+            {hasUsedDrawer === false && !expanded ? (
+              <>
+                <ChevronUp
+                  size={18}
+                  className="shrink-0 text-[var(--gold-dark)]"
+                  aria-hidden
+                />
+                <span className="min-w-0 truncate text-sm font-semibold text-[var(--ink)]">
+                  Pull up for standings &amp; bets
+                </span>
+                {peekBets > 0 && (
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[var(--canvas-raised)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--gold-dark)]">
+                    <Coins size={10} />
+                    {peekBets}
+                  </span>
+                )}
+              </>
+            ) : (
+              <>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--ink-tertiary)]">
+                  Match
+                </span>
+                <span className="truncate font-mono text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ink-secondary)]">
+                  {peekLabel}
+                </span>
+                {peekBets > 0 && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[var(--gold-subtle)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--gold-dark)]">
+                    <Coins size={10} />
+                    {peekBets} bet{peekBets === 1 ? '' : 's'}
+                  </span>
+                )}
+              </>
             )}
           </div>
 
-          <span className="pt-1.5 text-[var(--ink-tertiary)]">
+          <span className="pt-3 text-[var(--ink-tertiary)]">
             {expanded ? <ChevronDown size={16} /> : <ChevronUp size={16} />}
           </span>
         </button>
