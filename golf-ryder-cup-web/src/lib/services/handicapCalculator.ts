@@ -176,7 +176,11 @@ export function getMatchPlayStrokesOnHole(
   teamBHandicap: number,
   holeHandicaps: number[]
 ): { teamAStrokes: number; teamBStrokes: number } {
-  if (holeNumber < 1 || holeNumber > 18) {
+  // Validate against the actual course length (some courses are 9 or
+  // 11 holes, not 18). Falls back to 18 only when the array is empty
+  // — callers without a real teeSet still get a safe answer.
+  const totalHoles = holeHandicaps.length || 18;
+  if (holeNumber < 1 || holeNumber > totalHoles) {
     return { teamAStrokes: 0, teamBStrokes: 0 };
   }
 

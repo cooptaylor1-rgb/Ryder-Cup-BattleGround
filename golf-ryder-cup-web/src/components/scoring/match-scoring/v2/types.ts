@@ -67,6 +67,13 @@ export interface CockpitScoring {
   undoCount: number;
   presses: Press[];
   sessionLeaderboard: SessionLeaderboardRow[];
+  /** True hole count for this course/teeSet — defaults to 18, but
+   * 9-hole and 11-hole tracks need to render only their actual holes. */
+  totalHoles: number;
+  /** Per-hole match-play stroke allocation, indexed [hole - 1].
+   * Lets the HoleStrip surface "team A gets a stroke on hole 11"
+   * without burying it behind a tap-to-expand panel. */
+  strokesByHole: Array<{ teamAStrokes: number; teamBStrokes: number }>;
 }
 
 export interface CockpitPreferences {

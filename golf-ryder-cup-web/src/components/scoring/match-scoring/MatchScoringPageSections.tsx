@@ -343,6 +343,7 @@ export function MatchScoringPageSections({
         teamAName={model.teamAName}
         teamBName={model.teamBName}
         saveState={saveState}
+        totalHoles={model.totalHoles}
       />
 
       <CockpitHeader
@@ -386,6 +387,8 @@ export function MatchScoringPageSections({
               undoCount,
               presses,
               sessionLeaderboard: model.sessionLeaderboard,
+              totalHoles: model.totalHoles,
+              strokesByHole: model.strokesByHole,
             }}
             teams={{
               teamAName: model.teamAName,
@@ -465,6 +468,8 @@ export function MatchScoringPageSections({
             undoCount,
             presses,
             sessionLeaderboard: model.sessionLeaderboard,
+            totalHoles: model.totalHoles,
+            strokesByHole: model.strokesByHole,
           }}
           teams={{
             teamAName: model.teamAName,

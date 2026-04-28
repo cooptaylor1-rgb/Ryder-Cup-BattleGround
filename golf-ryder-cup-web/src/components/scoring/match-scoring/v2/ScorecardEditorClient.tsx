@@ -99,6 +99,9 @@ export default function ScorecardEditorClient() {
   const teeSet = match.teeSetId ? teeSets.find((t) => t.id === match.teeSetId) : undefined;
   const holeHandicaps = teeSet?.holeHandicaps ?? DEFAULT_HOLE_HANDICAPS;
   const holePars = teeSet?.holePars ?? Array.from({ length: 18 }, () => 4);
+  // Honour the actual course length. 9- and 11-hole courses should
+  // not render an empty back-nine grid.
+  const totalHoles = holePars.length || holeHandicaps.length || 18;
 
   const teamAName = 'USA';
   const teamBName = 'Europe';
@@ -196,8 +199,17 @@ export default function ScorecardEditorClient() {
     setEditingHole(hole);
   };
 
-  const front9 = Array.from({ length: 9 }, (_, i) => i + 1);
-  const back9 = Array.from({ length: 9 }, (_, i) => i + 10);
+  // Standard 18-hole course → split into front 9 / back 9.
+  // Anything else (9-, 11-, 13-hole) renders as a single grid so we
+  // don't show "Front 9" with 5 empty slots.
+  const renderAsTwoNines = totalHoles === 18;
+  const front9 = Array.from(
+    { length: renderAsTwoNines ? 9 : totalHoles },
+    (_, i) => i + 1
+  );
+  const back9 = renderAsTwoNines
+    ? Array.from({ length: totalHoles - 9 }, (_, i) => i + 10)
+    : [];
 
   return (
     <div className="min-h-screen bg-[var(--canvas)] page-premium-enter">
@@ -230,7 +242,7 @@ export default function ScorecardEditorClient() {
         )}
 
         <Nine
-          label="Front 9"
+          label={renderAsTwoNines ? 'Front 9' : `Holes 1–${front9.length}`}
           holes={front9}
           holePars={holePars}
           holeHandicaps={holeHandicaps}
@@ -242,6 +254,7 @@ export default function ScorecardEditorClient() {
           canEdit={canEditHole}
           onEdit={handleOpenEdit}
         />
+        {back9.length > 0 && (
         <Nine
           label="Back 9"
           holes={back9}
@@ -255,6 +268,7 @@ export default function ScorecardEditorClient() {
           canEdit={canEditHole}
           onEdit={handleOpenEdit}
         />
+        )}
 
         <ProvenanceFooter entries={auditEntries} />
       </main>

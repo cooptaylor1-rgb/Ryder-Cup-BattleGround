@@ -19,8 +19,8 @@ interface DrawerMatchTabProps {
 }
 
 export function DrawerMatchTab({ scoring, teams, onJumpToHole }: DrawerMatchTabProps) {
-  const { matchState, currentHole } = scoring;
-  const total = 18;
+  const { matchState, currentHole, totalHoles } = scoring;
+  const total = totalHoles;
 
   // Build a per-hole row, including unscored holes, so the card shows the
   // full 18 even when only a few have been played.

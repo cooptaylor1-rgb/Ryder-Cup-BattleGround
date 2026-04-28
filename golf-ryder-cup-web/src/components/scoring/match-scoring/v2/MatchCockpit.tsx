@@ -49,6 +49,8 @@ export function MatchCockpit({
     isMatchComplete,
     isEditingScores,
     isSaving,
+    totalHoles,
+    strokesByHole,
   } = scoring;
 
   const [strokeSheetOpen, setStrokeSheetOpen] = useState(false);
@@ -175,6 +177,8 @@ export function MatchCockpit({
             holeResults={matchState.holeResults}
             teamAColor={teams.teamAColor}
             teamBColor={teams.teamBColor}
+            totalHoles={totalHoles}
+            strokesByHole={strokesByHole}
             onJump={handlers.onJumpToHole}
             onEditHole={isCaptainMode ? handlers.onJumpToHole : handlers.onJumpToHole}
           />
@@ -183,7 +187,7 @@ export function MatchCockpit({
         <button
           type="button"
           onClick={handlers.onNextHole}
-          disabled={currentHole >= 18}
+          disabled={currentHole >= totalHoles}
           aria-label="Next hole"
           className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-[color:var(--rule)] bg-[var(--canvas)] text-[var(--ink-secondary)] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--canvas)] active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-30"
         >
