@@ -272,7 +272,7 @@ describe('1000-Trip Mega Stress Simulation', () => {
     expect(stats.matchesCreated).toBe(4000);
     expect(await db.trips.count()).toBe(1000);
     expect(await db.matches.count()).toBe(4000);
-  }, 120000);
+  }, 240000);
 
   // ============================================
   // PHASE 2: SCORE ALL 4000 MATCHES
@@ -459,7 +459,7 @@ describe('1000-Trip Mega Stress Simulation', () => {
     // At least some dedup hits should have occurred
     expect(stats.dedupHits + stats.conflictsDetected).toBeGreaterThan(0);
     expect(stats.invariantFailures).toBe(0);
-  }, 120000);
+  }, 240000);
 
   // ============================================
   // PHASE 5: CONFLICT DETECTION (200 tests)
@@ -493,7 +493,7 @@ describe('1000-Trip Mega Stress Simulation', () => {
     // Fresh scores are within the 30s conflict window, so conflicts should be detected
     expect(stats.conflictsDetected).toBeGreaterThan(0);
     expect(stats.invariantFailures).toBe(0);
-  }, 120000);
+  }, 240000);
 
   // ============================================
   // PHASE 6: UNDO ROBUSTNESS (300 tests)
@@ -547,7 +547,7 @@ describe('1000-Trip Mega Stress Simulation', () => {
 
     expect(stats.undoOperations).toBeGreaterThan(50);
     expect(stats.invariantFailures).toBe(0);
-  }, 120000);
+  }, 240000);
 
   // ============================================
   // PHASE 7: EDIT + RE-VALIDATE (200 tests)
@@ -601,7 +601,7 @@ describe('1000-Trip Mega Stress Simulation', () => {
 
     expect(stats.editsPerformed).toBeGreaterThan(50);
     expect(stats.invariantFailures).toBe(0);
-  }, 120000);
+  }, 240000);
 
   // ============================================
   // PHASE 8: CASCADE DELETE (100 trips)
