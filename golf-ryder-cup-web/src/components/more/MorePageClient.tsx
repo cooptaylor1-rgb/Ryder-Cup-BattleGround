@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Award,
@@ -20,11 +20,14 @@ import {
   MessageSquare,
   MoreHorizontal,
   Palette,
+  Pin,
+  Search,
   Shield,
   Trash2,
   Trophy,
   Unlock,
   User,
+  X,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
 import {
@@ -82,6 +85,8 @@ export default function MorePageClient() {
   const [isSeeding, setIsSeeding] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showExitTripConfirm, setShowExitTripConfirm] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [pinnedIds, setPinnedIds] = usePinnedMoreItems();
 
   const handleEnableCaptainMode = async () => {
     if (captainPin.length < 4) {
@@ -348,6 +353,38 @@ export default function MorePageClient() {
     ? `${currentUser.firstName?.[0] || ''}${currentUser.lastName?.[0] || ''}` || '?'
     : '?';
 
+  // Flatten every menu item across all visible sections so the search
+  // typeahead and the pinned shortcuts row can pull from a single source
+  // of truth without each surface re-walking the section tree. Recomputed
+  // each render — this is a tiny static list, not worth memoizing against
+  // section arrays whose identity changes every render anyway.
+  const allMenuItems = [...primarySections, ...operatorSections].flatMap(
+    (section) => section.items
+  );
+
+  const togglePin = (itemId: string) => {
+    setPinnedIds((prev) =>
+      prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
+    );
+  };
+
+  const trimmedQuery = searchQuery.trim().toLowerCase();
+  const isSearching = trimmedQuery.length > 0;
+  const searchResults = isSearching
+    ? allMenuItems.filter((item) => {
+        const haystack = `${item.label} ${item.description}`.toLowerCase();
+        return haystack.includes(trimmedQuery);
+      })
+    : [];
+
+  // Preserve the user's pin order rather than the section walk order so a
+  // recently-pinned item lands at the end (next to the other pins) instead
+  // of jumping into a fixed position based on the section it came from.
+  const pinnedItemLookup = new Map(allMenuItems.map((item) => [item.id, item]));
+  const pinnedItems = pinnedIds
+    .map((id) => pinnedItemLookup.get(id))
+    .filter((item): item is NonNullable<typeof item> => Boolean(item));
+
   return (
     <div className="min-h-screen page-premium-enter texture-grain bg-[var(--canvas)]">
       <PageHeader
@@ -488,55 +525,152 @@ export default function MorePageClient() {
           />
         </section>
 
-        {primarySections.map((section) => (
-          <section
-            key={section.id}
-            className="mt-[var(--space-6)] rounded-[1.95rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]"
-          >
-            <div>
-              <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
-                {section.eyebrow}
-              </p>
-              <h2 className="mt-[var(--space-2)] font-serif text-[1.9rem] italic text-[var(--ink)]">
-                {section.title}
-              </h2>
-              <p className="mt-[var(--space-2)] max-w-[40rem] text-sm leading-7 text-[var(--ink-secondary)]">
-                {section.description}
-              </p>
-            </div>
+        <section className="mt-[var(--space-6)] rounded-[1.95rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]">
+          <label className="relative flex items-center">
+            <Search
+              size={16}
+              className="pointer-events-none absolute left-4 text-[var(--ink-tertiary)]"
+              aria-hidden="true"
+            />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search trip tools, settings, help…"
+              aria-label="Search the More menu"
+              className="w-full rounded-[1.25rem] border border-[color:var(--rule)]/75 bg-[color:var(--surface)]/82 py-3 pl-11 pr-11 text-sm text-[var(--ink)] outline-none transition focus:border-[var(--maroon)]"
+            />
+            {searchQuery ? (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 flex h-8 w-8 items-center justify-center rounded-full text-[var(--ink-tertiary)] hover:text-[var(--ink)]"
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
+            ) : null}
+          </label>
 
-            <div className="mt-[var(--space-5)] grid gap-[var(--space-4)] md:grid-cols-2 xl:grid-cols-3">
-              {section.items.map((item) => (
-                <MenuTile key={item.id} item={item} />
-              ))}
+          {!isSearching && pinnedItems.length > 0 ? (
+            <div className="mt-[var(--space-5)]">
+              <div className="flex items-center gap-[var(--space-2)]">
+                <Pin size={14} className="text-[var(--maroon)]" />
+                <p className="type-overline tracking-[0.14em] text-[var(--ink-tertiary)]">
+                  Pinned shortcuts
+                </p>
+              </div>
+              <div className="mt-[var(--space-3)] grid gap-[var(--space-4)] md:grid-cols-2 xl:grid-cols-4">
+                {pinnedItems.map((item) => (
+                  <MenuTile
+                    key={`pinned-${item.id}`}
+                    item={item}
+                    isPinned
+                    onTogglePin={togglePin}
+                  />
+                ))}
+              </div>
             </div>
+          ) : null}
+
+          {!isSearching && pinnedItems.length === 0 ? (
+            <p className="mt-[var(--space-4)] text-xs leading-6 text-[var(--ink-tertiary)]">
+              Tap the pin on any tile below to keep it at the top of this page.
+            </p>
+          ) : null}
+        </section>
+
+        {isSearching ? (
+          <section className="mt-[var(--space-6)] rounded-[1.95rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]">
+            <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
+              Search Results
+            </p>
+            <h2 className="mt-[var(--space-2)] font-serif text-[1.9rem] italic text-[var(--ink)]">
+              {searchResults.length === 0
+                ? `Nothing matches "${searchQuery}"`
+                : `${searchResults.length} match${searchResults.length === 1 ? '' : 'es'}`}
+            </h2>
+
+            {searchResults.length > 0 ? (
+              <div className="mt-[var(--space-5)] grid gap-[var(--space-4)] md:grid-cols-2 xl:grid-cols-3">
+                {searchResults.map((item) => (
+                  <MenuTile
+                    key={`search-${item.id}`}
+                    item={item}
+                    isPinned={pinnedIds.includes(item.id)}
+                    onTogglePin={togglePin}
+                  />
+                ))}
+              </div>
+            ) : (
+              <p className="mt-[var(--space-3)] text-sm leading-6 text-[var(--ink-secondary)]">
+                Try a different keyword, or clear the search to see every tool.
+              </p>
+            )}
           </section>
-        ))}
+        ) : (
+          <>
+            {primarySections.map((section) => (
+              <section
+                key={section.id}
+                className="mt-[var(--space-6)] rounded-[1.95rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]"
+              >
+                <div>
+                  <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
+                    {section.eyebrow}
+                  </p>
+                  <h2 className="mt-[var(--space-2)] font-serif text-[1.9rem] italic text-[var(--ink)]">
+                    {section.title}
+                  </h2>
+                  <p className="mt-[var(--space-2)] max-w-[40rem] text-sm leading-7 text-[var(--ink-secondary)]">
+                    {section.description}
+                  </p>
+                </div>
 
-        {operatorSections.map((section) => (
-          <section
-            key={section.id}
-            className="mt-[var(--space-6)] rounded-[1.95rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]"
-          >
-            <div>
-              <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
-                {section.eyebrow}
-              </p>
-              <h2 className="mt-[var(--space-2)] font-serif text-[1.9rem] italic text-[var(--ink)]">
-                {section.title}
-              </h2>
-              <p className="mt-[var(--space-2)] max-w-[40rem] text-sm leading-7 text-[var(--ink-secondary)]">
-                {section.description}
-              </p>
-            </div>
+                <div className="mt-[var(--space-5)] grid gap-[var(--space-4)] md:grid-cols-2 xl:grid-cols-3">
+                  {section.items.map((item) => (
+                    <MenuTile
+                      key={item.id}
+                      item={item}
+                      isPinned={pinnedIds.includes(item.id)}
+                      onTogglePin={togglePin}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))}
 
-            <div className="mt-[var(--space-5)] grid gap-[var(--space-4)] md:grid-cols-2">
-              {section.items.map((item) => (
-                <MenuTile key={item.id} item={item} />
-              ))}
-            </div>
-          </section>
-        ))}
+            {operatorSections.map((section) => (
+              <section
+                key={section.id}
+                className="mt-[var(--space-6)] rounded-[1.95rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(244,238,231,0.99))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]"
+              >
+                <div>
+                  <p className="type-overline tracking-[0.16em] text-[var(--ink-tertiary)]">
+                    {section.eyebrow}
+                  </p>
+                  <h2 className="mt-[var(--space-2)] font-serif text-[1.9rem] italic text-[var(--ink)]">
+                    {section.title}
+                  </h2>
+                  <p className="mt-[var(--space-2)] max-w-[40rem] text-sm leading-7 text-[var(--ink-secondary)]">
+                    {section.description}
+                  </p>
+                </div>
+
+                <div className="mt-[var(--space-5)] grid gap-[var(--space-4)] md:grid-cols-2">
+                  {section.items.map((item) => (
+                    <MenuTile
+                      key={item.id}
+                      item={item}
+                      isPinned={pinnedIds.includes(item.id)}
+                      onTogglePin={togglePin}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </>
+        )}
 
         <section className="mt-[var(--space-6)] rounded-[1.95rem] border border-[color:var(--rule)]/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(245,239,232,0.99))] p-[var(--space-5)] shadow-[0_18px_38px_rgba(41,29,17,0.06)]">
           <div className="flex items-start gap-[var(--space-4)]">
@@ -658,4 +792,51 @@ export default function MorePageClient() {
       />
     </div>
   );
+}
+
+const PINNED_STORAGE_KEY = 'golf-ryder-more-pinned-v1';
+const DEFAULT_PINNED_IDS = ['schedule', 'finances', 'social', 'recap'];
+
+/**
+ * Persist the captain's pinned shortcuts on /more across sessions. We
+ * store IDs (not item shapes) so renames or icon swaps in the menu
+ * registry don't invalidate the saved preference. The first render
+ * lazily loads from localStorage; subsequent state changes write back
+ * synchronously so the next page visit sees the latest pinset.
+ */
+function usePinnedMoreItems(): [string[], (updater: (prev: string[]) => string[]) => void] {
+  const [pinned, setPinned] = useState<string[]>(DEFAULT_PINNED_IDS);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = window.localStorage.getItem(PINNED_STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.every((value) => typeof value === 'string')) {
+        // Reading localStorage on mount is the standard "rehydrate after
+        // SSR" pattern; doing it via lazy useState init would mismatch
+        // hydration with the server-rendered default set.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setPinned(parsed);
+      }
+    } catch {
+      // Corrupt entry or quota error — fall back to defaults silently.
+    }
+  }, []);
+
+  const update = (updater: (prev: string[]) => string[]) => {
+    setPinned((prev) => {
+      const next = updater(prev);
+      try {
+        window.localStorage.setItem(PINNED_STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // Storage unavailable (private mode, quota); the in-memory pinset
+        // is still correct for this session.
+      }
+      return next;
+    });
+  };
+
+  return [pinned, update];
 }

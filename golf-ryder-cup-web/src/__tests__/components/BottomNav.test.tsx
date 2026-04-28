@@ -15,8 +15,28 @@ const mockAccessStore = {
   isCaptainMode: false,
 };
 
+// useHaptic reads from useScoringPrefsStore; provide a permissive default
+// shape so the haptic call resolves without trying to spin up real preferences.
+const mockScoringPrefsStore = {
+  scoringPreferences: {
+    hapticFeedback: true,
+    hapticsScore: true,
+    hapticsNavigation: true,
+    hapticsAlerts: true,
+    hapticIntensity: 'medium' as const,
+  },
+};
+
 vi.mock('@/lib/stores', () => ({
   useAccessStore: () => mockAccessStore,
+  useScoringPrefsStore: (selector: unknown) => {
+    if (typeof selector === 'function') {
+      return (selector as (state: typeof mockScoringPrefsStore) => unknown)(
+        mockScoringPrefsStore
+      );
+    }
+    return mockScoringPrefsStore;
+  },
 }));
 
 // Mock useUserInProgressMatch — BottomNav uses this to render the live
@@ -27,6 +47,14 @@ vi.mock('@/lib/hooks', () => ({
     matchId: null,
     hasInProgress: false,
   }),
+}));
+
+// BottomNav subscribes to the trip-sync queue to render a pending-write
+// badge. The real service touches Dexie/Supabase indirectly; tests just
+// need a stable empty queue.
+vi.mock('@/lib/services/tripSyncService', () => ({
+  TRIP_SYNC_QUEUE_CHANGED_EVENT: 'trip-sync-queue-changed',
+  getSyncQueueStatus: () => ({ pending: 0, failed: 0, total: 0 }),
 }));
 
 // Mock next/navigation

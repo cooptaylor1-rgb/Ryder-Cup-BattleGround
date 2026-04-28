@@ -25,6 +25,10 @@ export default function LivePageClient() {
     const [flashMatchId, setFlashMatchId] = useState<string | null>(null);
     const flashTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+    const [spotlightEnabled, setSpotlightEnabled] = useState(false);
+    const [spotlightPaused, setSpotlightPaused] = useState(false);
+    const [pinnedSpotlightMatchId, setPinnedSpotlightMatchId] = useState<string | null>(null);
+
     const activeSession = getActiveSession();
 
     const matches = useLiveQuery(
@@ -181,10 +185,30 @@ export default function LivePageClient() {
                 soundEnabled={soundEnabled}
                 isFullscreen={isFullscreen}
                 flashMatchId={flashMatchId}
+                spotlightEnabled={spotlightEnabled}
+                spotlightPaused={spotlightPaused}
+                pinnedSpotlightMatchId={pinnedSpotlightMatchId}
                 getMatchState={getMatchState}
                 getPlayer={getPlayer}
                 onToggleSound={() => setSoundEnabled((current) => !current)}
                 onToggleFullscreen={() => void toggleFullscreen()}
+                onToggleSpotlight={() => {
+                    setSpotlightEnabled((current) => {
+                        const next = !current;
+                        // Reset pause/pin whenever the mode flips so reopening
+                        // spotlight starts from a clean rotation rather than
+                        // resuming whatever pinned state we had hours ago.
+                        if (!next) {
+                            setSpotlightPaused(false);
+                            setPinnedSpotlightMatchId(null);
+                        }
+                        return next;
+                    });
+                }}
+                onToggleSpotlightPause={() => setSpotlightPaused((current) => !current)}
+                onPinSpotlightMatch={(matchId) =>
+                    setPinnedSpotlightMatchId((current) => (current === matchId ? null : matchId))
+                }
                 onRefresh={() => {
                     if (activeSession) {
                         loadSessionMatches(activeSession.id);

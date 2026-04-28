@@ -154,6 +154,7 @@ export function LineupBuilderSections({
                 playersPerTeam={session.playersPerTeam}
                 teamALabel={teamALabel}
                 teamBLabel={teamBLabel}
+                pointsPerMatch={session.pointsPerMatch}
                 onDrop={(team) => actions.handleDropOnMatch(match.id, team)}
                 onRemovePlayer={(playerId) => actions.handleRemovePlayer(match.id, playerId)}
                 onDeleteMatch={() => actions.handleDeleteMatch(match.id)}
