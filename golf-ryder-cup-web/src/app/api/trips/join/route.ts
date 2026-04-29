@@ -135,6 +135,31 @@ function looksLikeMissingRpc(error: { code?: string; message?: string }): boolea
 }
 
 /**
+ * Detect the Postgres / PostgREST signature for "the schema is missing
+ * a required table". This usually means migration
+ * `20260424010000_trip_memberships_and_trip_scoped_rls` (or its
+ * follow-up `20260429000000_join_trip_rpc`) was never applied to the
+ * project. Surfacing a targeted message lets the operator skip the
+ * usual "is the env var set?" rabbit hole and go straight to fixing
+ * the database.
+ */
+function looksLikeMissingMigration(error: { code?: string; message?: string }): boolean {
+  return (
+    error.code === 'PGRST205' ||
+    error.code === '42P01' ||
+    /could not find the table|relation .* does not exist|schema cache/i.test(
+      error.message ?? ''
+    )
+  );
+}
+
+const MIGRATION_HINT_MESSAGE =
+  'The database is missing the trip_memberships migration. Apply ' +
+  '20260424010000_trip_memberships_and_trip_scoped_rls.sql and ' +
+  '20260429000000_join_trip_rpc.sql in the Supabase SQL editor (or run ' +
+  '`supabase db push`), then try again.';
+
+/**
  * Attempt to resolve a trip preview through the public lookup RPC. The
  * caller falls through to the legacy admin path on `kind: 'unavailable'`,
  * which covers both pre-migration deployments and the (test-only) case
@@ -160,6 +185,19 @@ async function lookupTripViaRpc(
 
   if (error) {
     if (looksLikeMissingRpc(error)) return { kind: 'unavailable' };
+    if (looksLikeMissingMigration(error)) {
+      return {
+        kind: 'error',
+        response: NextResponse.json(
+          {
+            error: 'Database migration required',
+            message: MIGRATION_HINT_MESSAGE,
+            detail: error.message,
+          },
+          { status: 503 }
+        ),
+      };
+    }
     return {
       kind: 'error',
       response: NextResponse.json(
@@ -186,6 +224,19 @@ async function findTripByCode(
     .maybeSingle();
 
   if (error) {
+    if (looksLikeMissingMigration(error)) {
+      return {
+        trip: null,
+        response: NextResponse.json(
+          {
+            error: 'Database migration required',
+            message: MIGRATION_HINT_MESSAGE,
+            detail: error.message,
+          },
+          { status: 503 }
+        ),
+      };
+    }
     return {
       trip: null,
       response: NextResponse.json(
@@ -291,6 +342,20 @@ async function redeemMembership({
     const raced = await findMembership(admin, tripId, userId);
     if (raced) {
       return { membership: raced, response: null };
+    }
+
+    if (looksLikeMissingMigration(error)) {
+      return {
+        membership: null,
+        response: NextResponse.json(
+          {
+            error: 'Database migration required',
+            message: MIGRATION_HINT_MESSAGE,
+            detail: error.message,
+          },
+          { status: 503 }
+        ),
+      };
     }
 
     return {
@@ -454,6 +519,20 @@ async function joinViaRpc(
         response: NextResponse.json(
           { error: 'Unauthorized', message: 'Sign in before joining a trip.' },
           { status: 401 }
+        ),
+        rpcMissing: false,
+      };
+    }
+    if (looksLikeMissingMigration(error)) {
+      return {
+        payload: null,
+        response: NextResponse.json(
+          {
+            error: 'Database migration required',
+            message: MIGRATION_HINT_MESSAGE,
+            detail: error.message,
+          },
+          { status: 503 }
         ),
         rpcMissing: false,
       };
