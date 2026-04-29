@@ -241,4 +241,104 @@ describe('/api/trips/join', () => {
     expect(response.status).toBe(401);
     expect(data.error).toBe('Unauthorized');
   });
+
+  it('joins via the SECURITY DEFINER RPC when available, without needing the service role', async () => {
+    // Simulates a deploy where SUPABASE_SERVICE_ROLE_KEY is missing but
+    // the RPC migration has shipped. The user's authenticated client
+    // calls the RPC directly; the route should pass through the result
+    // without ever asking for an admin client.
+    vi.unstubAllEnvs();
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon-key');
+    // Intentionally no SUPABASE_SERVICE_ROLE_KEY.
+
+    const rpcMock = vi.fn().mockResolvedValue({
+      data: {
+        tripId: tripRow.id,
+        shareCode: tripRow.share_code,
+        trip: {
+          id: tripRow.id,
+          name: tripRow.name,
+          startDate: tripRow.start_date,
+          endDate: tripRow.end_date,
+          location: tripRow.location,
+          captainName: tripRow.captain_name,
+        },
+        membership: {
+          id: 'membership-rpc',
+          role: 'player',
+          status: 'active',
+          playerId: 'player-rpc',
+        },
+      },
+      error: null,
+    });
+    const authedClient = {
+      ...createAuthClient(),
+      rpc: rpcMock,
+    };
+    createClientMock.mockReturnValue(authedClient);
+
+    const response = await POST(createRequest('POST'));
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(rpcMock).toHaveBeenCalledWith('join_trip_by_share_code', {
+      p_share_code: 'ABCD1234',
+      p_invitation_id: null,
+    });
+    expect(data).toMatchObject({
+      success: true,
+      tripId: tripRow.id,
+      membership: { id: 'membership-rpc', role: 'player' },
+    });
+  });
+
+  it('returns 404 when the RPC reports the trip is missing', async () => {
+    vi.unstubAllEnvs();
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon-key');
+
+    const rpcMock = vi.fn().mockResolvedValue({
+      data: null,
+      error: { code: 'P0002', message: 'trip-not-found' },
+    });
+    const authedClient = {
+      ...createAuthClient(),
+      rpc: rpcMock,
+    };
+    createClientMock.mockReturnValue(authedClient);
+
+    const response = await POST(createRequest('POST'));
+    const data = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(data).toMatchObject({ error: 'Trip not found' });
+  });
+
+  it('falls back to the legacy admin path when the RPC migration is missing', async () => {
+    // When the RPC isn't deployed yet, joining should still work via
+    // the admin client (provided SUPABASE_SERVICE_ROLE_KEY is set).
+    const admin = createAdminClient({ linkedPlayerId: 'player-1' });
+    const rpcMock = vi.fn().mockResolvedValue({
+      data: null,
+      error: { code: '42883', message: 'function ... does not exist' },
+    });
+    createClientMock.mockImplementation((_url: string, key: string) => {
+      if (key === 'service-role-key') return admin;
+      const authedClient = {
+        ...createAuthClient(),
+        rpc: rpcMock,
+      };
+      return authedClient;
+    });
+
+    const response = await POST(createRequest('POST'));
+    const data = await response.json();
+
+    expect(rpcMock).toHaveBeenCalledTimes(1);
+    expect(response.status).toBe(200);
+    expect(data.tripId).toBe(tripRow.id);
+    expect(admin.insertedMemberships).toHaveLength(1);
+  });
 });
