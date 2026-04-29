@@ -2,6 +2,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Session as SupabaseSession } from '@supabase/supabase-js';
 import type { UserProfile } from '@/lib/stores';
 
+const supabaseFromMock = vi.hoisted(() => vi.fn());
+
+vi.mock('@/lib/supabase/client', () => ({
+  isSupabaseConfigured: true,
+  supabase: {
+    from: supabaseFromMock,
+  },
+}));
+
 const localStorageMock = (() => {
   let store: Record<string, string> = {};
   return {
@@ -69,6 +78,7 @@ describe('authStore syncSupabaseSession', () => {
     });
 
     localStorageMock.clear();
+    supabaseFromMock.mockReset();
     vi.resetModules();
     ({ useAuthStore } = await import('@/lib/stores'));
     resetAuthStore();
@@ -309,5 +319,115 @@ describe('authStore syncSupabaseSession', () => {
       currentUser: localProfile,
       error: 'An account with this email already exists',
     });
+  });
+
+  it('hydrates a UserProfile from cloud Player rows when the device has no local profile', async () => {
+    // Reproduces: laptop user installs the PWA on their phone, signs in,
+    // and currently gets shoved into "create profile" because localStorage
+    // is empty even though a Player row already encodes their identity.
+    useAuthStore.setState({
+      authUserId: 'auth-uid-9000',
+      authEmail: 'wil@example.com',
+      hasResolvedSupabaseSession: true,
+    });
+
+    const maybeSingleMock = vi.fn().mockResolvedValue({
+      data: {
+        id: 'player-cloud-7',
+        trip_id: 'trip-1',
+        linked_auth_user_id: 'auth-uid-9000',
+        linked_profile_id: 'profile-cloud-7',
+        first_name: 'Wil',
+        last_name: 'Kamin',
+        email: 'wil@example.com',
+        handicap_index: 8.5,
+        ghin: '12345678',
+        tee_preference: 'middle',
+        avatar_url: null,
+        created_at: '2026-04-25T12:00:00.000Z',
+        updated_at: '2026-04-29T18:00:00.000Z',
+      },
+      error: null,
+    });
+    const limitMock = vi.fn().mockReturnValue({ maybeSingle: maybeSingleMock });
+    const orderMock = vi.fn().mockReturnValue({ limit: limitMock });
+    const eqMock = vi.fn().mockReturnValue({ order: orderMock });
+    const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
+    supabaseFromMock.mockReturnValue({ select: selectMock });
+
+    const profile = await useAuthStore.getState().hydrateProfileFromCloud();
+
+    expect(supabaseFromMock).toHaveBeenCalledWith('players');
+    expect(eqMock).toHaveBeenCalledWith('linked_auth_user_id', 'auth-uid-9000');
+    expect(profile).toMatchObject({
+      id: 'profile-cloud-7',
+      firstName: 'Wil',
+      lastName: 'Kamin',
+      email: 'wil@example.com',
+      handicapIndex: 8.5,
+      ghin: '12345678',
+      teePreference: 'middle',
+      preferredTees: 'middle',
+      isProfileComplete: true,
+      hasCompletedOnboarding: true,
+    });
+    expect(useAuthStore.getState()).toMatchObject({
+      currentUser: expect.objectContaining({ id: 'profile-cloud-7' }),
+      isAuthenticated: true,
+    });
+
+    // Persisted to localStorage so the next cold start skips the
+    // hydration round-trip and works offline.
+    const storedUsers = JSON.parse(localStorageMock.getItem('golf-app-users') ?? '{}');
+    expect(storedUsers['profile-cloud-7']).toMatchObject({
+      profile: expect.objectContaining({
+        firstName: 'Wil',
+        lastName: 'Kamin',
+        handicapIndex: 8.5,
+      }),
+    });
+  });
+
+  it('does not clobber an existing local profile during cloud rehydration', async () => {
+    // A local profile already exists; the cloud row could be slightly
+    // behind a pending unsynced edit, so leave the local one in place.
+    const localProfile = createProfile({ handicapIndex: 6.1 });
+    localStorageMock.setItem(
+      'golf-app-users',
+      JSON.stringify({
+        [localProfile.id]: { profile: localProfile, pin: null },
+      })
+    );
+    useAuthStore.setState({
+      currentUser: localProfile,
+      isAuthenticated: true,
+      authUserId: 'auth-uid-9000',
+      authEmail: localProfile.email,
+    });
+
+    const profile = await useAuthStore.getState().hydrateProfileFromCloud();
+
+    expect(profile).toBe(localProfile);
+    expect(supabaseFromMock).not.toHaveBeenCalled();
+  });
+
+  it('returns null when cloud has no Player row for this auth user (genuinely new account)', async () => {
+    useAuthStore.setState({
+      authUserId: 'auth-uid-newcomer',
+      authEmail: 'new@example.com',
+    });
+
+    const maybeSingleMock = vi.fn().mockResolvedValue({ data: null, error: null });
+    const limitMock = vi.fn().mockReturnValue({ maybeSingle: maybeSingleMock });
+    const orderMock = vi.fn().mockReturnValue({ limit: limitMock });
+    const eqMock = vi.fn().mockReturnValue({ order: orderMock });
+    const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
+    supabaseFromMock.mockReturnValue({ select: selectMock });
+
+    const profile = await useAuthStore.getState().hydrateProfileFromCloud();
+
+    expect(profile).toBeNull();
+    expect(useAuthStore.getState().currentUser).toBeNull();
+    expect(useAuthStore.getState().isAuthenticated).toBe(false);
   });
 });

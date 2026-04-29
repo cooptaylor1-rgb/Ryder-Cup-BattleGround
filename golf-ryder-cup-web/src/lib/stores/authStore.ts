@@ -27,6 +27,7 @@ import {
   createUpdateProfileAction,
   createCompleteOnboardingAction,
   createCheckExistingUserAction,
+  createHydrateProfileFromCloudAction,
 } from './auth/profileActions';
 
 // ============================================
@@ -57,6 +58,7 @@ export const useAuthStore = create<AuthState>()(
         updateProfile: createUpdateProfileAction(api),
         completeOnboarding: createCompleteOnboardingAction(api),
         checkExistingUser: createCheckExistingUserAction(),
+        hydrateProfileFromCloud: createHydrateProfileFromCloudAction(api),
 
         // --- Session actions (kept inline — small & tightly coupled to state) ---
 
