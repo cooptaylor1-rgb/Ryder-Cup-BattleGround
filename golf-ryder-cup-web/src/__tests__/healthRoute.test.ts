@@ -85,6 +85,12 @@ describe('GET /api/health', () => {
     stubStrictEnv();
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://example.supabase.co');
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon-key');
+    // Explicitly clear SUPABASE_SERVICE_ROLE_KEY. Vitest's `unstubAllEnvs`
+    // restores the *real* process env, and Railway's build environment
+    // injects this key — without an explicit empty stub, the test would
+    // fall through to the createClient probe and fail with an
+    // unrelated "Cannot read properties of undefined" error in CI.
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', '');
     stubRedisEnv();
     mockRedisPing();
 
