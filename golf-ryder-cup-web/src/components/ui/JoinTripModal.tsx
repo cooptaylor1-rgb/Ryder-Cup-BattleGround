@@ -9,7 +9,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { pullTripByShareCode } from '@/lib/services/tripSyncService';
+import { getSyncBlockReason, pullTripByShareCode } from '@/lib/services/tripSyncService';
 import { ensureCurrentUserTripPlayerLink } from '@/lib/services/tripPlayerLinkService';
 import { useAuthStore } from '@/lib/stores';
 import { useTripStore } from '@/lib/stores/tripStore';
@@ -92,6 +92,18 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode, initial
     }
     if (!currentUser.hasCompletedOnboarding) {
       router.push(`/profile/complete?next=${encodeURIComponent(joinPath)}`);
+      return;
+    }
+
+    // Local zustand `isAuthenticated` reflects whether a profile is
+    // saved on this device — it can stay true after the Supabase auth
+    // session expires (refresh tokens drop, ITP wipes cookies, etc.).
+    // Check the live block reason so an expired session doesn't surface
+    // as a misleading "Offline" message; route the user to /login to
+    // refresh their token before attempting the join.
+    const blockReason = getSyncBlockReason();
+    if (blockReason === 'auth-required' || blockReason === 'auth-pending') {
+      router.push(`/login?next=${encodeURIComponent(joinPath)}`);
       return;
     }
 

@@ -12,6 +12,11 @@ const { mockPullTripByShareCode, mockLoadTrip, mockStoreTripShareCode, mockRoute
 
 vi.mock('@/lib/services/tripSyncService', () => ({
   pullTripByShareCode: mockPullTripByShareCode,
+  // The modal now consults this synchronously before attempting the
+  // join so an expired Supabase session redirects to login instead of
+  // surfacing a misleading "Offline" error. Mock to "no block" for the
+  // happy-path test.
+  getSyncBlockReason: () => null,
 }));
 
 vi.mock('@/lib/stores/tripStore', () => ({
