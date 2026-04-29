@@ -246,11 +246,11 @@ describe('/api/trips/join', () => {
     // Simulates a deploy where SUPABASE_SERVICE_ROLE_KEY is missing but
     // the RPC migration has shipped. The user's authenticated client
     // calls the RPC directly; the route should pass through the result
-    // without ever asking for an admin client.
-    vi.unstubAllEnvs();
-    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co');
-    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon-key');
-    // Intentionally no SUPABASE_SERVICE_ROLE_KEY.
+    // without ever asking for an admin client. Explicitly stub the
+    // service-role key to empty (rather than unstubAllEnvs) so we don't
+    // accidentally unwind setup.ts's stubs and leak state to later
+    // test files.
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', '');
 
     const rpcMock = vi.fn().mockResolvedValue({
       data: {
@@ -295,9 +295,7 @@ describe('/api/trips/join', () => {
   });
 
   it('returns 404 when the RPC reports the trip is missing', async () => {
-    vi.unstubAllEnvs();
-    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://test.supabase.co');
-    vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon-key');
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', '');
 
     const rpcMock = vi.fn().mockResolvedValue({
       data: null,
