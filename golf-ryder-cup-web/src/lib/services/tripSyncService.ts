@@ -40,6 +40,7 @@ export {
 } from './trip-sync/tripSyncQueue';
 export { setSyncAuthSession as setTripSyncAuthSession } from './trip-sync/tripSyncShared';
 export { TRIP_SYNC_QUEUE_CHANGED_EVENT } from './trip-sync/tripSyncShared';
+export { getSyncBlockReason } from './trip-sync/tripSyncShared';
 export {
   ensureTripShareCode,
   getTripShareCode,

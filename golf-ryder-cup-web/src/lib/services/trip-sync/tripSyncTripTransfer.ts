@@ -274,7 +274,7 @@ async function reconcileLocalOrphans({
 export function parseBetNotes(raw: unknown): Record<string, unknown> {
   return parseSideBetNotes(raw);
 }
-import { canSync, getTable, logger } from './tripSyncShared';
+import { canSync, getSyncBlockReason, getTable, logger } from './tripSyncShared';
 import {
   syncAnnouncementToCloud,
   syncAttendanceRecordToCloud,
@@ -299,7 +299,7 @@ import type { TripSyncResult } from './tripSyncTypes';
 
 export async function syncTripToCloudFull(tripId: string): Promise<TripSyncResult> {
   if (!canSync()) {
-    return { success: false, tripId, error: 'Offline', queued: true };
+    return { success: false, tripId, error: describeSyncBlock(getSyncBlockReason()), queued: true };
   }
 
   try {
@@ -503,9 +503,31 @@ async function redeemShareCodeForTripId(
   };
 }
 
+/**
+ * Map a `getSyncBlockReason()` value to a user-facing error string. We
+ * used to return the literal "Offline" for every blocked state, which
+ * was confusing for a user with five bars of 5G whose actual problem
+ * was that their Supabase session expired. The new strings name the
+ * real fix the user can take.
+ */
+function describeSyncBlock(reason: ReturnType<typeof getSyncBlockReason>): string {
+  switch (reason) {
+    case 'offline':
+      return "You're offline. Reconnect and try again.";
+    case 'supabase-unconfigured':
+      return 'Cloud sync is not configured on this build. Contact the trip organizer.';
+    case 'auth-pending':
+      return 'Still signing you in. Try again in a moment.';
+    case 'auth-required':
+      return 'Sign in to your account before joining a trip.';
+    default:
+      return 'Cloud sync is unavailable right now.';
+  }
+}
+
 export async function pullTripByShareCode(shareCode: string, invitationId?: string): Promise<TripSyncResult> {
   if (!canSync()) {
-    return { success: false, tripId: '', error: 'Offline' };
+    return { success: false, tripId: '', error: describeSyncBlock(getSyncBlockReason()) };
   }
 
   try {
@@ -537,7 +559,7 @@ async function pullTripCore(lookup: {
   tripId?: string;
 }): Promise<TripSyncResult> {
   if (!canSync()) {
-    return { success: false, tripId: '', error: 'Offline' };
+    return { success: false, tripId: '', error: describeSyncBlock(getSyncBlockReason()) };
   }
 
   try {
