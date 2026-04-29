@@ -215,11 +215,24 @@ export async function syncPlayerToCloud(
     return;
   }
 
-  const player = await loadEntityForSync({
-    data,
-    entityName: 'Player',
-    fallback: () => db.players.get(playerId),
-  });
+  // Prefer the latest Dexie row over the queued snapshot.
+  //
+  // The cloud `players` RLS policy rejects non-captain inserts/updates
+  // unless `linked_auth_user_id = auth.uid()`. The queued `data`
+  // payload was captured when queueSyncOperation ran — which for the
+  // initial join flow can be *before* ensureCurrentUserTripPlayerLink
+  // resolves the signed-in user and writes the correct
+  // linked_auth_user_id back to Dexie. If we push the stale snapshot,
+  // the upsert fails forever; "Retry sync" just re-pushes the same
+  // bad payload, and any subsequent profile edits collapse onto the
+  // same failed-create item via the queue's dedup. Reading from Dexie
+  // at push time picks up whatever the link reconciler last wrote, so
+  // a one-time fix on the next retry attempt unsticks the whole queue.
+  const fresh = await db.players.get(playerId);
+  const player = fresh ?? data;
+  if (!player) {
+    throw new Error('Player not found locally');
+  }
 
   const cloudData = playerToCloud(player, tripId);
 
