@@ -314,6 +314,38 @@ describe('/api/trips/join', () => {
     expect(data).toMatchObject({ error: 'Trip not found' });
   });
 
+  it('returns a 503 with migration guidance when trip_memberships is missing from the schema cache', async () => {
+    // Simulates the production case the user reported: the user has the
+    // service-role key set in Railway but their Supabase project never
+    // applied the trip_memberships migration. Both the RPC and the
+    // legacy admin path hit "could not find the table public.trip_memberships
+    // in the schema cache" — the route should translate that into a
+    // hint pointing at the actual fix (apply the migration).
+    const rpcMock = vi.fn().mockResolvedValue({
+      data: null,
+      error: {
+        code: 'PGRST205',
+        message:
+          "Could not find the table 'public.trip_memberships' in the schema cache",
+      },
+    });
+    const authedClient = {
+      ...createAuthClient(),
+      rpc: rpcMock,
+    };
+    createClientMock.mockImplementation((_url: string, key: string) =>
+      key === 'service-role-key' ? createAdminClient() : authedClient
+    );
+
+    const response = await POST(createRequest('POST'));
+    const data = await response.json();
+
+    expect(response.status).toBe(503);
+    expect(data.error).toBe('Database migration required');
+    expect(data.message).toContain('trip_memberships');
+    expect(data.message).toContain('20260424010000');
+  });
+
   it('falls back to the legacy admin path when the RPC migration is missing', async () => {
     // When the RPC isn't deployed yet, joining should still work via
     // the admin client (provided SUPABASE_SERVICE_ROLE_KEY is set).
