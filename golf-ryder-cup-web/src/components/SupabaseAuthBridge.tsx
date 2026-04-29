@@ -35,6 +35,19 @@ function syncAuthDependentServices(session: Session | null): void {
   if (!session) return;
 
   void (async () => {
+    // First-time sign-in on a fresh device has no local profile in
+    // localStorage even though the user's identity is already in
+    // cloud as a Player row keyed by linked_auth_user_id. Without
+    // this rehydration, syncSupabaseSession leaves currentUser=null
+    // and the app forces a redundant "create profile" flow on every
+    // new phone install. hydrateProfileFromCloud is a noop when a
+    // profile already exists locally.
+    try {
+      await useAuthStore.getState().hydrateProfileFromCloud();
+    } catch (error) {
+      authLogger.warn('Cloud profile hydration threw:', error);
+    }
+
     // retryFailedQueue hydrates the persisted IndexedDB queue before
     // checking failed items. Do this even when the in-memory queue
     // looks empty; after a cold page load the pending work may exist

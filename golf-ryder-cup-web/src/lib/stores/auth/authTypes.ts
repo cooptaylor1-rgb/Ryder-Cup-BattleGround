@@ -53,5 +53,9 @@ export interface AuthState {
   completeOnboarding: () => Promise<void>;
   checkExistingUser: (email: string) => Promise<UserProfile | null>;
   syncSupabaseSession: (session: import('@supabase/supabase-js').Session | null) => void;
+  /** Pull the user's existing identity from cloud Player rows when the
+   *  device has no local profile yet. Returns the rehydrated profile, or
+   *  null when there's nothing to pull (no auth, no cloud row, offline). */
+  hydrateProfileFromCloud: () => Promise<UserProfile | null>;
   clearError: () => void;
 }

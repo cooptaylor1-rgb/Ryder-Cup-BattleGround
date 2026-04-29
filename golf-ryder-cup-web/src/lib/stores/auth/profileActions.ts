@@ -8,6 +8,7 @@ import { db } from '../../db';
 import { authLogger } from '../../utils/logger';
 import { hashPin } from '../../utils/crypto';
 import { queueSyncOperation } from '../../services/tripSyncService';
+import { supabase } from '../../supabase/client';
 import type { Player } from '../../types/models';
 import type { AuthState, UserProfile } from './authTypes';
 import {
@@ -23,6 +24,20 @@ type StoreApi = {
   set: (partial: Partial<AuthState>) => void;
   get: () => AuthState;
 };
+
+const ALLOWED_PREFERRED_TEES: ReadonlyArray<NonNullable<UserProfile['preferredTees']>> = [
+  'back',
+  'middle',
+  'forward',
+];
+
+function coercePreferredTees(value: unknown): UserProfile['preferredTees'] {
+  if (typeof value !== 'string') return undefined;
+  const lower = value.toLowerCase();
+  return (ALLOWED_PREFERRED_TEES as readonly string[]).includes(lower)
+    ? (lower as NonNullable<UserProfile['preferredTees']>)
+    : undefined;
+}
 
 export function createCreateProfileAction({ set, get }: StoreApi) {
   return async (
@@ -227,6 +242,122 @@ export function createCheckExistingUserAction() {
       return findStoredUserByEmail(email);
     } catch (error) {
       authLogger.error('Failed to parse stored users:', error);
+      return null;
+    }
+  };
+}
+
+/**
+ * Reconstruct a local UserProfile from the user's most recent cloud
+ * Player row when the device has no local profile yet.
+ *
+ * Why this exists: profiles are stored in localStorage (`golf-app-users`)
+ * and never sync to Supabase. So when someone signs into a fresh device
+ * — installing the PWA on a phone after using it on a laptop, e.g. —
+ * the auth bridge resolves the Supabase session but `findStoredUserByEmail`
+ * returns null, the app treats them as brand-new, and forces a redundant
+ * profile-create flow even though their name, handicap, GHIN, etc. are
+ * already in cloud on every Player row this auth user is linked to.
+ *
+ * The cloud `players` table holds firstName/lastName/email/handicap/ghin
+ * per trip with the same auth user across rows (because updateProfile
+ * patches every linked row identically). Pulling the most recent one
+ * and stamping it into localStorage gives the new device the same
+ * starting state as the desktop session — the user lands signed in,
+ * with their handicap and identity already present.
+ */
+export function createHydrateProfileFromCloudAction({ set, get }: StoreApi) {
+  return async (): Promise<UserProfile | null> => {
+    const { authUserId, authEmail, currentUser } = get();
+
+    // Already have a local profile — nothing to recover. Don't clobber
+    // it with cloud data, which may be slightly behind a pending local
+    // update that hasn't flushed yet.
+    if (currentUser) return currentUser;
+    if (!authUserId) return null;
+    if (!supabase) return null;
+
+    try {
+      // Pick the freshest row this auth user owns. Multiple trips means
+      // multiple rows; updateProfile keeps them in lockstep, so any one
+      // is fine — but the most-recently-updated one is the safest pick
+      // in case the user touched their handicap on another device just
+      // before installing this one.
+      const response = await supabase
+        .from('players')
+        .select('*')
+        .eq('linked_auth_user_id', authUserId)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (response.error) {
+        authLogger.warn('Cloud profile hydration query failed:', response.error.message);
+        return null;
+      }
+
+      const row = response.data as Record<string, unknown> | null;
+      if (!row) return null;
+
+      const cloudFirstName = typeof row.first_name === 'string' ? row.first_name : '';
+      const cloudLastName = typeof row.last_name === 'string' ? row.last_name : '';
+      const cloudEmail =
+        (typeof row.email === 'string' && row.email.trim()) || authEmail || '';
+      // Reuse the cloud-side linked_profile_id so any other device
+      // that hydrated from the same Player row converges on the same
+      // local profile id. Falls back to a fresh UUID only when the
+      // cloud row predates linked_profile_id being populated.
+      const profileId =
+        (typeof row.linked_profile_id === 'string' && row.linked_profile_id) ||
+        crypto.randomUUID();
+      const handicapIndex =
+        typeof row.handicap_index === 'number' ? row.handicap_index : undefined;
+      const ghin = typeof row.ghin === 'string' && row.ghin ? row.ghin : undefined;
+      const teePreference =
+        typeof row.tee_preference === 'string' && row.tee_preference
+          ? row.tee_preference
+          : undefined;
+      const avatarUrl =
+        typeof row.avatar_url === 'string' && row.avatar_url ? row.avatar_url : undefined;
+      const createdAt =
+        (typeof row.created_at === 'string' && row.created_at) || new Date().toISOString();
+      const now = new Date().toISOString();
+
+      const profile: UserProfile = {
+        id: profileId,
+        firstName: cloudFirstName,
+        lastName: cloudLastName,
+        email: cloudEmail,
+        handicapIndex,
+        ghin,
+        teePreference,
+        preferredTees: coercePreferredTees(teePreference),
+        avatarUrl,
+        // The first device set "completed onboarding"; this device just
+        // skipped the create flow. Treat onboarding as done so we don't
+        // trap the user in a tutorial they've already finished.
+        hasCompletedOnboarding: true,
+        isProfileComplete: Boolean(cloudFirstName && cloudLastName && cloudEmail),
+        createdAt,
+        updatedAt: now,
+      };
+
+      const users = readStoredUsers();
+      users[profile.id] = { profile, pin: users[profile.id]?.pin ?? null };
+      writeStoredUsers(users);
+
+      set({
+        currentUser: profile,
+        isAuthenticated: true,
+      });
+
+      authLogger.log(`Hydrated user profile from cloud for auth ${authUserId}`);
+      return profile;
+    } catch (error) {
+      authLogger.warn(
+        'Cloud profile hydration failed:',
+        error instanceof Error ? error.message : String(error)
+      );
       return null;
     }
   };
