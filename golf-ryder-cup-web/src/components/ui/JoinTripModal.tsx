@@ -100,10 +100,14 @@ export function JoinTripModal({ isOpen, onClose, onSuccess, initialCode, initial
     // session expires (refresh tokens drop, ITP wipes cookies, etc.).
     // Check the live block reason so an expired session doesn't surface
     // as a misleading "Offline" message; route the user to /login to
-    // refresh their token before attempting the join.
+    // refresh their token before attempting the join. The `cloud=1`
+    // flag is critical: without it the login page sees the local
+    // `isAuthenticated=true` and bounces straight back to next=, which
+    // loops the user through code → login → code without ever giving
+    // them a chance to actually re-enter their password.
     const blockReason = getSyncBlockReason();
     if (blockReason === 'auth-required' || blockReason === 'auth-pending') {
-      router.push(`/login?next=${encodeURIComponent(joinPath)}`);
+      router.push(`/login?cloud=1&next=${encodeURIComponent(joinPath)}`);
       return;
     }
 
