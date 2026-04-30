@@ -3,20 +3,28 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
 import { JoinTripModal } from '@/components/ui/JoinTripModal';
 
-const { mockPullTripByShareCode, mockLoadTrip, mockStoreTripShareCode, mockRouterPush } = vi.hoisted(() => ({
+const {
+  mockPullTripByShareCode,
+  mockLoadTrip,
+  mockStoreTripShareCode,
+  mockRouterPush,
+  mockGetSyncBlockReason,
+} = vi.hoisted(() => ({
   mockPullTripByShareCode: vi.fn(),
   mockLoadTrip: vi.fn(),
   mockStoreTripShareCode: vi.fn(),
   mockRouterPush: vi.fn(),
+  mockGetSyncBlockReason: vi.fn<
+    () => 'offline' | 'supabase-unconfigured' | 'auth-pending' | 'auth-required' | null
+  >(),
 }));
 
 vi.mock('@/lib/services/tripSyncService', () => ({
   pullTripByShareCode: mockPullTripByShareCode,
   // The modal now consults this synchronously before attempting the
   // join so an expired Supabase session redirects to login instead of
-  // surfacing a misleading "Offline" error. Mock to "no block" for the
-  // happy-path test.
-  getSyncBlockReason: () => null,
+  // surfacing a misleading "Offline" error.
+  getSyncBlockReason: mockGetSyncBlockReason,
 }));
 
 vi.mock('@/lib/stores/tripStore', () => ({
@@ -69,6 +77,7 @@ describe('JoinTripModal', () => {
       tripId: 'trip-123',
     });
     mockLoadTrip.mockResolvedValue(undefined);
+    mockGetSyncBlockReason.mockReturnValue(null);
   });
 
   afterEach(() => {
@@ -106,5 +115,28 @@ describe('JoinTripModal', () => {
 
     expect(onClose).not.toHaveBeenCalled();
     expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  it('routes through cloud sign-in when the Supabase session is missing', async () => {
+    // Repro: locally signed-in user (zustand isAuthenticated=true) whose
+    // Supabase session has expired. Without `cloud=1` the login page
+    // sees the local profile and immediately bounces back to next=,
+    // which loops the user through code → login → code without ever
+    // letting them re-enter their password.
+    mockGetSyncBlockReason.mockReturnValue('auth-required');
+
+    render(<JoinTripModal isOpen onClose={vi.fn()} onSuccess={vi.fn()} />);
+
+    fireEvent.change(screen.getByLabelText(/share code/i), {
+      target: { value: 'ABCD1234' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /join trip/i }));
+
+    await waitFor(() => {
+      expect(mockRouterPush).toHaveBeenCalledWith(
+        '/login?cloud=1&next=%2Fjoin%3Fcode%3DABCD1234'
+      );
+    });
+    expect(mockPullTripByShareCode).not.toHaveBeenCalled();
   });
 });
