@@ -25,6 +25,7 @@ import { TripSyncInitializer } from '@/components/TripSyncInitializer';
 import { TripRealtimeBridge } from '@/components/TripRealtimeBridge';
 import { CapacitorProvider } from '@/components/CapacitorProvider';
 import { SupabaseAuthBridge } from '@/components/SupabaseAuthBridge';
+import { AuthLinkRescuer } from '@/components/AuthLinkRescuer';
 import { baseMetadata, viewport as baseViewport } from '@/lib/utils/metadata';
 
 // Self-hosted fonts (see public/fonts). Previously used next/font/google,
@@ -211,6 +212,7 @@ export default function RootLayout({
                     </div>
                   }
                 >
+                  <AuthLinkRescuer />
                   <SupabaseAuthBridge />
                   <AuthGuard>
                     <TripRehydrationProvider>
