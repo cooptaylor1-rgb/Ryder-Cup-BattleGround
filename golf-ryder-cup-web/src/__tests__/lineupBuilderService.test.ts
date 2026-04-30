@@ -347,4 +347,88 @@ describe('lineupBuilderService', () => {
     expect(savedMatch?.teamAPlayerIds).toEqual(['a1', 'a2']);
     expect(savedMatch?.teamBPlayerIds).toEqual(['b1', 'b2']);
   });
+
+  it('saveLineup deduplicates concurrent calls so a double-tap never creates two rows per matchOrder', async () => {
+    // Repro: a captain double-taps Publish in the Lineup Builder.
+    // Both onPublish handlers fire saveLineup before either has
+    // committed its Dexie write, so existence check returns [] for
+    // both and both INSERT — producing duplicate Group cards on the
+    // Live Net Board. The in-flight Promise map should collapse the
+    // second call onto the first instead of racing it.
+    const now = isoNow();
+    const trip: Trip = {
+      id: 'trip-1',
+      name: 'Trip',
+      startDate: now,
+      endDate: now,
+      isCaptainModeEnabled: true,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    const session: RyderCupSession = {
+      id: 'session-1',
+      tripId: trip.id,
+      name: 'Day 1 AM',
+      sessionNumber: 1,
+      sessionType: 'singles',
+      status: 'scheduled',
+      createdAt: now,
+    };
+
+    const players: Player[] = [
+      { id: 'a1', firstName: 'Alpha', lastName: 'One', handicapIndex: 4 },
+      { id: 'b1', firstName: 'Bravo', lastName: 'One', handicapIndex: 12 },
+    ];
+
+    const teams: Team[] = [
+      { id: 'team-usa', tripId: trip.id, name: 'USA', color: 'usa', mode: 'ryderCup', createdAt: now },
+      { id: 'team-europe', tripId: trip.id, name: 'Europe', color: 'europe', mode: 'ryderCup', createdAt: now },
+    ];
+
+    const teamMembers: TeamMember[] = [
+      { id: 'tm-1', teamId: 'team-usa', playerId: 'a1', sortOrder: 1, isCaptain: false, createdAt: now },
+      { id: 'tm-2', teamId: 'team-europe', playerId: 'b1', sortOrder: 1, isCaptain: false, createdAt: now },
+    ];
+
+    await db.trips.put(trip);
+    await db.sessions.put(session);
+    await db.players.bulkPut(players);
+    await db.teams.bulkPut(teams);
+    await db.teamMembers.bulkPut(teamMembers);
+
+    const state: LineupState = {
+      sessionId: session.id,
+      sessionType: session.sessionType,
+      playersPerMatch: 1,
+      matches: [
+        {
+          matchNumber: 1,
+          teamAPlayers: [createLineupPlayer('a1', 'usa', 4)],
+          teamBPlayers: [createLineupPlayer('b1', 'europe', 12)],
+          locked: false,
+        },
+      ],
+      availableTeamA: [],
+      availableTeamB: [],
+    };
+
+    const [first, second] = await Promise.all([
+      saveLineup(state, trip.id),
+      saveLineup(state, trip.id),
+    ]);
+
+    expect(first.success).toBe(true);
+    expect(second.success).toBe(true);
+    // Both callers see the same matchId — the second is the first's
+    // Promise, not a fresh save.
+    expect(first.matchIds).toEqual(second.matchIds);
+
+    const allMatches = await db.matches
+      .where('sessionId')
+      .equals(session.id)
+      .toArray();
+    expect(allMatches).toHaveLength(1);
+    expect(allMatches[0].matchOrder).toBe(1);
+  });
 });

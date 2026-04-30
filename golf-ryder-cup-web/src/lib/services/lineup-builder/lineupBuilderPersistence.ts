@@ -5,9 +5,37 @@ import { buildMatchHandicapContext } from '../matchHandicapService';
 import { queueSyncOperation } from '../tripSyncService';
 import type { LineupState } from './lineupBuilderTypes';
 
+// Per-session in-flight guard. A captain who double-taps Publish (or
+// any UI path that re-fires the save handler before the first call's
+// Dexie write commits) used to land both calls on `existingMatches.length === 0`
+// for every matchOrder, which produced duplicate Match rows that
+// surfaced as duplicate "Group N" cards on the Live Net Board. By
+// returning the in-flight promise here, the second caller sees the
+// same result as the first instead of racing it.
+const inflightSavesBySession = new Map<UUID, Promise<{ success: boolean; matchIds: UUID[] }>>();
+
 export async function saveLineup(
   state: LineupState,
   _tripId: UUID
+): Promise<{ success: boolean; matchIds: UUID[] }> {
+  const inflight = inflightSavesBySession.get(state.sessionId);
+  if (inflight) {
+    return inflight;
+  }
+
+  const promise = (async () => {
+    try {
+      return await persistLineupRows(state);
+    } finally {
+      inflightSavesBySession.delete(state.sessionId);
+    }
+  })();
+  inflightSavesBySession.set(state.sessionId, promise);
+  return promise;
+}
+
+async function persistLineupRows(
+  state: LineupState
 ): Promise<{ success: boolean; matchIds: UUID[] }> {
   const session = await db.sessions.get(state.sessionId);
   if (!session) {
