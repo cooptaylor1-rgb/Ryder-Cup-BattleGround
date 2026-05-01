@@ -98,7 +98,14 @@ export function LineupBuilderSections({
               </p>
             </div>
 
-            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+            {/* Wrap rather than horizontal-scroll so the second toggle
+                stays visible when team names are long enough that both
+                buttons can't sit side-by-side. The previous
+                `overflow-x-auto no-scrollbar` setup hid the second
+                toggle entirely on desktop — no visible scrollbar to
+                grab and no swipe affordance — which stranded captains
+                who needed to switch rosters to fill out the other side. */}
+            <div className="flex flex-wrap gap-2 pb-1">
               <RosterToggle
                 team="A"
                 label={`${teamALabel} (${model.availableTeamA.length})`}
