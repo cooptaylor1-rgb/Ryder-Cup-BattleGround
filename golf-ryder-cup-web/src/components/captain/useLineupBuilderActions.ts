@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { BuilderTeam, MatchSlot, Player, SessionConfig } from './lineupBuilderTypes';
 
@@ -62,6 +62,63 @@ export function useLineupBuilderActions({
   const handleDragEnd = useCallback(() => {
     setDraggedPlayer(null);
   }, []);
+
+  // Drive viewport auto-scroll while a drag is in flight. The browser's
+  // native drag auto-scroll is unreliable — Chrome/Safari rarely scroll
+  // the window unless the cursor is at the literal edge — so a captain
+  // dragging into match #3 or #4 (below the fold) had no way to reveal
+  // the drop target. We listen for `dragover` on the document, capture
+  // the cursor's viewport Y, and pan the window when it gets within an
+  // edge band. requestAnimationFrame keeps it smooth; the rAF loop
+  // self-cancels when no scroll is needed and on drag end.
+  useEffect(() => {
+    if (!draggedPlayer || typeof window === 'undefined') return;
+
+    const EDGE_BAND = 96;
+    const MAX_SPEED = 18;
+
+    let pointerY = 0;
+    let rafId: number | null = null;
+
+    const computeDelta = (): number => {
+      const distFromTop = pointerY;
+      const distFromBottom = window.innerHeight - pointerY;
+      if (distFromTop < EDGE_BAND && distFromTop >= 0) {
+        const ratio = 1 - distFromTop / EDGE_BAND;
+        return -Math.ceil(MAX_SPEED * ratio);
+      }
+      if (distFromBottom < EDGE_BAND && distFromBottom >= 0) {
+        const ratio = 1 - distFromBottom / EDGE_BAND;
+        return Math.ceil(MAX_SPEED * ratio);
+      }
+      return 0;
+    };
+
+    const tick = () => {
+      const delta = computeDelta();
+      if (delta !== 0) {
+        window.scrollBy(0, delta);
+        rafId = window.requestAnimationFrame(tick);
+      } else {
+        rafId = null;
+      }
+    };
+
+    const handleDragOver = (event: DragEvent) => {
+      pointerY = event.clientY;
+      if (rafId === null) {
+        rafId = window.requestAnimationFrame(tick);
+      }
+    };
+
+    document.addEventListener('dragover', handleDragOver);
+    return () => {
+      document.removeEventListener('dragover', handleDragOver);
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+      }
+    };
+  }, [draggedPlayer]);
 
   const handleDropOnMatch = useCallback(
     (matchId: string, team: BuilderTeam) => {
