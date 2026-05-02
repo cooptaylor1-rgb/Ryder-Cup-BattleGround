@@ -125,18 +125,41 @@ export async function calculateTeamStandings(tripId: string): Promise<TeamStandi
     const totalMatches = matches.length;
     const remainingMatches = totalMatches - matchesCompleted;
 
+    // Captain-set cup score override. When both manualTeam{A,B}Points
+    // are present on the trip, surface those as the live + projected
+    // points instead of the values computed from hole_results. Used
+    // when rounds were played outside the app and the captain just
+    // wants the leaderboard to read the known total without
+    // backfilling per-hole entries. Match counts (played / completed
+    // / remaining) stay computed so the captain UI still reflects
+    // what actually exists in the data; only the headline points
+    // change.
+    const trip = await db.trips.get(tripId);
+    const overrideA = trip?.manualTeamAPoints;
+    const overrideB = trip?.manualTeamBPoints;
+    const hasOverride = typeof overrideA === 'number' && typeof overrideB === 'number';
+    const finalTeamAPoints = hasOverride ? overrideA! : teamAPoints;
+    const finalTeamBPoints = hasOverride ? overrideB! : teamBPoints;
+    const finalTeamAProjected = hasOverride ? overrideA! : teamAProjected;
+    const finalTeamBProjected = hasOverride ? overrideB! : teamBProjected;
+
     return {
-        teamAPoints,
-        teamBPoints,
-        teamAProjected,
-        teamBProjected,
+        teamAPoints: finalTeamAPoints,
+        teamBPoints: finalTeamBPoints,
+        teamAProjected: finalTeamAProjected,
+        teamBProjected: finalTeamBProjected,
         matchesPlayed,
         matchesCompleted,
         matchesRemaining: remainingMatches,
         totalMatches,
         remainingMatches,
-        leader: teamAPoints > teamBPoints ? 'teamA' : teamAPoints < teamBPoints ? 'teamB' : null,
-        margin: Math.abs(teamAPoints - teamBPoints),
+        leader:
+            finalTeamAPoints > finalTeamBPoints
+                ? 'teamA'
+                : finalTeamAPoints < finalTeamBPoints
+                  ? 'teamB'
+                  : null,
+        margin: Math.abs(finalTeamAPoints - finalTeamBPoints),
     };
 }
 

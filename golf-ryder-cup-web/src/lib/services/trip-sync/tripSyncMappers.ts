@@ -118,6 +118,8 @@ export function tripToCloud(trip: Trip): Record<string, unknown> {
     is_practice_round: trip.isPracticeRound || false,
     scoring_settings: trip.scoringSettings ?? null,
     handicap_settings: trip.handicapSettings ?? null,
+    manual_team_a_points: trip.manualTeamAPoints ?? null,
+    manual_team_b_points: trip.manualTeamBPoints ?? null,
     created_at: trip.createdAt,
     updated_at: trip.updatedAt || nowIso(),
   };
@@ -136,6 +138,8 @@ export function tripFromCloud(row: Record<string, unknown>): Trip {
     isPracticeRound: row.is_practice_round === true ? true : undefined,
     scoringSettings: coerceScoringSettings(row.scoring_settings),
     handicapSettings: coerceHandicapSettings(row.handicap_settings),
+    manualTeamAPoints: numberOrUndefined(row.manual_team_a_points),
+    manualTeamBPoints: numberOrUndefined(row.manual_team_b_points),
     createdAt: String(row.created_at ?? nowIso()),
     updatedAt: String(row.updated_at ?? nowIso()),
   };
