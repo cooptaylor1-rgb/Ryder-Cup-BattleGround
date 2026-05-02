@@ -38,6 +38,12 @@ export interface AvailablePlayersPanelProps {
   players: Player[];
   onDragStart: (player: Player) => void;
   onDragEnd: () => void;
+  /** Tap-to-place handler. Tapping a chip toggles whether this player
+   *  is the currently held selection; tapping a match slot then drops
+   *  the held player there. Used as the touch-device fallback for the
+   *  HTML5 drag flow, which doesn't fire on mobile. */
+  onSelectPlayer?: (player: Player) => void;
+  selectedPlayerId?: string | null;
   isLocked: boolean;
 }
 
@@ -47,6 +53,8 @@ export function AvailablePlayersPanel({
   players,
   onDragStart,
   onDragEnd,
+  onSelectPlayer,
+  selectedPlayerId,
   isLocked,
 }: AvailablePlayersPanelProps) {
   const color = team === 'A' ? 'var(--team-usa)' : 'var(--team-europe)';
@@ -83,6 +91,8 @@ export function AvailablePlayersPanel({
             player={player}
             onDragStart={() => onDragStart(player)}
             onDragEnd={onDragEnd}
+            onSelect={onSelectPlayer ? () => onSelectPlayer(player) : undefined}
+            isSelected={selectedPlayerId === player.id}
             isDraggable={!isLocked}
           />
         ))}

@@ -41,7 +41,17 @@ function DropZone({
         event.preventDefault();
         if (!isLocked) onDrop();
       }}
-      className={cn('p-3 rounded-xl min-h-20 transition-all', isDragging && 'ring-2 ring-dashed')}
+      onClick={() => {
+        // Tap-to-place fallback for touch devices. Only fires the drop
+        // when something is actually held — otherwise an accidental tap
+        // on an empty slot does nothing instead of clearing state.
+        if (!isLocked && isDragging) onDrop();
+      }}
+      role={isDragging ? 'button' : undefined}
+      className={cn(
+        'p-3 rounded-xl min-h-20 transition-all',
+        isDragging && 'ring-2 ring-dashed cursor-pointer'
+      )}
       style={{
         background: `${color}10`,
         border: `1px solid ${color}30`,
@@ -72,7 +82,9 @@ function DropZone({
           >
             <User className="w-4 h-4" />
             <span className="text-xs">
-              {isDragging ? 'Drop here' : `${emptySlots} player${emptySlots > 1 ? 's' : ''} needed`}
+              {isDragging
+                ? 'Tap or drop here'
+                : `${emptySlots} player${emptySlots > 1 ? 's' : ''} needed`}
             </span>
           </div>
         )}

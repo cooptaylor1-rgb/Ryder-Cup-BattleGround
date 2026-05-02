@@ -12,6 +12,11 @@ export interface PlayerChipProps {
   onDragStart?: () => void;
   onDragEnd?: () => void;
   onRemove?: () => void;
+  /** Tap-to-place fallback for touch devices. Click toggles whether
+   *  this chip is the "held" player; tapping a match slot then places
+   *  it. Wired alongside the desktop drag flow in PlayerChip's onClick. */
+  onSelect?: () => void;
+  isSelected?: boolean;
   isDraggable?: boolean;
   showRemove?: boolean;
   size?: 'sm' | 'md';
@@ -22,6 +27,8 @@ export const PlayerChip = React.memo(function PlayerChip({
   onDragStart,
   onDragEnd,
   onRemove,
+  onSelect,
+  isSelected = false,
   isDraggable = true,
   showRemove = false,
   size = 'md',
@@ -34,14 +41,30 @@ export const PlayerChip = React.memo(function PlayerChip({
       draggable={isDraggable}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
+      onClick={onSelect}
+      role={onSelect ? 'button' : undefined}
+      tabIndex={onSelect ? 0 : undefined}
+      onKeyDown={
+        onSelect
+          ? (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                onSelect();
+              }
+            }
+          : undefined
+      }
       className={cn(
         'flex items-center gap-2 rounded-lg transition-all',
         isDraggable && 'cursor-grab active:cursor-grabbing active:scale-95',
+        onSelect && !isDraggable && 'cursor-pointer',
+        onSelect && 'hover:bg-[color:var(--surface-raised)]',
         size === 'sm' ? 'px-2 py-1' : 'px-3 py-2'
       )}
       style={{
-        background: 'var(--surface)',
-        border: `1px solid ${color}50`,
+        background: isSelected ? `${color}18` : 'var(--surface)',
+        border: `${isSelected ? 2 : 1}px solid ${isSelected ? color : `${color}50`}`,
+        boxShadow: isSelected ? `0 0 0 3px ${color}33` : undefined,
       }}
     >
       {isDraggable && (

@@ -18,6 +18,7 @@ export interface LineupBuilderActions {
   hasChanges: boolean;
   handleDragStart: (player: Player) => void;
   handleDragEnd: () => void;
+  handleTogglePlayerSelection: (player: Player) => void;
   handleDropOnMatch: (matchId: string, team: BuilderTeam) => void;
   handleRemovePlayer: (matchId: string, playerId: string) => void;
   handleDeleteMatch: (matchId: string) => Promise<void>;
@@ -62,6 +63,21 @@ export function useLineupBuilderActions({
   const handleDragEnd = useCallback(() => {
     setDraggedPlayer(null);
   }, []);
+
+  // Tap-to-place fallback for touch devices. HTML5 native drag-and-drop
+  // doesn't fire on touch in mobile Safari or Chrome Android, so the
+  // drag flow is desktop-only. This parallel path lets a captain on
+  // their phone tap a player chip to "pick it up" (driven by the same
+  // draggedPlayer state the drag flow uses) and tap a match slot to
+  // drop it. Re-tapping the same chip clears the selection so a captain
+  // doesn't get stuck with a held player they don't want.
+  const handleTogglePlayerSelection = useCallback(
+    (player: Player) => {
+      if (isLocked) return;
+      setDraggedPlayer((current) => (current?.id === player.id ? null : player));
+    },
+    [isLocked]
+  );
 
   // Drive viewport auto-scroll while a drag is in flight. The browser's
   // native drag auto-scroll is unreliable — Chrome/Safari rarely scroll
@@ -237,6 +253,7 @@ export function useLineupBuilderActions({
     hasChanges,
     handleDragStart,
     handleDragEnd,
+    handleTogglePlayerSelection,
     handleDropOnMatch,
     handleRemovePlayer,
     handleDeleteMatch,

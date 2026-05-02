@@ -128,6 +128,8 @@ export function LineupBuilderSections({
                   players={actions.showRoster === 'A' ? model.availableTeamA : model.availableTeamB}
                   onDragStart={actions.handleDragStart}
                   onDragEnd={actions.handleDragEnd}
+                  onSelectPlayer={actions.handleTogglePlayerSelection}
+                  selectedPlayerId={actions.draggedPlayer?.id ?? null}
                   isLocked={isLocked}
                 />
               </div>
