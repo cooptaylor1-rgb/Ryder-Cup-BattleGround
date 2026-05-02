@@ -189,6 +189,41 @@ describe('tournamentEngine', () => {
     });
   });
 
+  it('honors a captain-set cup score override and keeps match counts computed', async () => {
+    // Repro for the live-event "the leaderboard math doesn't match
+    // what we played outside the app" need: rounds happened on paper,
+    // captain wants the board to read a specific total without
+    // backfilling per-hole entries. Setting both manualTeam{A,B}Points
+    // pins the displayed score; per-match counts stay computed so the
+    // captain UI still reflects what's actually in the data.
+    const { trip } = await seedTournamentTrip();
+    await db.trips.update(trip.id, {
+      manualTeamAPoints: 13.5,
+      manualTeamBPoints: 2.5,
+    });
+
+    const standings = await calculateTeamStandings(trip.id);
+    expect(standings.teamAPoints).toBe(13.5);
+    expect(standings.teamBPoints).toBe(2.5);
+    expect(standings.teamAProjected).toBe(13.5);
+    expect(standings.teamBProjected).toBe(2.5);
+    expect(standings.leader).toBe('teamA');
+    expect(standings.margin).toBe(11);
+    // Match counts and "remaining" reflect the actual data, not the
+    // override — captains still need to see what's been played even
+    // when the headline points are pinned.
+    expect(standings.matchesPlayed).toBe(3);
+    expect(standings.matchesCompleted).toBe(2);
+    expect(standings.totalMatches).toBe(3);
+
+    // Clearing one side falls back to computed (both must be set for
+    // the override to apply).
+    await db.trips.update(trip.id, { manualTeamAPoints: undefined });
+    const reverted = await calculateTeamStandings(trip.id);
+    expect(reverted.teamAPoints).toBe(1.5);
+    expect(reverted.teamBPoints).toBe(0.5);
+  });
+
   it('derives player records and leaderboard order from completed matches only', async () => {
     const { trip } = await seedTournamentTrip();
 

@@ -260,6 +260,16 @@ export interface Trip {
    * as scoringSettings.
    */
   handicapSettings?: import('@/components/trip-setup').HandicapSettings;
+  /**
+   * Captain-set cup score override. When BOTH fields are present, the
+   * standings engine uses these instead of the values it would compute
+   * from hole_results — useful when rounds were played outside the app
+   * and the captain just wants the leaderboard to reflect a known
+   * total. Set both back to null/undefined to fall back to computed
+   * scoring. The match-level data is left untouched either way.
+   */
+  manualTeamAPoints?: number;
+  manualTeamBPoints?: number;
   createdAt: ISODateString;
   updatedAt: ISODateString;
 }
